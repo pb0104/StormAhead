@@ -1,0 +1,239 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Disaster Ops Agent Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one wide left-to-right flow diagram (data → intake → shared picture → analysis → decide → human), scrolling sideways inside its own frame on small screens. */
+:root {
+  --bg: #EDF0F3;
+  --surface: #FFFFFF;
+  --sunk: #E2E7EC;
+  --ink: #142033;
+  --muted: #536074;
+  --line: #B9C3CF;
+  --accent: #C9430C;
+  --intake: #0E7377;
+  --shared: #6A4FB0;
+  --analysis: #2D5BA6;
+  --human: #2C7A4C;
+  --src: #6B7686;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E141C; --surface: #161F2B; --sunk: #1D2836; --ink: #E4EAF2; --muted: #98A6B8; --line: #36445A;
+    --accent: #FF7B3F; --intake: #43B9BD; --shared: #A891F0; --analysis: #7FA7F2; --human: #5CC489; --src: #8F9BAD;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E141C; --surface: #161F2B; --sunk: #1D2836; --ink: #E4EAF2; --muted: #98A6B8; --line: #36445A;
+  --accent: #FF7B3F; --intake: #43B9BD; --shared: #A891F0; --analysis: #7FA7F2; --human: #5CC489; --src: #8F9BAD;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); }
+.wrap {
+  max-width: 1680px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 40px;
+  display: grid; gap: 14px;
+}
+h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(1.9rem, 4vw, 2.8rem); text-transform: uppercase; letter-spacing: .01em; line-height: 1; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); font-size: .95rem; max-width: 80ch; line-height: 1.5; }
+.frame { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; }
+svg { display: block; width: 100%; min-width: 1240px; height: auto; }
+.note { font-family: var(--mono); font-size: .74rem; color: var(--muted); }
+
+/* SVG styles */
+.colTitle { font-family: var(--display); font-weight: 700; font-size: 21px; text-transform: uppercase; letter-spacing: .02em; }
+.colSub { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+.box { fill: var(--surface); stroke-width: 1.4; }
+.box.log { stroke-dasharray: 0; }
+.name { font-family: var(--body); font-weight: 600; font-size: 14px; fill: var(--ink); }
+.how { font-family: var(--body); font-size: 12px; fill: var(--muted); }
+.tools { font-family: var(--mono); font-size: 10.5px; }
+.wire { stroke: var(--line); stroke-width: 1.4; fill: none; }
+.wireLabel { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+.fb { stroke: var(--human); stroke-width: 1.6; fill: none; stroke-dasharray: 5 4; }
+.fbLabel { font-family: var(--mono); font-size: 11px; fill: var(--human); }
+.arrowHead { fill: var(--line); }
+.fbHead { fill: var(--human); }
+</style>
+
+<div class="wrap">
+  <h1>Disaster Ops Agent Flow</h1>
+  <p class="sub">How each agent works, from raw public data to an action a person approves. Each box shows what the agent does and the main tools behind it. Arrows show where its output goes next.</p>
+  <div class="frame" role="img" aria-label="Agent flow diagram: public data feeds five intake agents; their events go to a shared event log with a coordinator and a verification agent; six analysis agents read verified events; four decision agents draft actions; a human approves them in the operations dashboard, and approvals and rejections feed back to verification and memory.">
+    <svg id="diagram" viewBox="0 0 1600 850" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <p class="note">Brainstorm, November 2026 · Replay of Hurricane Helene in western NC · 911 calls and live outage feeds would be simulated</p>
+</div>
+
+<script>
+const COLS = [
+  { title: "Public data", sub: "raw feeds, cached for replay", x: 20, w: 180, color: "--src", items: [
+    { name: "Weather & water", how: "NWS alerts, NHC tracks, USGS + FIMAN gauges, radar" },
+    { name: "Imagery", how: "Maxar Open Data, NOAA aerial, Sentinel, traffic cams" },
+    { name: "Roads & terrain", how: "OpenStreetMap, DriveNC, landslide + elevation" },
+    { name: "Power & comms", how: "EAGLE-I outages, FCC cell-site reports, IODA" },
+    { name: "People & places", how: "CDC SVI, Census, OpenFEMA, critical facilities" },
+    { name: "Voices", how: "Bluesky, Reddit, YouTube, 911 + scanner (simulated)" }
+  ]},
+  { title: "Intake agents", sub: "one per data type", x: 250, w: 230, color: "--intake", items: [
+    { name: "Social & Media", how: "Pull posts → LLM reads text and photos → extract what, where, how urgent", tools: "Multimodal LLM · CrisisTransformers" },
+    { name: "Radio & 911", how: "Audio → transcript → classify incident, pull location and needs", tools: "Whisper · LLM" },
+    { name: "Weather & Hydro", how: "Poll forecasts and gauges → flag threshold breaches and storm path by area", tools: "NWS · NHC · FIMAN" },
+    { name: "Imagery", how: "Crop before/after tiles along roads → ask: water, washout, debris, damage?", tools: "Maxar · LLM vision · xView2" },
+    { name: "Infrastructure", how: "Read outage, cell-site, DOT and hospital feeds → status per area", tools: "EAGLE-I · FCC DIRS · DriveNC" }
+  ]},
+  { title: "Shared picture", sub: "one log every agent uses", x: 530, w: 200, color: "--shared", items: [
+    { name: "Coordinator", how: "Watches the log, decides which agents run next, merges their results", tools: "LangGraph · MCP" },
+    { name: "Shared event log", how: "One format for all: time · place · type · confidence · source · evidence", kind: "log" },
+    { name: "Verification", how: "Checks each claim against physical data, merges duplicates, labels it supported, conflicting or unverified", tools: "photo vs. gauge" }
+  ]},
+  { title: "Analysis agents", sub: "one per domain", x: 780, w: 240, color: "--analysis", items: [
+    { name: "Roads & Access", how: "Road graph + closures + flood and slide risk → passable roads, reroutes, cut-off towns", tools: "OSMnx · OSRM" },
+    { name: "Power & Utilities", how: "Outages × critical sites → who is on a generator, and for how long", tools: "outage data · facilities" },
+    { name: "Comms & Silence", how: "Expected vs. actual activity per map cell → areas gone quiet where hazard is high", tools: "post baseline · cell sites" },
+    { name: "Hazard Forecast", how: "Gauge trends + rain + terrain → where flooding or slides hit in the next 6–24 h", tools: "gauges · elevation" },
+    { name: "People & Needs", how: "Vulnerability + help requests → needs by area, never by person", tools: "SVI · requests" },
+    { name: "Shelters & Supplies", how: "Capacity, stock and depots → which ones are still reachable", tools: "shelters · depots" }
+  ]},
+  { title: "Decision agents", sub: "draft actions, never send", x: 1070, w: 230, color: "--accent", items: [
+    { name: "Resource Allocation", how: "Ranks combined findings, matches needs to assets, routes them on passable roads", tools: "priority score · routing" },
+    { name: "Alerts & Messaging", how: "Drafts targeted, multilingual public alerts and responder notes", tools: "LLM · area targeting" },
+    { name: "Briefing", how: "Writes situation reports, shift handoffs and leadership briefs", tools: "LLM · event log" },
+    { name: "Knowledge & Memory", how: "Retrieves guidance and past events like Helene, and logs every decision", tools: "RAG · decision log" }
+  ]},
+  { title: "Human gate", sub: "the only way out", x: 1350, w: 230, color: "--human", items: [
+    { name: "Operations dashboard", how: "Layered map + action queue. Each proposal shows its evidence and confidence. The analyst approves, edits or rejects.", tools: "Approve · Edit · Reject", weight: 2.3 },
+    { name: "Dispatch & resources", kind: "out", weight: .75 },
+    { name: "Public alerts", kind: "out", weight: .75 },
+    { name: "Situation reports", kind: "out", weight: .75 }
+  ]}
+];
+
+const Y0 = 84, Y1 = 760, GAP = 14;
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("diagram");
+
+function el(tag, attrs, parent = svg) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  parent.appendChild(n);
+  return n;
+}
+function wrap(text, maxChars) {
+  const words = text.split(" "), lines = [];
+  let cur = "";
+  for (const w of words) {
+    if ((cur + " " + w).trim().length > maxChars && cur) { lines.push(cur); cur = w; }
+    else cur = (cur + " " + w).trim();
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+const cv = v => `var(${v})`;
+
+// Arrowheads
+const defs = el("defs", {});
+const m1 = el("marker", { id: "ah", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+el("path", { d: "M0,0 L10,5 L0,10 z", class: "arrowHead" }, m1);
+const m2 = el("marker", { id: "fh", viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+el("path", { d: "M0,0 L10,5 L0,10 z", class: "fbHead" }, m2);
+
+// Layout boxes
+COLS.forEach(col => {
+  const n = col.items.length;
+  const totalW = col.items.reduce((s, it) => s + (it.weight || 1), 0);
+  const avail = Y1 - Y0 - GAP * (n - 1);
+  let y = Y0;
+  col.items.forEach(it => {
+    const h = avail * (it.weight || 1) / totalW;
+    it.x = col.x; it.w = col.w; it.y = y; it.h = h;
+    if (it.kind === "out") { it.x = col.x + 26; it.w = col.w - 26; }
+    it.cy = y + h / 2;
+    y += h + GAP;
+  });
+});
+
+// Wires between columns (drawn first so boxes sit on top)
+const wireG = el("g", {});
+const LABELS = ["normalize", "events", "verified events", "findings", "proposals"];
+for (let i = 0; i < COLS.length - 1; i++) {
+  const a = COLS[i], b = COLS[i + 1];
+  const bx = (a.x + a.w + b.x) / 2;
+  const targets = i === COLS.length - 2 ? [b.items[0]] : b.items;
+  const ys = a.items.map(it => it.cy).concat(targets.map(it => it.cy));
+  el("line", { x1: bx, y1: Math.min(...ys), x2: bx, y2: Math.max(...ys), class: "wire" }, wireG);
+  a.items.forEach(it => el("line", { x1: it.x + it.w, y1: it.cy, x2: bx, y2: it.cy, class: "wire" }, wireG));
+  targets.forEach(it => el("line", { x1: bx, y1: it.cy, x2: it.x - 2, y2: it.cy, class: "wire", "marker-end": "url(#ah)" }, wireG));
+  const lab = el("text", { x: bx, y: Y0 - 8, "text-anchor": "middle", class: "wireLabel" }, wireG);
+  lab.textContent = LABELS[i];
+}
+// Dashboard → outputs spine
+const hum = COLS[COLS.length - 1];
+const dash = hum.items[0];
+const sx = hum.x + 12;
+el("line", { x1: sx, y1: dash.y + dash.h, x2: sx, y2: hum.items[hum.items.length - 1].cy, class: "wire" }, wireG);
+hum.items.slice(1).forEach(it => el("line", { x1: sx, y1: it.cy, x2: it.x - 2, y2: it.cy, class: "wire", "marker-end": "url(#ah)" }, wireG));
+const ap = el("text", { x: sx + 6, y: dash.y + dash.h + 12, class: "wireLabel" }, wireG);
+ap.textContent = "approved";
+
+// Feedback loop: dashboard → Verification and Knowledge & Memory
+const ver = COLS[2].items[2];
+const mem = COLS[4].items[3];
+const FY = 806;
+const fbStartX = hum.x + hum.w - 14;
+el("path", { d: `M${fbStartX},${Y1} L${fbStartX},${FY} L${ver.x + ver.w / 2},${FY} L${ver.x + ver.w / 2},${ver.y + ver.h + 3}`, class: "fb", "marker-end": "url(#fh)" });
+el("path", { d: `M${mem.x + mem.w / 2},${FY} L${mem.x + mem.w / 2},${mem.y + mem.h + 3}`, class: "fb", "marker-end": "url(#fh)" });
+const fbl = el("text", { x: (ver.x + ver.w / 2 + mem.x + mem.w / 2) / 2, y: FY + 20, "text-anchor": "middle", class: "fbLabel" });
+fbl.textContent = "↺ approvals and rejections feed back: Verification learns what was wrong, Memory keeps what was decided";
+
+// Columns and boxes
+COLS.forEach(col => {
+  const t = el("text", { x: col.x, y: 36, class: "colTitle", fill: cv(col.color) });
+  t.textContent = col.title;
+  const s = el("text", { x: col.x, y: 54, class: "colSub" });
+  s.textContent = col.sub;
+
+  col.items.forEach(it => {
+    const g = el("g", {});
+    const isLog = it.kind === "log", isOut = it.kind === "out";
+    el("rect", {
+      x: it.x, y: it.y, width: it.w, height: it.h, rx: 6, class: "box",
+      stroke: cv(col.color),
+      fill: isLog ? `color-mix(in srgb, ${cv(col.color)} 10%, var(--surface))` : (col.color === "--src" ? "var(--sunk)" : "var(--surface)"),
+      "stroke-dasharray": col.color === "--src" ? "4 3" : "0"
+    }, g);
+    if (!isOut && col.color !== "--src") el("rect", { x: it.x, y: it.y, width: 4, height: it.h, rx: 2, fill: cv(col.color) }, g);
+
+    const pad = 14;
+    if (isOut) {
+      const tx = el("text", { x: it.x + 12, y: it.cy + 5, class: "name" }, g);
+      tx.textContent = it.name;
+      return;
+    }
+    const name = el("text", { x: it.x + pad, y: it.y + 22, class: "name" }, g);
+    name.textContent = it.name;
+    const maxChars = Math.floor((it.w - pad * 2) / 6.6);
+    const lines = wrap(it.how, maxChars);
+    lines.forEach((ln, k) => {
+      const tl = el("text", { x: it.x + pad, y: it.y + 41 + k * 15, class: "how" }, g);
+      tl.textContent = ln;
+    });
+    if (it.tools) {
+      const tt = el("text", { x: it.x + pad, y: it.y + it.h - 11, class: "tools", fill: cv(col.color) }, g);
+      tt.textContent = it.tools;
+    }
+  });
+});
+</script>
+
+</body></html>
