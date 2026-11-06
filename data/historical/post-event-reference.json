@@ -1,0 +1,27 @@
+{
+ "note": "Post-event reference items for the evaluation view ONLY. They must never enter a planning run.",
+ "evidence": [
+  {
+   "id": "EV-HIST-MAXAR-2024",
+   "title": "Maxar Open Data \u2014 Nepal Floods Sept 2024 collection",
+   "sourceUrl": "https://browser.moregeo.it/external/maxar-opendata.s3.amazonaws.com/events/Nepal-Floods-Sept-2024/collection.json",
+   "observedAt": "2024-09-28T00:00:00Z",
+   "availableAt": "2024-09-30T00:00:00Z",
+   "retrievedAt": "2026-11-06T00:00:00Z",
+   "phase": "post-event",
+   "status": "reference-only",
+   "note": "Scene dates, footprints and license NOT yet verified. Not connected."
+  },
+  {
+   "id": "EV-HIST-UNOSAT",
+   "title": "UNOSAT Kathmandu flood assessment",
+   "sourceUrl": "https://unosat.org/products/3993",
+   "observedAt": null,
+   "availableAt": "2024-10-01T00:00:00Z",
+   "retrievedAt": "2026-11-06T00:00:00Z",
+   "phase": "post-event",
+   "status": "reference-only",
+   "note": "Post-event assessment; evaluation only. Publication date is a placeholder \u2014 verify. Not connected."
+  }
+ ]
+}

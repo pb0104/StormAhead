@@ -1,0 +1,818 @@
+{
+ "meta": {
+  "name": "CascadeIQ synthetic Nepal-inspired flood scenario",
+  "forecastVersion": "synthetic-v1",
+  "asOf": "2024-09-25T12:00:00Z",
+  "simulated": true,
+  "disclaimer": "ALL assets, roads, travel times, hazard footprints and resources are SIMULATED. They do not represent real Nepal facilities or a real forecast.",
+  "responseThresholdMinutes": 30
+ },
+ "assets": [
+  {
+   "id": "n_S1",
+   "type": "settlement",
+   "name": "Sim Riverbank Town (simulated)",
+   "position": [
+    84.3,
+    27.7
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_S2",
+   "type": "settlement",
+   "name": "Sim Midhill (simulated)",
+   "position": [
+    84.42,
+    27.7
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_S3",
+   "type": "settlement",
+   "name": "Sim Eastfield (simulated)",
+   "position": [
+    84.58,
+    27.7
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_H1",
+   "type": "hospital",
+   "name": "Sim District Hospital (simulated)",
+   "position": [
+    84.44,
+    27.72
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_SH1",
+   "type": "shelter",
+   "name": "Sim Community Shelter (simulated)",
+   "position": [
+    84.6,
+    27.73
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_ST1",
+   "type": "staging",
+   "name": "Staging candidate ST1 \u2014 West Ridge (simulated)",
+   "position": [
+    84.32,
+    27.74
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_ST2",
+   "type": "staging",
+   "name": "Staging candidate ST2 \u2014 North Plateau (simulated)",
+   "position": [
+    84.42,
+    27.76
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_ST3",
+   "type": "staging",
+   "name": "Staging candidate ST3 \u2014 East School Ground (simulated)",
+   "position": [
+    84.57,
+    27.75
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_B1w",
+   "type": "junction",
+   "name": "Bridge 1 west approach (simulated)",
+   "position": [
+    84.34,
+    27.71
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_B1e",
+   "type": "junction",
+   "name": "Bridge 1 east approach (simulated)",
+   "position": [
+    84.36,
+    27.71
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_B2w",
+   "type": "junction",
+   "name": "Bridge 2 west approach (simulated)",
+   "position": [
+    84.5,
+    27.71
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "n_B2e",
+   "type": "junction",
+   "name": "Bridge 2 east approach (simulated)",
+   "position": [
+    84.52,
+    27.71
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ]
+  },
+  {
+   "id": "A_BR1",
+   "type": "crossing",
+   "name": "Bridge 1 \u2014 West River (simulated)",
+   "position": [
+    84.35,
+    27.71
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ],
+   "edgeId": "B1"
+  },
+  {
+   "id": "A_BR2",
+   "type": "crossing",
+   "name": "Bridge 2 \u2014 East River (simulated)",
+   "position": [
+    84.51,
+    27.71
+   ],
+   "source": "Synthetic scenario author (invented)",
+   "timestamp": "2024-09-25T00:00:00Z",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-INFRA"
+   ],
+   "edgeId": "B2"
+  }
+ ],
+ "roads": [
+  {
+   "id": "R1",
+   "name": "Riverbank Town \u2013 Bridge 1 approach",
+   "from": "n_S1",
+   "to": "n_B1w",
+   "kind": "road",
+   "travelMinutes": 4,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R2",
+   "name": "West Ridge \u2013 Riverbank Town",
+   "from": "n_ST1",
+   "to": "n_S1",
+   "kind": "road",
+   "travelMinutes": 6,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R3",
+   "name": "West Ridge \u2013 Bridge 1 approach",
+   "from": "n_ST1",
+   "to": "n_B1w",
+   "kind": "road",
+   "travelMinutes": 5,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "B1",
+   "name": "Bridge 1 (West River)",
+   "from": "n_B1w",
+   "to": "n_B1e",
+   "kind": "bridge",
+   "travelMinutes": 3,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R4",
+   "name": "Bridge 1 east approach \u2013 Midhill",
+   "from": "n_B1e",
+   "to": "n_S2",
+   "kind": "road",
+   "travelMinutes": 9,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R5",
+   "name": "Midhill \u2013 District Hospital",
+   "from": "n_S2",
+   "to": "n_H1",
+   "kind": "road",
+   "travelMinutes": 4,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R6",
+   "name": "Midhill \u2013 North Plateau",
+   "from": "n_S2",
+   "to": "n_ST2",
+   "kind": "road",
+   "travelMinutes": 6,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R7",
+   "name": "Midhill \u2013 Bridge 2 approach",
+   "from": "n_S2",
+   "to": "n_B2w",
+   "kind": "road",
+   "travelMinutes": 10,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "B2",
+   "name": "Bridge 2 (East River)",
+   "from": "n_B2w",
+   "to": "n_B2e",
+   "kind": "bridge",
+   "travelMinutes": 3,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R8",
+   "name": "Bridge 2 east approach \u2013 Eastfield",
+   "from": "n_B2e",
+   "to": "n_S3",
+   "kind": "road",
+   "travelMinutes": 8,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R9",
+   "name": "Eastfield \u2013 Shelter",
+   "from": "n_S3",
+   "to": "n_SH1",
+   "kind": "road",
+   "travelMinutes": 4,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R10",
+   "name": "Eastfield \u2013 East School Ground",
+   "from": "n_S3",
+   "to": "n_ST3",
+   "kind": "road",
+   "travelMinutes": 6,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R11",
+   "name": "East School Ground \u2013 Shelter",
+   "from": "n_ST3",
+   "to": "n_SH1",
+   "kind": "road",
+   "travelMinutes": 5,
+   "via": [],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R12",
+   "name": "Mountain track: North Plateau \u2013 West Ridge",
+   "from": "n_ST2",
+   "to": "n_ST1",
+   "kind": "track",
+   "travelMinutes": 40,
+   "via": [
+    [
+     84.37,
+     27.77
+    ]
+   ],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  },
+  {
+   "id": "R13",
+   "name": "Northern road: North Plateau \u2013 East School Ground",
+   "from": "n_ST2",
+   "to": "n_ST3",
+   "kind": "road",
+   "travelMinutes": 35,
+   "via": [
+    [
+     84.5,
+     27.78
+    ]
+   ],
+   "provenance": "Synthetic; travel time invented for demo",
+   "simulated": true
+  }
+ ],
+ "hazards": [
+  {
+   "id": "HZ-LOW",
+   "label": "Low flood (simulated)",
+   "severity": "low",
+   "footprint": [
+    [
+     [
+      [
+       84.345,
+       27.705
+      ],
+      [
+       84.355,
+       27.705
+      ],
+      [
+       84.355,
+       27.715
+      ],
+      [
+       84.345,
+       27.715
+      ],
+      [
+       84.345,
+       27.705
+      ]
+     ]
+    ]
+   ],
+   "timeWindow": {
+    "start": "2024-09-27T00:00:00Z",
+    "end": "2024-09-28T00:00:00Z"
+   },
+   "closedEdgeIds": [],
+   "closureBasis": "Assumed: water stays below bridge deck; Bridge 1 is exposed but remains passable.",
+   "siteEligibility": {},
+   "source": "Hypothetical scenario authored for demo",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-HAZ-LOW"
+   ]
+  },
+  {
+   "id": "HZ-MED",
+   "label": "Medium flood (simulated)",
+   "severity": "medium",
+   "footprint": [
+    [
+     [
+      [
+       84.343,
+       27.69
+      ],
+      [
+       84.357,
+       27.69
+      ],
+      [
+       84.357,
+       27.72
+      ],
+      [
+       84.343,
+       27.72
+      ],
+      [
+       84.343,
+       27.69
+      ]
+     ]
+    ],
+    [
+     [
+      [
+       84.505,
+       27.69
+      ],
+      [
+       84.515,
+       27.69
+      ],
+      [
+       84.515,
+       27.72
+      ],
+      [
+       84.505,
+       27.72
+      ],
+      [
+       84.505,
+       27.69
+      ]
+     ]
+    ]
+   ],
+   "timeWindow": {
+    "start": "2024-09-27T00:00:00Z",
+    "end": "2024-09-28T12:00:00Z"
+   },
+   "closedEdgeIds": [
+    "B2"
+   ],
+   "closureBasis": "Assumed: Bridge 2 (lower deck) overtopped and closed; Bridge 1 exposed but assumed passable.",
+   "siteEligibility": {},
+   "source": "Hypothetical scenario authored for demo",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-HAZ-MED"
+   ]
+  },
+  {
+   "id": "HZ-SEV",
+   "label": "Severe flood (simulated)",
+   "severity": "severe",
+   "footprint": [
+    [
+     [
+      [
+       84.335,
+       27.68
+      ],
+      [
+       84.365,
+       27.68
+      ],
+      [
+       84.365,
+       27.75
+      ],
+      [
+       84.335,
+       27.75
+      ],
+      [
+       84.335,
+       27.68
+      ]
+     ]
+    ],
+    [
+     [
+      [
+       84.495,
+       27.68
+      ],
+      [
+       84.525,
+       27.68
+      ],
+      [
+       84.525,
+       27.74
+      ],
+      [
+       84.495,
+       27.74
+      ],
+      [
+       84.495,
+       27.68
+      ]
+     ]
+    ],
+    [
+     [
+      [
+       84.365,
+       27.765
+      ],
+      [
+       84.375,
+       27.765
+      ],
+      [
+       84.375,
+       27.775
+      ],
+      [
+       84.365,
+       27.775
+      ],
+      [
+       84.365,
+       27.765
+      ]
+     ]
+    ],
+    [
+     [
+      [
+       84.29,
+       27.69
+      ],
+      [
+       84.31,
+       27.69
+      ],
+      [
+       84.31,
+       27.71
+      ],
+      [
+       84.29,
+       27.71
+      ],
+      [
+       84.29,
+       27.69
+      ]
+     ]
+    ],
+    [
+     [
+      [
+       84.56,
+       27.74
+      ],
+      [
+       84.58,
+       27.74
+      ],
+      [
+       84.58,
+       27.76
+      ],
+      [
+       84.56,
+       27.76
+      ],
+      [
+       84.56,
+       27.74
+      ]
+     ]
+    ]
+   ],
+   "timeWindow": {
+    "start": "2024-09-27T00:00:00Z",
+    "end": "2024-09-29T00:00:00Z"
+   },
+   "closedEdgeIds": [
+    "B1",
+    "B2",
+    "R12"
+   ],
+   "closureBasis": "Assumed: both bridges overtopped; mountain track blocked by simulated landslide. Roads R1, R3, R4, R7, R8 are exposed but assumed passable (invented rule).",
+   "siteEligibility": {
+    "ST3": {
+     "eligible": false,
+     "reason": "East School Ground lies inside the simulated severe footprint; unsafe to stage."
+    }
+   },
+   "source": "Hypothetical scenario authored for demo",
+   "simulated": true,
+   "evidenceIds": [
+    "EV-SYN-HAZ-SEV"
+   ]
+  }
+ ],
+ "sites": [
+  {
+   "id": "ST1",
+   "name": "West Ridge",
+   "nodeId": "n_ST1",
+   "capacity": 1,
+   "compatible": [
+    "inspection",
+    "rescue"
+   ],
+   "simulated": true
+  },
+  {
+   "id": "ST2",
+   "name": "North Plateau",
+   "nodeId": "n_ST2",
+   "capacity": 2,
+   "compatible": [
+    "inspection",
+    "rescue"
+   ],
+   "simulated": true
+  },
+  {
+   "id": "ST3",
+   "name": "East School Ground",
+   "nodeId": "n_ST3",
+   "capacity": 2,
+   "compatible": [
+    "inspection",
+    "rescue"
+   ],
+   "simulated": true
+  }
+ ],
+ "defaultInventory": {
+  "inspection": 2,
+  "rescue": 1
+ },
+ "startingLocation": "Regional depot (simulated)",
+ "demands": [
+  {
+   "id": "DM-S1-R",
+   "name": "Riverbank Town \u2014 rescue",
+   "nodeId": "n_S1",
+   "requiredType": "rescue",
+   "weight": 3
+  },
+  {
+   "id": "DM-S2-R",
+   "name": "Midhill \u2014 rescue",
+   "nodeId": "n_S2",
+   "requiredType": "rescue",
+   "weight": 2
+  },
+  {
+   "id": "DM-S3-R",
+   "name": "Eastfield \u2014 rescue",
+   "nodeId": "n_S3",
+   "requiredType": "rescue",
+   "weight": 3
+  },
+  {
+   "id": "DM-SH1-R",
+   "name": "Shelter \u2014 rescue support",
+   "nodeId": "n_SH1",
+   "requiredType": "rescue",
+   "weight": 2
+  },
+  {
+   "id": "DM-H1-I",
+   "name": "Hospital access route \u2014 inspection",
+   "nodeId": "n_H1",
+   "requiredType": "inspection",
+   "weight": 4
+  },
+  {
+   "id": "DM-B1-I",
+   "name": "Bridge 1 \u2014 inspection",
+   "nodeId": "n_B1w",
+   "requiredType": "inspection",
+   "weight": 2
+  },
+  {
+   "id": "DM-B2-I",
+   "name": "Bridge 2 \u2014 inspection",
+   "nodeId": "n_B2w",
+   "requiredType": "inspection",
+   "weight": 2
+  },
+  {
+   "id": "DM-SH1-I",
+   "name": "Shelter access \u2014 inspection",
+   "nodeId": "n_SH1",
+   "requiredType": "inspection",
+   "weight": 2
+  }
+ ],
+ "evidence": [
+  {
+   "id": "EV-SYN-INFRA",
+   "title": "Synthetic infrastructure layer (invented)",
+   "sourceUrl": null,
+   "observedAt": "2024-09-25T00:00:00Z",
+   "availableAt": "2024-09-25T00:00:00Z",
+   "retrievedAt": "2026-11-06T00:00:00Z",
+   "phase": "pre-event",
+   "status": "synthetic",
+   "note": "Invented roads, assets and travel times. Not real Nepal facilities."
+  },
+  {
+   "id": "EV-SYN-HAZ-LOW",
+   "title": "Synthetic low-flood scenario",
+   "sourceUrl": null,
+   "observedAt": "2024-09-27T00:00:00Z",
+   "availableAt": "2024-09-25T00:00:00Z",
+   "retrievedAt": "2026-11-06T00:00:00Z",
+   "phase": "pre-event",
+   "status": "synthetic",
+   "note": "Hypothetical hazard scenario."
+  },
+  {
+   "id": "EV-SYN-HAZ-MED",
+   "title": "Synthetic medium-flood scenario",
+   "sourceUrl": null,
+   "observedAt": "2024-09-27T00:00:00Z",
+   "availableAt": "2024-09-25T00:00:00Z",
+   "retrievedAt": "2026-11-06T00:00:00Z",
+   "phase": "pre-event",
+   "status": "synthetic",
+   "note": "Hypothetical hazard scenario."
+  },
+  {
+   "id": "EV-SYN-HAZ-SEV",
+   "title": "Synthetic severe-flood scenario",
+   "sourceUrl": null,
+   "observedAt": "2024-09-27T00:00:00Z",
+   "availableAt": "2024-09-25T00:00:00Z",
+   "retrievedAt": "2026-11-06T00:00:00Z",
+   "phase": "pre-event",
+   "status": "synthetic",
+   "note": "Hypothetical hazard scenario."
+  },
+  {
+   "id": "EV-SYN-INV",
+   "title": "Synthetic resource inventory",
+   "sourceUrl": null,
+   "observedAt": "2024-09-25T00:00:00Z",
+   "availableAt": "2024-09-25T00:00:00Z",
+   "retrievedAt": "2026-11-06T00:00:00Z",
+   "phase": "pre-event",
+   "status": "synthetic",
+   "note": "Two inspection teams and one rescue team (default)."
+  }
+ ]
+}
