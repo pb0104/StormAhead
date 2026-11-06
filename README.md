@@ -1,58 +1,52 @@
 # CascadeIQ
 
-A multi-agent preparedness dashboard that helps decide **where to pre-position limited teams before an expected flood**, and what each plan trades off.
+Predicting the **unforeseen knock-on impact of a flood** — tested as a hindcast on the **Kathmandu valley, Sept 2024**, using real data.
 
-> **Everything in the default demo is SIMULATED** — a Nepal-*inspired* scenario with invented settlements, roads, travel times, hazard footprints and inventories. It does not represent real Nepal facilities or a real forecast. The prototype measures *modeled accessibility and coverage*, not lives saved or operational safety. No real messages or deployments occur.
+The flood is a *given input* (UNOSAT observed extent, 30 Sep 2024); nothing here forecasts it. The model takes a **pre-event** road network (OpenStreetMap snapshot, 2 Jan 2024), works out which roads close, which dry places lose hospital access and which dry roads get stranded, then is **scored afterwards** against independent BIPAD incident reports it never saw.
 
-## Run it (no API keys, no network, no map tiles)
+> **Current honest result: no demonstrated predictive skill beyond baselines.** See [docs/hindcast-results.md](docs/hindcast-results.md). The 84% headline match rate is no better than random same-size sets (p ≈ 1.0).
 
-Requires Node ≥ 22.5 (uses built-in `node:sqlite`; developed on Node 26).
+## Run it (no API keys)
+
+Requires Node ≥ 22.5.
 
 ```bash
 npm install
-npm start            # builds the web app, serves UI + API on http://127.0.0.1:3001
-# or, for hot reload:
-npm run dev          # API :3001 + Vite :5173 (open http://localhost:5173)
-npm test             # 30 tests (engine + API workflow)
+npm start        # builds the web app, serves UI + API on http://127.0.0.1:3001
+npm run dev      # hot reload: API :3001 + Vite :5173
+npm test         # 20 tests
 npm run typecheck
 ```
 
 ## Layout
 
 ```
-apps/api        Fastify API, SQLite persistence, review workflow, SSE events
-apps/web        React + Vite + MapLibre dashboard (local GeoJSON, no tiles)
-packages/shared    Zod schemas / data model
-packages/analysis  Dijkstra, exposure (Turf), closures, placement, ranking, brief, temporal guard
-packages/agents    Tool registry + deterministic orchestrator (rule-based agents)
-packages/adapters  Replaceable source / LLM interfaces (synthetic only today)
-data/synthetic     Invented scenario; data/historical  post-event reference links only
-docs            sources, assumptions, demo script
-tests           Vitest
+apps/api            Fastify API: /api/hindcast/{meta,geo,run}
+apps/web            React + Vite + MapLibre dashboard (no map tiles; local GeoJSON)
+packages/analysis   cascade engine (heap Dijkstra, closures, cascade, scoring + baselines)
+packages/shared     agent event type
+data/real/kathmandu derived data (network, places, flood extent, incidents, provenance)
+scripts/            fetch_bipad.mjs, prepare_kathmandu.py (rebuild the derived data)
+docs/               real-data-findings, hindcast-results, assumptions, sources, demo-script
+tests/              Vitest
 ```
 
 ## How it works
 
-1. **Hazard Agent** loads three simulated scenarios (low / medium / severe).
-2. **Infrastructure Agent** intersects footprints with roads and assets (Turf). Result = *exposed*, **not** closed.
-3. **Access Agent** applies explicit scenario closures + your extra closures, runs Dijkstra, reports changed routes and isolated demand.
-4. **Resource Planning Agent** enumerates every capacity/compatibility-feasible placement, evaluates each across all scenarios, ranks by **worst-case coverage**, tie-break **worst-case mean response time**.
-5. **Coordinator** checks the temporal guard and unresolved inputs, and assembles an evidence-linked brief.
+1. **Coordinator** asserts the road snapshot predates the event; the observed extent is used only as the given hazard; incident reports are withheld.
+2. **Hazard Agent** loads the observed flood extent (hindcast mode).
+3. **Infrastructure Agent** closes roads using a documented, adjustable rule (bridge touching the flood, or ≥ X% of length flooded). Exposed ≠ closed.
+4. **Access Agent** (`analyzeCascade`) finds *cascade* impacts: dry places that lose or badly degrade access to an available hospital, and dry roads cut off from the network.
+5. **Verification Agent** scores afterwards against BIPAD reports, with a random baseline (permutation test), a "nearest the flood" baseline, and sensitivity to the closure threshold and match radius.
 
-Agents are **deterministic rule-based modules**; the activity feed shows real tool calls and summaries formatted from tool output — not LLM reasoning. Scenario probabilities are not invented; the equal-weight average is labelled illustrative.
+Agents are deterministic rule-based modules; the activity tab shows real tool calls.
 
-Review: approve / request revision / reject → only an approved, non-stale plan can create **simulated** assignments. Changing inventory, constraints or forecast marks approved plans (and their inbox items) **Needs review**.
+## Data and licences
 
-## Status
+OSM via Geofabrik (ODbL, © OpenStreetMap contributors) · UNOSAT SPOT-6 flood extent, product 3996 (CC BY-SA) · BIPAD incident API (licence not stated — confirm before redistribution) · Maxar Open Data imagery (CC-BY-NC) identified but **not used yet**. Details: [docs/real-data-findings.md](docs/real-data-findings.md), [docs/sources.md](docs/sources.md).
 
-| Phase | State |
-|---|---|
-| 1 Synthetic scenario | Done — validated with referential checks |
-| 2 Analytical engine | Done — tested |
-| 3 API | Done — tested end to end |
-| 4 Dashboard | Done — verified in real Chrome via scripted journey |
-| 5 Agents | Rule-based orchestration + tool registry done. **LLM adapter is an interface only (not implemented)** |
-| 6 Historical integration | **Not done.** Maxar/UNOSAT appear as unverified reference links in the evaluation view; nothing connected |
-| 7 Demo polish | Mostly: review flow, last run's events stay visible in the feed, error handling. No offline-replay recording; no God's Eye View |
+## Not done
 
-See [docs/sources.md](docs/sources.md), [docs/assumptions.md](docs/assumptions.md), [docs/demo-script.md](docs/demo-script.md), [data/PROVENANCE.md](data/PROVENANCE.md).
+Maxar pre/post imagery display · better cascade targets (major hospitals, shelters, population) · power/telecom/landslide cascades · pre-event hazard prediction (out of scope by design).
+
+The earlier synthetic-data staging planner was removed; it remains in git history (commit `7489b10` "V1 demo"), though later uncommitted additions to it were not kept.

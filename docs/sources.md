@@ -1,6 +1,6 @@
 # Sources and attribution
 
-**Connected in this build: none.** The default demo is fully synthetic. Links below are candidates only; coverage, dates and licences are **unverified**.
+**Connected in this build: none.** The default demo is fully synthetic. Real-data availability for the Kathmandu valley was checked on 2026-11-06 — see [real-data-findings.md](real-data-findings.md) (OSM Jan-2024 snapshot, UNOSAT SPOT-6 extent and BIPAD incidents are now used by the Kathmandu hindcast; Maxar imagery is not).
 
 | Source | Link | Status |
 |---|---|---|

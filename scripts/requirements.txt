@@ -1,0 +1,2 @@
+pyogrio
+shapely

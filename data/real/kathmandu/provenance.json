@@ -1,0 +1,44 @@
+{
+ "area": "Kathmandu valley (UNOSAT SPOT-6 analysis extent)",
+ "bbox": [
+  85.284,
+  27.587,
+  85.493,
+  27.788
+ ],
+ "network": {
+  "source": "OpenStreetMap via Geofabrik nepal-240101.osm.pbf",
+  "snapshot": "2024-01-02",
+  "licence": "ODbL (c) OpenStreetMap contributors",
+  "phase": "pre-event",
+  "speedKmhByClass": {
+   "motorway": 60,
+   "trunk": 40,
+   "primary": 35,
+   "secondary": 30,
+   "tertiary": 25,
+   "unclassified": 20,
+   "residential": 15,
+   "living_street": 10
+  },
+  "assumptions": [
+   "roads undirected",
+   "free-flow speeds are assumptions",
+   "exact coordinate match = same node",
+   "only motorway..residential, living_street (no service/track/path)"
+  ]
+ },
+ "hazardInput": {
+  "source": "UNOSAT product 3996 Spot6_20240930_FloodExtent_Kathmandu",
+  "observedOn": "2024-09-30",
+  "phase": "post-event (used ONLY as the given hazard in hindcast mode)",
+  "licence": "CC BY-SA"
+ },
+ "counts": {
+  "nodes": 31045,
+  "edges": 38038,
+  "places": 718,
+  "hospitals": 185,
+  "edgesTouchingFlood": 464
+ }
+}

@@ -1,10 +1,4 @@
-import type { Dataset, PlanningInputs } from "../../../packages/shared/schemas.ts";
-import type { Action, RunRecord } from "../../api/service.ts";
-import type { ExposureResult } from "../../../packages/analysis/exposure.ts";
-import type { Evidence } from "../../../packages/shared/schemas.ts";
-
-export type { Action, RunRecord };
-export type Evaluation = { note: string; connected: boolean; evidence: Evidence[]; message: string; latestRecommendation: string | null };
+import type { AgentEvent } from "../../../packages/shared/events.ts";
 
 async function j<T>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, { ...init, headers: init?.body ? { "Content-Type": "application/json" } : {} });
@@ -14,16 +8,22 @@ async function j<T>(url: string, init?: RequestInit): Promise<T> {
 }
 const send = (method: string, body?: unknown): RequestInit => ({ method, body: body === undefined ? undefined : JSON.stringify(body) });
 
-export const api = {
-  dataset: () => j<{ dataset: Dataset; inputs: PlanningInputs; inputHash: string }>("/api/dataset"),
-  exposure: () => j<Record<string, ExposureResult>>("/api/exposure"),
-  latest: () => j<{ run: RunRecord | null }>("/api/runs/latest"),
-  setInputs: (p: Partial<PlanningInputs>) => j<{ inputs: PlanningInputs }>("/api/inputs", send("PUT", p)),
-  plan: () => j<RunRecord>("/api/plan", send("POST")),
-  review: (id: string, body: { decision: string; reviewer: string; planId?: string; notes?: string }) =>
-    j<RunRecord>(`/api/runs/${id}/review`, send("POST", body)),
-  assign: (id: string) => j<{ actions: Action[] }>(`/api/runs/${id}/assignments`, send("POST")),
-  inbox: () => j<{ actions: Action[] }>("/api/inbox"),
-  evaluation: () => j<Evaluation>("/api/evaluation"),
-  reset: () => j<unknown>("/api/reset", send("POST")),
+export type HindcastRun = {
+  runId: string; params: { closeShare: number; bridgeClosesOnAnyContact: boolean; degradeMinutes: number; degradeRatio: number };
+  result: { counts: Record<string, number>; closedEdges: number[]; exposedEdges: number[]; strandedEdges: number[]; placeStatus: string[]; placeT0: (number | null)[]; placeT1: (number | null)[]; hospitals: { index: number; inFlood: boolean; disconnected: boolean }[] };
+  score: { options: { radiusM: number; directBufferM: number; primaryHazards: string[]; permutations: number }; evaluated: number; inFlood: number; outsideFlood: number; outsideCovered: number; outsideRecall: number | null;
+    randomBaseline: { meanCovered: number; p: number }; proximityBaseline: { covered: number }; flagged: { places: number; edges: number };
+    incidents: { id: number; title: string; hazard: string; distFloodM: number; zone: string; coveredByCascade: boolean | null }[] };
+  sensitivity: { closeShare: number; closedEdges: number; cascadeIsolated: number; cascadeDegraded: number; strandedEdges: number; outsideCovered: number; outsideFlood: number; randomMean: number; p: number; proximity: number }[];
+  radiusSensitivity: { radiusM: number; outsideCovered: number; outsideFlood: number; randomMean: number; p: number; proximity: number }[];
+  landslideCheck: { evaluated: number; inFlood: number; outsideFlood: number; outsideCovered: number; randomMean: number; p: number; proximity: number };
+  events: AgentEvent[];
+};
+export type HindcastMeta = { available: boolean; provenance?: any; incidents?: any; evaluationIncidents?: number; defaults?: any };
+export type HindcastGeo = { roads: any; flood: any; places: { n: string; lon: number; lat: number }[]; hospitals: { n: string; lon: number; lat: number; inFlood: boolean }[];
+  incidents: { id: number; title: string; lon: number; lat: number; hazard: string; floodRelated: boolean; hasImpact: boolean; distFloodM: number; on: string; loss: Record<string, number> }[] };
+export const hindcast = {
+  meta: () => j<HindcastMeta>("/api/hindcast/meta"),
+  geo: () => j<HindcastGeo>("/api/hindcast/geo"),
+  run: (p: Record<string, unknown>) => j<HindcastRun>("/api/hindcast/run", send("POST", p)),
 };

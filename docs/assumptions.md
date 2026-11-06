@@ -1,12 +1,10 @@
 # Assumptions and limitations
 
-- All inputs are **simulated**; Zod schemas require `simulated: true` on assets, roads, hazards and sites.
-- **Exposure ≠ closure.** Footprint/road intersection yields "exposed". Closures are explicit per-scenario lists with a stated basis (invented rules).
-- **Objective:** maximise worst-case weighted coverage over the supplied scenarios; tie-break on lower worst-case mean response (over reachable demands); final tie-break plan key (deterministic).
-- **Coverage:** a demand is covered if the nearest compatible, available resource reaches it within the threshold (default 30 min). Each (location, resource type) demand counts once however many resources could serve it.
-- **Unreachable** demands have `minutes = null` and are listed; they never receive finite times. Demands with no compatible resource are `no-resource` (unmet).
-- **Scenario-specific eligibility:** resources staged at a site ineligible in a scenario are *lost* in that scenario (not relocated).
-- **No probabilities** exist; none are invented. Equal-weight mean coverage is illustrative only.
-- Temporal guard: planning rejects evidence that is `post-event` or whose `availableAt` is after the dataset cut-off (`asOf`). Post-event references live in a separate file/endpoint.
-- Not modeled: congestion, debris, flood timing, mobilisation delay, resource heterogeneity, multi-hop logistics, one-way roads.
-- Throughput: exhaustive enumeration is only suitable for a handful of resources/sites.
+- **Hindcast, not forecast.** The observed UNOSAT flood extent is the given hazard (post-event data, used only for that). The road network is pre-event (OSM 2024-01-02). Incident reports are used only for scoring, after prediction; a test verifies the prediction is independent of them.
+- **Closure rule (assumption):** a road is closed if a bridge touches the flood, or ≥ closeShare (default 30%) of its length is flooded. Exposed ≠ closed. Sensitivity at 10/30/50% is reported.
+- **Speeds (assumption):** free-flow per highway class (motorway 60 … residential 15 km/h); roads undirected; identical coordinates = same node; service roads/tracks/paths excluded.
+- **Cascade definition:** dry place with no (or ≥ +10 min and ≥ 1.5× slower) access to an available hospital; flooded hospitals are unavailable; "stranded" = dry open road cut off from the main network.
+- **"Hospital" = OSM `amenity=hospital`** (185 features, many small clinics) — hospital access therefore rarely breaks.
+- **Scoring:** primary set = verified BIPAD incidents, 26 Sep–6 Oct 2024, hazard Flood/Inundation/Heavy Rainfall, with reported impact (19). Match radius 1000 m, in-flood buffer 100 m. Must beat a same-size random set (permutation, p < 0.05) AND a same-size nearest-the-flood set. Landslides scored separately (no landslide physics). Radius sensitivity was added after seeing results and is labelled exploratory.
+- **Ground truth limits:** BIPAD points are ward-level reports; absence of a report ≠ no impact; the optical flood extent likely under-detects urban flooding (no report lies inside it); 19 incidents is small.
+- Not modelled: power, telecom, landslides, congestion, debris, flood timing.
