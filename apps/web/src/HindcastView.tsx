@@ -1,3 +1,4 @@
+import "./hindcast.css";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { maplibregl } from "./mapsetup.ts";
 import { hindcast, type HindcastGeo, type HindcastMeta, type HindcastRun } from "./api.ts";
