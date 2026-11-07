@@ -8,7 +8,7 @@ import { useEffect, useRef } from "react";
  * dragging this handle will reasonably expect to see a flood, so the labels have to say plainly that they will
  * not, or the control misleads by itself.
  */
-export function SwipeHandle({ value, onChange, onClose }: { value: number; onChange: (v: number) => void; onClose: () => void }) {
+export function SwipeHandle({ value, onChange, onClose, patches }: { value: number; onChange: (v: number) => void; onClose: () => void; patches: number }) {
   const drag = useRef(false);
   useEffect(() => {
     const move = (e: PointerEvent) => { if (drag.current) onChange(Math.min(0.97, Math.max(0.03, e.clientX / window.innerWidth))); };
@@ -33,10 +33,14 @@ export function SwipeHandle({ value, onChange, onClose }: { value: number; onCha
       <div className="swipe-tag left" style={{ opacity: value > 0.12 ? 1 : 0 }}>13 Jan 2024 · before</div>
       <div className="swipe-tag right" style={{ opacity: value < 0.88 ? 1 : 0 }}>6 Oct 2024 · after</div>
       <div className="swipe-note">
-        <strong>This is not a flood before/after.</strong> The 6 Oct scene is the only optical image of the valley
-        after the event: it is about half cloud, and it was taken eight days after the 27–28 Sep peak, by which time
-        the water had receded. It shows the valley, not the flood. The mapped flood footprint is the UNOSAT extent,
-        which is an <em>input</em> to the engine, not something it predicted.
+        <strong>What you are looking at.</strong> Left: 13 Jan 2024, clear. Right: 6 Oct 2024 — the only optical image
+        of the valley after the event, about half cloud, and taken eight days after the 27–28 Sep peak once the water
+        had receded. <strong>Neither side shows the flood</strong>, so do not try to read one from them: the white in
+        the right-hand image is cloud, not water.
+        <br />
+        The {patches} cyan outlines are where UNOSAT <em>mapped</em> the water on 30 Sep. That footprint is an{" "}
+        <em>input</em> to the engine, not one of its predictions — to see what the engine actually predicted and
+        whether it was right, turn on <strong>Verification (real)</strong>.
         <button className="link" onClick={onClose}>Close</button>
       </div>
     </>

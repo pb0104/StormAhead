@@ -153,12 +153,13 @@ export function App() {
       <CommandRail open={railOpen} setOpen={setRailOpen} vis={vis} toggle={toggle} stage={stage} setStage={setStage} ran={ran} busy={busy} run={run}
         rain={rain} setRain={setRain} weather={weather} terrain={terrain} wet={wet} total={FLOOD_POLYS.length} deepest={deepest} flowText={flowText}
         swipeOn={swipe !== null} legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
-      {swipe !== null && <SwipeHandle value={swipe} onChange={setSwipe} onClose={() => setSwipe(null)} />}
+      {swipe !== null && <SwipeHandle value={swipe} onChange={setSwipe} onClose={() => setSwipe(null)} patches={FLOOD_POLYS.length} />}
       {vis.verify && verify && (
         <div className="verifybar" role="status">
           <strong>Verification overlay.</strong> Scores the <em>real</em> hindcast engine against {verify.summary.evaluatedIncidents} withheld
           incident reports — <em>not</em> the demo closures on this map.{" "}
-          <i className="vk hit" />hit <i className="vk miss" />missed <i className="vk fa" />false alarm <i className="vk pt" />reported incident
+          <i className="vk hit" />{verify.summary.truthWards ? "" : ""}hit <i className="vk miss" />missed <i className="vk fa" />false alarm <i className="vk pt" />reported incident
+          <button className="link" onClick={() => setDetails(true)}>What does this mean?</button>
         </div>
       )}
       {hint && !vis.verify && <div className="hint" role="status">Select a closed road to see where to send response.</div>}

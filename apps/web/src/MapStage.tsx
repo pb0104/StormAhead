@@ -124,6 +124,13 @@ export function MapStage(p: MapProps) {
       const corners: [[number, number], [number, number], [number, number], [number, number]] = [[BBOX[0], BBOX[3]], [BBOX[2], BBOX[3]], [BBOX[2], BBOX[1]], [BBOX[0], BBOX[1]]];
       m.addSource("runoff", { type: "image", url: BLANK, coordinates: corners });
       m.addLayer({ id: "runoff-raster", type: "raster", source: "runoff", paint: { "raster-opacity": 0, "raster-opacity-transition": { duration: 1500 }, "raster-resampling": "linear", "raster-fade-duration": 0 } });
+      // The mapped flood footprint, drawn over both sides of the before/after swipe. Without it the imagery has
+      // no referent and you cannot tell where the water was supposed to be. Unfiltered by depth: this is the
+      // observed extent as UNOSAT mapped it, not the console's illustrative depth model.
+      m.addLayer({ id: "swipe-flood", type: "line", source: "flood", layout: { visibility: "none" },
+        paint: { "line-color": "#4DE2FF", "line-width": 2, "line-opacity": 0.95 } });
+      m.addLayer({ id: "swipe-flood-fill", type: "fill", source: "flood", layout: { visibility: "none" },
+        paint: { "fill-color": "#4DE2FF", "fill-opacity": 0.18 } });
       m.addLayer({ id: "roads", type: "line", source: "roads", layout: { "line-cap": "round" }, paint: {
         "line-color": ["match", ["get", "c"], 0, "#E4ECF0", 1, "#D3DEE4", 2, "#A9BAC4", "#8497A2"],
         "line-width": ["interpolate", ["linear"], ["zoom"], 10, ["match", ["get", "c"], 0, 1.3, 1, 1.1, 0.6], 15, ["match", ["get", "c"], 0, 4, 1, 3.4, 2, 2.4, 1.6]],
@@ -277,6 +284,7 @@ export function MapStage(p: MapProps) {
       // handle so dragging reveals it. null = swipe off.
       const sw = q.swipe;
       show("maxar-pre", sw !== null); show("maxar-post", sw !== null);
+      show("swipe-flood", sw !== null); show("swipe-flood-fill", sw !== null);
       if (sw !== null) (mm as any).__redrawSwipe?.();
 
       // Verification overlay (independent of the demo run: it scores the real engine, not what is on screen).

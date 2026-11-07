@@ -215,7 +215,8 @@ Stack: TypeScript, React 19, Vite, MapLibre GL JS, Fastify, Zod, Vitest. No data
 **Before / after imagery** in the command rail swipes between two Maxar Open Data mosaics of the valley:
 13 Jan 2024 and 6 Oct 2024, built by `scripts/build_maxar_mosaics.py`.
 
-**It is not a flood before/after, and the UI says so on screen.** The 6 Oct scene is the only optical image of the
+The **observed UNOSAT footprint is drawn in cyan over both sides**, so the imagery has a referent: without it there is
+nothing to orient by. **It is not a flood before/after, and the UI says so on screen.** The 6 Oct scene is the only optical image of the
 valley after the event, and it is roughly **half obscured by cloud** and was taken **eight days after the
 27–28 Sep peak**, by which time the water had receded. It shows the valley, not the flood. The pre-event scene is
 clear across the whole valley and is genuinely useful as a sharp, true pre-event reference.
@@ -247,7 +248,10 @@ overlay is not scoring them.
 
 ### Per-agent scorecard
 
-Visible in the console under **Details → Evaluation**, served by `GET /api/scorecard`, and reproducible from
+Visible in the console under **Details → Evaluation**, which now **opens on this tab** and leads with a plain-language
+verdict — what the engine got right, what it got wrong, why that is not skill, what it does *not* mean, and what would
+change the answer — followed by a generated one-sentence reading of every row (so the prose cannot drift from the
+numbers). It is served by `GET /api/scorecard` and reproducible from
 `packages/analysis/wards.ts`. The 1 km point test could not discriminate — in a dense valley almost any same-size set covers the incidents, so
 every baseline tied it. Scoring on **wards** (the unit BIPAD reports are actually collected in) makes false alarms
 countable, so an agent can no longer look good by flagging everything. 19 scorable incidents fall in 10 of 203 wards.
