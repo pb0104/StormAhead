@@ -33,8 +33,7 @@ function stub(over: Partial<OpsHandle> = {}): OpsHandle {
     deployAgents: vi.fn(() => ({ ok: true })),
     excludeAgents: vi.fn(() => ({ ok: true, removed: [], picked: [] })),
     includeAgents: vi.fn(() => ({ ok: true, added: [], picked: [] })),
-    focusForecastAgent: vi.fn(() => ({ ok: true })),
-    getFocusedAgentBriefing: vi.fn(() => ({ ok: true })),
+    getOracleContext: vi.fn(() => ({ ok: true, agents: [] })),
     ...over,
   };
 }
@@ -45,6 +44,18 @@ describe("ask_stormahead tool", () => {
     const r = await runOpsTool(h, "ask_stormahead", { question: "How do the next 15 days look?" });
     expect(r.ok).toBe(true);
     expect(h.askStormAhead).toHaveBeenCalledWith("How do the next 15 days look?");
+  });
+});
+
+describe("get_oracle_context tool", () => {
+  it("returns the full intel snapshot", async () => {
+    const h = stub({
+      getOracleContext: vi.fn(() => ({ ok: true, agents: [{ id: "weather", headline: "rain" }], phase: "done" })),
+    });
+    const r = await runOpsTool(h, "get_oracle_context", {});
+    expect(r.ok).toBe(true);
+    expect(h.getOracleContext).toHaveBeenCalled();
+    expect(r.agents).toEqual([{ id: "weather", headline: "rain" }]);
   });
 });
 

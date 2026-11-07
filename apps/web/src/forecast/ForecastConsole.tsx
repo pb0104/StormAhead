@@ -28,7 +28,6 @@ import { getFactors, getIntent, streamForecast, type AgentResult, type Combined,
 import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, socialHotspots } from "../voice/insights.ts";
 import { buildSnapshot, resolveEntity, type OpsHandle } from "../voice/opsHandle.ts";
 import { resolveAgentIds } from "../voice/agentNames.ts";
-import { voiceForAgent } from "../../../../packages/voice/agentVoices.ts";
 import "./forecast.css";
 
 type Phase = "idle" | "scoping" | "running" | "done";
@@ -86,7 +85,6 @@ export function ForecastConsole() {
   const [llmOn, setLlmOn] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [boardMin, setBoardMin] = useState(false);
-  const [focusedAgent, setFocusedAgent] = useState<string | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [approved, setApproved] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -107,6 +105,7 @@ export function ForecastConsole() {
   const [playing, setPlaying] = useState(false);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const [fitKey, setFitKey] = useState(0);
+  const [goto, setGoto] = useState<{ lon: number; lat: number; zoom?: number; key: number } | null>(null);
   const [layersOpen, setLayersOpen] = useState(false);
   const [radioOpen, setRadioOpen] = useState(false);
   const radio = useRadio();
@@ -183,7 +182,7 @@ export function ForecastConsole() {
     window.clearInterval(revealTimer.current);
     setOrder([]); setAgentState({}); setResults({}); setFusion([]); setCombined(null); setReport(null); setReportState("idle");
     setRan(false); setRevealN(0); setPockets(false); setAssessRain(null); setAssessResult(null); setSeries(null);
-    setVis(BASE_VIS); setActiveAlert(null); setPlaying(false); setApproved(false); setSelected(null); setReportOpen(false); setBoardMin(false); setFocusedAgent(null);
+    setVis(BASE_VIS); setActiveAlert(null); setPlaying(false); setApproved(false); setSelected(null); setReportOpen(false); setBoardMin(false);
   };
 
   const onEvent = (e: ForecastEvent) => {
@@ -312,56 +311,92 @@ export function ForecastConsole() {
   phaseRef.current = phase;
   const pickedRef = useRef(picked);
   pickedRef.current = picked;
-  const focusedAgentRef = useRef(focusedAgent);
-  focusedAgentRef.current = focusedAgent;
   const agentStateRef = useRef(agentState);
   agentStateRef.current = agentState;
   const resultsRef = useRef(results);
   resultsRef.current = results;
   const agentsMetaRef = useRef(factors?.agents ?? []);
   agentsMetaRef.current = factors?.agents ?? [];
-  const talkOpenCtxRef = useRef<((t: string, opts?: { voice?: string; persona?: string }) => void) | null>(null);
-
-  const briefingFor = (id: string) => {
-    const meta = agentsMetaRef.current.find((a) => a.id === id);
-    const r = resultsRef.current[id] ?? agentStateRef.current[id]?.result;
-    if (!meta || !r) return null;
+  const fusionRef = useRef(fusion);
+  fusionRef.current = fusion;
+  const combinedRef = useRef(combined);
+  combinedRef.current = combined;
+  const reportRef = useRef(report);
+  reportRef.current = report;
+  const orderRef = useRef(order);
+  orderRef.current = order;
+  const questionRef = useRef(question);
+  questionRef.current = question;
+  const winRef = useRef(win);
+  winRef.current = win;
+  const activeAlertRef = useRef(activeAlert);
+  activeAlertRef.current = activeAlert;
+  const visRef = useRef(vis);
+  visRef.current = vis;
+  const modeRef = useRef(mode);
+  modeRef.current = mode;
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+  const sceneRef = useRef(scene);
+  sceneRef.current = scene;
+  const buildOracleContext = () => {
+    const meta = agentsMetaRef.current;
+    const agents = orderRef.current.map((id) => {
+      const m = meta.find((a) => a.id === id);
+      const st = agentStateRef.current[id];
+      const r = resultsRef.current[id] ?? st?.result;
+      return {
+        id,
+        name: m?.name ?? id,
+        factor: m?.factor ?? id,
+        status: st?.status ?? (r ? "done" : "queued"),
+        risk: r?.risk ?? null,
+        headline: r?.headline ?? null,
+        thinking: r?.thinking ?? [],
+        watch: r?.watch ?? null,
+        facts: r?.facts ?? {},
+        alerts: (r?.alerts ?? []).map((a) => ({
+          id: a.id, title: a.title, detail: a.detail, severity: a.severity, when: a.when, lon: a.lon, lat: a.lat,
+        })),
+        by: r?.by ?? null,
+      };
+    });
+    const layersOn = Object.entries(visRef.current).filter(([, on]) => on).map(([k]) => k);
+    const sc = sceneRef.current;
+    const flyTargets = [
+      ...(combinedRef.current ?? []).map((c) => c.place).filter(Boolean),
+      ...(sc?.entities ?? [])
+        .filter((e) => ["site", "school", "hospital", "tower", "dam", "airport", "helipad", "shelter", "alert"].includes(e.kind) || e.kind.includes("hospital"))
+        .map((e) => e.name),
+    ];
+    const uniquePlaces = [...new Set(flyTargets)].slice(0, 40);
     return {
-      id,
-      name: meta.name,
-      factor: meta.factor,
-      sources: meta.sources,
-      risk: r.risk,
-      headline: r.headline,
-      thinking: r.thinking,
-      watch: r.watch,
-      facts: r.facts,
-      alerts: r.alerts.map((a) => ({ id: a.id, title: a.title, detail: a.detail, severity: a.severity, when: a.when })),
-      by: r.by,
+      ok: true as const,
+      role: "ORACLE",
+      question: questionRef.current || null,
+      window: winRef.current
+        ? { label: winRef.current.label, start: winRef.current.startLabel, end: winRef.current.endLabel, hours: winRef.current.hours }
+        : null,
+      phase: phaseRef.current,
+      ui: {
+        mapMode: modeRef.current,
+        layersOn,
+        selected: selectedRef.current
+          ? { id: selectedRef.current.id, name: selectedRef.current.name, kind: selectedRef.current.kind }
+          : null,
+        activeAlertId: activeAlertRef.current,
+        boardMinimized: boardMin,
+        reportOpen,
+        howToNavigate: "Use fly_to_place with a name from placesNearby, or select_entity for a site.",
+      },
+      agents,
+      fusionSteps: fusionRef.current,
+      combined: combinedRef.current,
+      placesNearby: uniquePlaces,
+      report: reportRef.current
+        ? { by: reportRef.current.by, markdown: reportRef.current.markdown.slice(0, 4000), error: reportRef.current.error }
+        : null,
     };
-  };
-
-  const focusAgentChannel = (id: string) => {
-    const brief = briefingFor(id);
-    if (!brief) return { ok: false as const, error: "agent not finished yet" };
-    setFocusedAgent(id);
-    setBoardMin(false);
-    const { voice, callSign } = voiceForAgent(id);
-    const ctx = [
-      `[OPERATOR SELECTED AGENT CHANNEL]`,
-      `Your name is ${callSign}. You are the specialist "${brief.name}" (${brief.factor}).`,
-      `Answer follow-up questions ONLY from this briefing. Cite numbers from it. Keep answers short and spoken.`,
-      `Risk: ${brief.risk}`,
-      `Headline: ${brief.headline}`,
-      `Watch: ${brief.watch || "(none)"}`,
-      `Reasoning:`,
-      ...brief.thinking.map((t, i) => `${i + 1}. ${t}`),
-      `Facts: ${JSON.stringify(brief.facts)}`,
-      `Alerts: ${brief.alerts.map((a) => a.title).join("; ") || "(none)"}`,
-      `Say your name (${callSign}) in one short sentence, then wait for questions.`,
-    ].join("\n");
-    talkOpenCtxRef.current?.(ctx, { voice, persona: callSign });
-    return { ok: true as const, agent: brief.name, callSign, voice, id };
   };
 
   const talkHandle = useMemo<OpsHandle>(() => ({
@@ -422,10 +457,15 @@ export function ForecastConsole() {
     flyToPlace: (name) => {
       const place = resolvePlace(scene, name);
       if (!place.ok) return { ok: false, error: place.error, suggestions: place.suggestions };
-      const e = resolveEntity(scene, buildingById, { name: place.name });
+      const e = resolveEntity(scene, buildingById, { name: place.name })
+        ?? resolveEntity(scene, buildingById, { name })
+        ?? (scene?.entities ?? []).find((x) => x.name.toLowerCase() === place.name.toLowerCase())
+        ?? null;
       if (e) select(e);
-      setFitKey((k) => k + 1);
-      return { ok: true, name: place.name, match: place.match };
+      else setSelected(null);
+      setActiveAlert(null);
+      setGoto((g) => ({ lon: place.at[0], lat: place.at[1], zoom: 13.8, key: (g?.key ?? 0) + 1 }));
+      return { ok: true, name: place.name, match: place.match, lon: place.at[0], lat: place.at[1], selectedId: e?.id ?? null };
     },
     clearInsights: () => {
       setVis(BASE_VIS);
@@ -471,27 +511,10 @@ export function ForecastConsole() {
       });
       return { ok: true, added: ids, unknown, picked: next };
     },
-    focusForecastAgent: (nameOrId) => {
-      const catalog = agentsMetaRef.current;
-      const { ids, unknown } = resolveAgentIds([nameOrId], catalog);
-      const id = ids[0];
-      if (!id) return { ok: false, error: "agent not found", unknown, available: catalog.map((a) => a.id) };
-      return focusAgentChannel(id);
-    },
-    getFocusedAgentBriefing: () => {
-      const id = focusedAgentRef.current;
-      if (!id) return { ok: false, error: "no agent focused — click a finished agent card first" };
-      const brief = briefingFor(id);
-      if (!brief) return { ok: false, error: "focused agent has no briefing yet" };
-      return { ok: true, ...brief };
-    },
-  }), [stage, assessRain, ran, phase, mode, selected, vis, done, scene, why, acts, buildingById, factors]);
+    getOracleContext: () => buildOracleContext(),
+  }), [stage, assessRain, ran, phase, mode, selected, vis, done, scene, why, acts, buildingById, factors, boardMin, reportOpen]);
 
   const talk = useLiveTalk(talkHandle);
-  talkOpenCtxRef.current = talk.openWithContext;
-  useEffect(() => {
-    if (!talk.live) setFocusedAgent(null);
-  }, [talk.live]);
   const talkSendRef = useRef(talk.send);
   talkSendRef.current = talk.send;
   const talkCanRef = useRef(talk.canSend);
@@ -590,7 +613,7 @@ export function ForecastConsole() {
       <MapStage scene={scene} ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={null} selected={selected} recs={recs} hover={hover}
         buildings={bldgFc} buildingPts={bldgPts} buildingById={buildingById} verify={null} swipe={null} onSelect={select} compact={narrow}
         view3d={mode === "3d"} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={assessRain ?? OBSERVED_IN} flying={flying} onFlyEnd={() => setFlying(false)}
-        atmosphere={atmosphere} padLeft={24} alerts={pins} activeAlert={activeAlert} onAlert={pickAlert} fitAlertsKey={fitKey} panelPad={panelPad} stations={stationPins} onStation={toggleStation} />
+        atmosphere={atmosphere} padLeft={24} alerts={pins} activeAlert={activeAlert} onAlert={pickAlert} fitAlertsKey={fitKey} goto={goto} panelPad={panelPad} stations={stationPins} onStation={toggleStation} />
       <RainOverlay intensity={rainLevel} />
       <div className="fx-vignette" aria-hidden="true" />
 
@@ -643,8 +666,7 @@ export function ForecastConsole() {
       {/* ---------------- agents + report ---------------- */}
       {showBoard && factors && (
         <AgentBoard agents={agentsMeta} order={order} state={agentState} fusion={fusion} combined={combined} reportState={reportState} reportBy={report?.by}
-          elapsed={elapsed} minimized={boardMin} setMinimized={setBoardMin} onAlert={pickAlert} llmConfigured={llmOn} tallDock={phase === "done" && !!series}
-          focusedId={focusedAgent} onFocusAgent={(id) => { focusAgentChannel(id); }} />
+          elapsed={elapsed} minimized={boardMin} setMinimized={setBoardMin} onAlert={pickAlert} llmConfigured={llmOn} tallDock={phase === "done" && !!series} />
       )}
       {reportOpen && win && (
         <ReportPanel window={win} question={question} agents={agentsMeta} results={results} combined={combined ?? []} report={report} daily={series?.daily ?? null}
@@ -718,15 +740,12 @@ export function ForecastConsole() {
             disabled={phase === "running" && !talk.canSend}
             placeholder={
               talk.status === "connecting" ? "Connecting spoken assistant…"
-                : talk.canSend
-                  ? (focusedAgent
-                    ? `Ask ${agentsMeta.find((a) => a.id === focusedAgent)?.name ?? "agent"}…`
-                    : "Talk: type or paste from Wispr Flow…")
+                : talk.canSend ? "Talk to ORACLE… type or paste from Wispr Flow…"
                   : phase === "running" ? "Agents are working…"
                     : phase === "done" ? "Ask a follow-up or a new question…"
                       : "Ask StormAhead… e.g. How do the next 15 days look?"
             }
-            aria-label={talk.live ? "Talk to StormAhead" : "Ask StormAhead"}
+            aria-label={talk.live ? "Talk to ORACLE" : "Ask StormAhead"}
             onKeyDown={(e) => { if (e.key === "Escape" && phase === "scoping") setPhase(order.length ? "done" : "idle"); }}
           />
           {phase === "running" && !talk.canSend
@@ -736,7 +755,7 @@ export function ForecastConsole() {
         {talk.live && talk.log.length > 0 && (
           <div className="fx-talk-captions fx-glass" aria-live="polite">
             {talk.log.slice(-3).map((l, i) => (
-              <p key={i} className={l.role === "user" ? "you" : "bot"}><b>{l.role === "user" ? "You" : (talk.persona ?? "ORACLE")}</b> {l.text}</p>
+              <p key={i} className={l.role === "user" ? "you" : "bot"}><b>{l.role === "user" ? "You" : "ORACLE"}</b> {l.text}</p>
             ))}
           </div>
         )}

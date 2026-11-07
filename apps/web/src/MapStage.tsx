@@ -31,6 +31,8 @@ export type MapProps = {
   onAlert?: (id: string | null) => void;
   /** Bumped to fit the camera to every visible alert. */
   fitAlertsKey?: number;
+  /** Spoken / tool navigation: fly the camera to a lon/lat (ORACLE "take me to…"). */
+  goto?: { lon: number; lat: number; zoom?: number; key: number } | null;
   /** Live radio stations with a known position, drawn as small DOM markers. */
   stations?: { id: string; lon: number; lat: number; name: string; playing: boolean }[];
   onStation?: (id: string) => void;
@@ -702,6 +704,16 @@ export function MapStage(p: MapProps) {
     const go = () => m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: props.current.panelPad ?? 60, maxZoom: 13.2, duration: 1400 });
     if (ready.current) go(); else m.once("load", go);
   }, [p.fitAlertsKey]);
+
+  // ORACLE / tool: fly to an arbitrary place.
+  useEffect(() => {
+    const m = map.current;
+    const g = p.goto;
+    if (!m || !g) return;
+    const pad = props.current.panelPad ?? { left: 40, right: 40, top: 80, bottom: 160 };
+    const go = () => m.flyTo({ center: [g.lon, g.lat], zoom: g.zoom ?? 13.6, padding: pad, duration: 1200, essential: true });
+    if (ready.current) go(); else m.once("load", go);
+  }, [p.goto?.key]);
 
   return (
     <div className="mapstage">

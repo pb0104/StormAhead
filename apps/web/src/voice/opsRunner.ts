@@ -93,13 +93,8 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
       if (!agents.length) return { ok: false, error: "agents array required" };
       return handle.includeAgents(agents);
     }
-    case "focus_forecast_agent": {
-      const name = String(args.name ?? args.id ?? "").trim();
-      if (!name) return { ok: false, error: "name required" };
-      return handle.focusForecastAgent(name);
-    }
-    case "get_focused_agent_briefing":
-      return handle.getFocusedAgentBriefing();
+    case "get_oracle_context":
+      return handle.getOracleContext();
     default:
       return { ok: false, error: `Unknown tool: ${name}` };
   }

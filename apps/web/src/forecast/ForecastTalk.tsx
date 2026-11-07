@@ -1,9 +1,9 @@
 /**
- * Gemini Live talk for the forecast console.
- * Top-bar toggle only — the main Ask bar sends when Live is on.
+ * Gemini Live talk for the forecast console — single ORACLE channel.
+ * Top-bar toggle; the main Ask bar sends when Live is on.
  */
 import { useEffect, useRef, useState } from "react";
-import { createLiveSession, type LiveConnectOpts, type LiveStatus } from "../voice/liveConnection.ts";
+import { createLiveSession, type LiveStatus } from "../voice/liveConnection.ts";
 import type { OpsHandle } from "../voice/opsHandle.ts";
 import { Icon } from "./Icon.tsx";
 
@@ -23,10 +23,8 @@ export type LiveTalk = {
   canSend: boolean;
   toggle: () => void;
   send: (text: string) => boolean;
-  /** Ensure Live is up (reconnect if voice/persona changes), then inject context. */
-  openWithContext: (text: string, opts?: LiveConnectOpts) => void;
-  /** Current spoken persona label for captions (null = ORACLE). */
-  persona: string | null;
+  /** Push quiet context once Live is ready (assessment / UI briefing). */
+  openWithContext: (text: string) => void;
 };
 
 function proxyHandle(ref: { current: OpsHandle }): OpsHandle {
@@ -57,8 +55,7 @@ function proxyHandle(ref: { current: OpsHandle }): OpsHandle {
     deployAgents: () => ref.current.deployAgents(),
     excludeAgents: (n) => ref.current.excludeAgents(n),
     includeAgents: (n) => ref.current.includeAgents(n),
-    focusForecastAgent: (n) => ref.current.focusForecastAgent(n),
-    getFocusedAgentBriefing: () => ref.current.getFocusedAgentBriefing(),
+    getOracleContext: () => ref.current.getOracleContext(),
   };
 }
 
@@ -66,7 +63,6 @@ export function useLiveTalk(handle: OpsHandle): LiveTalk {
   const [status, setStatus] = useState<LiveStatus>("idle");
   const [error, setError] = useState<string | null>(null);
   const [log, setLog] = useState<{ role: "assistant" | "user"; text: string }[]>([]);
-  const [persona, setPersona] = useState<string | null>(null);
   const session = useRef<ReturnType<typeof createLiveSession> | null>(null);
   const handleRef = useRef(handle);
   handleRef.current = handle;
@@ -105,36 +101,26 @@ export function useLiveTalk(handle: OpsHandle): LiveTalk {
     session.current?.sendContext(ctx);
   }, [status]);
 
-  const openWithContext = (text: string, opts?: LiveConnectOpts) => {
+  const openWithContext = (text: string) => {
     const t = text.trim();
     if (!t) return;
     setError(null);
-    const voice = opts?.voice?.trim() || undefined;
-    const who = opts?.persona?.trim() || undefined;
-    setPersona(who ?? null);
-    const cur = session.current?.getOpts() ?? {};
-    const needReconnect =
-      (voice ?? "") !== (cur.voice ?? "")
-      || (who ?? "") !== (cur.persona ?? "")
-      || statusRef.current === "idle"
-      || statusRef.current === "error";
-    pendingContext.current = t;
-    if (needReconnect) session.current?.connect({ voice, persona: who });
-    else if (statusRef.current === "ready" || statusRef.current === "busy") {
-      pendingContext.current = null;
+    const st = statusRef.current;
+    if (st === "ready" || st === "busy") {
       session.current?.sendContext(t);
+      return;
     }
+    pendingContext.current = t;
+    if (st === "idle" || st === "error") session.current?.connect();
   };
 
   const toggle = () => {
     setError(null);
-    if (live) {
-      setPersona(null);
-      session.current?.stop();
-    } else session.current?.connect();
+    if (live) session.current?.stop();
+    else session.current?.connect();
   };
 
-  return { status, error, log, live, canSend, toggle, send, openWithContext, persona };
+  return { status, error, log, live, canSend, toggle, send, openWithContext };
 }
 
 export function TalkToggle({ talk }: { talk: LiveTalk }) {
@@ -144,7 +130,7 @@ export function TalkToggle({ talk }: { talk: LiveTalk }) {
       className={`fx-tool${talk.live ? " on" : ""}`}
       aria-pressed={talk.live}
       onClick={talk.toggle}
-      title="Spoken assistant — uses the Ask bar below"
+      title="Talk to ORACLE — uses the Ask bar below"
     >
       <Icon name="sparkle" size={16} />
       <span>{LABEL[talk.status]}</span>

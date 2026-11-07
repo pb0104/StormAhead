@@ -22,42 +22,26 @@ const KIND_ICON: Record<string, string> = { read: "read", calc: "calc", found: "
 const RISK_LABEL: Record<string, string> = { low: "Low", moderate: "Moderate", high: "High", severe: "Severe" };
 
 function AgentCard({
-  meta, s, open, focused, onToggle, onAlert, onFocus,
+  meta, s, open, onToggle, onAlert,
 }: {
-  meta: AgentMeta; s: AgentState; open: boolean; focused: boolean;
-  onToggle: () => void; onAlert: (id: string) => void; onFocus: () => void;
+  meta: AgentMeta; s: AgentState; open: boolean;
+  onToggle: () => void; onAlert: (id: string) => void;
 }) {
   const log = useRef<HTMLOListElement>(null);
   useEffect(() => { log.current?.scrollTo({ top: log.current.scrollHeight, behavior: "smooth" }); }, [s.steps.length, s.result]);
   const r = s.result, showSteps = s.status !== "done" || open;
-  const canTalk = s.status === "done" && !!r;
   return (
-    <article
-      className={`fx-agent is-${s.status}${r ? ` risk-${r.risk}` : ""}${focused ? " focused" : ""}${canTalk ? " talkable" : ""}`}
-      aria-busy={s.status === "running"}
-      aria-pressed={focused}
-    >
-      <button
-        type="button"
-        className="fx-agent-head"
-        onClick={() => { if (canTalk) onFocus(); }}
-        disabled={!canTalk}
-        title={canTalk ? "Talk to this agent about its reasoning" : undefined}
-      >
+    <article className={`fx-agent is-${s.status}${r ? ` risk-${r.risk}` : ""}`} aria-busy={s.status === "running"}>
+      <div className="fx-agent-head static">
         <span className="fx-agent-ico"><Icon name={meta.id} size={17} /></span>
         <span className="fx-agent-id">
           <span className="fx-agent-name">{meta.name}</span>
-          <span className="fx-agent-src">{focused ? `${meta.name.replace(/ agent$/i, "")} channel · ask in the Talk bar` : meta.sources}</span>
+          <span className="fx-agent-src">{meta.sources}</span>
         </span>
         {s.status === "queued" && <span className="fx-state">Queued</span>}
         {s.status === "running" && <span className="fx-state run"><i className="fx-spin" />Working</span>}
-        {s.status === "done" && r && (
-          <span className="fx-agent-end">
-            {focused && <span className="fx-talking">Talking</span>}
-            <span className={`fx-risk risk-${r.risk}`}>{RISK_LABEL[r.risk]}</span>
-          </span>
-        )}
-      </button>
+        {s.status === "done" && r && <span className={`fx-risk risk-${r.risk}`}>{RISK_LABEL[r.risk]}</span>}
+      </div>
       {s.status === "running" && <div className="fx-agent-bar"><i /></div>}
       <div className="fx-agent-body">
         {s.status === "done" && (
@@ -104,7 +88,6 @@ export type BoardProps = {
   agents: AgentMeta[]; order: string[]; state: Record<string, AgentState>;
   fusion: string[]; combined: Combined[] | null; reportState: "idle" | "writing" | "done"; reportBy?: "stackai" | "rules";
   elapsed: number; minimized: boolean; tallDock?: boolean; setMinimized: (b: boolean) => void; onAlert: (id: string) => void; llmConfigured: boolean;
-  focusedId?: string | null; onFocusAgent?: (id: string) => void;
 };
 
 export function AgentBoard(p: BoardProps) {
@@ -133,7 +116,6 @@ export function AgentBoard(p: BoardProps) {
       </header>
       <div className="fx-progress" role="progressbar" aria-valuemin={0} aria-valuemax={p.order.length} aria-valuenow={done}><i style={{ width: `${(done / Math.max(1, p.order.length)) * 100}%` }} /></div>
       {!p.llmConfigured && <p className="fx-note"><Icon name="info" size={13} />StackAI isn't configured, so agents summarise with rules. Add STACKAI_ORG_ID and STACKAI_FLOW_ID to .env for LLM reasoning.</p>}
-      {done > 0 && <p className="fx-note talk-hint"><Icon name="sparkle" size={13} />Click a finished agent to open an ORACLE channel and ask about its reasoning.</p>}
       <div className="fx-agents">
         {p.order.map((id) => {
           const meta = byId.get(id); const s = p.state[id];
@@ -144,10 +126,8 @@ export function AgentBoard(p: BoardProps) {
               meta={meta}
               s={s}
               open={!!open[id]}
-              focused={p.focusedId === id}
               onToggle={() => setOpen((o) => ({ ...o, [id]: !o[id] }))}
               onAlert={p.onAlert}
-              onFocus={() => p.onFocusAgent?.(id)}
             />
           );
         })}

@@ -40,13 +40,8 @@ async function accessToken(): Promise<string> {
   throw new Error("No GCP token. Run: gcloud auth application-default login (or gcloud auth login)");
 }
 
-function setupMessage(model: string, opts: { voice?: string; persona?: string } = {}) {
-  // Snake_case matches verified Vertex Live smoke on this project.
-  const voice = (opts.voice || process.env.VERTEX_LIVE_VOICE || DEFAULT_VOICE).trim();
-  const persona = opts.persona?.trim();
-  const instruction = persona
-    ? `${OPS_INSTRUCTIONS}\n\nACTIVE CHANNEL: You are speaking as "${persona}" (not ORACLE). Introduce yourself as ${persona}. Answer from your briefing only. If the operator addresses a different agent (e.g. "hey rivers", "talk to power"), call focus_forecast_agent to hand off — do not answer for them.`
-    : OPS_INSTRUCTIONS;
+function setupMessage(model: string) {
+  const voice = (process.env.VERTEX_LIVE_VOICE ?? DEFAULT_VOICE).trim();
   return {
     setup: {
       model,
@@ -58,7 +53,7 @@ function setupMessage(model: string, opts: { voice?: string; persona?: string } 
           },
         },
       },
-      system_instruction: { parts: [{ text: instruction }] },
+      system_instruction: { parts: [{ text: OPS_INSTRUCTIONS }] },
       tools: [
         {
           function_declarations: OPS_LIVE_TOOLS.map((t) => ({
@@ -77,14 +72,11 @@ function setupMessage(model: string, opts: { voice?: string; persona?: string } 
 export async function registerLiveVoice(app: FastifyInstance) {
   await app.register(websocket);
 
-  app.get("/api/voice/live", { websocket: true }, async (socket, req) => {
+  app.get("/api/voice/live", { websocket: true }, async (socket) => {
     let upstream: WebSocket | null = null;
     const sendClient = (obj: unknown) => {
       if (socket.readyState === socket.OPEN) socket.send(JSON.stringify(obj));
     };
-    const q = (req.query ?? {}) as { voice?: string; persona?: string };
-    const voice = typeof q.voice === "string" ? q.voice : undefined;
-    const persona = typeof q.persona === "string" ? q.persona : undefined;
 
     try {
       const cfg = vertexConfig();
@@ -97,8 +89,8 @@ export async function registerLiveVoice(app: FastifyInstance) {
       });
 
       upstream.on("open", () => {
-        upstream!.send(JSON.stringify(setupMessage(cfg.model, { voice, persona })));
-        sendClient({ type: "proxy.ready", model: cfg.model, voice: voice || DEFAULT_VOICE, persona: persona || null });
+        upstream!.send(JSON.stringify(setupMessage(cfg.model)));
+        sendClient({ type: "proxy.ready", model: cfg.model, voice: process.env.VERTEX_LIVE_VOICE ?? DEFAULT_VOICE });
       });
 
       upstream.on("message", (data) => {

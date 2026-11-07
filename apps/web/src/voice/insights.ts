@@ -106,7 +106,23 @@ export function resolvePlace(
     }
   }
 
-  const hitPlace = [...placeNames.entries()].filter(([n]) => n.toLowerCase().includes(q) || q.includes(n.toLowerCase()));
+  const scoreName = (n: string) => {
+    const nl = n.toLowerCase();
+    if (nl === q) return 0;
+    if (nl.startsWith(q) || q.startsWith(nl)) return 1;
+    if (nl.includes(q) || q.includes(nl)) return 2;
+    return 9;
+  };
+
+  const hitPlace = [...placeNames.entries()]
+    .filter(([n]) => scoreName(n) < 9)
+    .sort((a, b) => scoreName(a[0]) - scoreName(b[0]) || a[0].length - b[0].length);
+  if (hitPlace.length >= 1 && scoreName(hitPlace[0]![0]) <= 1) {
+    const [name, pts] = hitPlace[0]!;
+    const b = boundsOf(pts)!;
+    const at: LonLat = [(b[0][0] + b[1][0]) / 2, (b[0][1] + b[1][1]) / 2];
+    return { ok: true, name, at, bounds: b, match: "social-place" };
+  }
   if (hitPlace.length === 1) {
     const [name, pts] = hitPlace[0]!;
     const b = boundsOf(pts)!;
@@ -114,8 +130,10 @@ export function resolvePlace(
     return { ok: true, name, at, bounds: b, match: "social-place" };
   }
 
-  const ents = (scene?.entities ?? []).filter((e) => e.name.toLowerCase().includes(q));
-  if (ents.length === 1) {
+  const ents = (scene?.entities ?? [])
+    .filter((e) => scoreName(e.name) < 9)
+    .sort((a, b) => scoreName(a.name) - scoreName(b.name) || a.name.length - b.name.length);
+  if (ents.length >= 1 && (ents.length === 1 || scoreName(ents[0]!.name) <= 1)) {
     const e = ents[0]!;
     return { ok: true, name: e.name, at: e.at, bounds: [e.at, e.at], match: "entity" };
   }

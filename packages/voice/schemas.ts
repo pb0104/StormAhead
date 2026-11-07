@@ -63,25 +63,14 @@ export const OPS_LIVE_TOOLS = [
     },
   },
   {
-    name: "focus_forecast_agent",
+    name: "get_oracle_context",
     description:
-      "Hand off to one finished specialist (same as clicking its card). Call this when the operator says hey/talk to/ask a named agent — e.g. weather, rivers, power, satellite. Pass the name or id they used.",
-    parameters: {
-      type: "object",
-      properties: { name: { type: "string" } },
-      required: ["name"],
-      additionalProperties: false,
-    },
-  },
-  {
-    name: "get_focused_agent_briefing",
-    description:
-      "Read the focused agent's StackAI reasoning, headline, watch line, facts and alerts. Call this before answering questions about that agent.",
+      "PRIMARY intel tool. Read everything ORACLE needs: console phase, visible layers, selection, all specialist agent outputs (risk, headline, reasoning, watch, alerts), fusion, and situation-report summary. Call this before answering questions about findings, agents, or what is on screen.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "get_scene_state",
-    description: "Read compact console state: phase, rain, layers, selection, which forecast agents are currently picked.",
+    description: "Read compact console state: stage, rain, layers, selection.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -129,11 +118,24 @@ export const OPS_LIVE_TOOLS = [
   },
   {
     name: "fly_to_place",
-    description: "Zoom to a named place.",
+    description:
+      "Fly/zoom the map to a named place. Use for 'take me to…', 'go to…', 'zoom to…', 'show me…' a location (district, town, facility, alert place). Pass the place name they said.",
     parameters: {
       type: "object",
       properties: { name: { type: "string" } },
       required: ["name"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "select_entity",
+    description: "Select a map entity by name or id (hospital, tower, school, alert site, etc.) so the console focuses it.",
+    parameters: {
+      type: "object",
+      properties: {
+        name: { type: "string" },
+        id: { type: "string" },
+      },
       additionalProperties: false,
     },
   },
@@ -144,16 +146,12 @@ export const OPS_LIVE_TOOLS = [
   },
 ] as const;
 
-export const OPS_INSTRUCTIONS = `You are ORACLE — StormAhead's spoken ops intelligence on the Kathmandu Valley forecast console (Sep 2024 flood replay). Speak as ORACLE, not as a generic AI.
-The operator speaks via Wispr or types into the Ask StormAhead bar. You hear that text.
+export const OPS_INSTRUCTIONS = `You are ORACLE — StormAhead's only spoken ops intelligence on the Kathmandu Valley forecast console (Sep 2024 flood replay). The operator talks only to you. Specialist agents (weather, rivers, terrain, …) run in the background; you gather their outputs and explain the fused picture. Never impersonate a specialist or switch voices.
 
-DEFAULT: For forecasts, outlooks, "what happens next", hospital/power/cell risk, or anything that belongs in the Ask StormAhead prompt — call ask_stormahead with their question. That is the same path as the main Ask bar (intent → factor picker).
-While the factor picker is open, if they say they don't want some agents — call exclude_agents (UI chips update). To add some back — include_agents. Then if they say deploy / go / run / yes — call deploy_agents.
+The operator speaks via Wispr or types into the Ask StormAhead bar.
 
-AGENT CHANNELS (after agents have finished): If the operator addresses a specialist by name — e.g. "hey weather", "talk to rivers", "ask power", "satellite what's the damage" — immediately call focus_forecast_agent with that name. Do not answer as ORACLE for that specialist's domain; hand off first.
-Call signs / ids: weather, rivers, terrain (flood & runoff), satellite, roads, cellular (cell), power, social, facilities, landslides.
-Clicking an agent card does the same handoff. Once focused, that agent's voice answers from its briefing (get_focused_agent_briefing if needed). If they address a *different* agent while focused, call focus_forecast_agent again to switch.
-Always speak one or two short sentences after tools: confirm what you changed or started.
-Map-only requests (show rainfall alerts, towers, social, zoom to a place) may use the map tools.
-Never invent a forecast yourself — use ask_stormahead / deploy_agents.
-Be concise.`;
+DEFAULT: For new forecasts / outlooks / "what happens next" — call ask_stormahead. While the factor picker is open: exclude_agents / include_agents as asked, then deploy_agents on confirm.
+SUMMARIZE / UI: For "what's on screen", "summarize the agents", "brief me", "what did weather find", the situation report, layers, selection, or any UI question — call get_oracle_context first, then give a short spoken summary from that data. Cite specialists by name when useful; you remain ORACLE.
+NAVIGATION: For "take me to X", "go to X", "zoom to X", "fly to X" — call fly_to_place with X. If they name a specific site/hospital/tower, you may select_entity too. If fly_to_place returns suggestions, offer one and retry.
+Map layers / rainfall / towers / social: use the map tools. Never invent a forecast — use ask_stormahead / deploy_agents.
+Speak one or two short sentences after tools. Be concise.`;

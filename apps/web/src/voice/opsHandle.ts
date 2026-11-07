@@ -58,10 +58,8 @@ export type OpsHandle = {
   excludeAgents: (names: string[]) => { ok: boolean; [k: string]: unknown };
   /** Turn factor-picker chips on. */
   includeAgents: (names: string[]) => { ok: boolean; [k: string]: unknown };
-  /** Focus a finished forecast agent for spoken Q&A about its reasoning. */
-  focusForecastAgent: (nameOrId: string) => { ok: boolean; [k: string]: unknown };
-  /** Return the focused agent's briefing (reasoning, headline, watch, alerts). */
-  getFocusedAgentBriefing: () => { ok: boolean; [k: string]: unknown };
+  /** Full intel for ORACLE: agents + fusion + report + UI snapshot. */
+  getOracleContext: () => { ok: boolean; [k: string]: unknown };
 };
 
 export function buildSnapshot(p: {

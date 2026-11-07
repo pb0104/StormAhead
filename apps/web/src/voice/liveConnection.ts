@@ -10,19 +10,12 @@ export type LiveEvents = {
   onError: (msg: string) => void;
 };
 
-export type LiveConnectOpts = { voice?: string; persona?: string };
-
-function wsUrl(opts?: LiveConnectOpts): string {
-  // Dev: hit the API directly — Vite's WS proxy is flaky for Live.
-  const base =
-    location.hostname === "localhost" || location.hostname === "127.0.0.1"
-      ? "ws://127.0.0.1:3001/api/voice/live"
-      : `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/api/voice/live`;
-  const q = new URLSearchParams();
-  if (opts?.voice) q.set("voice", opts.voice);
-  if (opts?.persona) q.set("persona", opts.persona);
-  const qs = q.toString();
-  return qs ? `${base}?${qs}` : base;
+function wsUrl(): string {
+  if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+    return "ws://127.0.0.1:3001/api/voice/live";
+  }
+  const proto = location.protocol === "https:" ? "wss:" : "ws:";
+  return `${proto}//${location.host}/api/voice/live`;
 }
 
 type ToolCall = { id?: string; name?: string; args?: Record<string, unknown>; arguments?: Record<string, unknown> };
@@ -45,7 +38,6 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
   let ws: WebSocket | null = null;
   let ready = false;
   let closed = false;
-  let activeOpts: LiveConnectOpts = {};
   const player = createPcmPlayer(24_000);
 
   function setStatus(s: LiveStatus, detail?: string) {
@@ -79,9 +71,7 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
       setStatus("error", msg.error);
       return;
     }
-    if (msg.type === "proxy.ready") {
-      return;
-    }
+    if (msg.type === "proxy.ready") return;
     if (msg.type === "proxy.close") {
       ready = false;
       const reason = String(msg.reason ?? "");
@@ -120,30 +110,12 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
     if (sc?.turnComplete || sc?.turn_complete) setStatus("ready");
   }
 
-  function connect(opts?: LiveConnectOpts) {
-    const next = {
-      voice: opts?.voice?.trim() || undefined,
-      persona: opts?.persona?.trim() || undefined,
-    };
-    const same =
-      ws
-      && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)
-      && (activeOpts.voice ?? "") === (next.voice ?? "")
-      && (activeOpts.persona ?? "") === (next.persona ?? "");
-    if (same) return;
-    // Voice/persona are fixed at Live setup — reconnect to switch agents.
-    if (ws) {
-      closed = true;
-      ws.onclose = null;
-      ws.close();
-      ws = null;
-      ready = false;
-    }
-    activeOpts = next;
+  function connect() {
+    if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) return;
     closed = false;
-    player.unlock(); // user gesture unlocks AudioContext
+    player.unlock();
     setStatus("connecting");
-    ws = new WebSocket(wsUrl(next));
+    ws = new WebSocket(wsUrl());
     ws.onopen = () => setStatus("connecting", "Waiting for Vertex…");
     ws.onmessage = (ev) => onMessage(String(ev.data));
     ws.onerror = () => {
@@ -159,7 +131,6 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
   function stop() {
     closed = true;
     ready = false;
-    activeOpts = {};
     player.reset();
     ws?.close();
     ws = null;
@@ -186,14 +157,11 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
     );
   }
 
-  /** Inject operator context (e.g. focused agent briefing) and let ORACLE acknowledge. */
+  /** Quiet context push (no user caption) — e.g. assessment briefing for ORACLE. */
   function sendContext(text: string) {
     const t = text.trim();
     if (!t) return;
-    if (!ws || ws.readyState !== WebSocket.OPEN || !ready) {
-      events.onError("Connect Talk first, then select an agent.");
-      return;
-    }
+    if (!ws || ws.readyState !== WebSocket.OPEN || !ready) return;
     setStatus("busy");
     player.unlock();
     ws.send(
@@ -206,5 +174,5 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
     );
   }
 
-  return { connect, stop, sendText, sendContext, getOpts: () => ({ ...activeOpts }) };
+  return { connect, stop, sendText, sendContext };
 }

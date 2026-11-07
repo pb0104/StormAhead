@@ -55,8 +55,7 @@ export function VoiceDock({ handle }: { handle: OpsHandle }) {
       deployAgents: () => handleRef.current.deployAgents(),
       excludeAgents: (n) => handleRef.current.excludeAgents(n),
       includeAgents: (n) => handleRef.current.includeAgents(n),
-      focusForecastAgent: (n) => handleRef.current.focusForecastAgent(n),
-      getFocusedAgentBriefing: () => handleRef.current.getFocusedAgentBriefing(),
+      getOracleContext: () => handleRef.current.getOracleContext(),
     };
     session.current = createLiveSession(proxy, {
       onStatus: (s, d) => {
