@@ -1,10 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CascadeIQ Current Flow</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Layout: two stacked swim lanes (server engine on top, browser console below) joined by one dashed hand-off, plus a column of planned pieces. Box colour = how real each part is. */
+/* Layout: two stacked swim lanes (server engine on top, browser console below) joined by snapshot + live API hand-offs, plus a column of planned pieces. Box colour = how real each part is. */
 :root {
   --bg: #EDF0F3;
   --surface: #FFFFFF;
@@ -45,7 +50,7 @@ body { background: var(--bg); color: var(--ink); font-family: var(--body); font-
 }
 .eyebrow { font-family: var(--mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
 h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(1.9rem, 4vw, 2.8rem); text-transform: uppercase; letter-spacing: .01em; line-height: 1; text-wrap: balance; }
-.sub { margin: 0; color: var(--muted); max-width: 80ch; }
+.sub { margin: 0; color: var(--muted); max-width: 90ch; }
 .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .84rem; align-items: center; }
 .legend span { display: inline-flex; align-items: center; gap: 7px; }
 .legend i { width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--c); background: color-mix(in srgb, var(--c) 18%, var(--surface)); }
@@ -80,11 +85,12 @@ h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(
 .halo { paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
 .bandHalo { paint-order: stroke; stroke: var(--band); stroke-width: 6px; stroke-linejoin: round; }
 </style>
-
+</head>
+<body>
 <div class="wrap">
   <div class="eyebrow">CascadeIQ · Kathmandu valley floods, Sept 2024 · as built on 7 Nov 2026</div>
   <h1>What the system does today</h1>
-  <p class="sub">The engine on the server works on real data. The console in the browser is what you demo. It now reads real buildings from the server and bundles four more real sources, but its closures are still a snapshot and most resources are still mock. The colour of each box shows how real that part is.</p>
+  <p class="sub">The server engine is rule-based on real data. The ops console is the only UI surface: it pulls scene, assessment, atmosphere, buildings and evaluation from the API, merges BIPAD / Google / OpenCelliD / night-lights / Reddit layers on the client, and still replays a hand-picked closure snapshot when you hit Run. Colour shows how real each part is.</p>
   <div class="legend" aria-label="Legend">
     <span><i style="--c: var(--real)"></i>Real data</span>
     <span><i style="--c: var(--calc)"></i>Real logic on real data</span>
@@ -92,18 +98,18 @@ h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(
     <span><i style="--c: var(--snap)"></i>Snapshot of real output</span>
     <span><i class="dash" style="--c: var(--mock)"></i>Mock or simulated</span>
     <span><i style="--c: var(--ink)"></i>Interface</span>
-    <span><i class="dash" style="--c: var(--ghost)"></i>Not built yet</span>
+    <span><i class="dash" style="--c: var(--ghost)"></i>Not built yet / not rendered</span>
   </div>
-  <div class="frame" role="img" aria-label="Flow diagram. Top lane, the engine on the server: OpenStreetMap roads and buildings and the UNOSAT flood extent are prepared offline and run through five rule-based agents. BIPAD incident reports feed only Verification, which finds no skill beyond baselines yet. A Fastify API runs the chain and serves buildings to the console. A dashed hand-off shows closures and cut-off areas picked once from the engine. Bottom lane, the console: real buildings, roads, flood, tiles, OpenCelliD cell sites, NASA night-light outages and the IODA internet signal, plus remaining mock data, feed browser agents and rules: weather (mock), terrain and flow (real elevation), a replay animation, shelter rules, cell-site status, risk rules, evidence text and recommendations. These drive the map, status strip, drawer and photoreal view. The analyst assigns actions, which only change the screen. Planned pieces: Run calls the engine, an LLM agent, a saved action log, road routing, real rain and incident replay, real landslides, and any-location config.">
-    <svg id="diagram" viewBox="0 0 1640 1600" xmlns="http://www.w3.org/2000/svg"></svg>
+  <div class="frame" role="img" aria-label="Flow diagram. Top lane, the engine: OpenStreetMap roads and buildings and the UNOSAT flood extent are prepared offline and run through six rule-based agents, including Shelter. BIPAD reports and ward polygons feed only Verification. A Fastify API runs the chain and also serves the modular ops adapters, buildings, scorecard and verification map. A dashed hand-off shows closures picked once from the engine. Bottom lane, the console: live API scene and assessment, BIPAD facilities, Google Places and food, Open-Meteo weather and atmosphere, cell sites, night lights, IODA, Reddit posts, Maxar swipe and the remaining mock radio and helipads feed browser and server rules. These drive the map, verification overlay, swipe, drawer, social feed, Street View and photoreal view. The analyst assigns actions, which only change the screen. Planned: Run calls the engine live, an LLM, a saved action log, live routing, Helene and Detect surfaces in the UI, and any-location config.">
+    <svg id="diagram" viewBox="0 0 1640 1880" xmlns="http://www.w3.org/2000/svg"></svg>
   </div>
   <div class="facts">
-    <div class="fact"><h2>One thin link to the engine</h2><p>The console now loads real buildings from the server, but the Run button still replays 12 closures and 6 cut-off areas picked by hand from one engine run.</p></div>
-    <div class="fact"><h2>Real so far</h2><p>Map, roads, flood outline, elevation, 7,115 buildings, 328 cell sites, the regional internet signal and 9 power-outage areas from night lights. Most resources, zones and evidence numbers are still mock.</p></div>
-    <div class="fact"><h2>No LLM anywhere</h2><p>Every "agent" today is a deterministic rule or a small browser model. The engine labels its events "rule-based" and never presents them as AI reasoning.</p></div>
-    <div class="fact"><h2>Nothing is saved</h2><p>Assigning a team or issuing an alert changes the screen only. No action is stored, so the system can't learn from what the analyst did.</p></div>
+    <div class="fact"><h2>Live API, snapshot Run</h2><p>The console loads scene, assessment, atmosphere, buildings, scorecard and verification from the server. The Run button still replays 12 closures and 6 cut-off pockets picked once from the engine.</p></div>
+    <div class="fact"><h2>Real so far</h2><p>OSM roads and 7,115 buildings; UNOSAT flood; BIPAD facilities, gauges, alerts and 18 landslides; Google Places care homes, fire/police and 59 food shops; Open-Meteo rain and atmosphere; 328 cell sites; 9 night-light outages; IODA; 183 Reddit posts; Maxar before/after mosaics. Radio, helipads and depot stock stay simulated.</p></div>
+    <div class="fact"><h2>No LLM in the loop</h2><p>Every agent is a deterministic rule or a small model. Social translations were done offline into the feed file. The engine labels events rule-based and never presents them as AI reasoning.</p></div>
+    <div class="fact"><h2>Nothing is saved</h2><p>Assigning a team or issuing an alert changes the screen only. No action is stored, so the system cannot learn from what the analyst did.</p></div>
   </div>
-  <p class="note">Read from the code on 7 Nov 2026: commit cf26b99 plus uncommitted work (cell sites, IODA, night lights). Hospital and Tribhuvan Airport positions are real; their status is not.</p>
+  <p class="note">Read from the code on 7 Nov 2026: commit a8c6a69 (BIPAD merge, adapters, atmosphere, verification map, Maxar swipe, Google food/travel, Reddit social feed, Street View). Ops console is the sole rendered surface; HindcastView, DetectView and HeleneView are kept but not mounted.</p>
 </div>
 
 <script>
@@ -127,7 +133,7 @@ function wrap(text, maxChars) {
 }
 const COLOR = { real: "--real", calc: "--calc", mixed: "--mixed", snap: "--snap", mock: "--mock", ui: "--ink", ghost: "--ghost" };
 const cv = st => `var(${COLOR[st]})`;
-function stack(x, w, y0, y1, items, gap = 12) {
+function stack(x, w, y0, y1, items, gap = 10) {
   const tot = items.reduce((s, it) => s + (it.weight || 1), 0);
   const avail = y1 - y0 - gap * (items.length - 1);
   let y = y0;
@@ -143,84 +149,88 @@ const defs = el("defs", {});
 });
 
 // ---------- Geometry ----------
-const A_TOP = 50, A_BOT = 520, BRIDGE_Y = 538, LINK_Y = 554, B_TOP = 578, B0 = B_TOP + 74, B1 = 1570;
+const A_TOP = 50, A_BOT = 560, BRIDGE_Y = 578, LINK_Y = 596, B_TOP = 620, B0 = B_TOP + 74, B1 = 1850;
 
 // ---------- Lanes ----------
 el("rect", { x: 6, y: A_TOP, width: 1628, height: A_BOT - A_TOP, rx: 10, class: "band" });
 txt(20, A_TOP + 28, "Engine · server", "laneTitle");
-txt(190, A_TOP + 28, "packages/analysis + apps/api · real data, rule-based, tested · run results not shown in the console", "laneSub");
+txt(190, A_TOP + 28, "packages/analysis + apps/api · real data, rule-based, 102 tests · Run results still not what the console replays", "laneSub");
 el("rect", { x: 6, y: B_TOP, width: 1628, height: B1 + 20 - B_TOP, rx: 10, class: "band" });
 txt(20, B_TOP + 28, "Console · browser", "laneTitle");
-txt(212, B_TOP + 28, "apps/web · what you demo · real layers growing, closures still a snapshot", "laneSub");
+txt(212, B_TOP + 28, "apps/web OpsConsole · sole UI · live adapters + BIPAD/Google merge · closures still a snapshot", "laneSub");
 
 // ---------- Engine lane ----------
 txt(20, 108, "Real data", "colHead");
 txt(300, 108, "Offline prep", "colHead");
-txt(540, 108, "Agent chain · deterministic rules, no LLM", "colHead");
+txt(520, 108, "Agent chain · deterministic rules, no LLM", "colHead");
 
-const src = stack(20, 220, 120, 500, [
+const src = stack(20, 220, 120, 540, [
   { name: "OpenStreetMap roads", how: "Pre-event, 2 Jan 2024. 38k segments, 185 hospitals.", st: "real", chip: "REAL DATA" },
   { name: "OpenStreetMap buildings", how: "7,115 shelter-type buildings, pre-event. Floors on 80%.", st: "real", chip: "REAL DATA" },
   { name: "UNOSAT flood extent", how: "SPOT-6 satellite, 30 Sep 2024. Given as the hazard.", st: "real", chip: "REAL DATA" },
-  { name: "BIPAD incident reports", how: "19 verified flood reports. Used only to score.", st: "real", chip: "REAL DATA · SCORING ONLY" },
+  { name: "BIPAD + ward polygons", how: "19 flood reports and 203 OSM wards. Scoring only — never a model input.", st: "real", chip: "REAL · SCORING ONLY" },
 ]);
-const prep = at(300, 120, 200, 130, { name: "Prepare data", how: "Scripts run once: flooded share of each road, buildings and places in the flood, distance to water.", st: "calc", chip: "REAL LOGIC · OFFLINE" });
-const CX = [540, 761, 982, 1203, 1424];
+const prep = at(300, 120, 180, 130, { name: "Prepare data", how: "Scripts run once: flooded share of each road, buildings and places in the flood, distance to water.", st: "calc", chip: "REAL LOGIC · OFFLINE" });
+const CX = [520, 700, 880, 1060, 1240, 1420];
 const chain = [
-  { name: "Coordinator", how: "Checks roads and buildings predate the flood so the test can't cheat. Holds back the reports.", st: "calc", chip: "REAL LOGIC" },
+  { name: "Coordinator", how: "Checks roads and buildings predate the flood so the test can't cheat. Holds back reports.", st: "calc", chip: "REAL LOGIC" },
   { name: "Hazard agent", how: "Loads the observed flood extent. It does not predict the flood.", st: "calc", chip: "REAL LOGIC" },
-  { name: "Infrastructure agent", how: "Closes a road if it is a bridge touching water or at least 30% flooded. 310 closed.", st: "calc", chip: "REAL LOGIC · ASSUMED RULE" },
-  { name: "Access agent", how: "Shortest paths from open hospitals. Finds 1 cut-off place, 428 stranded roads, 12 cut-off buildings.", st: "calc", chip: "REAL LOGIC" },
-  { name: "Verification agent", how: "Scores against the reports, random sets and a nearest-to-flood baseline. No skill shown yet.", st: "calc", chip: "REAL LOGIC" },
-].map((it, i) => at(CX[i], 120, 196, 130, it));
-const api = at(540, 290, 300, 100, { name: "Fastify API", how: "POST /api/hindcast/run runs the chain. GET /api/buildings serves footprints to the console.", st: "calc", chip: "WORKS · 41 TESTS" });
-const research = at(870, 290, 300, 100, { name: "Research screen", how: "HindcastView shows engine results. Built, but not rendered in the console.", st: "ghost", chip: "BUILT, NOT RENDERED" });
+  { name: "Infrastructure", how: "Closes a road if it is a bridge touching water or ≥30% flooded. 310 closed.", st: "calc", chip: "REAL LOGIC · ASSUMED RULE" },
+  { name: "Access agent", how: "Shortest paths from open hospitals. 1 cut-off place, 428 stranded roads, 12 cut-off buildings.", st: "calc", chip: "REAL LOGIC" },
+  { name: "Shelter agent", how: "Shelter / evacuate / refuge on 7,115 footprints. No height → no judgement.", st: "calc", chip: "REAL LOGIC" },
+  { name: "Verification", how: "Point test + ward scorecard vs reports and baselines. No skill beyond chance.", st: "calc", chip: "REAL LOGIC · NO SKILL" },
+].map((it, i) => at(CX[i], 120, 168, 130, it));
+const api = at(520, 300, 380, 120, { name: "Fastify modular API", how: "Ops: /scene, /assessment, /weather/*, /assets, /tiles/*. Engine: /buildings, /scorecard, /verification, /hindcast/run. Pipeline: /pipeline/* (built, no UI). 102 tests.", st: "calc", chip: "WORKS · 102 TESTS" });
+const evalBox = at(930, 300, 300, 120, { name: "Scorecard + verify map", how: "Ward hit / miss / false-alarm geography and Evaluation prose. Served live into the console Details and Verification overlay.", st: "calc", chip: "LIVE IN CONSOLE" });
+const ghostViews = at(1260, 300, 300, 120, { name: "Other surfaces", how: "HindcastView, DetectView (forward pipeline) and HeleneView are in the repo but not mounted. OpsConsole is App.", st: "ghost", chip: "BUILT, NOT RENDERED" });
 
 // ---------- Console lane ----------
 txt(34, B0 - 16, "Inputs", "colHead");
-txt(300, B0 - 16, "Processing in the browser", "colHead");
+txt(300, B0 - 16, "Processing", "colHead");
 txt(650, B0 - 16, "On screen", "colHead");
 txt(970, B0 - 16, "Analyst", "colHead");
 txt(1270, B0 - 16, "Not built yet · next steps", "colHead");
 
 const inp = stack(34, 210, B0, B1, [
-  { name: "Closures and cut-off areas", how: "12 closures, 6 pockets picked once from the engine. Stages made up.", st: "snap", chip: "SNAPSHOT OF REAL OUTPUT" },
-  { name: "Buildings", how: "7,115 real footprints with floor counts, loaded from the API.", st: "real", chip: "REAL · LIVE FROM API" },
-  { name: "Roads and flood shapes", how: "About 6,000 main OSM roads. UNOSAT flood extent, 30 Sep 2024.", st: "real", chip: "REAL DATA" },
-  { name: "Imagery and elevation", how: "Esri satellite and public elevation tiles, streamed.", st: "real", chip: "REAL · STREAMED" },
-  { name: "Cell sites", how: "328 sites from OpenCelliD. Positions are estimates.", st: "real", chip: "REAL · OPENCELLID" },
-  { name: "Night lights", how: "NASA Black Marble: 9 areas went dark after the flood.", st: "real", chip: "REAL · NASA" },
-  { name: "Internet signal", how: "IODA: 24% fewer networks visible at 07:45, 28 Sep. Regional.", st: "real", chip: "REAL · IODA" },
-  { name: "Mock world", how: "Hospital status, 16 schools, helipads, army bases, landslide and alert zones, dams, shelters, food depots, QRT staging, social posts, radio call-ins.", st: "mock", chip: "MOCK", weight: 1.6 },
+  { name: "Closures and cut-off pockets", how: "12 closures, 6 pockets picked once from the engine. Stages made up.", st: "snap", chip: "SNAPSHOT OF REAL OUTPUT" },
+  { name: "Buildings", how: "7,115 real footprints with floor counts, from GET /api/buildings.", st: "real", chip: "REAL · LIVE FROM API" },
+  { name: "Roads and flood shapes", how: "Main OSM roads. UNOSAT flood extent, 30 Sep 2024.", st: "real", chip: "REAL DATA" },
+  { name: "Imagery, elevation, Maxar", how: "Esri + elevation tiles. Maxar mosaics 13 Jan / 6 Oct for the swipe (CC BY-NC).", st: "real", chip: "REAL · STREAMED / CACHED" },
+  { name: "BIPAD facilities", how: "203 hospitals, 359 schools, 779 shelters, 63 responders, 3 army, Tribhuvan, 25 alerts, 13 gauges, 18 landslides. Places real; access modelled.", st: "real", chip: "REAL PLACES · MODELLED STATUS", weight: 1.35 },
+  { name: "Google Places + food", how: "8 care homes, 11 fire, 15 police, 59 food shops. Pocket supply + Google Routes travel times precomputed.", st: "real", chip: "REAL · SNAPSHOT + MODELLED" },
+  { name: "Cell, lights, internet", how: "328 OpenCelliD sites. 9 NASA Black Marble dark areas. IODA −24% at 07:45, 28 Sep.", st: "real", chip: "REAL · OPENCELLID / NASA / IODA" },
+  { name: "Open-Meteo weather", how: "Observed valley rain (205 mm max 24 h) and atmosphere (cloud + isobars). What-if slider still local.", st: "real", chip: "REAL · OPEN-METEO" },
+  { name: "Reddit social feed", how: "183 flood posts (Arctic Shift), 24 place-matched on the map, translations offline.", st: "real", chip: "REAL · REPLAYED" },
+  { name: "Still simulated", how: "Radio call-ins, helipads, food-depot stock numbers.", st: "mock", chip: "MOCK" },
 ]);
 const proc = stack(300, 300, B0, B1, [
-  { name: "Weather agent", how: "Rain slider (6, 10 or 15 in) becomes a total, range and intensity.", st: "mock", chip: "MOCK INPUT" },
-  { name: "Terrain agent", how: "Ranks flood patches by depth from real elevation. Scale is assumed.", st: "calc", chip: "REAL ELEVATION · ASSUMED SCALE" },
-  { name: "Flow agent", how: "Rain runs downhill over a 70 m elevation grid and pools.", st: "calc", chip: "REAL ELEVATION · SIMPLE MODEL" },
-  { name: "Run cascade assessment", how: "Plays a staged reveal of the fixed closures. Nothing is computed.", st: "mock", chip: "REPLAY ONLY" },
-  { name: "Shelter rules", how: "Each building: go upstairs, evacuate, or open as a refuge, from depth and floors.", st: "calc", chip: "REAL BUILDINGS · ASSUMED DEPTH" },
-  { name: "Cell-site status", how: "Down if flooded. At risk if near the flood or its lights went dark.", st: "calc", chip: "MODELLED FROM REAL DATA" },
-  { name: "Risk rules", how: "Rates mock schools, airports, army bases by distance to closures and outages.", st: "mixed", chip: "REAL LOGIC · MOCK INPUTS" },
-  { name: "Evidence text", how: "Real for cell sites, outages and buildings. Hashed numbers elsewhere.", st: "mixed", chip: "REAL FOR 3 KINDS · REST MOCK" },
-  { name: "Recommendations", how: "Nearest team, depot or shelter by straight line. Grid crews go to real dark areas.", st: "mixed", chip: "REAL LOGIC · MOSTLY MOCK INPUTS" },
+  { name: "Weather agent", how: "Open-Meteo observed totals by default; slider is a what-if depth scale.", st: "calc", chip: "REAL RAIN · WHAT-IF SCALE" },
+  { name: "Terrain agent", how: "GET /api/assessment ranks flood patches by depth from real elevation tiles.", st: "calc", chip: "SERVER · REAL ELEVATION" },
+  { name: "Flow agent", how: "Same assessment: rain over a 70 m elevation grid, pools and streaks.", st: "calc", chip: "SERVER · SIMPLE MODEL" },
+  { name: "Run cascade assessment", how: "Staged reveal of the fixed closures and pockets. Nothing recomputed.", st: "mock", chip: "REPLAY ONLY" },
+  { name: "Shelter rules", how: "Go upstairs / evacuate / open as refuge from depth and floors on real buildings.", st: "calc", chip: "REAL BUILDINGS · ASSUMED DEPTH" },
+  { name: "Facility + cell status", how: "BIPAD access from the flood road graph. Cells down/at-risk from flood + night lights.", st: "calc", chip: "MODELLED FROM REAL DATA" },
+  { name: "Client merge", how: "mergeBipadIntoScene swaps mock pins for BIPAD, Google, cells, outages and Reddit posts.", st: "calc", chip: "REAL LAYERS ON SCENE" },
+  { name: "Evidence + recommendations", how: "bipadAdvice: real evidence for most kinds. Pocket travel times from Google Routes + flood graph. Nearest team by straight line otherwise.", st: "mixed", chip: "MOSTLY REAL · SOME ASSUMED", weight: 1.2 },
 ]);
 const scr = stack(650, 240, B0, B1, [
-  { name: "Map, 2D or 3D", how: "Closures reveal in red. Flood shaded by depth, runoff streaks, coloured buildings, cell sites and dark areas.", st: "ui", chip: "INTERFACE" },
-  { name: "Status strip and details", how: "Counts that filter the map and zoom to affected roads. Grid outages and buildings to evacuate are now real counts. Details lists real and mock sources.", st: "ui", chip: "INTERFACE" },
-  { name: "Drawer", how: "What failed and why, recommended responses, and a real internet chart for cell sites and cut-off areas.", st: "ui", chip: "INTERFACE" },
-  { name: "Photoreal close-up", how: "The selected item over Google 3D tiles through Cesium. Needs a free token.", st: "real", chip: "REAL 3D TILES · OPTIONAL" },
+  { name: "Map, 2D or 3D", how: "Closures, depth flood, runoff, buildings, cells, dark areas, atmosphere clouds and isobars.", st: "ui", chip: "INTERFACE" },
+  { name: "Status strip + Details", how: "Filter counts. Details lists sources and the Evaluation scorecard verdict.", st: "ui", chip: "INTERFACE" },
+  { name: "Drawer + social feed", how: "What failed, recommended responses, IODA chart, nearby Reddit posts (and translations).", st: "ui", chip: "INTERFACE" },
+  { name: "Verification overlay", how: "203 wards coloured hit / miss / false alarm against withheld BIPAD reports. Banner warns demo closures are not scored.", st: "calc", chip: "REAL ENGINE SCORE" },
+  { name: "Before / after swipe", how: "Maxar mosaics plus merged pack chips (flood, dark cells, road impact, landslides, NDRRMA).", st: "real", chip: "REAL IMAGERY · CONTEXT ONLY" },
+  { name: "Photoreal + Street View", how: "Optional Cesium 3D tiles and Google Street View for the selected item.", st: "real", chip: "REAL · OPTIONAL TOKENS" },
 ]);
-const analyst = at(970, B0, 220, B1 - 190 - B0, { name: "Analyst decides", how: "Selects an item and reads the evidence. Assigns a QRT, food, shelter, a grid crew, army support or an airlift, moves people upstairs or out of a building, and issues a public alert preview in English and Nepali.", st: "ui", chip: "HUMAN IN THE LOOP" });
+const analyst = at(970, B0, 220, B1 - 190 - B0, { name: "Analyst decides", how: "Selects an item, reads evidence and the social feed, assigns QRT / food / shelter / grid / army / airlift, moves people upstairs or out, issues a bilingual alert preview.", st: "ui", chip: "HUMAN IN THE LOOP" });
 const result = at(970, B1 - 175, 220, 175, { name: "Simulated result", how: "Changes the screen only, with undo. Nothing is sent, saved or fed back to the system.", st: "mock", chip: "SIMULATED" });
 const ghost = stack(1270, 350, B0, B1, [
   { name: "Run button calls the engine", how: "Computes closures, cut-offs and hospital access live from the real flood map instead of replaying a snapshot." },
   { name: "LLM agent", how: "Writes the brief and the \"why\" text from computed evidence, and drafts alerts." },
   { name: "Saved action log", how: "Stores analyst actions and feedback so the next recommendation knows what's done." },
-  { name: "Road routing for responses", how: "Sends teams along open roads using the engine's road graph." },
-  { name: "Real rain and incident replay", how: "Observed rain for those dates. BIPAD reports replayed as incoming signals." },
-  { name: "Real landslides", how: "Swap the 4 drawn zones for the 17 BIPAD landslide reports already in the repo." },
+  { name: "Live road routing", how: "Travel times for pockets are a precomputed snapshot. Send teams on open roads at assign time." },
+  { name: "Helene + Detect in the UI", how: "Both backends exist (/api/helene/*, /api/pipeline/*). Mount the views and a mode switcher again." },
   { name: "Any location", how: "One config per event, so Helene or any town is a data drop-in." },
-].map(it => ({ ...it, st: "ghost", chip: "NOT BUILT" })));
+].map(it => ({ ...it, st: "ghost", chip: "NOT BUILT / NOT SHOWN" })));
 
 // ---------- Wires ----------
 const W = el("g", {});
@@ -232,24 +242,25 @@ const seg = (pts, cls = "wire") => el("path", { d: "M" + pts.map(p => p.join(","
 seg([[270, src[0].cy], [270, src[2].cy]]);
 line([[270, prep.cy], [prep.x - 2, prep.cy]]);
 line([[prep.x + prep.w, prep.cy], [chain[0].x - 2, prep.cy]]);
-for (let i = 0; i < 4; i++) line([[chain[i].x + chain[i].w, chain[i].cy], [chain[i + 1].x - 2, chain[i + 1].cy]]);
+for (let i = 0; i < chain.length - 1; i++) line([[chain[i].x + chain[i].w, chain[i].cy], [chain[i + 1].x - 2, chain[i + 1].cy]]);
 // BIPAD → Verification only
-const vx = chain[4].x + chain[4].w / 2;
-line([[240, src[3].cy], [vx, src[3].cy], [vx, chain[4].y + chain[4].h + 2]]);
-txt(1000, src[3].cy - 7, "held back until scoring", "wireLabel bandHalo", W, { "text-anchor": "middle" });
-// API ↔ chain, API → research screen
+const vx = chain[5].x + chain[5].w / 2;
+line([[240, src[3].cy], [vx, src[3].cy], [vx, chain[5].y + chain[5].h + 2]]);
+txt(980, src[3].cy - 7, "held back until scoring", "wireLabel bandHalo", W, { "text-anchor": "middle" });
+// API ↔ chain, API → scorecard, scorecard → ghost views
 line([[690, api.y], [690, chain[0].y + chain[0].h + 2]]);
-txt(698, 276, "runs on request", "wireLabel", W);
-line([[api.x + api.w, api.cy], [research.x - 2, research.cy]], "plan", "ph");
+txt(698, 286, "runs on request", "wireLabel", W);
+line([[api.x + api.w, api.cy], [evalBox.x - 2, evalBox.cy]]);
+line([[evalBox.x + evalBox.w, evalBox.cy], [ghostViews.x - 2, ghostViews.cy]], "plan", "ph");
 
 // snapshot hand-off: Access agent → closures fixture
 const ax = chain[3].x + chain[3].w / 2;
 line([[ax, chain[3].y + chain[3].h], [ax, BRIDGE_Y], [140, BRIDGE_Y], [140, inp[0].y - 2]], "bridge", "bh");
-txt(1000, BRIDGE_Y - 5, "closures and cut-offs picked once by hand from one engine run", "wireLabel halo", W, { "text-anchor": "middle" });
-// live link: API → buildings input
-const bl = inp[1];
-line([[600, api.y + api.h], [600, LINK_Y], [18, LINK_Y], [18, bl.cy], [bl.x - 2, bl.cy]], "realLink", "rh");
-txt(300, LINK_Y + 13, "GET /api/buildings · the console's one live call to the server", "wireLabel halo", W);
+txt(980, BRIDGE_Y - 5, "closures and cut-offs picked once by hand from one engine run", "wireLabel halo", W, { "text-anchor": "middle" });
+
+// live links from API into console
+line([[600, api.y + api.h], [600, LINK_Y], [18, LINK_Y], [18, inp[1].cy], [inp[1].x - 2, inp[1].cy]], "realLink", "rh");
+txt(320, LINK_Y + 13, "GET /api/buildings · /scene · /assessment · /weather/atmosphere · /scorecard · /verification", "wireLabel halo", W);
 
 function bus(fromItems, toItems, bx) {
   const ys = fromItems.map(i => i.cy).concat(toItems.map(i => i.cy));
@@ -284,5 +295,7 @@ function box(it) {
   el("rect", { x: it.x + pad, y: it.y + it.h - 25, width: cw, height: 16, rx: 3, fill: `color-mix(in srgb, ${c} 14%, transparent)` }, g);
   txt(it.x + pad + 7, it.y + it.h - 13.5, it.chip, "chipText", g, { fill: c });
 }
-[...src, prep, ...chain, api, research, ...inp, ...proc, ...scr, analyst, result, ...ghost].forEach(box);
+[...src, prep, ...chain, api, evalBox, ghostViews, ...inp, ...proc, ...scr, analyst, result, ...ghost].forEach(box);
 </script>
+</body>
+</html>
