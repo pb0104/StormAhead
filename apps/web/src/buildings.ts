@@ -10,7 +10,7 @@
  * What stays true to the data: a building with no usable `building:levels` (20% of them) gets NO judgement.
  * Its height is unknown, and the output of this module is "send people upstairs" or "move them out".
  */
-import { FLOOD_POLYS, type Entity, type Geometry } from "./mock/demo.ts";
+import type { Action, Entity, FloodPoly, Geometry, Reason } from "../../../packages/ports/index.ts";
 
 /** Storey height, for turning water depth into floors lost. An assumption. */
 export const FLOOR_H = 3;
@@ -46,8 +46,8 @@ const inRing = (lon: number, lat: number, ring: [number, number][]) => {
 };
 
 /** Water depth in metres at a point, from the depth the agents computed for each observed flood patch. */
-export function depthAt(lon: number, lat: number, depths: number[]): number {
-  for (let i = 0; i < FLOOD_POLYS.length; i++) if (inRing(lon, lat, FLOOD_POLYS[i]!.ring)) return depths[i] ?? 0;
+export function depthAt(lon: number, lat: number, depths: number[], polys: FloodPoly[]): number {
+  for (let i = 0; i < polys.length; i++) if (inRing(lon, lat, polys[i]!.ring)) return depths[i] ?? 0;
   return 0;
 }
 
@@ -74,10 +74,10 @@ export function shelterOf(floors: number | null, areaM2: number, depthM: number,
 
 export type Assessed = RawBuilding & Shelter;
 
-/** Assess every building against the current depth field. `cutOff` is tested against the demo's cut-off pockets. */
-export function assess(list: RawBuilding[], depths: number[], isCutOff: (lon: number, lat: number) => boolean): Assessed[] {
+/** Assess every building against the current depth field. `cutOff` is tested against cut-off pockets. */
+export function assess(list: RawBuilding[], depths: number[], polys: FloodPoly[], isCutOff: (lon: number, lat: number) => boolean): Assessed[] {
   return list.map((b) => {
-    const depthM = depthAt(b.at[0], b.at[1], depths);
+    const depthM = depthAt(b.at[0], b.at[1], depths, polys);
     return { ...b, ...shelterOf(b.f, b.a, depthM, depthM === 0 && isCutOff(b.at[0], b.at[1])) };
   });
 }
@@ -121,4 +121,48 @@ export function toEntity(b: Assessed): Entity {
       usableFloors: b.usableFloors ?? "", capacity: b.capacity ?? "",
     },
   };
+}
+
+const fmt = (n: number) => n.toLocaleString("en-US");
+
+/** Invented evidence and response cards for a selected shelter-reading building. */
+export function buildingAdvice(e: Entity): { reasons: Reason[]; actions: Action[] } {
+  const floors = e.props.floors === "" ? null : Number(e.props.floors);
+  const depth = Number(e.props.depthM), lost = Number(e.props.floorsLost);
+  const cap = Number(e.props.capacity) || 0;
+  const reasons: Reason[] = [
+    { input: "Buildings (REAL, OpenStreetMap 2 Jan 2024)", text: floors === null
+      ? `${e.props.type}, ${fmt(e.props.areaM2 as number)} m² footprint. Height is NOT tagged in OpenStreetMap, so no shelter judgement is offered for this building.`
+      : `${e.props.type}, ${floors} storey${floors === 1 ? "" : "s"}, ${fmt(e.props.areaM2 as number)} m² footprint.` },
+    { input: "Flood depth (terrain + weather agents)", text: depth > 0
+      ? `About ${depth.toFixed(1)} m of water here, so the lowest ${lost} floor${lost === 1 ? "" : "s"} ${lost === 1 ? "is" : "are"} unusable.`
+      : "No water on this building in the current forecast." },
+  ];
+  if (floors !== null) {
+    reasons.push({ input: "Assessment", text: e.props.role === "at-risk-evacuate"
+      ? "No floor stays above the water, so people cannot shelter here."
+      : e.props.role === "at-risk-vertical" ? `${e.props.usableFloors} floor(s) stay above the water: about ${fmt(cap)} places at 3.5 m² per person.`
+      : e.props.role === "refuge" ? `Dry, and inside an area that has lost road access. ${e.props.usableFloors} usable floor(s), about ${fmt(cap)} places.`
+      : "Dry and still reachable by road." });
+  }
+  const actions: Action[] = [];
+  if (e.props.role === "at-risk-evacuate") {
+    const n = Math.max(20, Math.round((e.props.areaM2 as number) / 12));
+    actions.push(
+      { id: `${e.id}:evac`, kind: "shelter", title: `Evacuate everyone in ${e.name}`, detail: `About ${fmt(n)} people. No floor stays above the water.` },
+      { id: `${e.id}:alert`, kind: "alert", title: "Issue public alert", detail: "Tell people to leave before water rises further.", alertEn: `Evacuate ${e.name}. No upper floor stays dry.`, alertNe: `${e.name} बाट बाहिरिनुहोस्।` },
+    );
+  } else if (e.props.role === "at-risk-vertical") {
+    actions.push(
+      { id: `${e.id}:road`, kind: "road", title: `Move people to the upper floors of ${e.name}`, detail: `${e.props.usableFloors} floor(s) stay above about ${depth.toFixed(1)} m of water: room for about ${fmt(cap)}. Send water and light, not transport.` },
+      { id: `${e.id}:army`, kind: "army", title: "Request boats to reach the upper floors", detail: "Ground floor is under water." },
+      { id: `${e.id}:food`, kind: "food", title: `Send food for about ${fmt(cap)}`, detail: "Upper-floor shelter in place." },
+    );
+  } else if (e.props.role === "refuge") {
+    actions.push(
+      { id: `${e.id}:shelter`, kind: "shelter", title: `Open ${e.name} as a local refuge`, detail: `Dry, ${e.props.usableFloors} usable floor(s), about ${fmt(cap)} places. The area has lost road access, so shelter people here rather than moving them out.`, targetId: e.id },
+      { id: `${e.id}:food`, kind: "food", title: `Send food for about ${fmt(cap)}`, detail: "Local refuge in a cut-off area." },
+    );
+  }
+  return { reasons, actions };
 }

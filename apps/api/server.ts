@@ -4,6 +4,7 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { z, ZodError } from "zod";
 import { HttpError } from "./common.ts";
+import { getServices } from "./composition.ts";
 import { HindcastService } from "./hindcast.ts";
 
 export function buildServer() {
@@ -17,7 +18,69 @@ export function buildServer() {
 
   app.get("/api/health", async () => ({ ok: true }));
 
-  // Kathmandu hindcast (real data): observed flood is a given input; impacts predicted; scored against incident reports.
+  const S = () => getServices();
+
+  app.get("/api/scene", async () => S().scene.load());
+
+  app.get("/api/weather/seed", async () => S().weatherSeed.seed());
+
+  /** Cloud cover + MSL pressure bands (Kathmandu). Disk-cached under data/cache/weather/. */
+  app.get("/api/weather/atmosphere", async (req) => {
+    const raw = (req.query as { refresh?: string } | undefined)?.refresh;
+    const refresh = raw === "1" || raw === "true";
+    return S().atmosphere.load({ refresh });
+  });
+
+  /** Real OSM critical assets (hospitals, dams, schools, airports, towers, shelters). Cached under data/cache/osm/. */
+  app.get("/api/assets", async (req) => {
+    const raw = (req.query as { refresh?: string } | undefined)?.refresh;
+    const refresh = raw === "1" || raw === "true";
+    return S().assets.load({ refresh });
+  });
+
+  app.get("/api/assessment", async (req) => {
+    const q = z.object({
+      rainIn: z.coerce.number().min(0).max(40).default(10),
+      stage: z.coerce.number().int().min(1).max(3).default(3),
+    }).parse(req.query);
+    return S().assessment.run(q.rainIn, q.stage);
+  });
+
+  app.get("/api/tiles/esri/:z/:y/:x", async (req, reply) => {
+    const p = z.object({ z: z.coerce.number(), y: z.coerce.number(), x: z.coerce.number() }).parse(req.params);
+    const t = await S().tiles.getEsri(p.z, p.y, p.x);
+    reply.header("Content-Type", t.contentType);
+    reply.header("Cache-Control", "public, max-age=31536000, immutable");
+    reply.header("X-Cache", t.cacheHit ? "HIT" : "MISS");
+    return reply.send(t.body);
+  });
+
+  app.get("/api/tiles/terrarium/:z/:x/:y", async (req, reply) => {
+    const p = z.object({ z: z.coerce.number(), x: z.coerce.number(), y: z.string() }).parse(req.params);
+    const y = Number(String(p.y).replace(/\.png$/i, ""));
+    const t = await S().tiles.getTerrarium(p.z, p.x, y);
+    reply.header("Content-Type", t.contentType || "image/png");
+    reply.header("Cache-Control", "public, max-age=31536000, immutable");
+    reply.header("X-Cache", t.cacheHit ? "HIT" : "MISS");
+    return reply.send(t.body);
+  });
+
+  /** Photoreal / Cesium ion proxy. Pass full upstream URL as ?u= */
+  app.get("/api/tiles/cesium", async (req, reply) => {
+    const q = z.object({ u: z.string().url() }).parse(req.query);
+    const token = process.env.CESIUM_ION_TOKEN ?? "";
+    const headers: Record<string, string> = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const key = q.u.replace(/^https?:\/\//, "").replace(/[^a-zA-Z0-9._/-]/g, "_").slice(0, 200);
+    const t = await S().tiles.getCesium(q.u, key, headers);
+    reply.header("Content-Type", t.contentType);
+    reply.header("Cache-Control", "public, max-age=86400");
+    reply.header("X-Cache", t.cacheHit ? "HIT" : "MISS");
+    reply.header("Access-Control-Allow-Origin", "*");
+    return reply.send(t.body);
+  });
+
+  // Kathmandu hindcast (legacy research path).
   let hind: HindcastService | null = null;
   const H = () => {
     if (hind) return hind;

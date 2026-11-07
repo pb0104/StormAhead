@@ -16,7 +16,7 @@ const within = (e: Entity, list: Entity[], d: number) => list.filter((x) => km(e
 
 export const KIND_LABEL: Record<string, string> = {
   closure: "Closed road", pocket: "Cut-off pocket", landslide: "Landslide zone", hospital: "Hospital", tower: "Cell tower", outage: "Grid outage",
-  building: "Building", alert: "Public alert zone", dam: "Dam gauge", social: "Social media post", radio: "Radio call-in", shelter: "Shelter", food: "Food depot", qrt: "QRT staging", school: "School", airport: "Airport or helipad", army: "Army base",
+  building: "Building", alert: "Public alert zone", dam: "Dam", social: "Social media post", radio: "Radio call-in", shelter: "Shelter", food: "Food depot", qrt: "QRT staging", school: "School", airport: "Airport", helipad: "Helipad", army: "Army base",
 };
 
 export function reasons(e: Entity): Reason[] {
