@@ -1,14 +1,15 @@
 import type { Vis } from "./MapStage.tsx";
 import { Glyph } from "./Glyph.tsx";
 import type { TerrainResult as Terrain, Weather } from "../../../packages/ports/index.ts";
+import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 
 const INPUTS: { group: string; items: [string, string][] }[] = [
-  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell towers"]] },
-  { group: "Live feeds", items: [["weather", "Weather"], ["atmosphere", "Atmosphere"], ["dams", "Dams"]] },
-  { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["helipads", "Helipads"], ["army", "Army bases"]] },
+  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell sites"]] },
+  { group: "Live feeds", items: [["weather", "Weather"], ["atmosphere", "Atmosphere"], ["dams", "River gauges"]] },
+  { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["helipads", "Helipads"], ["army", "Army sites"]] },
 ];
 const OUTPUTS: [string, string][] = [
-  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "QRT staging"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["verify", "Verification (real)"],
+  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "Responder bases"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Official alerts"], ["verify", "Verification (real)"],
 ];
 const STAGES: [number, string][] = [[1, "Now"], [2, "+6 h"], [3, "Peak +12 h"]];
 
@@ -26,11 +27,11 @@ export function CommandRail(p: RailProps) {
           <div className="brand"><span className="b1">Cascade</span><span className="b2">IQ</span></div>
           <button className="icon rail-close" onClick={() => p.setOpen(false)} aria-label="Close command rail">×</button>
         </div>
-        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, <b>demo data</b>.</p>
+        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges, cell sites and night-light outages are <b>real</b> (status modelled where noted); posts, radio and food depots are <b>simulated</b>.</p>
 
         <section>
           <label className="lbl" htmlFor="scn">Scenario</label>
-          <select id="scn" defaultValue="a"><option value="a">Heavy rain and dam release, 27–28 Sep (demo)</option></select>
+          <select id="scn" defaultValue="a"><option value="a">27–28 Sep 2024 floods (observed flood, real facilities)</option></select>
           <div className="seg" role="group" aria-label="Time">
             {STAGES.map(([n, l]) => <button key={n} aria-pressed={p.stage === n} onClick={() => p.setStage(n)}>{l}</button>)}
           </div>
@@ -39,12 +40,14 @@ export function CommandRail(p: RailProps) {
         <button className="cta" onClick={p.run} disabled={p.busy}>{p.busy ? "Assessing…" : p.ran ? "Refresh picture" : "Run cascade assessment"}</button>
 
         <section>
-          <h2 className="lbl">Rain forecast</h2>
+          <h2 className="lbl">Rain</h2>
           <div className="seg" role="group" aria-label="Rain presets">
-            {[6, 10, 15].map((n) => <button key={n} aria-pressed={p.rain === n} onClick={() => p.setRain(n)}>{n} in</button>)}
+            <button aria-pressed={p.rain === OBSERVED_IN} onClick={() => p.setRain(OBSERVED_IN)}>Observed</button>
+            {[6, 10, 15].filter((n) => n !== OBSERVED_IN).map((n) => <button key={n} aria-pressed={p.rain === n} onClick={() => p.setRain(n)}>{n} in</button>)}
           </div>
           <input className="range" type="range" min={4} max={20} step={1} value={p.rain} onChange={(e) => p.setRain(+e.target.value)} aria-label="Rainfall in inches over 24 hours" />
-          <p className="agent"><b>Weather agent</b> (mock): {p.weather.label.toLowerCase()} rain, <b>{p.weather.inches} in</b> ({Math.round(p.weather.mm)} mm) in 24 h. Range {p.weather.lowIn} to {p.weather.highIn} in, peak about {p.weather.peakMmH} mm/h.</p>
+          <p className="agent"><b>Weather agent</b> (real, Open-Meteo, ECMWF IFS 9 km): heaviest 24 h in the valley was <b>{WEATHER.max24hMm} mm</b>, ending {whenText(WEATHER.max24hEnd)}. Peak {WEATHER.peakMmH} mm/h at {whenText(WEATHER.peakAt)}. 27–28 Sep total {WEATHER.total2728Mm} mm (ERA5: {WEATHER.era5Total2728Mm} mm).</p>
+          <p className="agent">{p.rain === OBSERVED_IN ? <>Depth model uses the observed <b>{p.weather.inches} in</b> ({Math.round(p.weather.mm)} mm).</> : <>What-if: <b>{p.weather.inches} in</b> ({Math.round(p.weather.mm)} mm) in 24 h, instead of the observed {OBSERVED_IN} in.</>}</p>
           <p className="agent"><b>Terrain agent</b> ({p.terrain.status === "ready" ? "real elevation" : p.terrain.status}): {p.terrain.note}</p>
           <div className="depthbar" aria-hidden="true"><i /></div>
           <div className="depthkey"><span>shallow</span><span>1.5 m</span><span>3 m+</span></div>
@@ -80,7 +83,7 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw fill" style={{ background: "#3E8FD3A0", borderColor: "#CDF0FF" }} />Pooled runoff, with flow streaks</li>
             <li><i className="sw line dash" style={{ borderColor: "#FFB020" }} />Cut-off road pocket</li>
             <li><i className="sw fill" style={{ background: "#FF7A1A55", borderColor: "#FF7A1A" }} />Landslide zone</li>
-            <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Grid outage</li>
+            <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Night-lights outage</li>
             <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
             <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
             <li><i className="sw fill" style={{ background: "#46D68C80", borderColor: "#46D68C" }} />Ward correctly flagged <em className="real">real</em></li>
@@ -100,9 +103,8 @@ export function CommandRail(p: RailProps) {
                 <li><Glyph kind="airport" ring="#46D68C" />Airport, access ok · <Glyph kind="airport" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="helipad" ring="#46D68C" />Helipad, access ok · <Glyph kind="helipad" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="army" ring="#46D68C" />Army base, access ok · <Glyph kind="army" ring="#FFB020" badge />limited</li>
-                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell tower up</li>
-                <li><i className="sw dot sm" style={{ background: "#FF8E7A" }} />Cell tower down</li>
-                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />Dam</li>
+                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell site (OpenCelliD) · <i className="sw dot sm" style={{ background: "#FFB020" }} />at risk · <i className="sw dot sm" style={{ background: "#FF8E7A" }} />down, modelled</li>
+                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />River gauge</li>
                 <li><Glyph kind="qrt" ring="#0B1318" />QRT · <Glyph kind="shelter" ring="#0B1318" />Shelter · <Glyph kind="food" ring="#0B1318" />Food</li>
                 <li><i className="sw fill" style={{ background: "#2B7BFF47", borderColor: "#6FB0FF" }} />Low ground · <i className="sw fill" style={{ background: "#4DA3FF30", borderColor: "#4DA3FF" }} />Rain</li>
               </>

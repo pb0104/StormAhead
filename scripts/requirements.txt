@@ -1,3 +1,5 @@
 pyogrio
 shapely
 Pillow
+h5py
+numpy

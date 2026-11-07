@@ -1,9 +1,9 @@
 {
-  "name": "cascadeiq",
+  "name": "stormahead",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "CascadeIQ — predicting the unforeseen knock-on impact of floods (Kathmandu hindcast on real data)",
+  "description": "StormAhead — which roads can we still use, and where should resources go? (Hurricane Helene replay + Kathmandu ops console / hindcast)",
   "engines": {
     "node": ">=22.5"
   },
@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fastify/compress": "^9.3.0",
     "@fastify/static": "^10.1.10",
     "fastify": "^5.12.8",
     "maplibre-gl": "^6.16.0",

@@ -1,5 +1,6 @@
 import type { AgentEvent } from "../../../packages/shared/events.ts";
 import type { AssessmentResult, AssetsSnapshot, AtmosphereSnapshot, SceneSnapshot, WeatherSeed } from "../../../packages/ports/index.ts";
+import type { Closure } from "../../../packages/analysis/replay.ts";
 
 async function j<T>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, { ...init, headers: init?.body ? { "Content-Type": "application/json" } : {} });
@@ -50,6 +51,15 @@ export const hindcast = {
   meta: () => j<HindcastMeta>("/api/hindcast/meta"),
   geo: () => j<HindcastGeo>("/api/hindcast/geo"),
   run: (p: Record<string, unknown>) => j<HindcastRun>("/api/hindcast/run", send("POST", p)),
+};
+
+export type HeleneClosure = Closure & { edge: number | null; match: "ref" | "nearest" | "unmatched"; snapDistM: number | null };
+export type HeleneMeta = { available: boolean; provenance?: any; counties?: string[]; records?: number; byMatch?: Record<string, number>; byCondition?: Record<string, number>; replayRange?: string[]; caveats?: string[] };
+export type HeleneRoads = { nodes: [number, number][]; edges: [number, number, number, number, string, number, string | null, string | null, number, [number, number][] | null][] };
+export const helene = {
+  meta: () => j<HeleneMeta>("/api/helene/meta"),
+  roads: () => j<HeleneRoads>("/api/helene/roads"),
+  closures: () => j<{ closures: HeleneClosure[] }>("/api/helene/closures"),
 };
 
 export const ops = {

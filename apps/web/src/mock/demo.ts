@@ -1,10 +1,13 @@
 /**
- * DEMO DATA. Everything the console shows is mock or illustrative.
- * Road geometry comes from OpenStreetMap (Geofabrik, 2 Jan 2024, ODbL). Which roads are "closed" or "cut off",
- * and every tower, outage, alert, dam, post, call, shelter, depot and team below, is invented for the demo.
+ * DEMO DATA, being replaced layer by layer with real data.
+ * Road geometry comes from OpenStreetMap (Geofabrik, 2 Jan 2024, ODbL). Cell-site positions are REAL (OpenCelliD) with
+ * MODELLED status, and outage areas are REAL night-lights observations (realdata.ts). Which roads are "closed" or
+ * "cut off", and every alert, dam, post, call,
+ * shelter, depot and team below, is invented for the demo.
  */
 import raw from "./network.json";
 import floodRaw from "./flood.json";
+import { CELL_SITES, cellStatus, DARK_AREAS } from "../realdata.ts";
 
 export type Geometry =
   | { type: "Point"; coordinates: [number, number] }
@@ -88,23 +91,20 @@ const hospitals: Entity[] = [
   props: { access: access as string, extraMin: extra as number }, geom: pt(lon as number, lat as number),
 }));
 
-const towerSpots: [number, number, boolean][] = [
-  [85.305, 27.69, true], [85.31, 27.665, true], [85.299, 27.7, false], [85.327, 27.71, false], [85.345, 27.725, false], [85.36, 27.69, false],
-  [85.34, 27.668, false], [85.375, 27.705, false], [85.39, 27.68, false], [85.41, 27.676, true], [85.43, 27.7, false], [85.455, 27.69, false],
-  [85.37, 27.745, false], [85.32, 27.63, false], [85.4, 27.63, false], [85.29, 27.63, false],
-];
-const towers: Entity[] = towerSpots.map(([lon, lat, down], i) => ({
-  kind: "tower", id: `T-${String(i + 1).padStart(2, "0")}`, name: `Cell tower T-${String(i + 1).padStart(2, "0")}`, at: [lon, lat],
-  props: { status: down ? "down" : "up", cause: down ? "Power loss at the site" : "" }, geom: pt(lon, lat),
+// REAL cell-site positions (OpenCelliD); status MODELLED from the real observed flood extent. See realdata.ts.
+const towers: Entity[] = CELL_SITES.map((s) => ({
+  kind: "tower", id: s.id, name: `Cell site ${s.id} · ${s.operators.join(", ")}`, at: [s.lon, s.lat],
+  props: {
+    status: cellStatus(s), cells: s.cells, radios: s.radios.join(", "), operators: s.operators.join(", "), samples: s.samples,
+    firstSeen: s.firstSeen, preEvent: s.preEvent, distFloodM: s.distFloodM,
+  },
+  geom: pt(s.lon, s.lat),
 }));
 
-const outages: Entity[] = [
-  ["OG-1", "Feeder F-12, Teku to Kalimati", 85.302, 27.693, 0.011, 3100],
-  ["OG-2", "Feeder F-07, Balkhu south", 85.309, 27.662, 0.010, 1850],
-  ["OG-3", "Feeder F-21, Thimi east", 85.41, 27.676, 0.010, 2400],
-].map(([id, name, lon, lat, r, hh], i) => ({
-  kind: "outage" as const, id: id as string, name: name as string, at: [lon as number, lat as number] as [number, number],
-  props: { households: hh as number }, geom: blob(lon as number, lat as number, r as number, 31 + i),
+// REAL power-outage areas: clusters of night-lights cells that went dark after the flood (NASA Black Marble). See realdata.ts.
+const outages: Entity[] = DARK_AREAS.map((a) => ({
+  kind: "outage" as const, id: a.id, name: a.name, at: [a.lon, a.lat] as [number, number],
+  props: { cells: a.cells, areaKm2: a.areaKm2, medianRatio: a.medianRatio }, geom: { type: "Polygon" as const, coordinates: [a.ring] },
 }));
 
 const alerts: Entity[] = [
@@ -178,7 +178,7 @@ const schools: Entity[] = schoolSpots.map(([name, lon, lat], i) => {
   let risk: "ok" | "risk" | "high" = "ok";
   if (ls[0] < 1.2) { risk = "high"; why.push(`Terrain::Below the ${ls[1].name}, ${ls[0].toFixed(1)} km away. Slope risk ${ls[1].props.risk}.`); }
   if (cl[0] < 0.6) { if (cl[0] < 0.35) risk = "high"; else if (risk === "ok") risk = "risk"; why.push(`Road network::Closed road ${cl[1].id} is ${Math.round(cl[0] * 1000)} m away, so buses and parents may not reach it.`); }
-  if (og[0] < 0.9) { if (risk === "ok") risk = "risk"; why.push(`Grid::Inside the ${og[1].name} outage area, with no power.`); }
+  if (og[0] < 0.9) { if (risk === "ok") risk = "risk"; why.push(`Grid::Near ${og[1].name}, where lights went out after the flood (NASA night lights).`); }
   return { kind: "school" as const, id: `SC-${String(i + 1).padStart(2, "0")}`, name: name, at, props: { risk, students: 240 + ((i * 137) % 520), why: why.join("|") }, geom: pt(lon, lat) };
 });
 

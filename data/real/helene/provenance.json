@@ -1,0 +1,53 @@
+{
+ "area": "Western NC slice: Buncombe + Haywood + margin",
+ "bbox": [
+  -83.25,
+  35.3,
+  -82.25,
+  35.95
+ ],
+ "network": {
+  "source": "OpenStreetMap via Geofabrik north-carolina-240101.osm.pbf",
+  "snapshot": "2024-01-02",
+  "phase": "pre-event",
+  "licence": "ODbL (c) OpenStreetMap contributors",
+  "speedKmhByClass": {
+   "motorway": 100,
+   "trunk": 80,
+   "primary": 65,
+   "secondary": 55,
+   "tertiary": 45,
+   "unclassified": 40,
+   "residential": 30,
+   "living_street": 15,
+   "service": 20
+  },
+  "assumptions": [
+   "roads undirected",
+   "free-flow speeds are assumptions",
+   "exact coordinate match = same node",
+   "service roads/tracks/paths excluded"
+  ]
+ },
+ "closures": {
+  "source": "NCDOT TIMS \u2014 State Maintained Historical TIMS Incidents, Hurricane Helene (ArcGIS FeatureServer)",
+  "retrievedAt": "2026-11-07T00:42:22.798Z",
+  "window": [
+   "2024-09-24T00:00:00.000Z",
+   "2024-10-08T00:00:00.000Z"
+  ],
+  "disclaimer": "NCDOT shall not be held liable for any errors in this data. Points (not lines); state-maintained roads only; completeness unknown."
+ },
+ "snap": {
+  "maxSnapM": 250,
+  "results": {
+   "nearest": 155,
+   "ref": 79,
+   "unmatched": 1
+  }
+ },
+ "counts": {
+  "nodes": 48941,
+  "edges": 54712
+ }
+}

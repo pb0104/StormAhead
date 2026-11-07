@@ -1,0 +1,288 @@
+<title>CascadeIQ Current Flow</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: two stacked swim lanes (server engine on top, browser console below) joined by one dashed hand-off, plus a column of planned pieces. Box colour = how real each part is. */
+:root {
+  --bg: #EDF0F3;
+  --surface: #FFFFFF;
+  --band: #E4E9EF;
+  --ink: #142033;
+  --muted: #5A6679;
+  --line: #B9C3CF;
+  --real: #0E7377;
+  --calc: #2D5BA6;
+  --mixed: #6A4FB0;
+  --snap: #8A6400;
+  --mock: #C9430C;
+  --ghost: #8592A3;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E141C; --surface: #161F2B; --band: #121A24; --ink: #E4EAF2; --muted: #98A6B8; --line: #36445A;
+    --real: #43B9BD; --calc: #7FA7F2; --mixed: #A891F0; --snap: #E2B94B; --mock: #FF7B3F; --ghost: #6F7D90;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E141C; --surface: #161F2B; --band: #121A24; --ink: #E4EAF2; --muted: #98A6B8; --line: #36445A;
+  --real: #43B9BD; --calc: #7FA7F2; --mixed: #A891F0; --snap: #E2B94B; --mock: #FF7B3F; --ghost: #6F7D90;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.5; }
+.wrap {
+  max-width: 1680px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 40px;
+  display: grid; gap: 16px;
+}
+.eyebrow { font-family: var(--mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(1.9rem, 4vw, 2.8rem); text-transform: uppercase; letter-spacing: .01em; line-height: 1; text-wrap: balance; }
+.sub { margin: 0; color: var(--muted); max-width: 80ch; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .84rem; align-items: center; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--c); background: color-mix(in srgb, var(--c) 18%, var(--surface)); }
+.legend i.dash { border-style: dashed; background: transparent; }
+.frame { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.frame svg { display: block; width: 100%; min-width: 1240px; height: auto; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.fact { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.fact h2 { margin: 0; font-family: var(--display); font-size: 1.3rem; text-transform: uppercase; letter-spacing: .01em; }
+.fact p { margin: 0; font-size: .9rem; color: var(--muted); }
+.note { font-family: var(--mono); font-size: .74rem; color: var(--muted); margin: 0; }
+
+/* SVG */
+.band { fill: var(--band); stroke: var(--line); }
+.laneTitle { font-family: var(--display); font-weight: 700; font-size: 22px; text-transform: uppercase; letter-spacing: .02em; fill: var(--ink); }
+.laneSub { font-family: var(--mono); font-size: 11.5px; fill: var(--muted); }
+.colHead { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; fill: var(--muted); }
+.box { fill: var(--surface); stroke-width: 1.5; }
+.name { font-family: var(--body); font-weight: 600; font-size: 14px; fill: var(--ink); }
+.how { font-family: var(--body); font-size: 12px; fill: var(--muted); }
+.ghostName { fill: var(--muted); }
+.chipText { font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .04em; }
+.wire { stroke: var(--line); stroke-width: 1.6; fill: none; }
+.arrowHead { fill: var(--line); }
+.bridge { stroke: var(--snap); stroke-width: 2; stroke-dasharray: 7 5; fill: none; }
+.bridgeHead { fill: var(--snap); }
+.plan { stroke: var(--ghost); stroke-width: 1.6; stroke-dasharray: 5 4; fill: none; }
+.planHead { fill: var(--ghost); }
+.realLink { stroke: var(--real); stroke-width: 2; fill: none; }
+.realHead { fill: var(--real); }
+.wireLabel { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+.halo { paint-order: stroke; stroke: var(--bg); stroke-width: 6px; stroke-linejoin: round; }
+.bandHalo { paint-order: stroke; stroke: var(--band); stroke-width: 6px; stroke-linejoin: round; }
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">CascadeIQ · Kathmandu valley floods, Sept 2024 · as built on 7 Nov 2026</div>
+  <h1>What the system does today</h1>
+  <p class="sub">The engine on the server works on real data. The console in the browser is what you demo. It now reads real buildings from the server and bundles four more real sources, but its closures are still a snapshot and most resources are still mock. The colour of each box shows how real that part is.</p>
+  <div class="legend" aria-label="Legend">
+    <span><i style="--c: var(--real)"></i>Real data</span>
+    <span><i style="--c: var(--calc)"></i>Real logic on real data</span>
+    <span><i style="--c: var(--mixed)"></i>Real logic on mock inputs</span>
+    <span><i style="--c: var(--snap)"></i>Snapshot of real output</span>
+    <span><i class="dash" style="--c: var(--mock)"></i>Mock or simulated</span>
+    <span><i style="--c: var(--ink)"></i>Interface</span>
+    <span><i class="dash" style="--c: var(--ghost)"></i>Not built yet</span>
+  </div>
+  <div class="frame" role="img" aria-label="Flow diagram. Top lane, the engine on the server: OpenStreetMap roads and buildings and the UNOSAT flood extent are prepared offline and run through five rule-based agents. BIPAD incident reports feed only Verification, which finds no skill beyond baselines yet. A Fastify API runs the chain and serves buildings to the console. A dashed hand-off shows closures and cut-off areas picked once from the engine. Bottom lane, the console: real buildings, roads, flood, tiles, OpenCelliD cell sites, NASA night-light outages and the IODA internet signal, plus remaining mock data, feed browser agents and rules: weather (mock), terrain and flow (real elevation), a replay animation, shelter rules, cell-site status, risk rules, evidence text and recommendations. These drive the map, status strip, drawer and photoreal view. The analyst assigns actions, which only change the screen. Planned pieces: Run calls the engine, an LLM agent, a saved action log, road routing, real rain and incident replay, real landslides, and any-location config.">
+    <svg id="diagram" viewBox="0 0 1640 1600" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="facts">
+    <div class="fact"><h2>One thin link to the engine</h2><p>The console now loads real buildings from the server, but the Run button still replays 12 closures and 6 cut-off areas picked by hand from one engine run.</p></div>
+    <div class="fact"><h2>Real so far</h2><p>Map, roads, flood outline, elevation, 7,115 buildings, 328 cell sites, the regional internet signal and 9 power-outage areas from night lights. Most resources, zones and evidence numbers are still mock.</p></div>
+    <div class="fact"><h2>No LLM anywhere</h2><p>Every "agent" today is a deterministic rule or a small browser model. The engine labels its events "rule-based" and never presents them as AI reasoning.</p></div>
+    <div class="fact"><h2>Nothing is saved</h2><p>Assigning a team or issuing an alert changes the screen only. No action is stored, so the system can't learn from what the analyst did.</p></div>
+  </div>
+  <p class="note">Read from the code on 7 Nov 2026: commit cf26b99 plus uncommitted work (cell sites, IODA, night lights). Hospital and Tribhuvan Airport positions are real; their status is not.</p>
+</div>
+
+<script>
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("diagram");
+function el(tag, attrs, parent = svg) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  parent.appendChild(n);
+  return n;
+}
+function txt(x, y, s, cls, parent = svg, extra = {}) { const t = el("text", { x, y, class: cls, ...extra }, parent); t.textContent = s; return t; }
+function wrap(text, maxChars) {
+  const words = text.split(" "), lines = []; let cur = "";
+  for (const w of words) {
+    if ((cur + " " + w).trim().length > maxChars && cur) { lines.push(cur); cur = w; }
+    else cur = (cur + " " + w).trim();
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+const COLOR = { real: "--real", calc: "--calc", mixed: "--mixed", snap: "--snap", mock: "--mock", ui: "--ink", ghost: "--ghost" };
+const cv = st => `var(${COLOR[st]})`;
+function stack(x, w, y0, y1, items, gap = 12) {
+  const tot = items.reduce((s, it) => s + (it.weight || 1), 0);
+  const avail = y1 - y0 - gap * (items.length - 1);
+  let y = y0;
+  items.forEach(it => { it.x = x; it.w = w; it.y = y; it.h = avail * (it.weight || 1) / tot; it.cy = y + it.h / 2; y += it.h + gap; });
+  return items;
+}
+const at = (x, y, w, h, it) => Object.assign(it, { x, y, w, h, cy: y + h / 2 });
+
+const defs = el("defs", {});
+[["ah", "arrowHead"], ["bh", "bridgeHead"], ["ph", "planHead"], ["rh", "realHead"]].forEach(([id, cls]) => {
+  const m = el("marker", { id, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+  el("path", { d: "M0,0 L10,5 L0,10 z", class: cls }, m);
+});
+
+// ---------- Geometry ----------
+const A_TOP = 50, A_BOT = 520, BRIDGE_Y = 538, LINK_Y = 554, B_TOP = 578, B0 = B_TOP + 74, B1 = 1570;
+
+// ---------- Lanes ----------
+el("rect", { x: 6, y: A_TOP, width: 1628, height: A_BOT - A_TOP, rx: 10, class: "band" });
+txt(20, A_TOP + 28, "Engine · server", "laneTitle");
+txt(190, A_TOP + 28, "packages/analysis + apps/api · real data, rule-based, tested · run results not shown in the console", "laneSub");
+el("rect", { x: 6, y: B_TOP, width: 1628, height: B1 + 20 - B_TOP, rx: 10, class: "band" });
+txt(20, B_TOP + 28, "Console · browser", "laneTitle");
+txt(212, B_TOP + 28, "apps/web · what you demo · real layers growing, closures still a snapshot", "laneSub");
+
+// ---------- Engine lane ----------
+txt(20, 108, "Real data", "colHead");
+txt(300, 108, "Offline prep", "colHead");
+txt(540, 108, "Agent chain · deterministic rules, no LLM", "colHead");
+
+const src = stack(20, 220, 120, 500, [
+  { name: "OpenStreetMap roads", how: "Pre-event, 2 Jan 2024. 38k segments, 185 hospitals.", st: "real", chip: "REAL DATA" },
+  { name: "OpenStreetMap buildings", how: "7,115 shelter-type buildings, pre-event. Floors on 80%.", st: "real", chip: "REAL DATA" },
+  { name: "UNOSAT flood extent", how: "SPOT-6 satellite, 30 Sep 2024. Given as the hazard.", st: "real", chip: "REAL DATA" },
+  { name: "BIPAD incident reports", how: "19 verified flood reports. Used only to score.", st: "real", chip: "REAL DATA · SCORING ONLY" },
+]);
+const prep = at(300, 120, 200, 130, { name: "Prepare data", how: "Scripts run once: flooded share of each road, buildings and places in the flood, distance to water.", st: "calc", chip: "REAL LOGIC · OFFLINE" });
+const CX = [540, 761, 982, 1203, 1424];
+const chain = [
+  { name: "Coordinator", how: "Checks roads and buildings predate the flood so the test can't cheat. Holds back the reports.", st: "calc", chip: "REAL LOGIC" },
+  { name: "Hazard agent", how: "Loads the observed flood extent. It does not predict the flood.", st: "calc", chip: "REAL LOGIC" },
+  { name: "Infrastructure agent", how: "Closes a road if it is a bridge touching water or at least 30% flooded. 310 closed.", st: "calc", chip: "REAL LOGIC · ASSUMED RULE" },
+  { name: "Access agent", how: "Shortest paths from open hospitals. Finds 1 cut-off place, 428 stranded roads, 12 cut-off buildings.", st: "calc", chip: "REAL LOGIC" },
+  { name: "Verification agent", how: "Scores against the reports, random sets and a nearest-to-flood baseline. No skill shown yet.", st: "calc", chip: "REAL LOGIC" },
+].map((it, i) => at(CX[i], 120, 196, 130, it));
+const api = at(540, 290, 300, 100, { name: "Fastify API", how: "POST /api/hindcast/run runs the chain. GET /api/buildings serves footprints to the console.", st: "calc", chip: "WORKS · 41 TESTS" });
+const research = at(870, 290, 300, 100, { name: "Research screen", how: "HindcastView shows engine results. Built, but not rendered in the console.", st: "ghost", chip: "BUILT, NOT RENDERED" });
+
+// ---------- Console lane ----------
+txt(34, B0 - 16, "Inputs", "colHead");
+txt(300, B0 - 16, "Processing in the browser", "colHead");
+txt(650, B0 - 16, "On screen", "colHead");
+txt(970, B0 - 16, "Analyst", "colHead");
+txt(1270, B0 - 16, "Not built yet · next steps", "colHead");
+
+const inp = stack(34, 210, B0, B1, [
+  { name: "Closures and cut-off areas", how: "12 closures, 6 pockets picked once from the engine. Stages made up.", st: "snap", chip: "SNAPSHOT OF REAL OUTPUT" },
+  { name: "Buildings", how: "7,115 real footprints with floor counts, loaded from the API.", st: "real", chip: "REAL · LIVE FROM API" },
+  { name: "Roads and flood shapes", how: "About 6,000 main OSM roads. UNOSAT flood extent, 30 Sep 2024.", st: "real", chip: "REAL DATA" },
+  { name: "Imagery and elevation", how: "Esri satellite and public elevation tiles, streamed.", st: "real", chip: "REAL · STREAMED" },
+  { name: "Cell sites", how: "328 sites from OpenCelliD. Positions are estimates.", st: "real", chip: "REAL · OPENCELLID" },
+  { name: "Night lights", how: "NASA Black Marble: 9 areas went dark after the flood.", st: "real", chip: "REAL · NASA" },
+  { name: "Internet signal", how: "IODA: 24% fewer networks visible at 07:45, 28 Sep. Regional.", st: "real", chip: "REAL · IODA" },
+  { name: "Mock world", how: "Hospital status, 16 schools, helipads, army bases, landslide and alert zones, dams, shelters, food depots, QRT staging, social posts, radio call-ins.", st: "mock", chip: "MOCK", weight: 1.6 },
+]);
+const proc = stack(300, 300, B0, B1, [
+  { name: "Weather agent", how: "Rain slider (6, 10 or 15 in) becomes a total, range and intensity.", st: "mock", chip: "MOCK INPUT" },
+  { name: "Terrain agent", how: "Ranks flood patches by depth from real elevation. Scale is assumed.", st: "calc", chip: "REAL ELEVATION · ASSUMED SCALE" },
+  { name: "Flow agent", how: "Rain runs downhill over a 70 m elevation grid and pools.", st: "calc", chip: "REAL ELEVATION · SIMPLE MODEL" },
+  { name: "Run cascade assessment", how: "Plays a staged reveal of the fixed closures. Nothing is computed.", st: "mock", chip: "REPLAY ONLY" },
+  { name: "Shelter rules", how: "Each building: go upstairs, evacuate, or open as a refuge, from depth and floors.", st: "calc", chip: "REAL BUILDINGS · ASSUMED DEPTH" },
+  { name: "Cell-site status", how: "Down if flooded. At risk if near the flood or its lights went dark.", st: "calc", chip: "MODELLED FROM REAL DATA" },
+  { name: "Risk rules", how: "Rates mock schools, airports, army bases by distance to closures and outages.", st: "mixed", chip: "REAL LOGIC · MOCK INPUTS" },
+  { name: "Evidence text", how: "Real for cell sites, outages and buildings. Hashed numbers elsewhere.", st: "mixed", chip: "REAL FOR 3 KINDS · REST MOCK" },
+  { name: "Recommendations", how: "Nearest team, depot or shelter by straight line. Grid crews go to real dark areas.", st: "mixed", chip: "REAL LOGIC · MOSTLY MOCK INPUTS" },
+]);
+const scr = stack(650, 240, B0, B1, [
+  { name: "Map, 2D or 3D", how: "Closures reveal in red. Flood shaded by depth, runoff streaks, coloured buildings, cell sites and dark areas.", st: "ui", chip: "INTERFACE" },
+  { name: "Status strip and details", how: "Counts that filter the map and zoom to affected roads. Grid outages and buildings to evacuate are now real counts. Details lists real and mock sources.", st: "ui", chip: "INTERFACE" },
+  { name: "Drawer", how: "What failed and why, recommended responses, and a real internet chart for cell sites and cut-off areas.", st: "ui", chip: "INTERFACE" },
+  { name: "Photoreal close-up", how: "The selected item over Google 3D tiles through Cesium. Needs a free token.", st: "real", chip: "REAL 3D TILES · OPTIONAL" },
+]);
+const analyst = at(970, B0, 220, B1 - 190 - B0, { name: "Analyst decides", how: "Selects an item and reads the evidence. Assigns a QRT, food, shelter, a grid crew, army support or an airlift, moves people upstairs or out of a building, and issues a public alert preview in English and Nepali.", st: "ui", chip: "HUMAN IN THE LOOP" });
+const result = at(970, B1 - 175, 220, 175, { name: "Simulated result", how: "Changes the screen only, with undo. Nothing is sent, saved or fed back to the system.", st: "mock", chip: "SIMULATED" });
+const ghost = stack(1270, 350, B0, B1, [
+  { name: "Run button calls the engine", how: "Computes closures, cut-offs and hospital access live from the real flood map instead of replaying a snapshot." },
+  { name: "LLM agent", how: "Writes the brief and the \"why\" text from computed evidence, and drafts alerts." },
+  { name: "Saved action log", how: "Stores analyst actions and feedback so the next recommendation knows what's done." },
+  { name: "Road routing for responses", how: "Sends teams along open roads using the engine's road graph." },
+  { name: "Real rain and incident replay", how: "Observed rain for those dates. BIPAD reports replayed as incoming signals." },
+  { name: "Real landslides", how: "Swap the 4 drawn zones for the 17 BIPAD landslide reports already in the repo." },
+  { name: "Any location", how: "One config per event, so Helene or any town is a data drop-in." },
+].map(it => ({ ...it, st: "ghost", chip: "NOT BUILT" })));
+
+// ---------- Wires ----------
+const W = el("g", {});
+const line = (pts, cls = "wire", head = "ah") => el("path", { d: "M" + pts.map(p => p.join(",")).join(" L"), class: cls, "marker-end": `url(#${head})` }, W);
+const seg = (pts, cls = "wire") => el("path", { d: "M" + pts.map(p => p.join(",")).join(" L"), class: cls }, W);
+
+// sources → prep (roads, buildings, flood)
+[0, 1, 2].forEach(i => seg([[240, src[i].cy], [270, src[i].cy]]));
+seg([[270, src[0].cy], [270, src[2].cy]]);
+line([[270, prep.cy], [prep.x - 2, prep.cy]]);
+line([[prep.x + prep.w, prep.cy], [chain[0].x - 2, prep.cy]]);
+for (let i = 0; i < 4; i++) line([[chain[i].x + chain[i].w, chain[i].cy], [chain[i + 1].x - 2, chain[i + 1].cy]]);
+// BIPAD → Verification only
+const vx = chain[4].x + chain[4].w / 2;
+line([[240, src[3].cy], [vx, src[3].cy], [vx, chain[4].y + chain[4].h + 2]]);
+txt(1000, src[3].cy - 7, "held back until scoring", "wireLabel bandHalo", W, { "text-anchor": "middle" });
+// API ↔ chain, API → research screen
+line([[690, api.y], [690, chain[0].y + chain[0].h + 2]]);
+txt(698, 276, "runs on request", "wireLabel", W);
+line([[api.x + api.w, api.cy], [research.x - 2, research.cy]], "plan", "ph");
+
+// snapshot hand-off: Access agent → closures fixture
+const ax = chain[3].x + chain[3].w / 2;
+line([[ax, chain[3].y + chain[3].h], [ax, BRIDGE_Y], [140, BRIDGE_Y], [140, inp[0].y - 2]], "bridge", "bh");
+txt(1000, BRIDGE_Y - 5, "closures and cut-offs picked once by hand from one engine run", "wireLabel halo", W, { "text-anchor": "middle" });
+// live link: API → buildings input
+const bl = inp[1];
+line([[600, api.y + api.h], [600, LINK_Y], [18, LINK_Y], [18, bl.cy], [bl.x - 2, bl.cy]], "realLink", "rh");
+txt(300, LINK_Y + 13, "GET /api/buildings · the console's one live call to the server", "wireLabel halo", W);
+
+function bus(fromItems, toItems, bx) {
+  const ys = fromItems.map(i => i.cy).concat(toItems.map(i => i.cy));
+  seg([[bx, Math.min(...ys)], [bx, Math.max(...ys)]]);
+  fromItems.forEach(i => seg([[i.x + i.w, i.cy], [bx, i.cy]]));
+  toItems.forEach(i => line([[bx, i.cy], [i.x - 2, i.cy]]));
+}
+bus(inp, proc, 272);
+bus(proc, scr, 625);
+const drawer = scr[2];
+line([[drawer.x + drawer.w, drawer.cy], [analyst.x - 2, drawer.cy]]);
+txt(930, drawer.cy - 8, "select", "wireLabel bandHalo", W, { "text-anchor": "middle" });
+line([[analyst.x + analyst.w / 2, analyst.y + analyst.h], [analyst.x + analyst.w / 2, result.y - 2]]);
+txt(analyst.x + analyst.w / 2 + 8, analyst.y + analyst.h + 11, "assign / issue", "wireLabel", W);
+const log = ghost[2];
+line([[analyst.x + analyst.w, log.cy], [log.x - 2, log.cy]], "plan", "ph");
+txt(1230, log.cy - 8, "planned", "wireLabel bandHalo", W, { "text-anchor": "middle" });
+
+// ---------- Boxes ----------
+function box(it) {
+  const g = el("g", {});
+  const c = cv(it.st), dashed = it.st === "mock" || it.st === "ghost";
+  el("rect", { x: it.x, y: it.y, width: it.w, height: it.h, rx: 6, class: "box", stroke: c, "stroke-dasharray": dashed ? "5 4" : "0",
+    fill: it.st === "ghost" ? "var(--band)" : "var(--surface)" }, g);
+  if (!dashed) el("rect", { x: it.x, y: it.y, width: 4, height: it.h, rx: 2, fill: c }, g);
+  const pad = 14;
+  txt(it.x + pad, it.y + 22, it.name, "name" + (it.st === "ghost" ? " ghostName" : ""), g);
+  const maxChars = Math.floor((it.w - pad * 2) / 6.4);
+  const maxLines = Math.max(1, Math.floor((it.h - 40 - 26) / 15) + 1);
+  wrap(it.how, maxChars).slice(0, maxLines).forEach((ln, k) => txt(it.x + pad, it.y + 40 + k * 15, ln, "how", g));
+  const cw = it.chip.length * 6.1 + 14;
+  el("rect", { x: it.x + pad, y: it.y + it.h - 25, width: cw, height: 16, rx: 3, fill: `color-mix(in srgb, ${c} 14%, transparent)` }, g);
+  txt(it.x + pad + 7, it.y + it.h - 13.5, it.chip, "chipText", g, { fill: c });
+}
+[...src, prep, ...chain, api, research, ...inp, ...proc, ...scr, analyst, result, ...ghost].forEach(box);
+</script>

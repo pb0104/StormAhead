@@ -6,8 +6,10 @@ import { z, ZodError } from "zod";
 import { HttpError } from "./common.ts";
 import { getServices } from "./composition.ts";
 import { HindcastService } from "./hindcast.ts";
+import { HeleneService } from "./helene.ts";
+import compress from "@fastify/compress";
 
-export function buildServer() {
+export async function buildServer() {
   const app = Fastify({ logger: false });
 
   app.setErrorHandler((err: any, _req, reply) => {
@@ -16,6 +18,7 @@ export function buildServer() {
     return reply.code(err.statusCode ?? 500).send({ error: err.message ?? "Internal error" });
   });
 
+  await app.register(compress);
   app.get("/api/health", async () => ({ ok: true }));
 
   const S = () => getServices();
@@ -80,7 +83,18 @@ export function buildServer() {
     return reply.send(t.body);
   });
 
-  // Kathmandu hindcast (legacy research path).
+  // Hurricane Helene replay (western NC): reported road restrictions on a pre-storm network.
+  let hel: HeleneService | null = null;
+  const HL = () => {
+    if (hel) return hel;
+    if (!HeleneService.available()) throw new HttpError(404, "Helene dataset not prepared. Run scripts/fetch_tims.mjs then scripts/prepare_helene.py (see docs/helene-data-audit.md).");
+    return (hel = new HeleneService());
+  };
+  app.get("/api/helene/meta", async () => (HeleneService.available() ? HL().meta() : { available: false }));
+  app.get("/api/helene/roads", async () => HL().roads());
+  app.get("/api/helene/closures", async () => ({ closures: HL().closuresList() }));
+
+  // Kathmandu hindcast (real data): observed flood is a given input; impacts predicted; scored against incident reports.
   let hind: HindcastService | null = null;
   const H = () => {
     if (hind) return hind;

@@ -67,7 +67,7 @@ d("Kathmandu hindcast on the real dataset", () => {
     expect(() => h.run({ degradeRatio: 0.5 })).toThrow(/Invalid/);
   });
   it("serves through the API", async () => {
-    const app = buildServer();
+    const app = await buildServer();
     expect((await app.inject({ url: "/api/hindcast/meta" })).json().available).toBe(true);
     const run = (await app.inject({ method: "POST", url: "/api/hindcast/run", payload: { closeShare: 0.3 } })).json();
     expect(run.result.counts.places).toBe(h.prov.counts.places);

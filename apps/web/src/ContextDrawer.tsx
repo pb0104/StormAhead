@@ -2,9 +2,34 @@ import { useState } from "react";
 import type { Action, Entity, Reason } from "../../../packages/ports/index.ts";
 import { Glyph } from "./Glyph.tsx";
 import { RING, type BuildingKind } from "./icons.ts";
+import { PROVENANCE } from "./real/ops.ts";
+import { IODA_REGION, nepalTime } from "./realdata.ts";
 
 const BUILDINGS = new Set(["hospital", "school", "shelter", "food", "qrt", "airport", "helipad", "army"]);
 const ringFor = (e: Entity) => (e.kind === "hospital" || e.kind === "airport" || e.kind === "helipad" || e.kind === "army" ? (RING as Record<string, string>)[String(e.props.access)] : e.kind === "school" ? (RING as Record<string, string>)[String(e.props.risk)] : RING.base) ?? RING.none;
+
+/** REAL regional internet connectivity (IODA, Bagmati zone), hourly, 20 Sep to 5 Oct 2024, with the pre-rain baseline. */
+function IodaChart() {
+  const s = IODA_REGION.series.bgp!;
+  const W = 300, H = 74, P = 4, vals = s.values;
+  const lo = Math.min(...vals.filter((v): v is number => v != null)) * 0.97, hi = s.baseline * 1.03;
+  const x = (i: number) => P + (i / (vals.length - 1)) * (W - 2 * P), y = (v: number) => H - P - ((v - lo) / (hi - lo)) * (H - 2 * P);
+  const d = vals.map((v, i) => (v == null ? "" : `${i && vals[i - 1] != null ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`)).join("");
+  const minI = vals.indexOf(s.floodMin);
+  const rainI = Math.round((Date.UTC(2024, 8, 27) / 1000 - s.t0) / s.stepSec);
+  return (
+    <section>
+      <h3>Internet in the region</h3>
+      <svg className="ioda" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Networks visible on the internet in the Bagmati zone fell ${s.dropPct}% on the flood night`}>
+        <rect x={x(rainI)} y={0} width={x(rainI + 72) - x(rainI)} height={H} fill="#4DA3FF" opacity={0.12} />
+        <line x1={P} x2={W - P} y1={y(s.baseline)} y2={y(s.baseline)} stroke="#9BA8B0" strokeDasharray="3 3" strokeWidth={1} />
+        <path d={d} fill="none" stroke="#3DD6E0" strokeWidth={1.6} />
+        <circle cx={x(minI)} cy={y(s.floodMin)} r={3.2} fill="#FF8E7A" />
+      </svg>
+      <p className="ioda-cap">Networks visible on the internet, {IODA_REGION.label}. Dashed line: the week before the rain. Blue band: 27 to 29 Sep. Lowest point {s.dropPct}% below normal at {nepalTime(s.floodMinAt)}, Nepal time. Real data from IODA, Georgia Tech. Regional, so it shows when, not where.</p>
+    </section>
+  );
+}
 
 export type Done = Record<string, "assigned" | "issued">;
 const VERB: Record<Action["kind"], string> = { qrt: "Assign QRT", food: "Stage food", shelter: "Open shelter", grid: "Assign crew", alert: "Issue alert", road: "Stage", air: "Reserve", army: "Request" };
@@ -25,6 +50,7 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
             <div style={{ flex: 1 }}>
               <span className="d-kind">{kindLabel[e.kind] ?? e.kind}{e.props.source === "openstreetmap" ? " · OSM" : ` · ${e.id}`}</span>
               <h2>{e.name}</h2>
+              {PROVENANCE[e.props.prov as keyof typeof PROVENANCE] && <span className={`prov ${PROVENANCE[e.props.prov as keyof typeof PROVENANCE].tag}`}>{PROVENANCE[e.props.prov as keyof typeof PROVENANCE].text}</span>}
             </div>
             <button className="icon" onClick={onClose} aria-label="Close">×</button>
           </header>
@@ -34,6 +60,7 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
               <h3>What failed, and why</h3>
               <ul className="why">{why.map((r) => <li key={r.input}><b>{r.input}</b><span>{r.text}</span></li>)}</ul>
             </section>
+            {(e.kind === "tower" || e.kind === "pocket") && <IodaChart />}
             {acts.length > 0 && (
               <section>
                 <h3>Recommended response</h3>
@@ -62,7 +89,7 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
                 </div>
               </section>
             )}
-            <p className="d-foot">Demo only. Nothing is sent and nobody is dispatched.</p>
+            <p className="d-foot">Actions are suggestions. Nothing is sent and nobody is dispatched.</p>
           </div>
         </>
       )}
