@@ -23,7 +23,33 @@ export type MapProps = {
   onMapClick?: (at: [number, number]) => void;
   /** The picked spot, drawn as a ring of the feed radius. */
   pick?: [number, number] | null;
+  /** Left padding for the opening camera (the old command rail needs 310). */
+  padLeft?: number;
+  /** Forecast alerts drawn as pulsing DOM markers. */
+  alerts?: MapAlertPin[];
+  activeAlert?: string | null;
+  onAlert?: (id: string | null) => void;
+  /** Bumped to fit the camera to every visible alert. */
+  fitAlertsKey?: number;
+  /** Live radio stations with a known position, drawn as small DOM markers. */
+  stations?: { id: string; lon: number; lat: number; name: string; playing: boolean }[];
+  onStation?: (id: string) => void;
+  /** Padding to keep pins clear of floating panels when fitting. */
+  panelPad?: { left: number; right: number; top: number; bottom: number };
 };
+export type MapAlertPin = {
+  id: string; lon: number; lat: number; severity: "severe" | "high" | "moderate" | "info"; title: string; detail: string;
+  when: string | null; source: string; priority?: "P1" | "P2"; visible: boolean;
+};
+/** Swap only our own classes on a marker element, keeping the ones MapLibre adds (they position it). */
+function setOwnClasses(el: HTMLElement, cls: string) {
+  const prev = (el.dataset.own ?? "").split(" ").filter(Boolean);
+  if (prev.length) el.classList.remove(...prev);
+  const next = cls.split(" ").filter(Boolean);
+  if (next.length) el.classList.add(...next);
+  el.dataset.own = next.join(" ");
+}
+const esc = (t: string) => t.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
 const WAVE_FRAMES = 8;
 /** One frame of a seamless wave pattern: pale streaks that drift sideways as k advances. */
@@ -55,6 +81,8 @@ const BASE_OPACITY: Record<string, number> = {
 
 export function MapStage(p: MapProps) {
   const box = useRef<HTMLDivElement>(null), tip = useRef<HTMLDivElement>(null);
+  const radioPins = useRef(new Map<string, { mk: any; el: HTMLDivElement }>());
+  const pins = useRef(new Map<string, { mk: any; el: HTMLDivElement }>()), popup = useRef<any>(null);
   const map = useRef<any>(null), ready = useRef(false), props = useRef(p), markers = useRef<any[]>([]), raf = useRef(0), bar = useRef<HTMLElement | null>(null), floodRef = useRef<unknown>(null), verifyRef = useRef<unknown>(null), postCv = useRef<HTMLCanvasElement | null>(null), postImg = useRef<HTMLImageElement | null>(null), bldgRef = useRef<unknown>(null), flowCv = useRef<HTMLCanvasElement | null>(null), runoffUrl = useRef<string | null>(null);
   props.current = p;
 
@@ -72,7 +100,7 @@ export function MapStage(p: MapProps) {
         sources: {},
         layers: [{ id: "bg", type: "background", paint: { "background-color": "#0A1217" } }],
       },
-      bounds: [[BBOX[0], BBOX[1]], [BBOX[2], BBOX[3]]], fitBoundsOptions: { padding: { top: 64, bottom: 24, left: props.current.compact ? 16 : 310, right: 16 } },
+      bounds: [[BBOX[0], BBOX[1]], [BBOX[2], BBOX[3]]], fitBoundsOptions: { padding: { top: 64, bottom: 24, left: props.current.compact ? 16 : (props.current.padLeft ?? 310), right: 16 } },
       maxZoom: 18,
     });
     map.current = m;
@@ -606,6 +634,74 @@ export function MapStage(p: MapProps) {
     const xs = pts.map((c) => c[0]), ys = pts.map((c) => c[1]);
     m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: pad, maxZoom: props.current.recs.length ? 13.6 : 14.2, duration: 800 });
   }, [p.selected]);
+
+  // Forecast alerts: one pulsing DOM marker per alert, kept in sync by id. Visibility follows the timeline cursor.
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    const want = new Map((p.alerts ?? []).map((a) => [a.id, a]));
+    for (const [id, pin] of pins.current) if (!want.has(id)) { pin.mk.remove(); pins.current.delete(id); }
+    for (const a of want.values()) {
+      let pin = pins.current.get(a.id);
+      if (!pin) {
+        const el = document.createElement("div");
+        el.innerHTML = `<span class="fx-pin-ring"></span><span class="fx-pin-ring r2"></span><span class="fx-pin-dot">${a.priority ?? ""}</span>`;
+        el.addEventListener("click", (ev) => { ev.stopPropagation(); props.current.onAlert?.(a.id); });
+        el.setAttribute("role", "button"); el.setAttribute("aria-label", a.title); el.tabIndex = 0;
+        el.addEventListener("keydown", (ev) => { if (ev.key === "Enter") props.current.onAlert?.(a.id); });
+        pin = { mk: new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat([a.lon, a.lat]).addTo(m), el };
+        pins.current.set(a.id, pin);
+      }
+      setOwnClasses(pin.el, `fx-pin sev-${a.severity}${a.priority ? " fx-combined" : ""}${a.visible ? " on" : ""}${p.activeAlert === a.id ? " active" : ""}`);
+      pin.el.title = a.title;
+    }
+  }, [p.alerts, p.activeAlert]);
+  useEffect(() => () => { for (const pin of pins.current.values()) pin.mk.remove(); pins.current.clear(); popup.current?.remove(); }, []);
+
+  // Live radio stations: tap to play.
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    const want = new Map((p.stations ?? []).map((s) => [s.id, s]));
+    for (const [id, pin] of radioPins.current) if (!want.has(id)) { pin.mk.remove(); radioPins.current.delete(id); }
+    for (const s of want.values()) {
+      let pin = radioPins.current.get(s.id);
+      if (!pin) {
+        const el = document.createElement("div");
+        el.innerHTML = `<span class="fx-rpin-ico"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16v11H4ZM8 9l9-5M8 14.5a1.5 1.5 0 1 0 0-.01M13 13h4M13 16h4"/></svg></span><span class="fx-rpin-name">${esc(s.name)}</span>`;
+        el.addEventListener("click", (ev) => { ev.stopPropagation(); props.current.onStation?.(s.id); });
+        el.setAttribute("role", "button"); el.tabIndex = 0;
+        el.addEventListener("keydown", (ev) => { if (ev.key === "Enter") props.current.onStation?.(s.id); });
+        pin = { mk: new maplibregl.Marker({ element: el, anchor: "bottom" }).setLngLat([s.lon, s.lat]).addTo(m), el };
+        radioPins.current.set(s.id, pin);
+      }
+      setOwnClasses(pin.el, `fx-rpin${s.playing ? " playing" : ""}`);
+      pin.el.setAttribute("aria-label", `${s.playing ? "Stop" : "Play"} ${s.name}`);
+    }
+  }, [p.stations]);
+  useEffect(() => () => { for (const pin of radioPins.current.values()) pin.mk.remove(); radioPins.current.clear(); }, []);
+
+  // Selecting an alert flies to it and opens a small card.
+  useEffect(() => {
+    const m = map.current; popup.current?.remove(); popup.current = null;
+    const a = (p.alerts ?? []).find((x) => x.id === p.activeAlert);
+    if (!m || !a) return;
+    const pad = p.panelPad ?? { left: 40, right: 40, top: 80, bottom: 160 };
+    m.flyTo({ center: [a.lon, a.lat], zoom: Math.max(m.getZoom(), 13.4), padding: pad, duration: 1100, essential: true });
+    popup.current = new maplibregl.Popup({ closeButton: true, closeOnClick: false, offset: 18, className: "fx-popup", maxWidth: "300px" })
+      .setLngLat([a.lon, a.lat])
+      .setHTML(`<div class="fx-pop sev-${a.severity}"><div class="fx-pop-top"><span class="fx-sev">${a.priority ? `${a.priority} · combined` : a.severity}</span><span class="fx-pop-src">${esc(a.source)}</span></div><h4>${esc(a.title)}</h4><p>${esc(a.detail)}</p>${a.when ? `<div class="fx-pop-when">Expected ${esc(a.when)}</div>` : ""}</div>`)
+      .addTo(m);
+    popup.current.on("close", () => { if (props.current.activeAlert === a.id) props.current.onAlert?.(null); });
+  }, [p.activeAlert]);
+
+  // Fit to every visible alert (after a run).
+  useEffect(() => {
+    const m = map.current; if (!m || !p.fitAlertsKey) return;
+    const pts = (props.current.alerts ?? []).filter((a) => a.visible);
+    if (!pts.length) return;
+    const xs = pts.map((a) => a.lon), ys = pts.map((a) => a.lat);
+    const go = () => m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: props.current.panelPad ?? 60, maxZoom: 13.2, duration: 1400 });
+    if (ready.current) go(); else m.once("load", go);
+  }, [p.fitAlertsKey]);
 
   return (
     <div className="mapstage">

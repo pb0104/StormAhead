@@ -1,3 +1,5 @@
+// Keys (STACKAI_*, GOOGLE_*) live in the repo-root .env. Node loads it natively; a missing file is fine.
+try { process.loadEnvFile(new URL("../../.env", import.meta.url)); } catch { /* no .env: every key is optional */ }
 import { buildServer } from "./server.ts";
 
 const port = Number(process.env.PORT ?? 3001);

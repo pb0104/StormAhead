@@ -26,6 +26,33 @@ The Kathmandu ops console loads scene, weather seed, terrain/flow assessment and
 
 ---
 
+## Forecast console (the default screen)
+
+The app opens on a full-screen map with one prompt. The operator asks a question ("How do the next 15 days look?"), picks which factors to include, and watches the matching agents work **in parallel**. Each one streams its steps on real data, then reasons over its own numbers with an LLM. When they finish, a coordinator fuses their alerts into **combined findings** (places several agents flag together, ranked P1/P2). A briefing agent writes the situation report: what will be affected, how to prepare, resource allocation and a bilingual public alert. The map then plays the window back, with animated rain driven by the hourly gauges, flood water and runoff, road closures, outages and pulsing alert pins. **The report is a draft: approving it changes the screen only. Nothing is sent.**
+
+| Factor (agent) | Reads |
+|---|---|
+| Weather | 17 DHM rain gauges, hourly (BIPAD); Open-Meteo ECMWF cross-check |
+| River gauges | 13 DHM river stations: warning and danger crossings |
+| Terrain & flooding | Elevation tiles + runoff model via `/api/assessment`, driven by the window's heaviest 24 h |
+| Satellite | UNOSAT SPOT-6 extent, Maxar footprints, Black Marble coverage |
+| Roads & access | OSM network closure rule, cut-off pockets, hospital access |
+| Cellular | OpenCelliD sites near water; IODA regional drop |
+| Power grid | NASA Black Marble dark areas |
+| Social media | Reddit posts in the window, located help requests inside the valley |
+| Facilities & shelter | BIPAD hospitals, schools, open spaces, responders; Google care homes |
+| Landslides | BIPAD landslides 2021–2023 (2024 withheld) + a 100 mm/24 h trigger rule of thumb |
+
+**Replay rule.** The scenario clock is fixed at 26 Sep 2024 06:00 NPT, before the floods. Values inside the forecast window are what was actually observed, used as a perfect-forecast stand-in. The UI says so on the clock chip, in the report and in every agent's caveats. Coordinates always come from data; the LLM only writes text.
+
+**LLM (StackAI).** StackAI runs a deployed *flow*, so it needs three values in the repo-root `.env`: `STACKAI_API_KEY`, `STACKAI_ORG_ID` and `STACKAI_FLOW_ID`. The flow should be Input (`in-0`) → LLM (prompt `{in-0}`) → Output (`out-0`); the org and flow IDs are in its Export → API snippet. Every prompt is self-contained. Without them, the agents and the report fall back to rule-written summaries that are labelled as such. Code: `apps/api/forecast/` (`agents.ts`, `service.ts`, `stackai.ts`); UI: `apps/web/src/forecast/`. Endpoints: `GET /api/forecast/factors`, `POST /api/forecast/intent`, `POST /api/forecast/run` (server-sent events).
+
+**Live radio.** The **Radio** button opens live broadcast stations in Nepal (Radio Nepal, BBC Nepali, Kantipur FM and about 130 more), grouped as News, Kathmandu and All. The three stations with a known position in the valley also appear as map pins; tap one to play it. The approach follows gods-eye-view: the server only fetches and caches the station list from the **Radio Browser** directory (public domain, PDDL 1.0; `GET /api/radio/stations`, cached 45 min in memory and in `data/cache/radio/`). Pressing play connects the browser straight to the broadcaster's own HTTPS stream. StormAhead never proxies, records or transcribes audio, and none of it reaches the agents. This is radio **as of today**, not part of the 2024 replay, and it is broadcast news/FM, not emergency-services traffic (scanner feeds forbid this use; see the Radio notes in `CLAUDE.md`). Each broadcaster's stream terms apply.
+
+The earlier map-first ops console (`OpsConsole.tsx`) is kept but not mounted. Export it from `App.tsx` to bring it back.
+
+---
+
 ## Run it
 
 Requires Node ≥ 22.5. No API keys. The console streams some map tiles, so it needs internet for full detail (see [Data sources](#data-sources-and-licences)); without it the map falls back to a softer bundled satellite image.

@@ -9,6 +9,8 @@ import { HindcastService } from "./hindcast.ts";
 import { HeleneService } from "./helene.ts";
 import compress from "@fastify/compress";
 import { PipelineService } from "./pipeline.ts";
+import { radioClick, radioStations } from "./radio.ts";
+import { factorList, parseIntent, runForecast, type ForecastEvent } from "./forecast/service.ts";
 
 export async function buildServer() {
   const app = Fastify({ logger: false });
@@ -140,6 +142,39 @@ export async function buildServer() {
   app.post("/api/pipeline/run", async (req) => {
     const b = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(req.body ?? {});
     return P().run(b.date);
+  });
+
+  // Live broadcast radio: the station LIST only (Radio Browser, cached). Audio streams browser → broadcaster, never via us.
+  app.get("/api/radio/stations", async (_req, reply) => {
+    try { return reply.header("cache-control", "public, max-age=300").send(await radioStations()); }
+    catch (e) { throw new HttpError(503, (e as Error).message); }
+  });
+  app.post("/api/radio/click/:id", async (req) => {
+    const p = z.object({ id: z.string().uuid() }).parse(req.params);
+    return { counted: await radioClick(p.id) };
+  });
+
+  // Forecast console: question → factors → parallel agents (streamed as server-sent events) → fusion → LLM report.
+  app.get("/api/forecast/factors", async () => factorList());
+  app.post("/api/forecast/intent", async (req) => {
+    const b = z.object({ question: z.string().min(1).max(500) }).parse(req.body ?? {});
+    return parseIntent(b.question);
+  });
+  app.post("/api/forecast/run", async (req, reply) => {
+    const b = z.object({ question: z.string().min(1).max(500), hours: z.number().min(6).max(24 * 30).optional(), factors: z.array(z.string()).max(20).optional() }).parse(req.body ?? {});
+    reply.hijack();
+    const res = reply.raw;
+    res.writeHead(200, { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-cache, no-transform", Connection: "keep-alive", "X-Accel-Buffering": "no" });
+    let closed = false;
+    res.on("close", () => { closed = true; });
+    const emit = (e: ForecastEvent) => { if (!closed) res.write(`data: ${JSON.stringify(e)}\n\n`); };
+    try {
+      await runForecast(S(), b, emit, () => closed);
+    } catch (e) {
+      emit({ type: "error", message: (e as Error).message });
+    } finally {
+      res.end();
+    }
   });
 
   const dist = fileURLToPath(new URL("../web/dist", import.meta.url));

@@ -104,6 +104,7 @@ Each tile has `visual`, `ms_analytic`, `pan_analytic` COGs (~0.5–0.6 m GSD) pl
 - Broadcastify terms forbid automated access, re-streaming and any AI use including transcription without a commercial license. Don't use it.
 - OpenMHz (one-person project, ~30-day archive, unencrypted only): reuse allowed with credit if self-hosted, not bulk-scraped, not misrepresenting. API is only for their frontend; other use needs permission from luke@robotastic.com. No Helene audio remains.
 - NC VIPER supports encryption; much police traffic is encrypted.
+- Built: live **broadcast** radio in the console (Radio Browser directory, listen-only, browser plays the broadcaster directly; nothing recorded, transcribed or fed to agents). Same approach as gods-eye-view.
 - Plan: synthetic Helene radio traffic (TTS → Whisper) for the replay; optionally a few hand-picked OpenMHz clips labelled as real but not Helene. Real deployment: the EOC's own radio feeds or a self-run trunk-recorder.
 
 ## Inspiration (not things we are building)
