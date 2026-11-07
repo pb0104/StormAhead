@@ -56,6 +56,12 @@ export function VoiceDock({ handle }: { handle: OpsHandle }) {
       excludeAgents: (n) => handleRef.current.excludeAgents(n),
       includeAgents: (n) => handleRef.current.includeAgents(n),
       getOracleContext: () => handleRef.current.getOracleContext(),
+      listActions: () => handleRef.current.listActions(),
+      logAction: (t) => handleRef.current.logAction(t),
+      confirmActionUpdate: () => handleRef.current.confirmActionUpdate(),
+      cancelActionUpdate: () => handleRef.current.cancelActionUpdate(),
+      editAction: (id, c) => handleRef.current.editAction(id, c),
+      removeAction: (id) => handleRef.current.removeAction(id),
     };
     session.current = createLiveSession(proxy, {
       onStatus: (s, d) => {

@@ -11,7 +11,7 @@ import compress from "@fastify/compress";
 import { PipelineService } from "./pipeline.ts";
 import { radioClick, radioStations } from "./radio.ts";
 import { googleAttribution, googleStatus, googleTile, TileError } from "./googleTiles.ts";
-import { coverageAt, deleteAction, listActions, locations, nextRecommendation, parseUpdate, saveActions } from "./actions/actions.ts";
+import { coverageAt, deleteAction, listActions, locations, nextRecommendation, parseUpdate, saveActions, searchPlaces, updateAction } from "./actions/actions.ts";
 import { factorList, parseIntent, runForecast, type ForecastEvent } from "./forecast/service.ts";
 import { registerLiveVoice } from "./voice/liveProxy.ts";
 
@@ -178,6 +178,12 @@ export async function buildServer() {
     return { counted: await radioClick(p.id) };
   });
 
+  // Place search for navigation (ORACLE "fly me to X"): OSM places, wards, open spaces, facilities, named buildings.
+  app.get("/api/places/search", async (req) => {
+    const q = z.object({ q: z.string().trim().min(1).max(80) }).parse(req.query);
+    return searchPlaces(q.q);
+  });
+
   // Analyst action updates: a typed sentence → structured actions (LLM) → confirmed → saved to the location's history.
   const resolved = z.object({ name: z.string().max(200), lon: z.number().min(85.2).max(85.6), lat: z.number().min(27.5).max(27.9), kind: z.string().max(40) }).nullable();
   const draft = z.object({
@@ -201,6 +207,17 @@ export async function buildServer() {
   app.post("/api/actions/coverage", async (req) => {
     const b = z.object({ points: z.array(z.object({ id: z.string().max(80), lon: z.number(), lat: z.number() })).max(200) }).parse(req.body ?? {});
     return Object.fromEntries(b.points.map((p) => [p.id, coverageAt(p.lon, p.lat)]));
+  });
+  // Edit an action (the console and ORACLE use this). Changed place names are re-matched; unknown names are refused.
+  app.patch("/api/actions/:id", async (req) => {
+    const p = z.object({ id: z.string().uuid() }).parse(req.params);
+    const b = z.object({
+      kind: draft.shape.kind.optional(), resource: z.string().max(60).nullable().optional(), people: z.number().int().min(0).max(1_000_000).nullable().optional(),
+      placeText: z.string().max(80).nullable().optional(), destText: z.string().max(80).nullable().optional(), summary: z.string().max(120).optional(),
+    }).parse(req.body ?? {});
+    const r = updateAction(p.id, b);
+    if (!r.ok) throw new HttpError(r.error.startsWith("No such") ? 404 : 422, r.error);
+    return { ...actionsView(), item: r.item };
   });
   app.delete("/api/actions/:id", async (req) => {
     const p = z.object({ id: z.string().uuid() }).parse(req.params);

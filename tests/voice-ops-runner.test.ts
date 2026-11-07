@@ -34,6 +34,12 @@ function stub(over: Partial<OpsHandle> = {}): OpsHandle {
     excludeAgents: vi.fn(() => ({ ok: true, removed: [], picked: [] })),
     includeAgents: vi.fn(() => ({ ok: true, added: [], picked: [] })),
     getOracleContext: vi.fn(() => ({ ok: true, agents: [] })),
+    listActions: vi.fn(() => ({ ok: true, actions: [] })),
+    logAction: vi.fn(async () => ({ ok: true, pending: true })),
+    confirmActionUpdate: vi.fn(async () => ({ ok: true })),
+    cancelActionUpdate: vi.fn(() => ({ ok: true })),
+    editAction: vi.fn(async () => ({ ok: true })),
+    removeAction: vi.fn(async () => ({ ok: true })),
     ...over,
   };
 }
@@ -72,5 +78,29 @@ describe("runOpsTool", () => {
     const r = await runOpsTool(h, "apply_response", { actionId: "a1", mode: "assigned", confirmed: true });
     expect(r.ok).toBe(true);
     expect(h.applyDone).toHaveBeenCalledWith("a1", "assigned");
+  });
+});
+
+describe("ORACLE action tools", () => {
+  it("logs an update for confirmation, and only saves when the operator confirmed", async () => {
+    const h = stub();
+    expect((await runOpsTool(h, "log_action", { text: "Sent QRT-2 to Balkhu" })).ok).toBe(true);
+    expect(h.logAction).toHaveBeenCalledWith("Sent QRT-2 to Balkhu");
+    expect((await runOpsTool(h, "confirm_action_update", {})).ok).toBe(false);
+    expect(h.confirmActionUpdate).not.toHaveBeenCalled();
+    expect((await runOpsTool(h, "confirm_action_update", { confirmed: true })).ok).toBe(true);
+  });
+  it("maps edit fields and refuses an empty edit", async () => {
+    const h = stub();
+    await runOpsTool(h, "edit_action", { id: "a1", people: 60, place: "Kalimati open space" });
+    expect(h.editAction).toHaveBeenCalledWith("a1", { people: 60, placeText: "Kalimati open space" });
+    expect((await runOpsTool(h, "edit_action", { id: "a1" })).ok).toBe(false);
+  });
+  it("removes only with confirmation", async () => {
+    const h = stub();
+    expect((await runOpsTool(h, "remove_action", { id: "a1" })).ok).toBe(false);
+    expect(h.removeAction).not.toHaveBeenCalled();
+    await runOpsTool(h, "remove_action", { id: "a1", confirmed: true });
+    expect(h.removeAction).toHaveBeenCalledWith("a1");
   });
 });

@@ -95,6 +95,39 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
     }
     case "get_oracle_context":
       return handle.getOracleContext();
+    // Actions on the ground (current run). Saving and removing need the operator's agreement: confirmed must be true.
+    case "list_actions":
+      return handle.listActions();
+    case "log_action": {
+      const text = String(args.text ?? "").trim();
+      if (!text) return { ok: false, error: "text required: what was done, e.g. 'Sent QRT-2 to Balkhu'" };
+      return handle.logAction(text);
+    }
+    case "confirm_action_update":
+      if (args.confirmed !== true) return { ok: false, error: "Refused: read the update back and set confirmed=true only after the operator agrees." };
+      return handle.confirmActionUpdate();
+    case "cancel_action_update":
+      return handle.cancelActionUpdate();
+    case "edit_action": {
+      const id = String(args.id ?? "");
+      if (!id) return { ok: false, error: "id required (from list_actions)" };
+      const changes: Record<string, unknown> = {};
+      if (args.kind !== undefined) changes.kind = String(args.kind);
+      if (args.resource !== undefined) changes.resource = args.resource === null ? null : String(args.resource);
+      if (args.people !== undefined) changes.people = args.people === null ? null : Number(args.people);
+      if (args.place !== undefined) changes.placeText = args.place === null ? null : String(args.place);
+      if (args.destination !== undefined) changes.destText = args.destination === null ? null : String(args.destination);
+      if (args.summary !== undefined) changes.summary = String(args.summary);
+      if (!Object.keys(changes).length) return { ok: false, error: "nothing to change" };
+      if (changes.people !== undefined && changes.people !== null && !(Number.isFinite(changes.people) && (changes.people as number) >= 0)) return { ok: false, error: "people must be a non-negative number" };
+      return handle.editAction(id, changes as Parameters<OpsHandle["editAction"]>[1]);
+    }
+    case "remove_action": {
+      const id = String(args.id ?? "");
+      if (!id) return { ok: false, error: "id required (from list_actions)" };
+      if (args.confirmed !== true) return { ok: false, error: "Refused: confirm with the operator which action to remove, then set confirmed=true." };
+      return handle.removeAction(id);
+    }
     default:
       return { ok: false, error: `Unknown tool: ${name}` };
   }
