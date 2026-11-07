@@ -27,3 +27,13 @@ export const hindcast = {
   geo: () => j<HindcastGeo>("/api/hindcast/geo"),
   run: (p: Record<string, unknown>) => j<HindcastRun>("/api/hindcast/run", send("POST", p)),
 };
+
+import type { Closure } from "../../../packages/analysis/replay.ts";
+export type HeleneClosure = Closure & { edge: number | null; match: "ref" | "nearest" | "unmatched"; snapDistM: number | null };
+export type HeleneMeta = { available: boolean; provenance?: any; counties?: string[]; records?: number; byMatch?: Record<string, number>; byCondition?: Record<string, number>; replayRange?: string[]; caveats?: string[] };
+export type HeleneRoads = { nodes: [number, number][]; edges: [number, number, number, number, string, number, string | null, string | null, number, [number, number][] | null][] };
+export const helene = {
+  meta: () => j<HeleneMeta>("/api/helene/meta"),
+  roads: () => j<HeleneRoads>("/api/helene/roads"),
+  closures: () => j<{ closures: HeleneClosure[] }>("/api/helene/closures"),
+};
