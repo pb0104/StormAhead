@@ -14,7 +14,7 @@ export function StatusStrip({ items, focus, setFocus, openDetails, mode, setMode
         <button aria-pressed={mode === "2d"} onClick={() => setMode("2d")}>2D</button>
         <button aria-pressed={mode === "3d"} onClick={() => setMode("3d")}>3D</button>
       </div>
-      <span className="demo-tag">DEMO DATA</span>
+      <span className="demo-tag">REAL + SIMULATED</span>
       <button className="link" onClick={openDetails}>Details</button>
     </div>
   );

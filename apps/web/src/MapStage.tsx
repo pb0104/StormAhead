@@ -56,7 +56,7 @@ export function MapStage(p: MapProps) {
       maxZoom: 18,
     });
     map.current = m;
-    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "DEMO DATA · Base: Esri World Imagery (Maxar), Sentinel-2 EOX fallback · Roads: © OpenStreetMap contributors" }), "bottom-right");
+    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "Real + simulated layers (see Details) · Rain: Open-Meteo (CC BY 4.0) · Facilities, alerts, gauges: BIPAD · Base: Esri World Imagery (Maxar), Sentinel-2 EOX fallback · Roads: © OpenStreetMap contributors" }), "bottom-right");
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     m.on("load", () => {
       const TL = { "line-opacity-transition": { duration: 600 } }, TF = { "fill-opacity-transition": { duration: 600 } };

@@ -8,6 +8,7 @@ import { PhotorealView, savedToken } from "./PhotorealView.tsx";
 import { actions, distKm } from "./mock/advice.ts";
 import { FLOOD_POLYS, OF, type Entity } from "./mock/demo.ts";
 import { depthImage, runoff, slopeField, type Runoff } from "./hydro.ts";
+import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 import { floodDepths, STAGE_FRACTION, TERRAIN_IDLE, terrainAgent, weatherAgent, type Terrain } from "./agents.ts";
 import { assess, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "./buildings.ts";
 
@@ -42,7 +43,7 @@ export function App() {
   const view3d = mode === "3d";
   const [hover, setHover] = useState<string | null>(null);
   const [flying, setFlying] = useState(false);
-  const [rain, setRain] = useState(10);
+  const [rain, setRain] = useState(OBSERVED_IN);
   const [terrain, setTerrain] = useState<Terrain>(TERRAIN_IDLE);
   const [bldgLayer, setBldgLayer] = useState<BuildingLayer | null>(null);
   const timer = useRef<number | undefined>(undefined);
@@ -118,7 +119,7 @@ export function App() {
     { key: "pockets", label: "cut-off pockets", value: ran && pockets ? OF("pocket").length : null },
     { key: "landslides", label: "landslide zones", value: ran ? OF("landslide").length : null },
     { key: "schools", label: "schools at risk", value: ran ? OF("school").filter((s) => s.props.risk !== "ok").length : null },
-    { key: "hospitals", label: "hospitals at risk", value: ran ? OF("hospital").filter((h) => h.props.access !== "ok").length : null },
+    { key: "hospitals", label: "hospitals at risk", value: ran ? OF("hospital").filter((h) => h.props.access === "lost" || h.props.access === "degraded").length : null },
     { key: "outages", label: "grid outages", value: ran ? OF("outage").length : null },
     ...(bldgLayer ? [{ key: "evacuate", label: "buildings to evacuate", value: ran ? evacuate : null }] : []),
   ];
@@ -134,7 +135,7 @@ export function App() {
         legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
       {hint && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
       <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} />
-      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} agentLines={[`Weather agent (mock forecast): ${weather.label.toLowerCase()} rain, ${weather.inches} in (${Math.round(weather.mm)} mm) in 24 h, range ${weather.lowIn} to ${weather.highIn} in, peak about ${weather.peakMmH} mm/h.`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${FLOOD_POLYS.length} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
+      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} agentLines={[`Weather agent (real, Open-Meteo ECMWF IFS 9 km): heaviest 24 h ${WEATHER.max24hMm} mm valley average, ending ${whenText(WEATHER.max24hEnd)}; peak ${WEATHER.peakMmH} mm/h at ${whenText(WEATHER.peakAt)}. Depth model is using ${weather.inches} in (${rain === OBSERVED_IN ? "observed" : "what-if"}).`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${FLOOD_POLYS.length} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
         bldgLayer
           ? `Shelter agent (REAL buildings, OpenStreetMap 2 Jan 2024): ${bldgLayer.list.length} shelter-relevant footprints. At this forecast ${assessed.filter((b) => b.role === "at-risk-vertical").length} flooded buildings keep floors above the water, ${evacuate} have none and must be evacuated, and ${refuges.length} dry upper-floor buildings in cut-off areas could take about ${refuges.reduce((s, b) => s + (b.capacity ?? 0), 0).toLocaleString("en-US")} people. ${bldgLayer.list.filter((b) => b.f === null).length} have no tagged height and get no judgement.`
           : "Shelter agent: real building footprints are not loaded (run scripts/fetch_buildings.mjs and start the API)."]} />

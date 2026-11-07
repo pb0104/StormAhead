@@ -3,6 +3,7 @@ import { actions, KIND_LABEL, reasons, type Action } from "./mock/advice.ts";
 import type { Entity } from "./mock/demo.ts";
 import { Glyph } from "./Glyph.tsx";
 import { RING, type BuildingKind } from "./icons.ts";
+import { PROVENANCE } from "./real/ops.ts";
 
 const BUILDINGS = new Set(["hospital", "school", "shelter", "food", "qrt", "airport", "army"]);
 const ringFor = (e: Entity) => (e.kind === "hospital" || e.kind === "airport" || e.kind === "army" ? (RING as Record<string, string>)[String(e.props.access)] : e.kind === "school" ? (RING as Record<string, string>)[String(e.props.risk)] : RING.base) ?? RING.none;
@@ -24,6 +25,7 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
             <div style={{ flex: 1 }}>
               <span className="d-kind">{KIND_LABEL[e.kind]} · {e.id}</span>
               <h2>{e.name}</h2>
+              {PROVENANCE[e.props.prov as keyof typeof PROVENANCE] && <span className={`prov ${PROVENANCE[e.props.prov as keyof typeof PROVENANCE].tag}`}>{PROVENANCE[e.props.prov as keyof typeof PROVENANCE].text}</span>}
             </div>
             <button className="icon" onClick={onClose} aria-label="Close">×</button>
           </header>
@@ -61,7 +63,7 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
                 </div>
               </section>
             )}
-            <p className="d-foot">Demo only. Nothing is sent and nobody is dispatched.</p>
+            <p className="d-foot">Actions are suggestions. Nothing is sent and nobody is dispatched.</p>
           </div>
         </>
       )}
