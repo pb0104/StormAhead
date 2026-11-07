@@ -8,7 +8,10 @@ const SOURCES: [string, string, string][] = [
   ["Terrain", "Mock", "Low-ground patches drawn for the demo"],
   ["Road closures and cut-off pockets", "Mock", "Illustrative selection, not an assessment"],
   ["Cell towers", "Mock", "Invented sites and outage status"],
-  ["Weather", "Mock", "Invented rain cells and totals"],
+  ["Weather agent: rainfall forecast", "Mock", "A forecast you set with the slider. Range and intensity are derived by a simple rule"],
+  ["Terrain agent: elevation", "Real", "Public elevation tiles (AWS Terrain Tiles, Mapzen). Patches are ranked by how low they sit: ground height at the flood edge minus the low ground inside. The elevation data is too coarse for absolute depths"],
+  ["Flood depth", "Illustrative", "Depth scales linearly with rain. The deepest patch is set to 2.4 m at a 10 in reference (an assumption), and patches under 0.2 m show dry. Not a hydraulic simulation"],
+  ["Weather layer (rain cells)", "Mock", "Invented rain cells"],
   ["Dams", "Mock", "Invented gauges and levels"],
   ["Social media and radio", "Mock", "Invented posts and call-ins"],
   ["Critical buildings", "Mixed", "Hospital names and positions from OSM; access status invented"],
@@ -22,7 +25,7 @@ const ACTIVITY = [
   "Response agent: QRT, food, shelter and grid options drafted per selection (mock).",
 ];
 
-export function DetailsDialog({ open, onClose, done }: { open: boolean; onClose: () => void; done: Done }) {
+export function DetailsDialog({ open, onClose, done, agentLines }: { open: boolean; onClose: () => void; done: Done; agentLines: string[] }) {
   const [tab, setTab] = useState<"sources" | "assumptions" | "activity">("sources");
   if (!open) return null;
   return (
@@ -47,7 +50,7 @@ export function DetailsDialog({ open, onClose, done }: { open: boolean; onClose:
         )}
         {tab === "activity" && (
           <>
-            <ol className="plain">{ACTIVITY.map((a) => <li key={a}>{a}</li>)}</ol>
+            <ol className="plain">{[...agentLines, ...ACTIVITY].map((a) => <li key={a}>{a}</li>)}</ol>
             <h3>Simulated actions this session</h3>
             {Object.keys(done).length ? <ul className="plain">{Object.entries(done).map(([k, v]) => <li key={k}><code>{k}</code>: {v === "issued" ? "alert issued (simulated)" : "assigned (simulated)"}</li>)}</ul> : <p className="muted">None yet. Select a closure and assign a response.</p>}
           </>

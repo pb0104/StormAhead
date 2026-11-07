@@ -48,18 +48,22 @@ Audience: authorities only. There is no public view.
 
 - **Map (hero).** Full-bleed MapLibre map, no basemap provider key. Base is satellite imagery with the OSM road network on top.
 - **Command rail (left, collapsible).** Wordmark and one line of context, a mock scenario and time selector (Now, +6 h, Peak +12 h; later stages reveal more closures), the **Run cascade assessment** button, and compact toggles:
-  - *Inputs:* Terrain, Road network, Cell towers, Weather, Dams, Social media, Radio, Critical buildings.
+  - *Inputs:* Terrain, Road network, Cell towers, Weather, Dams, Social media, Radio, Hospitals, Schools, Airports, Army bases.
   - *Outputs:* Road closures, Landslides, QRT staging, Food, Shelter, Outages, Public alerts.
   - A legend that shows four symbols by default and the full set on request.
-- **Status strip (top).** Five counts (closed roads, cut-off pockets, landslide zones, hospitals at risk, grid outages). They are **filters**: clicking one zooms to that category's affected area, lights up the affected roads in the category's colour and dims everything else. If you click one before running the assessment, it runs the assessment first. Also holds the **2D / 3D** toggle, a "DEMO DATA" tag and the **Details** link.
+- **Status strip (top).** Six counts (closed roads, cut-off pockets, landslide zones, schools at risk, hospitals at risk, grid outages). They are **filters**: clicking one zooms to that category's affected area, lights up the affected roads in the category's colour and dims everything else. If you click one before running the assessment, it runs the assessment first. Also holds the **2D / 3D** toggle, a "DEMO DATA" tag and the **Details** link.
 - **Context drawer (right, bottom sheet on small screens).** Opens only when you select something on the map. Sections: *What failed, and why* and *Recommended response*. Response cards are the only cards in the UI, and each is assignable.
 - **Details dialog.** Sources (real vs mock), assumptions, and a log of simulated actions. This is the only place secondary information lives.
 
 ### Behaviours worth knowing
 
-- **Zoom to affected areas.** Strip filters fit the map to the affected features. Affected roads per category: closed roads → the closed segments; cut-off pockets → the stranded roads; landslide zones and grid outages → the main roads (trunk to tertiary) that run through each zone; hospitals at risk → the closures within 3.5 km of those hospitals. Selecting a single item also fits the map to it.
+- **Flooding is animated water with depth.** After a run, the real UNOSAT observed flood extent (30 Sep 2024) is drawn as rippling water, coloured by depth (light is shallow, dark is deep). Depth comes from two demo agents: a **weather agent** (a mock forecast you set with the rain slider or the 6, 10 and 15 inch presets) and a **terrain agent** (reads real elevation tiles in your browser and ranks each flood patch by how low it sits). The depth model is illustrative, not a hydraulic simulation: depth scales linearly with rain, the deepest patch is set to 2.4 m at a 10 inch reference (an assumption), patches under 0.2 m show dry, and the time selector applies 40%, 75% and 100% of the forecast rain. It can only show less water than the observed extent, or deeper water inside it, never a larger area. In the photoreal close-up the water is an animated surface raised by that depth. The extent itself is an optical product that likely under-detects urban flooding. Hover a patch for its depth.
+- **Runoff flows downhill and pools.** A **flow agent** routes the forecast rain over a 70 m elevation grid built from the same real elevation tiles: water drains off slopes and collects in channels and low ground. Pooled water is drawn in blue, with a modest number of slow streaks that follow the slope, mostly along the main channels (computed by D8 flow accumulation), drawn at screen resolution at a fixed gentle speed. It is a teaching model: no drainage network, soil or buildings, the grid edge is an outlet, and the headline depth is the median of the wet cells because single noisy elevation pits can hold unrealistically deep water. It is separate from the observed-extent flooding above and uses the Rain forecast slider and time selector.
+- **Zoom to affected areas.** Strip filters fit the map to the affected features. Affected roads per category: closed roads → the closed segments; cut-off pockets → the stranded roads; landslide zones and grid outages → the main roads (trunk to tertiary) that run through each zone; hospitals at risk → the closures within 3.5 km of those hospitals; schools at risk → the closures within 1.2 km of those schools. Selecting a single item also fits the map to it. Closures and cut-off pockets can recommend asking the nearest army base for engineers, boats or trucks, and pockets can recommend an airlift from an open airport or helipad.
 - **Recommended responses** are computed from the mock fixtures: the nearest QRT staging point, food depot with stock, shelter with free places, or outage feeder. The map draws dashed lines from the selection to the recommended resources.
 - **2D / 3D.** 3D turns on terrain relief and hill-shading, tilts the camera and enables rotation. Roads, closures and zones drape over the terrain. 2D is flat and works offline.
+- **Building types have their own icons.** Hospital (cross), school (house), airport or helipad (plane), army base (star), shelter (tent), food depot (crate) and QRT staging (shield), drawn in `icons.ts` and reused as inline SVG in the legend and drawer. The ring colour shows state (green ok, amber at risk or degraded, red high risk or access lost) and at-risk buildings carry a "!" badge. **Schools** are annotated with risk, computed in the demo fixtures from distance to landslide zones, closed roads and outage areas, and their drawer offers student evacuation, a hold-on-site order, shelter and an alert.
+- **Photoreal close-up (optional).** The drawer has **View in photoreal**, which opens just the selected item (and optionally the resources it links to) over Google Photorealistic 3D Tiles using CesiumJS. It needs a free Cesium ion token: put `VITE_CESIUM_TOKEN=...` in `apps/web/.env.local` (gitignored) or paste it into the prompt, which stores it in the browser only. Cesium loads from a CDN only when you open it. The first tiles take a few seconds to stream. Without a token, the rest of the console works unchanged.
 - **Motion** is limited to three things: the staged reveal of closures, the drawer slide-in, and the count change in the status strip. `prefers-reduced-motion` turns them off.
 
 ### Code map (`apps/web/src`)
@@ -71,6 +75,7 @@ Audience: authorities only. There is no public view.
 | `CommandRail.tsx`, `StatusStrip.tsx`, `ContextDrawer.tsx`, `DetailsDialog.tsx` | The four UI surfaces |
 | `mock/demo.ts` | **Demo fixtures** (entities, GeoJSON, affected-roads helper) |
 | `mock/advice.ts` | Invented evidence and recommended actions per entity kind |
+| `icons.ts`, `Glyph.tsx` | Per-building-type icon shapes for the map (canvas) and UI (SVG) |
 | `mock/network.json` | Fixture: OSM road geometry plus the selected closures and pockets |
 | `assets/valley.jpg` | Bundled Sentinel-2 mosaic, the offline fallback base |
 | `styles.css` | Console styles |
@@ -123,7 +128,13 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | Satellite base | **Real**: Esri World Imagery tiles (streamed), Sentinel-2 mosaic (bundled fallback) |
 | 3D terrain | **Real**: public elevation tiles (streamed) |
 | Hospital names and positions (6 shown) | **Real** names and positions from OSM. Access status (ok, degraded, lost) is **invented** |
+| Airports (3) | **Tribhuvan International Airport** is placed at its real position (it sits on the runway in the imagery). Its role, status and the 2 helipads are **mock** |
+| Army bases (3) | **Mock** sites, names and roles. Status is computed from distance to closures |
+| Schools (16) | **Mock** sites and names. Risk is computed from the other mock fixtures |
 | Which roads are closed (12 closures, 6 cut-off pockets) | **Illustrative.** Selected once from the engine's closed and stranded roads. The selection script is not in the repo |
+| Rain forecast (weather agent) | **Mock**: a value you set, with range and intensity from a simple rule |
+| Flood extent | **Real**: UNOSAT SPOT-6, observed 30 Sep 2024 |
+| Flood depth | **Illustrative**: ordering from real elevation tiles (terrain agent), scale assumed |
 | Terrain low-ground patches, rain cells | **Mock** (drawn) |
 | Landslide zones (4), grid outages (3), public-alert zones (2) | **Mock** (drawn) |
 | Cell towers (16, 3 down), dams (2), social posts (8), radio call-ins (6) | **Mock** |
@@ -141,8 +152,9 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | **BIPAD Portal** incident API, 26 Sep to 6 Oct 2024, verified, in the valley extent | Scoring only, never a model input | **Licence not stated on the API.** Confirm before redistributing | Ward-level report points. Missing report is not missing impact. Small sample. The data file is in this repo |
 | **Sentinel-2 cloudless 2020** (EOX WMS), bundled as `assets/valley.jpg` | Offline fallback satellite base | CC BY-NC-SA 4.0 (non-commercial). Contains modified Copernicus Sentinel data | 10 m resolution, so soft when zoomed. Shown dimmed |
 | **Esri World Imagery** tiles (Esri, Maxar, Earthstar Geographics) | Sharper streamed satellite base | Esri public tile service terms | Needs internet. Public service, no licensed key: check the terms before anything beyond a demo |
-| **AWS Terrain Tiles** (Mapzen, terrarium encoding) | 3D terrain and hill-shading | Public dataset, attribution shown on the map | Needs internet. 3D only |
+| **AWS Terrain Tiles** (Mapzen, terrarium encoding) | 3D terrain, hill-shading, and the terrain agent's elevation reads | Public dataset, attribution shown on the map | Needs internet. 3D only |
 | **Maxar Open Data**, "Nepal Floods Sept 2024" collection | Identified (pre-event 13 Jan 2024, post-event 6 Oct 2024 scenes for the valley). **Not used in the app** | CC BY-NC 4.0 | The 6 Oct scene is heavily clouded over much of the valley. See [docs/real-data-findings.md](docs/real-data-findings.md) |
+| **Google Photorealistic 3D Tiles** via Cesium ion (asset 2275207) | Optional photoreal close-up of a selected item | Cesium ion Community plan is free for personal and non-commercial use, capped at 1,000 root tiles a month. Google attribution is shown. Subject to the Google Maps Platform terms | Needs a Cesium ion token and internet. Check the plan terms before commercial use |
 | **Google Fonts** (Bricolage Grotesque, IBM Plex Sans/Mono) | UI typography | Open fonts | Loaded from the web. Falls back to system fonts offline |
 | All other console inputs and outputs | Towers, weather, dams, social, radio, shelters, depots, QRT, outages, alerts, landslide zones | **Invented** for the demo | Clearly labelled DEMO DATA |
 
