@@ -11,7 +11,7 @@ export type Rec = { id: string; kind: string; at: [number, number]; label: strin
 export const REC_COLOR: Record<string, string> = { qrt: "#93C5FD", food: "#FDE68A", shelter: "#86EFAC", grid: "#FFD23F", alert: "#3DD6E0", air: "#A5D8FF", army: "#C9D58B" };
 export type MapProps = {
   ran: boolean; revealN: number; showPockets: boolean; stage: number; vis: Vis; focus: string | null;
-  selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingById: Map<string, Entity>; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
+  selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingPts: unknown; buildingById: Map<string, Entity>; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
 };
 
 const WAVE_FRAMES = 8;
@@ -28,7 +28,7 @@ function waveFrame(k: number): { width: number; height: number; data: Uint8Clamp
   return { width: S, height: S, data: g.getImageData(0, 0, S, S).data };
 }
 const RED = "#FF4A3D", AMBER = "#FFB020";
-const HIT = ["bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-army", "pts-tower", "pts-dam", "pts-social", "pts-radio", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
+const HIT = ["bldg-halo", "bldg-dot", "bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-army", "pts-tower", "pts-dam", "pts-social", "pts-radio", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
 const GROUP: Record<string, string[]> = {
   closures: ["closures-glow", "closures", "closures-minor", "closures-muted"], pockets: ["pockets", "pockets-minor"],
   landslides: ["z-landslide-fill", "z-landslide-line"], hospitals: ["pts-hospital"], schools: ["pts-school"], outages: ["z-outage-fill", "z-outage-line"],
@@ -68,6 +68,7 @@ export function MapStage(p: MapProps) {
       m.addSource("rec", { type: "geojson", data: empty });
       m.addSource("affected", { type: "geojson", data: empty });
       m.addSource("bldg", { type: "geojson", data: empty });
+      m.addSource("bldgpt", { type: "geojson", data: empty });
       m.addSource("dem", { type: "raster-dem", tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"], encoding: "terrarium", tileSize: 256, maxzoom: 15, attribution: "Terrain: Mapzen / AWS Terrain Tiles" });
 
       m.addLayer({ id: "sat", type: "raster", source: "sat", paint: { "raster-opacity": 0.9, "raster-saturation": -0.45, "raster-brightness-max": 0.95, "raster-contrast": 0.15 } });
@@ -100,6 +101,19 @@ export function MapStage(p: MapProps) {
       // storey count in 3D, so a building's height on screen is its tagged height, not a stylistic choice.
       m.addLayer({ id: "bldg-fill", type: "fill", source: "bldg", paint: { "fill-color": ["get", "color"], "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } } });
       m.addLayer({ id: "bldg-line", type: "line", source: "bldg", paint: { "line-color": ["get", "color"], "line-width": 1, "line-opacity": 0, "line-opacity-transition": { duration: 600 } } });
+      // A footprint is about 11 m across: under one pixel at valley zoom. These markers carry the layer until
+      // the real geometry is big enough to read (about z16), then fade out so the footprints speak for themselves.
+      m.addLayer({ id: "bldg-halo", type: "circle", source: "bldgpt", paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 7, 13, 10, 16, 14],
+        "circle-color": "rgba(0,0,0,0)",
+        "circle-stroke-color": ["get", "color"],
+        "circle-stroke-width": ["interpolate", ["linear"], ["zoom"], 10, 2, 14, 2.6],
+        "circle-stroke-opacity": ["interpolate", ["linear"], ["zoom"], 15, 0.95, 16.5, 0],
+        "circle-opacity": 0 } });
+      m.addLayer({ id: "bldg-dot", type: "circle", source: "bldgpt", paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 2.6, 14, 3.4],
+        "circle-color": ["get", "color"],
+        "circle-opacity": ["interpolate", ["linear"], ["zoom"], 15, 1, 16.5, 0] } });
       m.addLayer({ id: "bldg-3d", type: "fill-extrusion", source: "bldg", layout: { visibility: "none" }, paint: {
         "fill-extrusion-color": ["get", "color"],
         "fill-extrusion-height": ["*", ["coalesce", ["get", "floors"], 2], 3],
@@ -196,9 +210,16 @@ export function MapStage(p: MapProps) {
       for (const id of ["pts-airport", "pts-army"]) mm.setPaintProperty(id, "icon-opacity", g(id === "pts-airport" ? "airports" : "army") ? 1 : 0);
       // Real building footprints: flat in 2D, extruded by their real storey count in 3D. Only shown after a run,
       // because the shelter reading depends on the flood depth the agents compute.
-      if (bldgRef.current !== q.buildings) { bldgRef.current = q.buildings; (mm.getSource("bldg") as any)?.setData(q.buildings ?? { type: "FeatureCollection", features: [] }); }
+      if (bldgRef.current !== q.buildings) {
+        bldgRef.current = q.buildings;
+        (mm.getSource("bldg") as any)?.setData(q.buildings ?? { type: "FeatureCollection", features: [] });
+        (mm.getSource("bldgpt") as any)?.setData(q.buildingPts ?? { type: "FeatureCollection", features: [] });
+      }
       const bOn = ran && g("shelterBuildings");
       show("bldg-fill", bOn && !q.view3d); show("bldg-line", bOn && !q.view3d); show("bldg-3d", bOn && q.view3d);
+      show("bldg-halo", bOn); show("bldg-dot", bOn);
+      const onlyEvac = q.focus === "evacuate" ? ["==", ["get", "role"], "at-risk-evacuate"] : null;
+      for (const id of ["bldg-fill", "bldg-line", "bldg-3d", "bldg-halo", "bldg-dot"]) mm.getLayer(id) && mm.setFilter(id, onlyEvac);
       mm.setPaintProperty("bldg-fill", "fill-opacity", bOn && !q.view3d ? 0.7 : 0);
       mm.setPaintProperty("bldg-line", "line-opacity", bOn && !q.view3d ? 0.9 : 0);
 
@@ -292,14 +313,26 @@ export function MapStage(p: MapProps) {
     const m = map.current; if (!m) return;
     const go = () => {
       const src = m.getSource("affected"); if (!src) return;
-      if (p.focus && closuresDone) {
+      const wide = window.innerWidth > 900;
+      const pad = wide ? { top: 80, bottom: 50, left: 330, right: 60 } : { top: 80, bottom: 50, left: 24, right: 24 };
+      if (p.focus === "evacuate") {
+        // Real buildings, so the bounds come from the layer rather than from the demo fixtures.
+        src.setData({ type: "FeatureCollection", features: [] });
+        const fc = props.current.buildings as any;
+        const pts: [number, number][] = (fc?.features ?? [])
+          .filter((f: any) => f.properties.role === "at-risk-evacuate")
+          .flatMap((f: any) => f.geometry.coordinates[0] as [number, number][]);
+        if (pts.length && !props.current.selected) {
+          const xs = pts.map((c) => c[0]), ys = pts.map((c) => c[1]);
+          m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: pad, maxZoom: 15.5, duration: 900 });
+        }
+      } else if (p.focus && closuresDone) {
         const a = affected(p.focus, p.stage); src.setData(a.fc);
-        const wide = window.innerWidth > 900;
-        if (a.bounds && !props.current.selected) m.fitBounds(a.bounds, { padding: wide ? { top: 80, bottom: 50, left: 330, right: 60 } : { top: 80, bottom: 50, left: 24, right: 24 }, maxZoom: 14.3, duration: 900 });
+        if (a.bounds && !props.current.selected) m.fitBounds(a.bounds, { padding: pad, maxZoom: 14.3, duration: 900 });
       } else src.setData({ type: "FeatureCollection", features: [] });
     };
     if (ready.current) go(); else m.once("load", go);
-  }, [p.focus, p.stage, closuresDone]);
+  }, [p.focus, p.stage, closuresDone, p.buildings]);
 
   // 2D / 3D: terrain, hillshade and a tilted camera.
   useEffect(() => {

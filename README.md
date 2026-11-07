@@ -21,7 +21,7 @@ Requires Node ≥ 22.5. No API keys. The console streams some map tiles, so it n
 npm install
 npm start        # builds the web app, serves UI + API on http://127.0.0.1:3001
 npm run dev      # hot reload: API :3001 + Vite :5173 (open http://localhost:5173)
-npm test         # 41 tests (cascade engine + hindcast API + shelter reading)
+npm test         # 50 tests (cascade engine + hindcast API + shelter reading + ward scorecard)
 npm run typecheck
 ```
 
@@ -53,7 +53,7 @@ Audience: authorities only. There is no public view.
   - A legend that shows four symbols by default and the full set on request.
 - **Status strip (top).** Up to seven counts (closed roads, cut-off pockets, landslide zones, schools at risk, hospitals at risk, grid outages, and buildings to evacuate when the real building layer is loaded). They are **filters**: clicking one zooms to that category's affected area, lights up the affected roads in the category's colour and dims everything else. If you click one before running the assessment, it runs the assessment first. Also holds the **2D / 3D** toggle, a "DEMO DATA" tag and the **Details** link.
 - **Context drawer (right, bottom sheet on small screens).** Opens only when you select something on the map. Sections: *What failed, and why* and *Recommended response*. Response cards are the only cards in the UI, and each is assignable.
-- **Details dialog.** Sources (real vs mock), assumptions, and a log of simulated actions. This is the only place secondary information lives.
+- **Details dialog.** Four tabs: sources (real vs mock), assumptions, a log of simulated actions, and **Evaluation** — the per-agent scorecard of the *real* engine, fetched from `GET /api/scorecard`. The tab opens with a warning that it does **not** score the demo map on screen. It is hidden when the ward dataset is absent. This is the only place secondary information lives.
 
 ### Behaviours worth knowing
 
@@ -75,6 +75,7 @@ Audience: authorities only. There is no public view.
 | `MapStage.tsx` | MapLibre map: layers, reveal, filtering, selection, zoom-to-affected, 2D/3D |
 | `CommandRail.tsx`, `StatusStrip.tsx`, `ContextDrawer.tsx`, `DetailsDialog.tsx` | The four UI surfaces |
 | `buildings.ts` | **Real** building footprints: fetch, depth join, shelter/evacuate reading |
+| `api.ts` | API client: the hindcast endpoints and the per-agent scorecard |
 | `mock/demo.ts` | **Demo fixtures** (entities, GeoJSON, affected-roads helper) |
 | `mock/advice.ts` | Invented evidence and recommended actions per entity kind |
 | `icons.ts`, `Glyph.tsx` | Per-building-type icon shapes for the map (canvas) and UI (SVG) |
@@ -98,9 +99,9 @@ Lives in `packages/analysis/cascade.ts`, served by `apps/api`. It is determinist
 3. **Infrastructure Agent**: closes roads by an adjustable rule: a bridge touching the flood, or at least `closeShare` (default 30%) of the road's length flooded. *Exposed does not mean closed.*
 4. **Access Agent** (`analyzeCascade`): multi-source Dijkstra from open hospitals on the full network and on the network with closures. Reports dry places that lose all hospital access (*isolated*) or whose trip gets at least +10 min and at least 1.5× slower (*degraded*), and dry open roads cut off from the main network (*stranded*). A flooded hospital counts as unavailable.
 5. **Shelter Agent**: reads 7,115 pre-event OSM building footprints (shelter-relevant types) and gives each a shelter reading — flooded with floors above the water (shelter in place), flooded with none (evacuate), or a dry upper-floor building inside a cut-off area (local refuge). A building with no usable `building:levels` gets **no judgement**, never a guessed height.
-6. **Verification Agent** (`scoreAgainstIncidents`): scores afterwards against BIPAD reports with a random baseline (permutation test, 2,000 sets), a nearest-the-flood baseline, and sensitivity to the closure threshold and match radius. Landslide incidents are scored separately as an out-of-model check.
+6. **Verification Agent**: scores afterwards against withheld BIPAD reports, two ways. (a) `scoreAgainstIncidents` — the original point test, with a random baseline (permutation test, 2,000 sets), a nearest-the-flood baseline, and sensitivity to the closure threshold and match radius; landslides scored separately as an out-of-model check. (b) `scoreByWard` — a **per-agent scorecard** over 203 ward polygons, reporting each agent's hits, **false alarms**, precision, recall and F1 against the same baselines, plus the given hazard as the bar to beat. See [Per-agent scorecard](#per-agent-scorecard).
 
-**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `GET /api/buildings` (real footprints for the console), `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. When `buildings.json` is present the response also carries `buildingTargets`: the same scoring re-run with buildings as cascade targets, reported **alongside** the primary headline rather than replacing it. The server also serves the built web app from `apps/web/dist`.
+**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `GET /api/buildings` (real footprints for the console), `GET /api/scorecard` (the per-agent evaluation, cached), `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. When `buildings.json` is present the response also carries `buildingTargets`: the same scoring re-run with buildings as cascade targets, reported **alongside** the primary headline rather than replacing it. The server also serves the built web app from `apps/web/dist`.
 
 **Spatial pre-computation** (per-road flooded share, per-place in-flood flag and distance to flood) is done offline by `scripts/prepare_kathmandu.py` and committed as derived data. The impact reasoning itself is all in TypeScript.
 
@@ -173,6 +174,8 @@ The derived data under `data/real/kathmandu/` is committed. To rebuild it:
 ```bash
 node scripts/fetch_bipad.mjs                     # incidents.json (evaluation only)
 node scripts/fetch_buildings.mjs                 # buildings.json (pre-event footprints; needs internet)
+node scripts/fetch_wards.mjs                     # wards.json (evaluation units; needs internet)
+node scripts/fetch_network_attic.mjs --date 2024-09-26 --out data/real/kathmandu-0926   # optional: 1-day-pre-event network
 pip install -r scripts/requirements.txt
 python -I scripts/prepare_kathmandu.py --osm nepal-240101.osm.pbf \
   --flood Spot6_20240930_FloodExtent_Kathmandu.shp --out data/real/kathmandu
@@ -187,10 +190,10 @@ Download the Geofabrik snapshot and the UNOSAT product 3996 shapefile separately
 ```
 apps/api            Fastify API: /api/health, /api/hindcast/{meta,geo,run}; serves apps/web/dist
 apps/web            React + Vite + MapLibre ops console (see "Code map")
-packages/analysis   cascade engine: heap Dijkstra, closures, cascade, scoring + baselines
+packages/analysis   cascade engine: heap Dijkstra, closures, cascade, scoring + baselines; wards.ts: per-agent ward scorecard
 packages/shared     agent event type
 data/real/kathmandu derived data: network, places, buildings, flood extent, incidents, provenance
-scripts/            fetch_bipad.mjs, fetch_buildings.mjs, prepare_kathmandu.py (rebuild the derived data)
+scripts/            fetch_bipad.mjs, fetch_buildings.mjs, fetch_wards.mjs, fetch_network_attic.mjs, prepare_kathmandu.py
 docs/               hindcast-results, real-data-findings, assumptions, sources, demo-script
 tests/              Vitest: cascade.test.ts, hindcast.test.ts
 ```
@@ -202,7 +205,39 @@ Stack: TypeScript, React 19, Vite, MapLibre GL JS, Fastify, Zod, Vitest. No data
 ## Status and what's not done
 
 - **Done:** the real-data hindcast engine and API (tested); the ops console UI with mock data, 2D/3D, status-strip zoom-to-affected, selection drawer and simulated actions.
-- **Not done:** the console still draws a static closure fixture rather than calling the cascade engine. The building layer *is* wired through (real footprints, served by the API, read by the console). Real power, telecom, dam, weather and social/radio feeds. Maxar imagery in the app. Better cascade targets: buildings were tried and did not help, so the hospital set is next (population weighting still untried). Landslide, power and telecom cascades. Why the hindcast shows no skill is still a set of untested hypotheses (see the results doc).
+- **Not done:** the console still draws a static closure fixture rather than calling the cascade engine. The building layer *is* wired through (real footprints, served by the API, read by the console). Real power, telecom, dam, weather and social/radio feeds. Maxar imagery in the app. Better cascade targets: buildings were tried and did not help, so the hospital set is next (population weighting still untried). Landslide, power and telecom cascades. Two hypotheses for the no-skill result are now tested and rejected (target set, stale network); the hospital set is the remaining one (see the results doc).
 - **Removed earlier:** the synthetic-data staging planner (commit `7489b10`, "V1 demo").
+
+### Per-agent scorecard
+
+Visible in the console under **Details → Evaluation**, served by `GET /api/scorecard`, and reproducible from
+`packages/analysis/wards.ts`. The 1 km point test could not discriminate — in a dense valley almost any same-size set covers the incidents, so
+every baseline tied it. Scoring on **wards** (the unit BIPAD reports are actually collected in) makes false alarms
+countable, so an agent can no longer look good by flagging everything. 19 scorable incidents fall in 10 of 203 wards.
+
+| Agent | Wards flagged | Hit | False alarm | Precision | Recall | F1 | Random F1 | p |
+|---|---|---|---|---|---|---|---|---|
+| *Hazard (GIVEN — not a prediction)* | 67 | 6 | 61 | 0.09 | 0.60 | 0.16 | 0.09 | 0.067 |
+| Infrastructure Agent | 59 | 6 | 53 | 0.10 | 0.60 | 0.17 | 0.08 | 0.030 |
+| Access Agent | 102 | 6 | 96 | 0.06 | 0.60 | 0.11 | 0.09 | 0.392 |
+| Shelter Agent | 10 | 2 | 8 | 0.20 | 0.20 | 0.20 | 0.05 | 0.082 |
+| All agents combined | 125 | 9 | 116 | 0.07 | 0.90 | 0.13 | 0.09 | 0.056 |
+
+The hazard row is a model *input*, so it is the bar: an agent that does not beat it adds nothing to the flood map.
+**The Access Agent flags half the valley** (102 of 203 wards) to find the same wards the Infrastructure Agent finds
+with 59, at p = 0.39 — indistinguishable from random. The **Shelter Agent raises the fewest and most precise
+concerns**, but on 2 hits. The Infrastructure Agent is the only one under p < 0.05, **and it does not replicate**:
+on a 1-day-pre-event network it becomes p = 0.052 (below). Read the whole table as negative.
+
+Rebuilding the network at **26 Sep 2024** (one day pre-event, via `scripts/fetch_network_attic.mjs`) instead of the
+committed 2 Jan 2024 snapshot leaves the cascade unchanged where it matters (1 isolated place, 0 degraded) and does
+not move the headline — so the nine-month-stale network was **not** the explanation. Full tables in
+[docs/hindcast-results.md](docs/hindcast-results.md).
+
+**No independent satellite ground truth exists for this valley.** Copernicus EMS never activated for the event, and
+every Copernicus GFM Sentinel-1 pass between 27 Sep and 7 Oct reports **zero flood pixels** over the valley while
+UNOSAT's optical product mapped 112 polygons there — SAR cannot see flooding under dense urban cover. UNOSAT's own
+affected-building layer is derived from the extent the model is *given*, so it cannot score the model either. That
+leaves the 19 BIPAD reports as the only independent record, and they bound how much any evaluation can conclude.
 
 Demo walk-through: [docs/demo-script.md](docs/demo-script.md).

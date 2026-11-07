@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DATA_NOTE } from "./mock/demo.ts";
 import type { Done } from "./ContextDrawer.tsx";
+import type { Scorecard } from "./api.ts";
 
 const SOURCES: [string, string, string][] = [
   ["Road geometry", "Real", "OpenStreetMap via Geofabrik, 2 Jan 2024 (ODbL)"],
@@ -25,15 +26,19 @@ const ACTIVITY = [
   "Response agent: QRT, food, shelter and grid options drafted per selection (mock).",
 ];
 
-export function DetailsDialog({ open, onClose, done, agentLines }: { open: boolean; onClose: () => void; done: Done; agentLines: string[] }) {
-  const [tab, setTab] = useState<"sources" | "assumptions" | "activity">("sources");
+const num = (x: number | null, d = 2) => (x === null ? "—" : x.toFixed(d));
+
+export function DetailsDialog({ open, onClose, done, agentLines, scorecard }: { open: boolean; onClose: () => void; done: Done; agentLines: string[]; scorecard: Scorecard | null }) {
+  type Tab = "sources" | "assumptions" | "activity" | "evaluation";
+  const [tab, setTab] = useState<Tab>("sources");
   if (!open) return null;
+  const tabs: Tab[] = scorecard ? ["sources", "assumptions", "activity", "evaluation"] : ["sources", "assumptions", "activity"];
   return (
     <div className="modal" role="dialog" aria-modal="true" aria-label="Details" onClick={onClose}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <header className="d-head"><h2>Details</h2><button className="icon" onClick={onClose} aria-label="Close">×</button></header>
         <div className="tabs" role="tablist">
-          {(["sources", "assumptions", "activity"] as const).map((t) => <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>{t[0]!.toUpperCase() + t.slice(1)}</button>)}
+          {tabs.map((t) => <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)}>{t[0]!.toUpperCase() + t.slice(1)}</button>)}
         </div>
         {tab === "sources" && (
           <table><thead><tr><th>Layer</th><th>Status</th><th>Source</th></tr></thead>
@@ -55,6 +60,48 @@ export function DetailsDialog({ open, onClose, done, agentLines }: { open: boole
             {Object.keys(done).length ? <ul className="plain">{Object.entries(done).map(([k, v]) => <li key={k}><code>{k}</code>: {v === "issued" ? "alert issued (simulated)" : "assigned (simulated)"}</li>)}</ul> : <p className="muted">None yet. Select a closure and assign a response.</p>}
           </>
         )}
+        {tab === "evaluation" && scorecard && (() => {
+          const w = scorecard.wardScore;
+          return (
+            <>
+              {/* The console on screen is a demo with invented closures. This scorecard measures the REAL engine.
+                  Saying so first is not optional: without it the table reads as validation of the demo. */}
+              <p className="warn">
+                <strong>This does not score the map on screen.</strong> The console’s closures and pockets are invented demo data.
+                The table below scores the <em>real</em> hindcast engine — run on the OpenStreetMap road network
+                ({scorecard.network.snapshot}) and the observed flood extent — against incident reports it never saw.
+              </p>
+              <p className="muted">
+                {w.evaluatedIncidents} verified flood reports ({scorecard.incidents.window?.join(" to ")}) fall in{" "}
+                <strong>{w.truthWards} of {w.wards} wards</strong>. Each agent is compared with {w.permutations.toLocaleString()} random
+                ward sets of its own size, so flagging more wards earns no credit.
+              </p>
+              <table>
+                <thead><tr><th>Agent</th><th>Wards flagged</th><th>Hit</th><th>False alarm</th><th>Precision</th><th>Recall</th><th>F1</th><th>Random F1</th><th>p</th></tr></thead>
+                <tbody>
+                  {w.agents.map((a) => {
+                    const c = a.confusion, given = a.agent.includes("GIVEN");
+                    return (
+                      <tr key={a.agent} className={given ? "given" : undefined}>
+                        <td title={a.what}>{a.agent}</td>
+                        <td>{a.flaggedWards}</td><td>{c.tp}</td><td>{c.fp}</td>
+                        <td>{num(c.precision)}</td><td>{num(c.recall)}</td><td>{num(c.f1)}</td>
+                        <td>{a.randomBaseline.meanF1.toFixed(2)}</td>
+                        <td><strong>{a.randomBaseline.p.toFixed(3)}</strong></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+              <ul className="plain">
+                <li>The <em>hazard</em> row is the observed flood extent, which is an <strong>input</strong>, not a prediction. It is the bar: an agent that does not beat it adds nothing to the flood map.</li>
+                <li><strong>No agent shows convincing skill.</strong> The one result under p&nbsp;&lt;&nbsp;0.05 does not survive rebuilding the road network one day before the event, so treat it as noise.</li>
+                <li>{w.note}</li>
+                <li>Wards: {scorecard.wards?.source} ({scorecard.wards?.snapshot}). Reports: {scorecard.incidents.source}.</li>
+              </ul>
+            </>
+          );
+        })()}
       </div>
     </div>
   );

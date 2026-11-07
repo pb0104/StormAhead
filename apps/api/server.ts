@@ -25,6 +25,12 @@ export function buildServer() {
     return (hind = new HindcastService());
   };
   app.get("/api/hindcast/meta", async () => (HindcastService.available() ? H().meta() : { available: false }));
+  // Per-agent evaluation of the real engine against withheld incident reports. Fast (no sensitivity sweeps), cached.
+  app.get("/api/scorecard", async () => {
+    const s = H().scorecard();
+    if (!s) throw new HttpError(404, "Ward layer not prepared. Run scripts/fetch_wards.mjs.");
+    return s;
+  });
   // Real pre-event building footprints for the console's shelter layer. 404 when the layer was never fetched,
   // so the console simply renders without it.
   app.get("/api/buildings", async (_req, reply) => {
