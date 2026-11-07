@@ -4,7 +4,7 @@
  * Posts/radio/food remain simulated.
  */
 import type { Action, Entity, Reason } from "../../../packages/ports/index.ts";
-import { OUTLET } from "./real/ops.ts";
+import { OUTLET, POCKET_FOOD, POCKET_TRAVEL } from "./real/ops.ts";
 import { IODA_REGION, NIGHT, nepalTime, nightCellAt } from "./realdata.ts";
 
 const hash = (s: string) => { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
@@ -32,11 +32,17 @@ function reasons(e: Entity, all: Entity[]): Reason[] {
       { input: "Social media (simulated)", text: `${2 + (h % 6)} geotagged posts within 400 m mention water on the road.` },
       { input: "Radio (simulated)", text: `${1 + (h % 3)} call-ins report the crossing impassable.` },
     ];
-    case "pocket": return [
-      { input: "Road network (modelled)", text: `${e.props.segments} open road segments are cut off from the rest of the network by closed crossings.` },
-      { input: "Cell sites", text: `${hit(e, towers, 2)} cell site(s) within 2 km modelled down or at risk from flooding, so reports may be missing.` },
-      { input: "Radio (simulated)", text: "Last call-in from the area 40 minutes ago." },
-    ];
+    case "pocket": {
+      const supply = POCKET_FOOD.get(e.id);
+      const travel = POCKET_TRAVEL.get(e.id);
+      return [
+        { input: "Road network (modelled)", text: `${e.props.segments} open road segments are cut off from the rest of the network by closed crossings.` },
+        { input: "Local supply (Google Places)", text: supply?.localSummary ?? "No Google food snapshot for this pocket." },
+        { input: "Shop status (Google + flood + night lights + cell)", text: supply?.statusSummary ?? "—" },
+        { input: "Travel time (Google Routes + flood graph)", text: travel?.summary ?? "—" },
+        { input: "Cell sites", text: `${hit(e, towers, 2)} cell site(s) within 2 km modelled down or at risk from flooding, so reports may be missing.` },
+      ];
+    }
     case "landslide": return [
       { input: "Landslide report (real, BIPAD)", text: `Verified report on ${e.props.on}: ${e.props.deaths} death(s), ${e.props.injured} injured, ${e.props.households} families affected.` },
       { input: "Road network (modelled)", text: closedNear(1.5) },
@@ -100,9 +106,16 @@ function reasons(e: Entity, all: Entity[]): Reason[] {
       { input: "Helipad (OpenStreetMap)", text: "Mapped helipad; status not in BIPAD." },
       { input: "Access (demo)", text: e.props.access === "ok" ? "Access assumed open." : `Access ${e.props.access}.` },
     ];
-    case "food": return [
-      { input: "Food depot (simulated)", text: `${fmt(e.props.packs as number)} meal packs on hand. No public stock feed was found.` },
-    ];
+    case "food":
+      if (e.props.role === "shop") {
+        return [
+          { input: "Food shop (Google Places)", text: `${e.props.shopKind}${e.props.address ? ` · ${e.props.address}` : ""}.` },
+          { input: "Status (modelled)", text: String(e.props.why || e.props.status) },
+        ];
+      }
+      return [
+        { input: "Food depot (simulated)", text: `${fmt(e.props.packs as number)} meal packs on hand. Stock is invented for the demo.` },
+      ];
     default: return [];
   }
 }
@@ -115,8 +128,24 @@ function actions(e: Entity, all: Entity[]): Action[] {
     a.push({ id: `${e.id}:qrt`, kind: "qrt", title: `Send a team from ${t.name} to evacuate ${label}`, detail: `${n ? `About ${fmt(n)} people. ` : ""}${t.props.unit} base, ${km(e.at, t.at).toFixed(1)} km away. Use the alternate route.`, targetId: t.id });
   };
   const feed = (n: number) => {
-    const t = nearest(e, food)[0]; if (!t) return;
-    a.push({ id: `${e.id}:food`, kind: "food", title: `Stage ${fmt(n)} meal packs from ${String(t.name).replace("Food depot, ", "")} depot (simulated)`, detail: `${t.id} holds ${fmt(t.props.packs as number)} packs. Depots and stock are simulated.`, targetId: t.id });
+    const depots = food.filter((f) => f.props.role === "depot");
+    const travel = e.kind === "pocket" ? POCKET_TRAVEL.get(e.id) : undefined;
+    const prefer = travel?.fastestNowId ? depots.find((d) => d.id === travel.fastestNowId) : null;
+    const t = prefer ?? nearest(e, depots)[0];
+    if (!t) return;
+    const row = travel?.depots.find((d) => d.id === t.id);
+    const timing = row?.googleMin != null && row.nowMin != null
+      ? ` Normally ${row.googleMin} min, now ${row.nowMin} min to the pocket edge.`
+      : "";
+    const changed = travel && travel.closestId && travel.fastestNowId && travel.closestId !== travel.fastestNowId
+      ? " Closest depot is no longer the fastest."
+      : "";
+    a.push({
+      id: `${e.id}:food`, kind: "food",
+      title: `Stage ${fmt(n)} meal packs from ${String(t.name).replace("Food depot, ", "")} depot`,
+      detail: `${t.id} holds ${fmt(t.props.packs as number)} packs (simulated stock).${timing}${changed}`,
+      targetId: t.id,
+    });
   };
   const shelter = () => {
     const t = nearest(e, shelters.filter((x) => x.props.access === "ok" || x.props.access === "degraded"))[0];
@@ -146,7 +175,22 @@ function actions(e: Entity, all: Entity[]): Action[] {
   };
   switch (e.kind) {
     case "closure": armyReq("engineers to bridge or clear the crossing", "Repair time is not modelled."); evac("the cut-off side", null); feed(800 + (h % 9) * 100); shelter(); if (within(e, outages, 3).length) grid(); alert(); break;
-    case "pocket": armyReq("boats and trucks", "Use for people responders cannot reach on foot."); airlift(); evac("the pocket", null); feed(600 + (h % 7) * 100); shelter(); break;
+    case "pocket": {
+      const supply = POCKET_FOOD.get(e.id);
+      armyReq("boats and trucks", "Use for people responders cannot reach on foot.");
+      airlift();
+      evac("the pocket", null);
+      if (supply && (supply.counts.grocery || supply.counts.convenience || supply.counts.wholesaler)) {
+        a.push({
+          id: `${e.id}:localsupply`, kind: "food",
+          title: "Use local shops first, then truck the gap",
+          detail: supply.localSummary,
+        });
+      }
+      feed(600 + (h % 7) * 100);
+      shelter();
+      break;
+    }
     case "landslide": evac("households near the slide", (e.props.households as number) * 4 || null); a.push({ id: `${e.id}:road`, kind: "road", title: "Close the access road below the slope", detail: "Advise traffic to use the ring road. Post a marshal at the junction." }); shelter(); alert(); break;
     case "hospital":
       evac("patients and staff if the route fails", null);

@@ -38,9 +38,11 @@ export function SwipeHandle({ value, onChange, onClose, patches }: { value: numb
         had receded. <strong>Neither side shows the flood</strong>, so do not try to read one from them: the white in
         the right-hand image is cloud, not water.
         <br />
-        The {patches} cyan outlines are where UNOSAT <em>mapped</em> the water on 30 Sep. That footprint is an{" "}
-        <em>input</em> to the engine, not one of its predictions — to see what the engine actually predicted and
-        whether it was right, turn on <strong>Verification (real)</strong>.
+        Overlays on both sides are the <strong>merged open-data pack</strong>: UNOSAT flood, modelled road
+        impacts, BIPAD hospitals/landslides, night-lights dark areas, Maxar STAC footprints, and an NDRRMA
+        summary point. Toggle them under Outputs. The flood footprint is an <em>input</em> to the engine, not
+        a prediction — for model skill, turn on <strong>Verification (real)</strong>
+        {patches ? ` (${patches} depth patches in the live flood layer)` : ""}.
         <button className="link" onClick={onClose}>Close</button>
       </div>
     </>

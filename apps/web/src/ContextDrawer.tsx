@@ -34,8 +34,8 @@ function IodaChart() {
 export type Done = Record<string, "assigned" | "issued">;
 const VERB: Record<Action["kind"], string> = { qrt: "Assign QRT", food: "Stage food", shelter: "Open shelter", grid: "Assign crew", alert: "Issue alert", road: "Stage", air: "Reserve", army: "Request" };
 
-export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPhoto, reasons: why, actions: acts, kindLabel }: {
-  onHover: (id: string | null) => void; onFly: (() => void) | null; onPhoto: () => void; e: Entity | null; done: Done;
+export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPhoto, onStreet, reasons: why, actions: acts, kindLabel }: {
+  onHover: (id: string | null) => void; onFly: (() => void) | null; onPhoto: () => void; onStreet: () => void; e: Entity | null; done: Done;
   setDone: (f: (d: Done) => Done) => void; onClose: () => void;
   reasons: Reason[]; actions: Action[]; kindLabel: Record<string, string>;
 }) {
@@ -54,7 +54,11 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
             </div>
             <button className="icon" onClick={onClose} aria-label="Close">×</button>
           </header>
-          <div className="d-tools">{onFly && <button className="ghost" onClick={onFly}>Fly through in 3D</button>}<button className="ghost" onClick={onPhoto}>View in photoreal</button></div>
+          <div className="d-tools">
+            {onFly && <button className="ghost" onClick={onFly}>Fly through in 3D</button>}
+            <button className="ghost" onClick={onPhoto}>View in photoreal</button>
+            <button className="ghost" onClick={onStreet}>Street View</button>
+          </div>
           <div className="d-body">
             <section>
               <h3>What failed, and why</h3>

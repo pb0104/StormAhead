@@ -1,6 +1,7 @@
 import type { Vis } from "./MapStage.tsx";
 import { Glyph } from "./Glyph.tsx";
 import type { TerrainResult as Terrain, Weather } from "../../../packages/ports/index.ts";
+import { MERGED_CHIPS } from "./mergedPack.ts";
 import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 
 const INPUTS: { group: string; items: [string, string][] }[] = [
@@ -71,6 +72,16 @@ export function CommandRail(p: RailProps) {
             {OUTPUTS.map(([k, l]) => <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>)}
             <button className="chip out" aria-pressed={p.swipeOn} onClick={() => p.toggle("swipe")}>Before / after imagery</button>
           </div>
+          {p.swipeOn && (
+            <div className="grp" style={{ marginTop: 10 }}>
+              <span className="grp-n">Merged evidence (on with swipe)</span>
+              <div className="chips">
+                {MERGED_CHIPS.map(([k, l]) => (
+                  <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="legend">
@@ -84,6 +95,9 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw line dash" style={{ borderColor: "#FFB020" }} />Cut-off road pocket</li>
             <li><i className="sw fill" style={{ background: "#FF7A1A55", borderColor: "#FF7A1A" }} />Landslide zone</li>
             <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Night-lights outage</li>
+            <li><i className="sw line" style={{ background: "#FF6B4A" }} />Merged road impact <em className="real">real∩modelled</em></li>
+            <li><i className="sw line dash" style={{ borderColor: "#E8F0FF" }} />Maxar STAC footprint <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#A78BFA", borderColor: "#FFFFFF" }} />NDRRMA summary <em className="real">report</em></li>
             <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
             <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
             <li><i className="sw fill" style={{ background: "#46D68C80", borderColor: "#46D68C" }} />Ward correctly flagged <em className="real">real</em></li>

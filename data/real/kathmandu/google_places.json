@@ -1,0 +1,994 @@
+{
+  "source": "Google Places API (New)",
+  "licence": "Google Maps Platform Terms \u2014 live Places data; attribution required",
+  "retrievedAt": "2026-11-07T20:33:51Z",
+  "bbox": [
+    85.284,
+    27.587,
+    85.493,
+    27.788
+  ],
+  "note": "Enrichment for ops console. Care homes are the main net-new layer; hospitals/fire/police overlap BIPAD/OSM.",
+  "counts": {
+    "hospitals": 20,
+    "careHomes": 8,
+    "fireStations": 11,
+    "police": 15
+  },
+  "hospitals": [
+    {
+      "id": "ChIJmZNSY7EZ6zkRuQ-sNEd_LlI",
+      "name": "Norvic International Hospital",
+      "at": [
+        85.3189355,
+        27.68994
+      ],
+      "address": "Kathmandu, Bagmati Province 44617, Nepal",
+      "types": [
+        "local_government_office",
+        "hospital",
+        "government_office",
+        "health",
+        "store",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJca-bvtEZ6zkRL3lkCFg9iUg",
+      "name": "Patan Hospital",
+      "at": [
+        85.3205683,
+        27.668301999999997
+      ],
+      "address": "M89C+7H9, Lagankhel Satdobato Rd, Lalitpur, Bagmati Province 44700, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJCyA3_P8Y6zkRvAaR6dNxxPw",
+      "name": "Bir Hospital",
+      "at": [
+        85.3137698,
+        27.705612499999997
+      ],
+      "address": "\u092e\u0939\u093e\u092c\u094c\u0926\u094d\u0927, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJRaf_Kb8Z6zkReRezznK3Sio",
+      "name": "HAMS Hospital",
+      "at": [
+        85.3457869,
+        27.7332225
+      ],
+      "address": "Mandikhatar Road, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJ19o9QzkZ6zkRJPwu2_pj3ns",
+      "name": "T.U. Teaching Hospital",
+      "at": [
+        85.3309597,
+        27.734999499999997
+      ],
+      "address": "Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJn8GadpQZ6zkR7dsEu9rdFQ0",
+      "name": "Civil Service Hospital of Nepal",
+      "at": [
+        85.3388038,
+        27.6863031
+      ],
+      "address": "Minbhawan Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJYyjdm-AZ6zkRz4QlOU1qehM",
+      "name": "KIST Medical College Teaching Hospital",
+      "at": [
+        85.3347172,
+        27.662824099999998
+      ],
+      "address": "KIST Hospital Road, M87P+62C, Imadol Marg, Bagmati Province 44700, Nepal",
+      "types": [
+        "general_hospital",
+        "hospital",
+        "educational_institution",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJsTPQFU4Z6zkRJHF3-vRSOTY",
+      "name": "Shahid Gangalal National Heart Centre",
+      "at": [
+        85.3438355,
+        27.745968899999998
+      ],
+      "address": "Budhanilkantha Sadak, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "doctor",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJKW4qBDwZ6zkRFzOfEMWJ8mQ",
+      "name": "Kanti Children's Hospital",
+      "at": [
+        85.3284721,
+        27.7346817
+      ],
+      "address": "P8MH+V9H, \u092e\u0939\u093e\u0930\u093e\u091c\u0917\u0928\u094d\u091c \u0938\u0921\u0915, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJP2JIqbIZ6zkRl5dtCm4mb2Q",
+      "name": "B&B Hospital, Gwarko",
+      "at": [
+        85.3295918,
+        27.6651235
+      ],
+      "address": "Lalitpur, Bagmati Province 44700, Nepal",
+      "types": [
+        "hospital",
+        "general_hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJkSAVFSkb6zkRw_OEIRFZB6s",
+      "name": "Karuna Hospital",
+      "at": [
+        85.3624699,
+        27.7514582
+      ],
+      "address": "Chunikhel Marg, Budhanilkantha, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJ9W2KvUMX6zkRdPOfhV6Ea1Y",
+      "name": "Nepal Cancer Hospital and Research Centre",
+      "at": [
+        85.33900829999999,
+        27.643393999999997
+      ],
+      "address": "J8VQ+8HX, \u0917\u094b\u0926\u093e\u0935\u0930\u0940 \u0930\u094b\u0921, Lalitpur, Bagmati Province 44700, Nepal",
+      "types": [
+        "hospital",
+        "medical_clinic",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJ4RWYhmUZ6zkRhSuw7gimqGE",
+      "name": "Om Hospital & Research Centre Pvt. Ltd.",
+      "at": [
+        85.3448044,
+        27.7214203
+      ],
+      "address": "\u091a\u093e\u092c\u0939\u093f\u0932 \u0938\u0921\u0915, Kathmandu, Bagmati Province 44602, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJg9f3QYUZ6zkRQv-lItdsNwc",
+      "name": "Frontline Hospital",
+      "at": [
+        85.33844719999999,
+        27.702505799999997
+      ],
+      "address": "Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJmUX1zK8Z6zkRxpq5iU9FvJM",
+      "name": "Annapurna Neuro Hospital",
+      "at": [
+        85.3214996,
+        27.694755800000003
+      ],
+      "address": "\u092e\u093e\u0907\u0924\u0940\u0918\u0930 \u092e\u0923\u094d\u0921\u0932\u093e, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJYdkU8YEZ6zkRNA4FdTPztNQ",
+      "name": "Tilganga Institute of Ophthalmology",
+      "at": [
+        85.35053990000002,
+        27.705662999999998
+      ],
+      "address": "Ring Rd, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "medical_clinic",
+        "doctor",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJAbOdP1IZ6zkROg4CQuDoGk8",
+      "name": "Neuro Hospital Bansbari",
+      "at": [
+        85.3460046,
+        27.7486124
+      ],
+      "address": "Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJXTmpii0Y6zkRJTY_yjOX8Z4",
+      "name": "Alka Hospital Pvt. Ltd.",
+      "at": [
+        85.3151963,
+        27.6741796
+      ],
+      "address": "Lalitpur, Bagmati Province 44600, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJx6hlRZMa6zkRb-s82ldE2tE",
+      "name": "KMC Hospital - Duwakot",
+      "at": [
+        85.41100589999999,
+        27.6842668
+      ],
+      "address": "44802, Changunarayan Rd, \u092d\u0915\u094d\u0924\u092a\u0941\u0930, \u092c\u093e\u0917\u092e\u0924\u0940 \u092a\u094d\u0930\u0926\u0947\u0936 44800, Nepal",
+      "types": [
+        "hospital",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    },
+    {
+      "id": "ChIJUc_MCZkZ6zkRtfQ6ywdfah8",
+      "name": "Venus Hospital",
+      "at": [
+        85.33765179999999,
+        27.6972168
+      ],
+      "address": "M8WQ+V3G, Devkota Sadak, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "general_hospital",
+        "hospital",
+        "medical_clinic",
+        "health",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "hospital"
+    }
+  ],
+  "careHomes": [
+    {
+      "id": "ChIJtVXsLhAZ6zkRgG6U-DY8wRU",
+      "name": "Hope Hermitage Elderly Care",
+      "at": [
+        85.3259337,
+        27.720076
+      ],
+      "address": "2 Nil Saraswatithan, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    },
+    {
+      "id": "ChIJO8wWTNsZ6zkRJtmKIgI-nKs",
+      "name": "WELCOME AGED CARE HOME Pvt Ltd",
+      "at": [
+        85.3253359,
+        27.719123699999997
+      ],
+      "address": "Bhitri, Kholagal Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "consultant",
+        "association_or_organization",
+        "point_of_interest",
+        "health",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    },
+    {
+      "id": "ChIJ-ZhfcRcc6zkRo8bmhEKVXH4",
+      "name": "Arogin Care Home and Day Care Center",
+      "at": [
+        85.3353157,
+        27.7213517
+      ],
+      "address": "Bansidhar Marg, Kathmandu, Bagmati Province 00977, Nepal",
+      "types": [
+        "child_care_agency",
+        "hospital",
+        "point_of_interest",
+        "health",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    },
+    {
+      "id": "ChIJh1p03xsZ6zkR-6X1hYtpkDY",
+      "name": "The Hope Hermitage (\u0906\u0936\u093e \u0915\u0941\u091f\u093f\u092f\u093e)",
+      "at": [
+        85.3470897,
+        27.754009999999997
+      ],
+      "address": "Q83W+JR5, Golfutar Main Rd, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    },
+    {
+      "id": "ChIJiR52CtkY6zkRTew8GigYMrE",
+      "name": "Himalaya Old Age Home",
+      "at": [
+        85.30996239999999,
+        27.737250999999997
+      ],
+      "address": "P8P5+WX4, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    },
+    {
+      "id": "ChIJQ3d4qi-0G6YRBBfzBEGp9L0",
+      "name": "City Aged Care Training and Research Center Pvt. Ltd. (Kathmandu)",
+      "at": [
+        85.3367609,
+        27.695509599999998
+      ],
+      "address": "27.695627, 85.336627, \u0915\u093e\u0920\u092e\u093e\u0921\u094c\u0901, \u092c\u093e\u0917\u092e\u0924\u0940 \u092a\u094d\u0930\u0926\u0947\u0936 44600, Nepal",
+      "types": [
+        "educational_institution",
+        "point_of_interest",
+        "health",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    },
+    {
+      "id": "ChIJJ8sUiuYZ6zkRB1rNhtUmNNc",
+      "name": "Florence Senior Care Home & Wellness Center",
+      "at": [
+        85.28865309999999,
+        27.7257304
+      ],
+      "address": "near Nepalese Army Institute of Health Science, Sanobharyang Rd, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    },
+    {
+      "id": "ChIJUzwISUgY6zkRR3qEhnjo8EA",
+      "name": "Health Home Care Nepal",
+      "at": [
+        85.3061278,
+        27.6830441
+      ],
+      "address": "House, 521 Shikali Marg, Lalitpur, Bagmati Province 44600, Nepal",
+      "types": [
+        "point_of_interest",
+        "health",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "care_home"
+    }
+  ],
+  "fireStations": [
+    {
+      "id": "ChIJm85b6YgZ6zkRH-4AOjFjeLc",
+      "name": "\u0915\u093e\u0920\u092e\u093e\u0921\u093e\u0948\u0901 \u0926\u092e\u0915\u0932",
+      "at": [
+        85.308865,
+        27.703562299999998
+      ],
+      "address": "P835+CGH, Layaku Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJEXdt3lUY6zkRQtmdhojHeV8",
+      "name": "Juddha Barun Yantra Karyalaya",
+      "at": [
+        85.30891170000001,
+        27.703563199999998
+      ],
+      "address": "Layaku Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJ-3HtJzMb6zkRfPUg_N8f4kE",
+      "name": "Emergency Service, Damkal",
+      "at": [
+        85.42005139999999,
+        27.671179799999997
+      ],
+      "address": "MCCC+F2F, Bhaktapur, Bagmati Province 44800, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJKaD2ocwZ6zkRSHV0Di2sOTo",
+      "name": "Lalitpur Barun Yantra",
+      "at": [
+        85.31485409999999,
+        27.6756256
+      ],
+      "address": "M8G7+7W5, Lalitpur, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJAQAAQy8a6zkRSXGfd_PXJ_o",
+      "name": "TIA Fire Station",
+      "at": [
+        85.3612606,
+        27.696002999999997
+      ],
+      "address": "M9W6+CG2, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJGUeXoEwZ6zkRXXhnHSFPgvw",
+      "name": "Agni Enterprises",
+      "at": [
+        85.2911293,
+        27.695866
+      ],
+      "address": "Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "supplier",
+        "manufacturer",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJd7e_BaMa6zkR88jVNmHVq7I",
+      "name": "Juddha Barun Yantra Office ,Bhaktapur",
+      "at": [
+        85.4200615,
+        27.671151199999997
+      ],
+      "address": "MCCC+F27, Ganeshthan Road, Bhaktapur, Bagmati Province 44800, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJV3uwocwZ6zkR9NSrjc9fc6U",
+      "name": "Juddha Barun Yantra",
+      "at": [
+        85.3150536,
+        27.675879199999997
+      ],
+      "address": "Lalitpur, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJSc8bTAAb6zkRAhqB3XUlbRA",
+      "name": "Thali Fire Brigade Station -Kageshowari Manohara",
+      "at": [
+        85.4052409,
+        27.727363999999998
+      ],
+      "address": "PCG4+W3X Thali Bus Station, Kageshwori Manohara, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJ97d_cQAf6zkRVSbFTXPGeo8",
+      "name": "Budhanilkantha Fire station",
+      "at": [
+        85.34881659999999,
+        27.754325800000004
+      ],
+      "address": "Q83X+QJ6, Budhanilkantha, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    },
+    {
+      "id": "ChIJV8OGLgAF6zkRRYVaULZwWwg",
+      "name": "\u0936\u093e\u0901\u0932\u0940\u0928\u0926\u0940 \u0906\u0930\u094d\u092f\u0918\u093e\u0901\u091f Shalinadi aryaghat",
+      "at": [
+        85.4690013,
+        27.7207445
+      ],
+      "address": "PFC9+JR, Shankharapur, Bagmati Province 44600, Nepal",
+      "types": [
+        "fire_station",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "fire_station"
+    }
+  ],
+  "police": [
+    {
+      "id": "ChIJ-cmwKCoZ6zkRLwxlOmkOilU",
+      "name": "Basundara Chauki Police Station",
+      "at": [
+        85.3254254,
+        27.738549499999998
+      ],
+      "address": "P8QG+C57, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJKxFzYzga6zkRKNl0FjENiIY",
+      "name": "Police Sector Kandaghari",
+      "at": [
+        85.374865,
+        27.6927728
+      ],
+      "address": "M9VF+4W5, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJMxSjAn8Z6zkR6rP5vkf3Gp0",
+      "name": "Kathmandu Valley Traffic Police Office",
+      "at": [
+        85.32141779999999,
+        27.699127999999998
+      ],
+      "address": "M8XC+MH3, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJexxgL_IZ6zkR_1JbOHcTJjE",
+      "name": "Cyber Bureau Nepal Police",
+      "at": [
+        85.3138804,
+        27.7072245
+      ],
+      "address": "P847+VHJ, \u091a\u093f\u0924\u094d\u0924\u0927\u0930 \u092e\u093e\u0930\u094d\u0917, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJGaUNOUYZ6zkRZER6pEfVAZo",
+      "name": "Maharajgunj Police Station",
+      "at": [
+        85.33855199999999,
+        27.7394797
+      ],
+      "address": "P8QQ+QCV, Ring Rd, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJw9gohs4b6zkRgwUODFzjN68",
+      "name": "Police Sector Kapan",
+      "at": [
+        85.356597,
+        27.7311578
+      ],
+      "address": "Budhanilkantha, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJc3uLRWQZ6zkRxaXBPSS6nis",
+      "name": "Police Headquarters, Character Verification Section",
+      "at": [
+        85.32852299999999,
+        27.7156256
+      ],
+      "address": "P88H+7C2, Sama Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJZSvwsBMb6zkRKU80OXmIb9o",
+      "name": "Chundevi Sallaghari Traffic Office",
+      "at": [
+        85.4168249,
+        27.6657479
+      ],
+      "address": "MC88+7PW, Suryabinayak, Bagmati Province 44800, Nepal",
+      "types": [
+        "police",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJq6p20usY6zkRx9FSi3r-7dQ",
+      "name": "Banasthali Police Bit",
+      "at": [
+        85.2974837,
+        27.7248764
+      ],
+      "address": "P7FW+XX5, Ring Rd, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJzbUZnuIZ6zkRuqnEe6Ne8Og",
+      "name": "Police Sector, Imadol",
+      "at": [
+        85.3438094,
+        27.6595001
+      ],
+      "address": "1 Imadol Krishna Mandir Rd, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJ0WekFTwZ6zkRxLWJWhm3qpI",
+      "name": "National Police Academy(NPA), Maharajgunj",
+      "at": [
+        85.32816009999999,
+        27.733843099999998
+      ],
+      "address": "P8MH+G7M, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJr9gt0FQF6zkRbLSyK7u_hrk",
+      "name": "Police Circle Jagati",
+      "at": [
+        85.43846599999999,
+        27.6654652
+      ],
+      "address": "MC8Q+59P, Araniko Highway, Bhaktapur, Bagmati Province 44800, Nepal",
+      "types": [
+        "police",
+        "government_office",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJv8LelFsY6zkRuOcXu8GsV_U",
+      "name": "Kalimati Police Station",
+      "at": [
+        85.2991422,
+        27.6972773
+      ],
+      "address": "M7WX+WM6, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJv5YlbAAZ6zkRM5T_SJ6JUAM",
+      "name": "Sukedhara Traffic Police Sector",
+      "at": [
+        85.3459981,
+        27.7282767
+      ],
+      "address": "P8HW+79V, Kathmandu, Bagmati Province 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    },
+    {
+      "id": "ChIJqzT8fekE6zkRM99QaQckA04",
+      "name": "Sankhu Police Station",
+      "at": [
+        85.4610962,
+        27.7276207
+      ],
+      "address": "44600, \u0936\u0919\u094d\u0916\u0930\u093e\u092a\u0941\u0930, \u092c\u093e\u0917\u092e\u0924\u0940 \u092a\u094d\u0930\u0926\u0947\u0936 44600, Nepal",
+      "types": [
+        "police",
+        "point_of_interest",
+        "service",
+        "establishment"
+      ],
+      "status": "OPERATIONAL",
+      "kind": "police"
+    }
+  ]
+}

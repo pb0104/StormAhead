@@ -4,6 +4,7 @@ import satUrl from "./assets/valley.jpg?url";
 import maxarPreUrl from "./assets/maxar-pre-2024-01-13.jpg?url";
 import maxarPostUrl from "./assets/maxar-post-2024-10-06.jpg?url";
 import { affected } from "./affected.ts";
+import { MERGED_FC } from "./mergedPack.ts";
 import type { AtmosphereSnapshot, Entity, Grid, SceneSnapshot } from "../../../packages/ports/index.ts";
 import { drawIcon, RING, type BuildingKind } from "./icons.ts";
 export type FlowField = { grid: Grid; gx: Float32Array; gy: Float32Array; acc: Float32Array };
@@ -147,6 +148,31 @@ export function MapStage(p: MapProps) {
         paint: { "fill-color": "#4DE2FF", "fill-opacity": 0.18 } });
       m.addLayer({ id: "swipe-flood", type: "line", source: "flood", layout: { visibility: "none" },
         paint: { "line-color": "#4DE2FF", "line-width": 2, "line-opacity": 0.95 } });
+      // Merged open-data pack (UNOSAT + roads + hospitals + dark + landslides + Maxar footprints + NDRRMA).
+      m.addSource("merged", { type: "geojson", data: MERGED_FC as any });
+      const kind = (k: string) => ["==", ["get", "kind"], k] as any;
+      m.addLayer({ id: "merged-flood-fill", type: "fill", source: "merged", filter: kind("flood"), layout: { visibility: "none" },
+        paint: { "fill-color": "#4DE2FF", "fill-opacity": 0.22 } });
+      m.addLayer({ id: "merged-flood-line", type: "line", source: "merged", filter: kind("flood"), layout: { visibility: "none" },
+        paint: { "line-color": "#4DE2FF", "line-width": 2.2, "line-opacity": 0.95 } });
+      m.addLayer({ id: "merged-dark-fill", type: "fill", source: "merged", filter: kind("power_dark"), layout: { visibility: "none" },
+        paint: { "fill-color": "#FFD23F", "fill-opacity": 0.28 } });
+      m.addLayer({ id: "merged-dark-line", type: "line", source: "merged", filter: kind("power_dark"), layout: { visibility: "none" },
+        paint: { "line-color": "#FFD23F", "line-width": 1.4, "line-opacity": 0.9 } });
+      m.addLayer({ id: "merged-footprint", type: "line", source: "merged", filter: kind("maxar_footprint"), layout: { visibility: "none" },
+        paint: { "line-color": "#E8F0FF", "line-width": 1, "line-opacity": 0.55, "line-dasharray": [2, 2] } });
+      m.addLayer({ id: "merged-roads", type: "line", source: "merged", filter: kind("road_impact"), layout: { visibility: "none", "line-cap": "round" },
+        paint: { "line-color": "#FF6B4A", "line-width": ["interpolate", ["linear"], ["zoom"], 11, 1.2, 15, 3.2], "line-opacity": 0.9 } });
+      m.addLayer({ id: "merged-hospitals", type: "circle", source: "merged", filter: kind("hospital"), layout: { visibility: "none" },
+        paint: {
+          "circle-radius": ["interpolate", ["linear"], ["zoom"], 11, 3.5, 15, 6],
+          "circle-color": ["match", ["get", "access"], "lost", "#FF4A3D", "degraded", "#FFB020", "#46D68C"],
+          "circle-stroke-color": "#0A1217", "circle-stroke-width": 1.2,
+        } });
+      m.addLayer({ id: "merged-landslides", type: "circle", source: "merged", filter: kind("landslide"), layout: { visibility: "none" },
+        paint: { "circle-radius": 6, "circle-color": "#FF7A1A", "circle-stroke-color": "#0A1217", "circle-stroke-width": 1.4 } });
+      m.addLayer({ id: "merged-ndrrma", type: "circle", source: "merged", filter: kind("ndrrma_summary"), layout: { visibility: "none" },
+        paint: { "circle-radius": 10, "circle-color": "#A78BFA", "circle-stroke-color": "#FFFFFF", "circle-stroke-width": 2 } });
       // Verification: the ward scorecard drawn as geography. Hits and misses are bold; the false alarms are
       // drawn faintly but ARE drawn - over-flagging is the main finding and hiding it would flatter the model.
       const OUT_COLOR: any = ["match", ["get", "outcome"], "hit", "#46D68C", "miss", "#FF4A3D", "false-alarm", "#FFB020", "rgba(0,0,0,0)"];
@@ -350,10 +376,17 @@ export function MapStage(p: MapProps) {
         (mm.getSource("bldg") as any)?.setData(q.buildings ?? { type: "FeatureCollection", features: [] });
         (mm.getSource("bldgpt") as any)?.setData(q.buildingPts ?? { type: "FeatureCollection", features: [] });
       }
-      // Before / after swipe: both mosaics plus the mapped flood footprint over them.
+      // Before / after swipe: mosaics + merged open-data pack overlays.
       const sw = q.swipe;
       show("maxar-pre", sw !== null); show("maxar-post", sw !== null);
-      show("swipe-flood", sw !== null); show("swipe-flood-fill", sw !== null);
+      const mFlood = g("mergedFlood"), mRoads = g("mergedRoads"), mHosp = g("mergedHospitals");
+      const mDark = g("mergedDark"), mSlide = g("mergedLandslides"), mFp = g("mergedFootprints"), mNd = g("mergedNdrrma");
+      show("merged-flood-fill", mFlood); show("merged-flood-line", mFlood);
+      show("merged-dark-fill", mDark); show("merged-dark-line", mDark);
+      show("merged-footprint", mFp); show("merged-roads", mRoads);
+      show("merged-hospitals", mHosp); show("merged-landslides", mSlide); show("merged-ndrrma", mNd);
+      // Legacy cyan flood outline only if merged flood chip is off (keeps a referent on the mosaics).
+      show("swipe-flood", sw !== null && !mFlood); show("swipe-flood-fill", sw !== null && !mFlood);
       if (sw !== null) (mm as any).__redrawSwipe?.();
       // Verification overlay: scores the real engine, independent of the demo run on screen.
       const vOn = g("verify") && !!q.verify;
