@@ -3,21 +3,26 @@ import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL(".", import.meta.url));
+const repoRoot = fileURLToPath(new URL("../..", import.meta.url));
+
 export default defineConfig({
   root,
+  // Keys live in the repo-root .env. Vite exposes only VITE_* names to the browser (e.g. VITE_GOOGLE_MAPS_API_KEY);
+  // everything else there (STACKAI_API_KEY, ...) stays server-side.
+  envDir: repoRoot,
   plugins: [
     react(),
     {
       name: "geojson-as-json",
       transform(src, id) {
-        if (!id.split("?")[0].endsWith(".geojson")) return;
+        if (!(id.split("?")[0] ?? "").endsWith(".geojson")) return;
         return { code: `export default ${src}`, map: null };
       },
     },
   ],
   server: {
     port: 5173,
-    fs: { allow: [fileURLToPath(new URL("../..", import.meta.url))] },
+    fs: { allow: [repoRoot] },
     proxy: { "/api": { target: "http://127.0.0.1:3001", changeOrigin: true } },
   },
   build: { outDir: "dist", emptyOutDir: true },

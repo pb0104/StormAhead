@@ -100,7 +100,7 @@ export function StreetView({ selected, onClose }: { selected: Entity; onClose: (
       {!key && (
         <div className="photo-card">
           <h3>Street View needs a Google Maps API key</h3>
-          <p>Set <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>apps/web/.env.local</code> (Maps JavaScript API enabled). This overlay covers the ops map so Street View is not shown beside MapLibre.</p>
+          <p>Set <code>VITE_GOOGLE_MAPS_API_KEY</code> in the repo-root <code>.env</code> (Maps JavaScript API enabled), then restart the dev server. This overlay covers the ops map so Street View is not shown beside MapLibre.</p>
         </div>
       )}
       {key && state === "error" && (
