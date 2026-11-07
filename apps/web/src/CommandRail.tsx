@@ -9,14 +9,14 @@ const INPUTS: { group: string; items: [string, string][] }[] = [
   { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["helipads", "Helipads"], ["army", "Army sites"]] },
 ];
 const OUTPUTS: [string, string][] = [
-  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "Responder bases"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Official alerts"],
+  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "Responder bases"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Official alerts"], ["verify", "Verification (real)"],
 ];
 const STAGES: [number, string][] = [[1, "Now"], [2, "+6 h"], [3, "Peak +12 h"]];
 
 export type RailProps = {
   open: boolean; setOpen: (b: boolean) => void; vis: Vis; toggle: (k: string) => void; stage: number; setStage: (n: number) => void;
   rain: number; setRain: (n: number) => void; weather: Weather; terrain: Terrain; wet: number; total: number; deepest: number; flowText: string;
-  ran: boolean; busy: boolean; run: () => void; legendOpen: boolean; setLegendOpen: (b: boolean) => void; actionsDone: number; openDetails: () => void;
+  ran: boolean; busy: boolean; run: () => void; swipeOn: boolean; legendOpen: boolean; setLegendOpen: (b: boolean) => void; actionsDone: number; openDetails: () => void;
 };
 
 export function CommandRail(p: RailProps) {
@@ -67,7 +67,10 @@ export function CommandRail(p: RailProps) {
 
         <section>
           <h2 className="lbl">Outputs</h2>
-          <div className="chips">{OUTPUTS.map(([k, l]) => <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>)}</div>
+          <div className="chips">
+            {OUTPUTS.map(([k, l]) => <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>)}
+            <button className="chip out" aria-pressed={p.swipeOn} onClick={() => p.toggle("swipe")}>Before / after imagery</button>
+          </div>
         </section>
 
         <section className="legend">
@@ -83,6 +86,9 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Night-lights outage</li>
             <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
             <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#46D68C80", borderColor: "#46D68C" }} />Ward correctly flagged <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#FF4A3D8C", borderColor: "#FF4A3D" }} />Ward missed: damage reported, nothing flagged <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#FFB02024", borderColor: "#FFB020" }} />Ward false alarm <em className="real">real</em></li>
             {p.legendOpen && (
               <>
                 <li><i className="sw fill" style={{ background: "#FFB020cc", borderColor: "#FFB020" }} />Building, shelter on upper floors <em className="real">real</em></li>

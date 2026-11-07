@@ -1,0 +1,9806 @@
+{
+ "places": [
+  {
+   "id": 31151023,
+   "name": "ज्ञानेश्वर",
+   "type": "neighbourhood",
+   "lon": 85.330547,
+   "lat": 27.708978,
+   "node": 1668,
+   "inFlood": false,
+   "distFloodM": 2493
+  },
+  {
+   "id": 31230179,
+   "name": "Jagati",
+   "type": "suburb",
+   "lon": 85.436521,
+   "lat": 27.666537,
+   "node": 4162,
+   "inFlood": false,
+   "distFloodM": 220
+  },
+  {
+   "id": 67157058,
+   "name": "काठमाडौं",
+   "type": "city",
+   "lon": 85.320582,
+   "lat": 27.708317,
+   "node": 33,
+   "inFlood": false,
+   "distFloodM": 1962
+  },
+  {
+   "id": 246543154,
+   "name": "Dallu Chautara",
+   "type": "locality",
+   "lon": 85.299874,
+   "lat": 27.709649,
+   "node": 5154,
+   "inFlood": false,
+   "distFloodM": 1880
+  },
+  {
+   "id": 268301854,
+   "name": "Bhedasing",
+   "type": "neighbourhood",
+   "lon": 85.309756,
+   "lat": 27.706991,
+   "node": 178,
+   "inFlood": false,
+   "distFloodM": 1501
+  },
+  {
+   "id": 314528404,
+   "name": "कालिमाटी",
+   "type": "neighbourhood",
+   "lon": 85.299615,
+   "lat": 27.698487,
+   "node": 1093,
+   "inFlood": false,
+   "distFloodM": 750
+  },
+  {
+   "id": 360720177,
+   "name": "सिर्जना  नगर",
+   "type": "suburb",
+   "lon": 85.405284,
+   "lat": 27.672598,
+   "node": 12054,
+   "inFlood": false,
+   "distFloodM": 297
+  },
+  {
+   "id": 360726230,
+   "name": "Bhimeshwor Chowk",
+   "type": "neighbourhood",
+   "lon": 85.432209,
+   "lat": 27.737987,
+   "node": 24222,
+   "inFlood": false,
+   "distFloodM": 1151
+  },
+  {
+   "id": 425227584,
+   "name": "गाबाहल",
+   "type": "locality",
+   "lon": 85.320991,
+   "lat": 27.674258,
+   "node": 3145,
+   "inFlood": false,
+   "distFloodM": 1118
+  },
+  {
+   "id": 457278653,
+   "name": "Adarsha",
+   "type": "neighbourhood",
+   "lon": 85.433015,
+   "lat": 27.666512,
+   "node": 252,
+   "inFlood": false,
+   "distFloodM": 224
+  },
+  {
+   "id": 480426151,
+   "name": "किरण चोक",
+   "type": "neighbourhood",
+   "lon": 85.33273,
+   "lat": 27.728354,
+   "node": 976,
+   "inFlood": false,
+   "distFloodM": 4470
+  },
+  {
+   "id": 480427050,
+   "name": "ढल्कु चोक",
+   "type": "neighbourhood",
+   "lon": 85.333458,
+   "lat": 27.718443,
+   "node": 10229,
+   "inFlood": false,
+   "distFloodM": 3541
+  },
+  {
+   "id": 562962890,
+   "name": "Chapagaon",
+   "type": "suburb",
+   "lon": 85.325016,
+   "lat": 27.602518,
+   "node": 21431,
+   "inFlood": false,
+   "distFloodM": 536
+  },
+  {
+   "id": 562963056,
+   "name": "Khokana",
+   "type": "suburb",
+   "lon": 85.299034,
+   "lat": 27.635887,
+   "node": 1089,
+   "inFlood": false,
+   "distFloodM": 607
+  },
+  {
+   "id": 723880699,
+   "name": "ललितपुर",
+   "type": "city",
+   "lon": 85.316805,
+   "lat": 27.676734,
+   "node": 16979,
+   "inFlood": false,
+   "distFloodM": 1204
+  },
+  {
+   "id": 873531692,
+   "name": "अरुन थापा मुर्ति चोक",
+   "type": "neighbourhood",
+   "lon": 85.310313,
+   "lat": 27.68087,
+   "node": 718,
+   "inFlood": false,
+   "distFloodM": 1069
+  },
+  {
+   "id": 947910115,
+   "name": "Chhetrapati",
+   "type": "locality",
+   "lon": 85.308615,
+   "lat": 27.711207,
+   "node": 1772,
+   "inFlood": false,
+   "distFloodM": 1947
+  },
+  {
+   "id": 994341009,
+   "name": "Civil Homes III",
+   "type": "neighbourhood",
+   "lon": 85.32106,
+   "lat": 27.623475,
+   "node": 12086,
+   "inFlood": false,
+   "distFloodM": 927
+  },
+  {
+   "id": 1144695433,
+   "name": "नारायण चौर",
+   "type": "suburb",
+   "lon": 85.325802,
+   "lat": 27.71517,
+   "node": 4535,
+   "inFlood": false,
+   "distFloodM": 2860
+  },
+  {
+   "id": 1145267936,
+   "name": "चाबहिल",
+   "type": "suburb",
+   "lon": 85.346671,
+   "lat": 27.717146,
+   "node": 16259,
+   "inFlood": false,
+   "distFloodM": 3767
+  },
+  {
+   "id": 1274031223,
+   "name": "पिङ्गलस्थान",
+   "type": "locality",
+   "lon": 85.347288,
+   "lat": 27.705794,
+   "node": 16825,
+   "inFlood": false,
+   "distFloodM": 2721
+  },
+  {
+   "id": 1278967699,
+   "name": "Pyaphal",
+   "type": "neighbourhood",
+   "lon": 85.306392,
+   "lat": 27.704887,
+   "node": 2381,
+   "inFlood": false,
+   "distFloodM": 1241
+  },
+  {
+   "id": 1281234041,
+   "name": "शंखमुल चोक",
+   "type": "neighbourhood",
+   "lon": 85.333333,
+   "lat": 27.683473,
+   "node": 3418,
+   "inFlood": false,
+   "distFloodM": 400
+  },
+  {
+   "id": 1317087920,
+   "name": "नोगेंद्र कान्छा चोक",
+   "type": "locality",
+   "lon": 85.347196,
+   "lat": 27.692796,
+   "node": 3525,
+   "inFlood": false,
+   "distFloodM": 1520
+  },
+  {
+   "id": 1341029550,
+   "name": "Sundarijal",
+   "type": "village",
+   "lon": 85.419189,
+   "lat": 27.758005,
+   "node": 688,
+   "inFlood": false,
+   "distFloodM": 3646
+  },
+  {
+   "id": 1349697740,
+   "name": "ठमेल",
+   "type": "suburb",
+   "lon": 85.311256,
+   "lat": 27.717028,
+   "node": 19088,
+   "inFlood": false,
+   "distFloodM": 2620
+  },
+  {
+   "id": 1382903024,
+   "name": "सिनामंगल",
+   "type": "suburb",
+   "lon": 85.350423,
+   "lat": 27.699184,
+   "node": 7384,
+   "inFlood": false,
+   "distFloodM": 1987
+  },
+  {
+   "id": 1383284250,
+   "name": "बत्तीसपुतली",
+   "type": "locality",
+   "lon": 85.341509,
+   "lat": 27.705676,
+   "node": 18,
+   "inFlood": false,
+   "distFloodM": 2582
+  },
+  {
+   "id": 1383284251,
+   "name": "कोटेश्वर",
+   "type": "suburb",
+   "lon": 85.349385,
+   "lat": 27.67922,
+   "node": 11953,
+   "inFlood": false,
+   "distFloodM": 577
+  },
+  {
+   "id": 1393448749,
+   "name": "सातदोवाटो",
+   "type": "suburb",
+   "lon": 85.325056,
+   "lat": 27.657521,
+   "node": 2238,
+   "inFlood": false,
+   "distFloodM": 936
+  },
+  {
+   "id": 1402635123,
+   "name": "Main Chok",
+   "type": "neighbourhood",
+   "lon": 85.441375,
+   "lat": 27.67176,
+   "node": 1410,
+   "inFlood": false,
+   "distFloodM": 368
+  },
+  {
+   "id": 1402635270,
+   "name": "Libali",
+   "type": "suburb",
+   "lon": 85.441918,
+   "lat": 27.670942,
+   "node": 4227,
+   "inFlood": false,
+   "distFloodM": 358
+  },
+  {
+   "id": 1585480220,
+   "name": "Damai Tol",
+   "type": "hamlet",
+   "lon": 85.304969,
+   "lat": 27.706792,
+   "node": 10711,
+   "inFlood": false,
+   "distFloodM": 1463
+  },
+  {
+   "id": 1772109891,
+   "name": "लाजिम्पाट",
+   "type": "suburb",
+   "lon": 85.320765,
+   "lat": 27.721508,
+   "node": 1761,
+   "inFlood": false,
+   "distFloodM": 3341
+  },
+  {
+   "id": 1772109893,
+   "name": "बूढानीलकण्ठ",
+   "type": "town",
+   "lon": 85.362142,
+   "lat": 27.777387,
+   "node": 5986,
+   "inFlood": false,
+   "distFloodM": 8241
+  },
+  {
+   "id": 1772109894,
+   "name": "गोल्फुटार",
+   "type": "suburb",
+   "lon": 85.347565,
+   "lat": 27.74823,
+   "node": 9857,
+   "inFlood": false,
+   "distFloodM": 6401
+  },
+  {
+   "id": 1772109895,
+   "name": "बालुवाटार",
+   "type": "suburb",
+   "lon": 85.331017,
+   "lat": 27.724603,
+   "node": 990,
+   "inFlood": false,
+   "distFloodM": 4023
+  },
+  {
+   "id": 1772109896,
+   "name": "पानीपोखरी",
+   "type": "suburb",
+   "lon": 85.324746,
+   "lat": 27.729252,
+   "node": 12305,
+   "inFlood": false,
+   "distFloodM": 4281
+  },
+  {
+   "id": 1772200585,
+   "name": "भीमसेन गोला",
+   "type": "neighbourhood",
+   "lon": 85.34428,
+   "lat": 27.699859,
+   "node": 27555,
+   "inFlood": false,
+   "distFloodM": 2259
+  },
+  {
+   "id": 1772200593,
+   "name": "मैतीदेवी",
+   "type": "suburb",
+   "lon": 85.333557,
+   "lat": 27.70512,
+   "node": 3323,
+   "inFlood": false,
+   "distFloodM": 2174
+  },
+  {
+   "id": 1772200602,
+   "name": "नया बानेश्वर",
+   "type": "suburb",
+   "lon": 85.338072,
+   "lat": 27.692621,
+   "node": 3839,
+   "inFlood": false,
+   "distFloodM": 1271
+  },
+  {
+   "id": 1772200616,
+   "name": "डिल्लीबजार",
+   "type": "suburb",
+   "lon": 85.327531,
+   "lat": 27.705463,
+   "node": 2592,
+   "inFlood": false,
+   "distFloodM": 2005
+  },
+  {
+   "id": 1802839410,
+   "name": "खिचापोखरी",
+   "type": "locality",
+   "lon": 85.310885,
+   "lat": 27.701813,
+   "node": 188,
+   "inFlood": false,
+   "distFloodM": 970
+  },
+  {
+   "id": 1803523645,
+   "name": "Makkhan Tol",
+   "type": "neighbourhood",
+   "lon": 85.308194,
+   "lat": 27.705315,
+   "node": 32525,
+   "inFlood": false,
+   "distFloodM": 1295
+  },
+  {
+   "id": 1803547375,
+   "name": "त्रिपुरेश्वर",
+   "type": "suburb",
+   "lon": 85.314114,
+   "lat": 27.693797,
+   "node": 5559,
+   "inFlood": false,
+   "distFloodM": 238
+  },
+  {
+   "id": 1817359094,
+   "name": "जडिबुटी",
+   "type": "suburb",
+   "lon": 85.351576,
+   "lat": 27.675379,
+   "node": 16844,
+   "inFlood": false,
+   "distFloodM": 351
+  },
+  {
+   "id": 1818954251,
+   "name": "नमुना बस्ती",
+   "type": "locality",
+   "lon": 85.378154,
+   "lat": 27.688422,
+   "node": 5879,
+   "inFlood": false,
+   "distFloodM": 209
+  },
+  {
+   "id": 1824134696,
+   "name": "ढुन्चो पाखा",
+   "type": "village",
+   "lon": 85.382093,
+   "lat": 27.689791,
+   "node": 5885,
+   "inFlood": false,
+   "distFloodM": 221
+  },
+  {
+   "id": 1824139218,
+   "name": "तेर्साटार",
+   "type": "neighbourhood",
+   "lon": 85.365531,
+   "lat": 27.675465,
+   "node": 5923,
+   "inFlood": false,
+   "distFloodM": 256
+  },
+  {
+   "id": 1827382607,
+   "name": "सुकेधारा",
+   "type": "suburb",
+   "lon": 85.346823,
+   "lat": 27.729812,
+   "node": 11705,
+   "inFlood": false,
+   "distFloodM": 4928
+  },
+  {
+   "id": 1831891602,
+   "name": "नारायण टोल",
+   "type": "neighbourhood",
+   "lon": 85.332945,
+   "lat": 27.737845,
+   "node": 27462,
+   "inFlood": false,
+   "distFloodM": 5448
+  },
+  {
+   "id": 1835392315,
+   "name": "फोर्स पार्क",
+   "type": "locality",
+   "lon": 85.378932,
+   "lat": 27.70117,
+   "node": 7465,
+   "inFlood": false,
+   "distFloodM": 714
+  },
+  {
+   "id": 1835392399,
+   "name": " एकता चोक",
+   "type": "neighbourhood",
+   "lon": 85.338983,
+   "lat": 27.704976,
+   "node": 6897,
+   "inFlood": false,
+   "distFloodM": 2388
+  },
+  {
+   "id": 1906476153,
+   "name": "गैरी गाउँ",
+   "type": "suburb",
+   "lon": 85.348899,
+   "lat": 27.689989,
+   "node": 12060,
+   "inFlood": false,
+   "distFloodM": 1169
+  },
+  {
+   "id": 1906492009,
+   "name": "सुविधानगर",
+   "type": "suburb",
+   "lon": 85.345483,
+   "lat": 27.685582,
+   "node": 3467,
+   "inFlood": false,
+   "distFloodM": 1108
+  },
+  {
+   "id": 1906556721,
+   "name": "बासुकी नगर",
+   "type": "neighbourhood",
+   "lon": 85.347148,
+   "lat": 27.681158,
+   "node": 29457,
+   "inFlood": false,
+   "distFloodM": 817
+  },
+  {
+   "id": 1906556724,
+   "name": "महादेवस्थान",
+   "type": "neighbourhood",
+   "lon": 85.344472,
+   "lat": 27.680036,
+   "node": 29466,
+   "inFlood": false,
+   "distFloodM": 716
+  },
+  {
+   "id": 1906556726,
+   "name": "सहयोगी नगर",
+   "type": "neighbourhood",
+   "lon": 85.339374,
+   "lat": 27.681857,
+   "node": 10322,
+   "inFlood": false,
+   "distFloodM": 540
+  },
+  {
+   "id": 1906556730,
+   "name": "सेती ओपी",
+   "type": "neighbourhood",
+   "lon": 85.344138,
+   "lat": 27.678703,
+   "node": 3444,
+   "inFlood": false,
+   "distFloodM": 578
+  },
+  {
+   "id": 1906556733,
+   "name": "ठुलोधारा",
+   "type": "neighbourhood",
+   "lon": 85.339521,
+   "lat": 27.677311,
+   "node": 3481,
+   "inFlood": false,
+   "distFloodM": 185
+  },
+  {
+   "id": 1906612410,
+   "name": "कोट देवी",
+   "type": "neighbourhood",
+   "lon": 85.349672,
+   "lat": 27.674944,
+   "node": 10083,
+   "inFlood": false,
+   "distFloodM": 504
+  },
+  {
+   "id": 1931270107,
+   "name": "क्षितिज नगर",
+   "type": "neighbourhood",
+   "lon": 85.332842,
+   "lat": 27.681115,
+   "node": 18843,
+   "inFlood": false,
+   "distFloodM": 212
+  },
+  {
+   "id": 1931288731,
+   "name": "श्री नगर",
+   "type": "neighbourhood",
+   "lon": 85.335379,
+   "lat": 27.683316,
+   "node": 15183,
+   "inFlood": false,
+   "distFloodM": 453
+  },
+  {
+   "id": 1931315718,
+   "name": "सुरुचि टोल",
+   "type": "neighbourhood",
+   "lon": 85.336426,
+   "lat": 27.687413,
+   "node": 27402,
+   "inFlood": false,
+   "distFloodM": 841
+  },
+  {
+   "id": 1931372083,
+   "name": "आलोक नगर",
+   "type": "neighbourhood",
+   "lon": 85.340223,
+   "lat": 27.684517,
+   "node": 10565,
+   "inFlood": false,
+   "distFloodM": 796
+  },
+  {
+   "id": 1931372084,
+   "name": "मिनभवन",
+   "type": "suburb",
+   "lon": 85.338011,
+   "lat": 27.685247,
+   "node": 10399,
+   "inFlood": false,
+   "distFloodM": 738
+  },
+  {
+   "id": 1934667599,
+   "name": "शंखमुल",
+   "type": "suburb",
+   "lon": 85.331019,
+   "lat": 27.682963,
+   "node": 3392,
+   "inFlood": false,
+   "distFloodM": 172
+  },
+  {
+   "id": 1934705655,
+   "name": "बुद्ध नगर",
+   "type": "suburb",
+   "lon": 85.329258,
+   "lat": 27.687234,
+   "node": 10585,
+   "inFlood": false,
+   "distFloodM": 225
+  },
+  {
+   "id": 1937681580,
+   "name": "भनिमण्डल चोक",
+   "type": "locality",
+   "lon": 85.307398,
+   "lat": 27.671149,
+   "node": 1182,
+   "inFlood": false,
+   "distFloodM": 760
+  },
+  {
+   "id": 1942529535,
+   "name": "Itachhen",
+   "type": "suburb",
+   "lon": 85.424435,
+   "lat": 27.672623,
+   "node": 219,
+   "inFlood": false,
+   "distFloodM": 455
+  },
+  {
+   "id": 1945526726,
+   "name": "सल्लाघारी चौर",
+   "type": "locality",
+   "lon": 85.40735,
+   "lat": 27.673265,
+   "node": 16840,
+   "inFlood": false,
+   "distFloodM": 82
+  },
+  {
+   "id": 1945932982,
+   "name": "नारायण गोपाल चोक",
+   "type": "neighbourhood",
+   "lon": 85.33713,
+   "lat": 27.74009,
+   "node": 11800,
+   "inFlood": false,
+   "distFloodM": 5832
+  },
+  {
+   "id": 1947098741,
+   "name": "शान्ति चोक",
+   "type": "locality",
+   "lon": 85.310256,
+   "lat": 27.672248,
+   "node": 5453,
+   "inFlood": false,
+   "distFloodM": 1040
+  },
+  {
+   "id": 1950313810,
+   "name": "सिर्जना टोल",
+   "type": "neighbourhood",
+   "lon": 85.335466,
+   "lat": 27.693245,
+   "node": 3918,
+   "inFlood": false,
+   "distFloodM": 1129
+  },
+  {
+   "id": 1950313811,
+   "name": "थापा गाउँ",
+   "type": "neighbourhood",
+   "lon": 85.333073,
+   "lat": 27.691781,
+   "node": 10748,
+   "inFlood": false,
+   "distFloodM": 849
+  },
+  {
+   "id": 1950355002,
+   "name": "गुराँस टोल",
+   "type": "locality",
+   "lon": 85.340845,
+   "lat": 27.697097,
+   "node": 32455,
+   "inFlood": false,
+   "distFloodM": 1804
+  },
+  {
+   "id": 1950423179,
+   "name": "बोगटी टोल",
+   "type": "neighbourhood",
+   "lon": 85.33454,
+   "lat": 27.690414,
+   "node": 10948,
+   "inFlood": false,
+   "distFloodM": 847
+  },
+  {
+   "id": 1950463387,
+   "name": "सुङ्गावा चोक",
+   "type": "neighbourhood",
+   "lon": 85.337984,
+   "lat": 27.730416,
+   "node": 10981,
+   "inFlood": false,
+   "distFloodM": 4909
+  },
+  {
+   "id": 1950473532,
+   "name": "लाखे चौर",
+   "type": "neighbourhood",
+   "lon": 85.332329,
+   "lat": 27.69424,
+   "node": 3816,
+   "inFlood": false,
+   "distFloodM": 1032
+  },
+  {
+   "id": 1950493572,
+   "name": "पुष्पा नगर",
+   "type": "neighbourhood",
+   "lon": 85.331635,
+   "lat": 27.695893,
+   "node": 11026,
+   "inFlood": false,
+   "distFloodM": 1158
+  },
+  {
+   "id": 1950520557,
+   "name": "बानेश्वर",
+   "type": "suburb",
+   "lon": 85.336798,
+   "lat": 27.700303,
+   "node": 3621,
+   "inFlood": false,
+   "distFloodM": 1833
+  },
+  {
+   "id": 1955840816,
+   "name": "खरेल टोल",
+   "type": "neighbourhood",
+   "lon": 85.32314,
+   "lat": 27.720525,
+   "node": 1760,
+   "inFlood": false,
+   "distFloodM": 3324
+  },
+  {
+   "id": 1955840817,
+   "name": "खोलागाल",
+   "type": "neighbourhood",
+   "lon": 85.323729,
+   "lat": 27.718154,
+   "node": 26014,
+   "inFlood": false,
+   "distFloodM": 3092
+  },
+  {
+   "id": 1955852123,
+   "name": "भृकुटी टोल",
+   "type": "neighbourhood",
+   "lon": 85.329075,
+   "lat": 27.717911,
+   "node": 28793,
+   "inFlood": false,
+   "distFloodM": 3274
+  },
+  {
+   "id": 1955852124,
+   "name": "जोर पिपल",
+   "type": "neighbourhood",
+   "lon": 85.329087,
+   "lat": 27.720097,
+   "node": 27506,
+   "inFlood": false,
+   "distFloodM": 3491
+  },
+  {
+   "id": 1955852125,
+   "name": "खुर्सानिटार",
+   "type": "neighbourhood",
+   "lon": 85.32626,
+   "lat": 27.72422,
+   "node": 32217,
+   "inFlood": false,
+   "distFloodM": 3807
+  },
+  {
+   "id": 1955852126,
+   "name": "नील सरसवती",
+   "type": "neighbourhood",
+   "lon": 85.326325,
+   "lat": 27.720123,
+   "node": 19055,
+   "inFlood": false,
+   "distFloodM": 3384
+  },
+  {
+   "id": 1955852127,
+   "name": "टंगाल",
+   "type": "locality",
+   "lon": 85.330449,
+   "lat": 27.717231,
+   "node": 1661,
+   "inFlood": false,
+   "distFloodM": 3274
+  },
+  {
+   "id": 1957364330,
+   "name": "आनन्दनगर",
+   "type": "neighbourhood",
+   "lon": 85.343404,
+   "lat": 27.723397,
+   "node": 2370,
+   "inFlood": false,
+   "distFloodM": 4409
+  },
+  {
+   "id": 1957364340,
+   "name": "धोबी खोला",
+   "type": "neighbourhood",
+   "lon": 85.342662,
+   "lat": 27.722493,
+   "node": 10967,
+   "inFlood": false,
+   "distFloodM": 4289
+  },
+  {
+   "id": 1957364341,
+   "name": "गंगाहिटी",
+   "type": "neighbourhood",
+   "lon": 85.343329,
+   "lat": 27.720108,
+   "node": 19057,
+   "inFlood": false,
+   "distFloodM": 4072
+  },
+  {
+   "id": 1962226007,
+   "name": "बाँशघारी",
+   "type": "suburb",
+   "lon": 85.325489,
+   "lat": 27.701366,
+   "node": 2599,
+   "inFlood": false,
+   "distFloodM": 1516
+  },
+  {
+   "id": 1969476948,
+   "name": "Pipal Bot",
+   "type": "neighbourhood",
+   "lon": 85.429776,
+   "lat": 27.682551,
+   "node": 26072,
+   "inFlood": false,
+   "distFloodM": 1378
+  },
+  {
+   "id": 2004031729,
+   "name": "गोङ्गबु",
+   "type": "suburb",
+   "lon": 85.314545,
+   "lat": 27.735028,
+   "node": 65,
+   "inFlood": false,
+   "distFloodM": 4637
+  },
+  {
+   "id": 2004031731,
+   "name": "सामाखुसी",
+   "type": "suburb",
+   "lon": 85.317758,
+   "lat": 27.735168,
+   "node": 3035,
+   "inFlood": false,
+   "distFloodM": 4714
+  },
+  {
+   "id": 2019307131,
+   "name": "Mulkharka",
+   "type": "village",
+   "lon": 85.43181,
+   "lat": 27.779878,
+   "node": 5240,
+   "inFlood": false,
+   "distFloodM": 5737
+  },
+  {
+   "id": 2019360372,
+   "name": "Jhule",
+   "type": "village",
+   "lon": 85.490121,
+   "lat": 27.774945,
+   "node": 19464,
+   "inFlood": false,
+   "distFloodM": 5551
+  },
+  {
+   "id": 2035862217,
+   "name": "भक्तपुर",
+   "type": "city",
+   "lon": 85.426168,
+   "lat": 27.671113,
+   "node": 26506,
+   "inFlood": false,
+   "distFloodM": 270
+  },
+  {
+   "id": 2035862218,
+   "name": "कमेरोतार",
+   "type": "locality",
+   "lon": 85.392263,
+   "lat": 27.678566,
+   "node": 27294,
+   "inFlood": false,
+   "distFloodM": 598
+  },
+  {
+   "id": 2051114284,
+   "name": "लोकन्थली",
+   "type": "suburb",
+   "lon": 85.360707,
+   "lat": 27.674697,
+   "node": 19204,
+   "inFlood": false,
+   "distFloodM": 375
+  },
+  {
+   "id": 2054092035,
+   "name": "Bhaisipati",
+   "type": "village",
+   "lon": 85.492318,
+   "lat": 27.634155,
+   "node": 20725,
+   "inFlood": false,
+   "distFloodM": 5792
+  },
+  {
+   "id": 2054092037,
+   "name": "Sanga",
+   "type": "village",
+   "lon": 85.47774,
+   "lat": 27.64216,
+   "node": 16988,
+   "inFlood": false,
+   "distFloodM": 4104
+  },
+  {
+   "id": 2054615266,
+   "name": "लामाटार",
+   "type": "suburb",
+   "lon": 85.390015,
+   "lat": 27.632965,
+   "node": 12042,
+   "inFlood": false,
+   "distFloodM": 2314
+  },
+  {
+   "id": 2069377368,
+   "name": "चोभार",
+   "type": "suburb",
+   "lon": 85.291267,
+   "lat": 27.666041,
+   "node": 1705,
+   "inFlood": false,
+   "distFloodM": 396
+  },
+  {
+   "id": 2082985720,
+   "name": "कीर्तन चोक",
+   "type": "neighbourhood",
+   "lon": 85.333493,
+   "lat": 27.723482,
+   "node": 982,
+   "inFlood": false,
+   "distFloodM": 4023
+  },
+  {
+   "id": 2083084860,
+   "name": "पञ्चकुमारी टोल",
+   "type": "locality",
+   "lon": 85.337948,
+   "lat": 27.723342,
+   "node": 11291,
+   "inFlood": false,
+   "distFloodM": 4223
+  },
+  {
+   "id": 2083743578,
+   "name": "Maru Tol",
+   "type": "neighbourhood",
+   "lon": 85.30586,
+   "lat": 27.703789,
+   "node": 5554,
+   "inFlood": false,
+   "distFloodM": 1123
+  },
+  {
+   "id": 2120583599,
+   "name": "माछापोखरी",
+   "type": "suburb",
+   "lon": 85.305824,
+   "lat": 27.735287,
+   "node": 224,
+   "inFlood": false,
+   "distFloodM": 4604
+  },
+  {
+   "id": 2120583600,
+   "name": "बालाजु",
+   "type": "suburb",
+   "lon": 85.304556,
+   "lat": 27.72701,
+   "node": 26497,
+   "inFlood": false,
+   "distFloodM": 3694
+  },
+  {
+   "id": 2120583601,
+   "name": "बसुन्धरा",
+   "type": "suburb",
+   "lon": 85.332617,
+   "lat": 27.742238,
+   "node": 11845,
+   "inFlood": false,
+   "distFloodM": 5896
+  },
+  {
+   "id": 2120583602,
+   "name": "चप्पल कारखाना",
+   "type": "suburb",
+   "lon": 85.3424,
+   "lat": 27.734919,
+   "node": 948,
+   "inFlood": false,
+   "distFloodM": 5558
+  },
+  {
+   "id": 2120583603,
+   "name": "धुम्बाराही",
+   "type": "suburb",
+   "lon": 85.344476,
+   "lat": 27.731785,
+   "node": 9619,
+   "inFlood": false,
+   "distFloodM": 5239
+  },
+  {
+   "id": 2120584130,
+   "name": "Sukedhara Chowk",
+   "type": "locality",
+   "lon": 85.345743,
+   "lat": 27.727875,
+   "node": 16859,
+   "inFlood": false,
+   "distFloodM": 4808
+  },
+  {
+   "id": 2122216844,
+   "name": "महाराजगंज",
+   "type": "suburb",
+   "lon": 85.328807,
+   "lat": 27.733079,
+   "node": 5440,
+   "inFlood": false,
+   "distFloodM": 4816
+  },
+  {
+   "id": 2122304889,
+   "name": "भाट-भटेनी",
+   "type": "suburb",
+   "lon": 85.331173,
+   "lat": 27.719236,
+   "node": 11244,
+   "inFlood": false,
+   "distFloodM": 3502
+  },
+  {
+   "id": 2122304890,
+   "name": "बिशालनगर",
+   "type": "suburb",
+   "lon": 85.335557,
+   "lat": 27.721778,
+   "node": 962,
+   "inFlood": false,
+   "distFloodM": 3964
+  },
+  {
+   "id": 2122304891,
+   "name": "गैरीधारा",
+   "type": "locality",
+   "lon": 85.327835,
+   "lat": 27.71773,
+   "node": 1660,
+   "inFlood": false,
+   "distFloodM": 3202
+  },
+  {
+   "id": 2122304892,
+   "name": "हाडीगाउँ",
+   "type": "locality",
+   "lon": 85.336247,
+   "lat": 27.717863,
+   "node": 5816,
+   "inFlood": false,
+   "distFloodM": 3595
+  },
+  {
+   "id": 2122304893,
+   "name": "लैनचौर चौक",
+   "type": "locality",
+   "lon": 85.315982,
+   "lat": 27.716998,
+   "node": 15560,
+   "inFlood": false,
+   "distFloodM": 2721
+  },
+  {
+   "id": 2122304896,
+   "name": "नयाँ बजार",
+   "type": "suburb",
+   "lon": 85.306635,
+   "lat": 27.720663,
+   "node": 2847,
+   "inFlood": false,
+   "distFloodM": 2985
+  },
+  {
+   "id": 2122304897,
+   "name": "सोरखुट्टे",
+   "type": "suburb",
+   "lon": 85.309667,
+   "lat": 27.71819,
+   "node": 1651,
+   "inFlood": false,
+   "distFloodM": 2726
+  },
+  {
+   "id": 2135712730,
+   "name": "Kel Tol",
+   "type": "neighbourhood",
+   "lon": 85.310666,
+   "lat": 27.706621,
+   "node": 15470,
+   "inFlood": false,
+   "distFloodM": 1481
+  },
+  {
+   "id": 2148707721,
+   "name": "Chhaling",
+   "type": "suburb",
+   "lon": 85.456726,
+   "lat": 27.698921,
+   "node": 15982,
+   "inFlood": false,
+   "distFloodM": 1213
+  },
+  {
+   "id": 2148707722,
+   "name": "Duwakot",
+   "type": "suburb",
+   "lon": 85.412682,
+   "lat": 27.694099,
+   "node": 9226,
+   "inFlood": false,
+   "distFloodM": 1590
+  },
+  {
+   "id": 2148707723,
+   "name": "Jhaukhel",
+   "type": "suburb",
+   "lon": 85.430489,
+   "lat": 27.690922,
+   "node": 11447,
+   "inFlood": false,
+   "distFloodM": 2147
+  },
+  {
+   "id": 2163524790,
+   "name": "सृजनशील टोल",
+   "type": "neighbourhood",
+   "lon": 85.336363,
+   "lat": 27.746998,
+   "node": 5417,
+   "inFlood": false,
+   "distFloodM": 6515
+  },
+  {
+   "id": 2169300532,
+   "name": "Pancha Kumari",
+   "type": "neighbourhood",
+   "lon": 85.353542,
+   "lat": 27.729187,
+   "node": 4828,
+   "inFlood": false,
+   "distFloodM": 4454
+  },
+  {
+   "id": 2175266676,
+   "name": "बुद्ध चोक",
+   "type": "neighbourhood",
+   "lon": 85.284037,
+   "lat": 27.733186,
+   "node": 26389,
+   "inFlood": false,
+   "distFloodM": 4867
+  },
+  {
+   "id": 2190750377,
+   "name": "मन्डीकाटार",
+   "type": "suburb",
+   "lon": 85.347392,
+   "lat": 27.73612,
+   "node": 9719,
+   "inFlood": false,
+   "distFloodM": 5419
+  },
+  {
+   "id": 2196725347,
+   "name": "संगम उपनिवेश",
+   "type": "suburb",
+   "lon": 85.397962,
+   "lat": 27.675267,
+   "node": 11494,
+   "inFlood": false,
+   "distFloodM": 213
+  },
+  {
+   "id": 2206264553,
+   "name": "धर्मस्थली",
+   "type": "village",
+   "lon": 85.300621,
+   "lat": 27.76704,
+   "node": 14661,
+   "inFlood": false,
+   "distFloodM": 8138
+  },
+  {
+   "id": 2207719950,
+   "name": "बल्खु",
+   "type": "suburb",
+   "lon": 85.29786,
+   "lat": 27.684993,
+   "node": 29843,
+   "inFlood": false,
+   "distFloodM": 124
+  },
+  {
+   "id": 2207719951,
+   "name": "बनस्थली",
+   "type": "suburb",
+   "lon": 85.297764,
+   "lat": 27.72494,
+   "node": 5161,
+   "inFlood": false,
+   "distFloodM": 3567
+  },
+  {
+   "id": 2207719952,
+   "name": "एकान्तकुना",
+   "type": "suburb",
+   "lon": 85.309404,
+   "lat": 27.668082,
+   "node": 4773,
+   "inFlood": false,
+   "distFloodM": 625
+  },
+  {
+   "id": 2207719954,
+   "name": "सानो भर्यांङ",
+   "type": "suburb",
+   "lon": 85.289215,
+   "lat": 27.720917,
+   "node": 6329,
+   "inFlood": false,
+   "distFloodM": 3420
+  },
+  {
+   "id": 2207770553,
+   "name": "Godawari",
+   "type": "suburb",
+   "lon": 85.373704,
+   "lat": 27.597702,
+   "node": 32397,
+   "inFlood": false,
+   "distFloodM": 1503
+  },
+  {
+   "id": 2207770554,
+   "name": "Taukhel",
+   "type": "locality",
+   "lon": 85.357533,
+   "lat": 27.611507,
+   "node": 1742,
+   "inFlood": false,
+   "distFloodM": 300
+  },
+  {
+   "id": 2214391320,
+   "name": "विशाल चोक",
+   "type": "neighbourhood",
+   "lon": 85.319475,
+   "lat": 27.65445,
+   "node": 2198,
+   "inFlood": false,
+   "distFloodM": 635
+  },
+  {
+   "id": 2218027990,
+   "name": "तिखिडेवल",
+   "type": "neighbourhood",
+   "lon": 85.31743,
+   "lat": 27.657348,
+   "node": 2212,
+   "inFlood": false,
+   "distFloodM": 515
+  },
+  {
+   "id": 2218549739,
+   "name": "क्वें लाँची",
+   "type": "neighbourhood",
+   "lon": 85.327678,
+   "lat": 27.674312,
+   "node": 6601,
+   "inFlood": false,
+   "distFloodM": 655
+  },
+  {
+   "id": 2218549741,
+   "name": "न्युटा",
+   "type": "neighbourhood",
+   "lon": 85.327651,
+   "lat": 27.673281,
+   "node": 10537,
+   "inFlood": false,
+   "distFloodM": 755
+  },
+  {
+   "id": 2218549742,
+   "name": "याङ्गु बाहल",
+   "type": "neighbourhood",
+   "lon": 85.327978,
+   "lat": 27.671665,
+   "node": 15456,
+   "inFlood": false,
+   "distFloodM": 787
+  },
+  {
+   "id": 2218549744,
+   "name": "चापट टोल",
+   "type": "neighbourhood",
+   "lon": 85.328981,
+   "lat": 27.671262,
+   "node": 10642,
+   "inFlood": false,
+   "distFloodM": 684
+  },
+  {
+   "id": 2218549746,
+   "name": "Kuti Saugal",
+   "type": "neighbourhood",
+   "lon": 85.327281,
+   "lat": 27.672098,
+   "node": 10538,
+   "inFlood": false,
+   "distFloodM": 870
+  },
+  {
+   "id": 2218571375,
+   "name": "Swotha",
+   "type": "neighbourhood",
+   "lon": 85.325345,
+   "lat": 27.674859,
+   "node": 1102,
+   "inFlood": false,
+   "distFloodM": 749
+  },
+  {
+   "id": 2220658044,
+   "name": "वध क्षेत्र",
+   "type": "hamlet",
+   "lon": 85.328705,
+   "lat": 27.673362,
+   "node": 10661,
+   "inFlood": false,
+   "distFloodM": 697
+  },
+  {
+   "id": 2220658048,
+   "name": "खापिंछे",
+   "type": "neighbourhood",
+   "lon": 85.328,
+   "lat": 27.673977,
+   "node": 6600,
+   "inFlood": false,
+   "distFloodM": 672
+  },
+  {
+   "id": 2220658051,
+   "name": "बेलाचे",
+   "type": "neighbourhood",
+   "lon": 85.326961,
+   "lat": 27.674849,
+   "node": 15481,
+   "inFlood": false,
+   "distFloodM": 643
+  },
+  {
+   "id": 2220703611,
+   "name": "गुइटा",
+   "type": "suburb",
+   "lon": 85.332313,
+   "lat": 27.671269,
+   "node": 32496,
+   "inFlood": false,
+   "distFloodM": 501
+  },
+  {
+   "id": 2224201462,
+   "name": "चोबु ननी",
+   "type": "neighbourhood",
+   "lon": 85.327401,
+   "lat": 27.676887,
+   "node": 15480,
+   "inFlood": false,
+   "distFloodM": 448
+  },
+  {
+   "id": 2224243791,
+   "name": "यल मूल",
+   "type": "neighbourhood",
+   "lon": 85.327991,
+   "lat": 27.67139,
+   "node": 15456,
+   "inFlood": false,
+   "distFloodM": 766
+  },
+  {
+   "id": 2224243814,
+   "name": "Wyona Nani",
+   "type": "neighbourhood",
+   "lon": 85.328123,
+   "lat": 27.674246,
+   "node": 6600,
+   "inFlood": false,
+   "distFloodM": 640
+  },
+  {
+   "id": 2224243823,
+   "name": "स: क्वों ट्व",
+   "type": "neighbourhood",
+   "lon": 85.32948,
+   "lat": 27.670564,
+   "node": 741,
+   "inFlood": false,
+   "distFloodM": 595
+  },
+  {
+   "id": 2224243824,
+   "name": "Baku Nani",
+   "type": "neighbourhood",
+   "lon": 85.328205,
+   "lat": 27.671647,
+   "node": 15456,
+   "inFlood": false,
+   "distFloodM": 769
+  },
+  {
+   "id": 2224247833,
+   "name": "भंगिनी नानी",
+   "type": "neighbourhood",
+   "lon": 85.329976,
+   "lat": 27.669264,
+   "node": 15458,
+   "inFlood": false,
+   "distFloodM": 469
+  },
+  {
+   "id": 2224261934,
+   "name": "भोला ढोका",
+   "type": "neighbourhood",
+   "lon": 85.332586,
+   "lat": 27.673132,
+   "node": 3857,
+   "inFlood": false,
+   "distFloodM": 556
+  },
+  {
+   "id": 2224356310,
+   "name": "झातापोल",
+   "type": "neighbourhood",
+   "lon": 85.324846,
+   "lat": 27.675302,
+   "node": 5394,
+   "inFlood": false,
+   "distFloodM": 752
+  },
+  {
+   "id": 2224488131,
+   "name": "तुलसी फो: नानी",
+   "type": "neighbourhood",
+   "lon": 85.326937,
+   "lat": 27.673942,
+   "node": 3959,
+   "inFlood": false,
+   "distFloodM": 727
+  },
+  {
+   "id": 2224488140,
+   "name": "पानी पुरी समुदाय",
+   "type": "neighbourhood",
+   "lon": 85.32653,
+   "lat": 27.6736,
+   "node": 3958,
+   "inFlood": false,
+   "distFloodM": 781
+  },
+  {
+   "id": 2224512174,
+   "name": "तुम बहाल",
+   "type": "neighbourhood",
+   "lon": 85.325425,
+   "lat": 27.675032,
+   "node": 1103,
+   "inFlood": false,
+   "distFloodM": 730
+  },
+  {
+   "id": 2225240053,
+   "name": "Ghalate",
+   "type": "suburb",
+   "lon": 85.421694,
+   "lat": 27.665165,
+   "node": 33330,
+   "inFlood": false,
+   "distFloodM": 222
+  },
+  {
+   "id": 2230569077,
+   "name": "जावालाखेल",
+   "type": "suburb",
+   "lon": 85.313376,
+   "lat": 27.67244,
+   "node": 4768,
+   "inFlood": false,
+   "distFloodM": 1222
+  },
+  {
+   "id": 2230569081,
+   "name": "कालिमाटी",
+   "type": "suburb",
+   "lon": 85.299202,
+   "lat": 27.698604,
+   "node": 9997,
+   "inFlood": false,
+   "distFloodM": 783
+  },
+  {
+   "id": 2230569084,
+   "name": "कुलेश्वर",
+   "type": "suburb",
+   "lon": 85.298763,
+   "lat": 27.692942,
+   "node": 11185,
+   "inFlood": false,
+   "distFloodM": 343
+  },
+  {
+   "id": 2230587293,
+   "name": "तिलगंगा",
+   "type": "suburb",
+   "lon": 85.349811,
+   "lat": 27.706036,
+   "node": 3256,
+   "inFlood": false,
+   "distFloodM": 2581
+  },
+  {
+   "id": 2230601515,
+   "name": "कुम्भेश्वर मन्दिर परिसर",
+   "type": "neighbourhood",
+   "lon": 85.326272,
+   "lat": 27.676367,
+   "node": 15471,
+   "inFlood": false,
+   "distFloodM": 569
+  },
+  {
+   "id": 2230608562,
+   "name": "Kamal Binayak",
+   "type": "suburb",
+   "lon": 85.438279,
+   "lat": 27.676771,
+   "node": 8712,
+   "inFlood": false,
+   "distFloodM": 654
+  },
+  {
+   "id": 2249170814,
+   "name": "कौशलटार",
+   "type": "suburb",
+   "lon": 85.365136,
+   "lat": 27.674449,
+   "node": 5922,
+   "inFlood": false,
+   "distFloodM": 141
+  },
+  {
+   "id": 2251951394,
+   "name": "Atalin",
+   "type": "locality",
+   "lon": 85.405086,
+   "lat": 27.64068,
+   "node": 15642,
+   "inFlood": false,
+   "distFloodM": 3295
+  },
+  {
+   "id": 2251951396,
+   "name": "Bageshwari",
+   "type": "village",
+   "lon": 85.477573,
+   "lat": 27.691489,
+   "node": 5218,
+   "inFlood": false,
+   "distFloodM": 1237
+  },
+  {
+   "id": 2251951399,
+   "name": "Bairikhel",
+   "type": "locality",
+   "lon": 85.428798,
+   "lat": 27.638835,
+   "node": 25427,
+   "inFlood": false,
+   "distFloodM": 2796
+  },
+  {
+   "id": 2251951406,
+   "name": "बालकोट",
+   "type": "neighbourhood",
+   "lon": 85.360394,
+   "lat": 27.668904,
+   "node": 11734,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2251951409,
+   "name": "बानाचौर",
+   "type": "locality",
+   "lon": 85.40607,
+   "lat": 27.664099,
+   "node": 32277,
+   "inFlood": false,
+   "distFloodM": 923
+  },
+  {
+   "id": 2251951410,
+   "name": "Bangau",
+   "type": "locality",
+   "lon": 85.445303,
+   "lat": 27.708641,
+   "node": 22186,
+   "inFlood": false,
+   "distFloodM": 1507
+  },
+  {
+   "id": 2251951412,
+   "name": "Banpadheri",
+   "type": "locality",
+   "lon": 85.474615,
+   "lat": 27.703121,
+   "node": 28130,
+   "inFlood": false,
+   "distFloodM": 1771
+  },
+  {
+   "id": 2251951415,
+   "name": "Basbari",
+   "type": "locality",
+   "lon": 85.455965,
+   "lat": 27.689482,
+   "node": 23989,
+   "inFlood": false,
+   "distFloodM": 534
+  },
+  {
+   "id": 2251951419,
+   "name": "बसिडोल",
+   "type": "locality",
+   "lon": 85.366963,
+   "lat": 27.670531,
+   "node": 32193,
+   "inFlood": false,
+   "distFloodM": 72
+  },
+  {
+   "id": 2251951422,
+   "name": "Basnetgau",
+   "type": "hamlet",
+   "lon": 85.464682,
+   "lat": 27.640737,
+   "node": 29271,
+   "inFlood": false,
+   "distFloodM": 3185
+  },
+  {
+   "id": 2251951425,
+   "name": "Basnetgau",
+   "type": "locality",
+   "lon": 85.414173,
+   "lat": 27.645473,
+   "node": 15625,
+   "inFlood": false,
+   "distFloodM": 2470
+  },
+  {
+   "id": 2251951426,
+   "name": "Batatol",
+   "type": "locality",
+   "lon": 85.448986,
+   "lat": 27.702974,
+   "node": 27980,
+   "inFlood": false,
+   "distFloodM": 2009
+  },
+  {
+   "id": 2251951429,
+   "name": "Besigau",
+   "type": "locality",
+   "lon": 85.41628,
+   "lat": 27.706553,
+   "node": 12794,
+   "inFlood": false,
+   "distFloodM": 721
+  },
+  {
+   "id": 2251951432,
+   "name": "Bhajubhairav",
+   "type": "locality",
+   "lon": 85.457787,
+   "lat": 27.700764,
+   "node": 23472,
+   "inFlood": false,
+   "distFloodM": 1346
+  },
+  {
+   "id": 2251951435,
+   "name": "Bhangalo",
+   "type": "locality",
+   "lon": 85.48098,
+   "lat": 27.650001,
+   "node": 20206,
+   "inFlood": false,
+   "distFloodM": 3993
+  },
+  {
+   "id": 2251951439,
+   "name": "Bhatedhikuro",
+   "type": "hamlet",
+   "lon": 85.445027,
+   "lat": 27.663185,
+   "node": 9229,
+   "inFlood": false,
+   "distFloodM": 221
+  },
+  {
+   "id": 2251951442,
+   "name": "Bhetasi",
+   "type": "locality",
+   "lon": 85.482803,
+   "lat": 27.662711,
+   "node": 20212,
+   "inFlood": false,
+   "distFloodM": 3039
+  },
+  {
+   "id": 2251951444,
+   "name": "Bhusundol",
+   "type": "locality",
+   "lon": 85.459409,
+   "lat": 27.698544,
+   "node": 23474,
+   "inFlood": false,
+   "distFloodM": 1059
+  },
+  {
+   "id": 2251951445,
+   "name": "Bibicha",
+   "type": "locality",
+   "lon": 85.438944,
+   "lat": 27.657707,
+   "node": 29949,
+   "inFlood": false,
+   "distFloodM": 490
+  },
+  {
+   "id": 2251951447,
+   "name": "बोडेगाउ",
+   "type": "locality",
+   "lon": 85.383571,
+   "lat": 27.694467,
+   "node": 31282,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2251951449,
+   "name": "Bungal",
+   "type": "locality",
+   "lon": 85.405857,
+   "lat": 27.668916,
+   "node": 606,
+   "inFlood": false,
+   "distFloodM": 540
+  },
+  {
+   "id": 2251951450,
+   "name": "Chakhu",
+   "type": "locality",
+   "lon": 85.429723,
+   "lat": 27.653968,
+   "node": 11650,
+   "inFlood": false,
+   "distFloodM": 1348
+  },
+  {
+   "id": 2251951451,
+   "name": "चमेलिडाँडा",
+   "type": "locality",
+   "lon": 85.393753,
+   "lat": 27.636674,
+   "node": 19367,
+   "inFlood": false,
+   "distFloodM": 2591
+  },
+  {
+   "id": 2251951452,
+   "name": "Chamthali",
+   "type": "hamlet",
+   "lon": 85.4493,
+   "lat": 27.656324,
+   "node": 23828,
+   "inFlood": false,
+   "distFloodM": 901
+  },
+  {
+   "id": 2251951453,
+   "name": "Chhapdada",
+   "type": "locality",
+   "lon": 85.438411,
+   "lat": 27.714055,
+   "node": 26229,
+   "inFlood": false,
+   "distFloodM": 974
+  },
+  {
+   "id": 2251951454,
+   "name": "चित्रपुर",
+   "type": "locality",
+   "lon": 85.381356,
+   "lat": 27.656264,
+   "node": 21469,
+   "inFlood": false,
+   "distFloodM": 1370
+  },
+  {
+   "id": 2251951455,
+   "name": "Chundevi",
+   "type": "suburb",
+   "lon": 85.413704,
+   "lat": 27.665074,
+   "node": 8812,
+   "inFlood": false,
+   "distFloodM": 505
+  },
+  {
+   "id": 2251951456,
+   "name": "Chundevi",
+   "type": "locality",
+   "lon": 85.444616,
+   "lat": 27.666872,
+   "node": 927,
+   "inFlood": false,
+   "distFloodM": 198
+  },
+  {
+   "id": 2251951457,
+   "name": "Dadagau",
+   "type": "locality",
+   "lon": 85.434898,
+   "lat": 27.649916,
+   "node": 26341,
+   "inFlood": false,
+   "distFloodM": 1432
+  },
+  {
+   "id": 2251951465,
+   "name": "Dadagau",
+   "type": "village",
+   "lon": 85.46777,
+   "lat": 27.687907,
+   "node": 865,
+   "inFlood": false,
+   "distFloodM": 292
+  },
+  {
+   "id": 2251951467,
+   "name": "दादिकोट",
+   "type": "hamlet",
+   "lon": 85.393593,
+   "lat": 27.649227,
+   "node": 15636,
+   "inFlood": false,
+   "distFloodM": 2297
+  },
+  {
+   "id": 2251951470,
+   "name": "Dagau",
+   "type": "locality",
+   "lon": 85.472732,
+   "lat": 27.650416,
+   "node": 15747,
+   "inFlood": false,
+   "distFloodM": 3251
+  },
+  {
+   "id": 2251951472,
+   "name": "Dahalgau",
+   "type": "locality",
+   "lon": 85.474866,
+   "lat": 27.701324,
+   "node": 28130,
+   "inFlood": false,
+   "distFloodM": 1620
+  },
+  {
+   "id": 2251951473,
+   "name": "Damaigau",
+   "type": "locality",
+   "lon": 85.491859,
+   "lat": 27.692311,
+   "node": 24233,
+   "inFlood": false,
+   "distFloodM": 2643
+  },
+  {
+   "id": 2251951476,
+   "name": "Deujagau",
+   "type": "village",
+   "lon": 85.461431,
+   "lat": 27.657305,
+   "node": 22042,
+   "inFlood": false,
+   "distFloodM": 1943
+  },
+  {
+   "id": 2251951479,
+   "name": "Deuralibhanjyan",
+   "type": "locality",
+   "lon": 85.475042,
+   "lat": 27.713243,
+   "node": 288,
+   "inFlood": false,
+   "distFloodM": 809
+  },
+  {
+   "id": 2251951482,
+   "name": "देवडोल",
+   "type": "locality",
+   "lon": 85.381844,
+   "lat": 27.665487,
+   "node": 22329,
+   "inFlood": false,
+   "distFloodM": 379
+  },
+  {
+   "id": 2251951485,
+   "name": "धनसार",
+   "type": "locality",
+   "lon": 85.373705,
+   "lat": 27.653158,
+   "node": 22428,
+   "inFlood": false,
+   "distFloodM": 762
+  },
+  {
+   "id": 2251951488,
+   "name": "धर्मेश्वर",
+   "type": "neighbourhood",
+   "lon": 85.359525,
+   "lat": 27.666795,
+   "node": 22334,
+   "inFlood": false,
+   "distFloodM": 104
+  },
+  {
+   "id": 2251951491,
+   "name": "Dihigau",
+   "type": "locality",
+   "lon": 85.456745,
+   "lat": 27.705182,
+   "node": 19355,
+   "inFlood": false,
+   "distFloodM": 1615
+  },
+  {
+   "id": 2251951494,
+   "name": "Dobhane",
+   "type": "locality",
+   "lon": 85.462119,
+   "lat": 27.702187,
+   "node": 26194,
+   "inFlood": false,
+   "distFloodM": 1386
+  },
+  {
+   "id": 2251951495,
+   "name": "Doreshwar",
+   "type": "locality",
+   "lon": 85.435178,
+   "lat": 27.641427,
+   "node": 19718,
+   "inFlood": false,
+   "distFloodM": 2289
+  },
+  {
+   "id": 2251951496,
+   "name": "Gaindagau",
+   "type": "locality",
+   "lon": 85.44279,
+   "lat": 27.699991,
+   "node": 15697,
+   "inFlood": false,
+   "distFloodM": 2277
+  },
+  {
+   "id": 2251951503,
+   "name": "गाम्चा",
+   "type": "locality",
+   "lon": 85.389898,
+   "lat": 27.655694,
+   "node": 21140,
+   "inFlood": false,
+   "distFloodM": 1608
+  },
+  {
+   "id": 2251951504,
+   "name": "Gamphedi",
+   "type": "locality",
+   "lon": 85.412523,
+   "lat": 27.712782,
+   "node": 26083,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2251951507,
+   "name": "Ghorsaine Gaun",
+   "type": "hamlet",
+   "lon": 85.482728,
+   "lat": 27.684954,
+   "node": 22686,
+   "inFlood": false,
+   "distFloodM": 1788
+  },
+  {
+   "id": 2251951510,
+   "name": "Ghumaune",
+   "type": "locality",
+   "lon": 85.454743,
+   "lat": 27.694018,
+   "node": 11484,
+   "inFlood": false,
+   "distFloodM": 966
+  },
+  {
+   "id": 2251951512,
+   "name": "Gokulgau",
+   "type": "locality",
+   "lon": 85.450303,
+   "lat": 27.70508,
+   "node": 19357,
+   "inFlood": false,
+   "distFloodM": 1748
+  },
+  {
+   "id": 2251951515,
+   "name": "Megaal",
+   "type": "locality",
+   "lon": 85.444686,
+   "lat": 27.695121,
+   "node": 294,
+   "inFlood": false,
+   "distFloodM": 1750
+  },
+  {
+   "id": 2251951518,
+   "name": "Gunchadol",
+   "type": "locality",
+   "lon": 85.424385,
+   "lat": 27.654111,
+   "node": 23912,
+   "inFlood": false,
+   "distFloodM": 1436
+  },
+  {
+   "id": 2251951521,
+   "name": "Gundu gaun",
+   "type": "hamlet",
+   "lon": 85.414784,
+   "lat": 27.6407,
+   "node": 15626,
+   "inFlood": false,
+   "distFloodM": 2971
+  },
+  {
+   "id": 2251951524,
+   "name": "Halalgau",
+   "type": "locality",
+   "lon": 85.484882,
+   "lat": 27.673746,
+   "node": 20617,
+   "inFlood": false,
+   "distFloodM": 2590
+  },
+  {
+   "id": 2251951526,
+   "name": "Hanumantar",
+   "type": "locality",
+   "lon": 85.425667,
+   "lat": 27.694804,
+   "node": 582,
+   "inFlood": false,
+   "distFloodM": 2315
+  },
+  {
+   "id": 2251951529,
+   "name": "इकुडोल",
+   "type": "locality",
+   "lon": 85.370121,
+   "lat": 27.659966,
+   "node": 12334,
+   "inFlood": false,
+   "distFloodM": 766
+  },
+  {
+   "id": 2251951531,
+   "name": "Itagau",
+   "type": "hamlet",
+   "lon": 85.471341,
+   "lat": 27.642758,
+   "node": 25000,
+   "inFlood": false,
+   "distFloodM": 3540
+  },
+  {
+   "id": 2251951535,
+   "name": "Jitpur",
+   "type": "village",
+   "lon": 85.475407,
+   "lat": 27.686256,
+   "node": 24229,
+   "inFlood": false,
+   "distFloodM": 1056
+  },
+  {
+   "id": 2251951537,
+   "name": "जोशिगाउ",
+   "type": "suburb",
+   "lon": 85.396129,
+   "lat": 27.669584,
+   "node": 19683,
+   "inFlood": false,
+   "distFloodM": 224
+  },
+  {
+   "id": 2251951542,
+   "name": "Kalighat",
+   "type": "neighbourhood",
+   "lon": 85.427395,
+   "lat": 27.679499,
+   "node": 28526,
+   "inFlood": false,
+   "distFloodM": 1179
+  },
+  {
+   "id": 2251951545,
+   "name": "कालिटार",
+   "type": "hamlet",
+   "lon": 85.393405,
+   "lat": 27.643136,
+   "node": 23204,
+   "inFlood": false,
+   "distFloodM": 2577
+  },
+  {
+   "id": 2251951548,
+   "name": "Kalitar",
+   "type": "locality",
+   "lon": 85.444782,
+   "lat": 27.701676,
+   "node": 15699,
+   "inFlood": false,
+   "distFloodM": 2246
+  },
+  {
+   "id": 2251951550,
+   "name": "Kaphlegau",
+   "type": "locality",
+   "lon": 85.475766,
+   "lat": 27.700008,
+   "node": 11469,
+   "inFlood": false,
+   "distFloodM": 1563
+  },
+  {
+   "id": 2251951552,
+   "name": "कार्की गाउँ",
+   "type": "hamlet",
+   "lon": 85.479754,
+   "lat": 27.68213,
+   "node": 24800,
+   "inFlood": false,
+   "distFloodM": 1635
+  },
+  {
+   "id": 2251951553,
+   "name": "कार्किगाउ",
+   "type": "locality",
+   "lon": 85.394983,
+   "lat": 27.685518,
+   "node": 26287,
+   "inFlood": false,
+   "distFloodM": 1016
+  },
+  {
+   "id": 2251951556,
+   "name": "Karkigau",
+   "type": "locality",
+   "lon": 85.462684,
+   "lat": 27.708642,
+   "node": 26179,
+   "inFlood": false,
+   "distFloodM": 1141
+  },
+  {
+   "id": 2251951559,
+   "name": "कटुञ्जे",
+   "type": "locality",
+   "lon": 85.4026,
+   "lat": 27.665277,
+   "node": 32365,
+   "inFlood": false,
+   "distFloodM": 947
+  },
+  {
+   "id": 2251951562,
+   "name": "Khadakagau",
+   "type": "locality",
+   "lon": 85.412848,
+   "lat": 27.634789,
+   "node": 15628,
+   "inFlood": false,
+   "distFloodM": 3650
+  },
+  {
+   "id": 2251951565,
+   "name": "Khadaka Tol",
+   "type": "locality",
+   "lon": 85.415588,
+   "lat": 27.701402,
+   "node": 608,
+   "inFlood": false,
+   "distFloodM": 1157
+  },
+  {
+   "id": 2251951566,
+   "name": "खालफिटार",
+   "type": "locality",
+   "lon": 85.372035,
+   "lat": 27.665912,
+   "node": 22847,
+   "inFlood": false,
+   "distFloodM": 540
+  },
+  {
+   "id": 2251951570,
+   "name": "Khatrigau",
+   "type": "locality",
+   "lon": 85.462256,
+   "lat": 27.705211,
+   "node": 15419,
+   "inFlood": false,
+   "distFloodM": 1520
+  },
+  {
+   "id": 2251951573,
+   "name": "Khatritol",
+   "type": "neighbourhood",
+   "lon": 85.472707,
+   "lat": 27.669303,
+   "node": 20109,
+   "inFlood": false,
+   "distFloodM": 1810
+  },
+  {
+   "id": 2251951574,
+   "name": "Kotali",
+   "type": "locality",
+   "lon": 85.427608,
+   "lat": 27.702706,
+   "node": 619,
+   "inFlood": false,
+   "distFloodM": 1818
+  },
+  {
+   "id": 2251951576,
+   "name": "Kulpakot",
+   "type": "locality",
+   "lon": 85.426574,
+   "lat": 27.707857,
+   "node": 23898,
+   "inFlood": false,
+   "distFloodM": 1446
+  },
+  {
+   "id": 2251951579,
+   "name": "Kuslamtar",
+   "type": "locality",
+   "lon": 85.463085,
+   "lat": 27.693521,
+   "node": 16028,
+   "inFlood": false,
+   "distFloodM": 424
+  },
+  {
+   "id": 2251951582,
+   "name": "Lakila",
+   "type": "locality",
+   "lon": 85.435005,
+   "lat": 27.696411,
+   "node": 11445,
+   "inFlood": false,
+   "distFloodM": 2280
+  },
+  {
+   "id": 2251951585,
+   "name": "Lamagau",
+   "type": "locality",
+   "lon": 85.492112,
+   "lat": 27.713386,
+   "node": 23720,
+   "inFlood": false,
+   "distFloodM": 2305
+  },
+  {
+   "id": 2251951588,
+   "name": "Lapuli",
+   "type": "locality",
+   "lon": 85.476839,
+   "lat": 27.656297,
+   "node": 20224,
+   "inFlood": false,
+   "distFloodM": 3187
+  },
+  {
+   "id": 2251951593,
+   "name": "Lukundol",
+   "type": "locality",
+   "lon": 85.424083,
+   "lat": 27.692937,
+   "node": 8838,
+   "inFlood": false,
+   "distFloodM": 2386
+  },
+  {
+   "id": 2251951594,
+   "name": "Magargau",
+   "type": "locality",
+   "lon": 85.431257,
+   "lat": 27.632698,
+   "node": 26388,
+   "inFlood": false,
+   "distFloodM": 3327
+  },
+  {
+   "id": 2251951596,
+   "name": "मगरगाउ",
+   "type": "locality",
+   "lon": 85.401953,
+   "lat": 27.652765,
+   "node": 24474,
+   "inFlood": false,
+   "distFloodM": 2090
+  },
+  {
+   "id": 2251951599,
+   "name": "Mahatgau",
+   "type": "village",
+   "lon": 85.460278,
+   "lat": 27.644145,
+   "node": 24716,
+   "inFlood": false,
+   "distFloodM": 2612
+  },
+  {
+   "id": 2251951602,
+   "name": "Majuwa",
+   "type": "locality",
+   "lon": 85.49106,
+   "lat": 27.696218,
+   "node": 5224,
+   "inFlood": false,
+   "distFloodM": 2655
+  },
+  {
+   "id": 2251951604,
+   "name": "मकालटोल",
+   "type": "locality",
+   "lon": 85.398437,
+   "lat": 27.656423,
+   "node": 24469,
+   "inFlood": false,
+   "distFloodM": 1588
+  },
+  {
+   "id": 2251951607,
+   "name": "Maligau",
+   "type": "locality",
+   "lon": 85.439658,
+   "lat": 27.641446,
+   "node": 26332,
+   "inFlood": false,
+   "distFloodM": 2199
+  },
+  {
+   "id": 2251951608,
+   "name": "Masandol",
+   "type": "locality",
+   "lon": 85.448324,
+   "lat": 27.669015,
+   "node": 4229,
+   "inFlood": false,
+   "distFloodM": 413
+  },
+  {
+   "id": 2251951612,
+   "name": "Mulakot",
+   "type": "locality",
+   "lon": 85.449627,
+   "lat": 27.709494,
+   "node": 24142,
+   "inFlood": false,
+   "distFloodM": 1290
+  },
+  {
+   "id": 2251951617,
+   "name": "Nalachhap",
+   "type": "locality",
+   "lon": 85.482875,
+   "lat": 27.668014,
+   "node": 20971,
+   "inFlood": false,
+   "distFloodM": 2702
+  },
+  {
+   "id": 2251951619,
+   "name": "Nalinchok",
+   "type": "hamlet",
+   "lon": 85.461337,
+   "lat": 27.653072,
+   "node": 11938,
+   "inFlood": false,
+   "distFloodM": 2104
+  },
+  {
+   "id": 2251951620,
+   "name": "Nankhel",
+   "type": "village",
+   "lon": 85.447342,
+   "lat": 27.647501,
+   "node": 32417,
+   "inFlood": false,
+   "distFloodM": 1607
+  },
+  {
+   "id": 2251951623,
+   "name": "निकोशेरा",
+   "type": "locality",
+   "lon": 85.403841,
+   "lat": 27.679337,
+   "node": 15584,
+   "inFlood": false,
+   "distFloodM": 149
+  },
+  {
+   "id": 2251951628,
+   "name": "दुलाल गाउँ",
+   "type": "village",
+   "lon": 85.490607,
+   "lat": 27.684177,
+   "node": 20225,
+   "inFlood": false,
+   "distFloodM": 2562
+  },
+  {
+   "id": 2251951630,
+   "name": "Nyabu",
+   "type": "locality",
+   "lon": 85.46611,
+   "lat": 27.678685,
+   "node": 844,
+   "inFlood": false,
+   "distFloodM": 698
+  },
+  {
+   "id": 2251951633,
+   "name": "Nyopanegau",
+   "type": "locality",
+   "lon": 85.419092,
+   "lat": 27.7033,
+   "node": 17141,
+   "inFlood": false,
+   "distFloodM": 1173
+  },
+  {
+   "id": 2251951635,
+   "name": "Padali",
+   "type": "locality",
+   "lon": 85.485425,
+   "lat": 27.700195,
+   "node": 22396,
+   "inFlood": false,
+   "distFloodM": 2322
+  },
+  {
+   "id": 2251951638,
+   "name": "Pagaritol",
+   "type": "locality",
+   "lon": 85.467754,
+   "lat": 27.697575,
+   "node": 28184,
+   "inFlood": false,
+   "distFloodM": 928
+  },
+  {
+   "id": 2251951641,
+   "name": "Pakunepati",
+   "type": "locality",
+   "lon": 85.440288,
+   "lat": 27.69718,
+   "node": 24645,
+   "inFlood": false,
+   "distFloodM": 2101
+  },
+  {
+   "id": 2251951642,
+   "name": "Palase",
+   "type": "village",
+   "lon": 85.463826,
+   "lat": 27.645751,
+   "node": 23867,
+   "inFlood": false,
+   "distFloodM": 2749
+  },
+  {
+   "id": 2251951643,
+   "name": "Pataletar",
+   "type": "locality",
+   "lon": 85.398041,
+   "lat": 27.637688,
+   "node": 796,
+   "inFlood": false,
+   "distFloodM": 3003
+  },
+  {
+   "id": 2251951645,
+   "name": "Paudeldada",
+   "type": "locality",
+   "lon": 85.440649,
+   "lat": 27.710567,
+   "node": 22187,
+   "inFlood": false,
+   "distFloodM": 1319
+  },
+  {
+   "id": 2251951648,
+   "name": "Phaidhoka",
+   "type": "locality",
+   "lon": 85.461384,
+   "lat": 27.67106,
+   "node": 4213,
+   "inFlood": false,
+   "distFloodM": 1063
+  },
+  {
+   "id": 2251951651,
+   "name": "फाइदोका",
+   "type": "locality",
+   "lon": 85.407412,
+   "lat": 27.688991,
+   "node": 27660,
+   "inFlood": false,
+   "distFloodM": 1206
+  },
+  {
+   "id": 2251951653,
+   "name": "Lamichhane Tole",
+   "type": "locality",
+   "lon": 85.469008,
+   "lat": 27.708085,
+   "node": 15414,
+   "inFlood": false,
+   "distFloodM": 1156
+  },
+  {
+   "id": 2251951656,
+   "name": "Pikhel",
+   "type": "locality",
+   "lon": 85.433432,
+   "lat": 27.706073,
+   "node": 11456,
+   "inFlood": false,
+   "distFloodM": 1971
+  },
+  {
+   "id": 2251951659,
+   "name": "Piple",
+   "type": "locality",
+   "lon": 85.480791,
+   "lat": 27.656368,
+   "node": 26199,
+   "inFlood": false,
+   "distFloodM": 3407
+  },
+  {
+   "id": 2251951661,
+   "name": "Pwargau",
+   "type": "village",
+   "lon": 85.466689,
+   "lat": 27.65268,
+   "node": 15758,
+   "inFlood": false,
+   "distFloodM": 2605
+  },
+  {
+   "id": 2251951664,
+   "name": "Rautetol",
+   "type": "locality",
+   "lon": 85.477345,
+   "lat": 27.673588,
+   "node": 20600,
+   "inFlood": false,
+   "distFloodM": 1934
+  },
+  {
+   "id": 2251951666,
+   "name": "राउत गाउँ",
+   "type": "locality",
+   "lon": 85.404535,
+   "lat": 27.658811,
+   "node": 5278,
+   "inFlood": false,
+   "distFloodM": 1494
+  },
+  {
+   "id": 2251951669,
+   "name": "रोकागाउ",
+   "type": "locality",
+   "lon": 85.408309,
+   "lat": 27.704334,
+   "node": 9270,
+   "inFlood": false,
+   "distFloodM": 396
+  },
+  {
+   "id": 2251951672,
+   "name": "सालामपाखा",
+   "type": "locality",
+   "lon": 85.382604,
+   "lat": 27.660339,
+   "node": 4285,
+   "inFlood": false,
+   "distFloodM": 943
+  },
+  {
+   "id": 2251951675,
+   "name": "Sangdaha",
+   "type": "locality",
+   "lon": 85.424526,
+   "lat": 27.712839,
+   "node": 27110,
+   "inFlood": false,
+   "distFloodM": 974
+  },
+  {
+   "id": 2251951676,
+   "name": "सानो थिमि",
+   "type": "suburb",
+   "lon": 85.371025,
+   "lat": 27.682811,
+   "node": 5931,
+   "inFlood": false,
+   "distFloodM": 674
+  },
+  {
+   "id": 2251951678,
+   "name": "सरस्वतीखेल",
+   "type": "locality",
+   "lon": 85.403134,
+   "lat": 27.696336,
+   "node": 15108,
+   "inFlood": false,
+   "distFloodM": 824
+  },
+  {
+   "id": 2251951681,
+   "name": "Saudol",
+   "type": "neighbourhood",
+   "lon": 85.473051,
+   "lat": 27.665136,
+   "node": 20116,
+   "inFlood": false,
+   "distFloodM": 2173
+  },
+  {
+   "id": 2251951683,
+   "name": "Shantigau",
+   "type": "hamlet",
+   "lon": 85.454223,
+   "lat": 27.65322,
+   "node": 19903,
+   "inFlood": false,
+   "distFloodM": 1495
+  },
+  {
+   "id": 2251951684,
+   "name": "शिकारितार",
+   "type": "locality",
+   "lon": 85.397208,
+   "lat": 27.65319,
+   "node": 21554,
+   "inFlood": false,
+   "distFloodM": 1903
+  },
+  {
+   "id": 2251951686,
+   "name": "Silamgal",
+   "type": "locality",
+   "lon": 85.420997,
+   "lat": 27.635993,
+   "node": 24030,
+   "inFlood": false,
+   "distFloodM": 3435
+  },
+  {
+   "id": 2251951689,
+   "name": "सिरुटार",
+   "type": "village",
+   "lon": 85.374931,
+   "lat": 27.655756,
+   "node": 28907,
+   "inFlood": false,
+   "distFloodM": 911
+  },
+  {
+   "id": 2251951694,
+   "name": "Soche",
+   "type": "locality",
+   "lon": 85.437164,
+   "lat": 27.637087,
+   "node": 19766,
+   "inFlood": false,
+   "distFloodM": 2711
+  },
+  {
+   "id": 2251951695,
+   "name": "सोमाथली",
+   "type": "locality",
+   "lon": 85.40366,
+   "lat": 27.702214,
+   "node": 14970,
+   "inFlood": false,
+   "distFloodM": 370
+  },
+  {
+   "id": 2251951696,
+   "name": "Sudal",
+   "type": "village",
+   "lon": 85.480323,
+   "lat": 27.676972,
+   "node": 20814,
+   "inFlood": false,
+   "distFloodM": 2017
+  },
+  {
+   "id": 2251951697,
+   "name": "सुम्लिन्टार",
+   "type": "locality",
+   "lon": 85.3826,
+   "lat": 27.651903,
+   "node": 4268,
+   "inFlood": false,
+   "distFloodM": 1622
+  },
+  {
+   "id": 2251951698,
+   "name": "Taikapu",
+   "type": "locality",
+   "lon": 85.471257,
+   "lat": 27.67246,
+   "node": 31222,
+   "inFlood": false,
+   "distFloodM": 1475
+  },
+  {
+   "id": 2251951699,
+   "name": "तल्लोगाउ",
+   "type": "locality",
+   "lon": 85.361823,
+   "lat": 27.663532,
+   "node": 32634,
+   "inFlood": false,
+   "distFloodM": 15
+  },
+  {
+   "id": 2251951700,
+   "name": "Tamangau",
+   "type": "locality",
+   "lon": 85.408671,
+   "lat": 27.633141,
+   "node": 23550,
+   "inFlood": false,
+   "distFloodM": 3931
+  },
+  {
+   "id": 2251951701,
+   "name": "Tamangau",
+   "type": "locality",
+   "lon": 85.457434,
+   "lat": 27.708683,
+   "node": 26189,
+   "inFlood": false,
+   "distFloodM": 1226
+  },
+  {
+   "id": 2251951702,
+   "name": "Tarkhakal",
+   "type": "locality",
+   "lon": 85.408249,
+   "lat": 27.637267,
+   "node": 15640,
+   "inFlood": false,
+   "distFloodM": 3513
+  },
+  {
+   "id": 2251951703,
+   "name": "तारखाकल",
+   "type": "locality",
+   "lon": 85.402261,
+   "lat": 27.643704,
+   "node": 15638,
+   "inFlood": false,
+   "distFloodM": 3043
+  },
+  {
+   "id": 2251951704,
+   "name": "Taudol",
+   "type": "locality",
+   "lon": 85.438997,
+   "lat": 27.647752,
+   "node": 19804,
+   "inFlood": false,
+   "distFloodM": 1518
+  },
+  {
+   "id": 2251951706,
+   "name": "Thakalmath",
+   "type": "locality",
+   "lon": 85.490717,
+   "lat": 27.691244,
+   "node": 19200,
+   "inFlood": false,
+   "distFloodM": 2518
+  },
+  {
+   "id": 2251951708,
+   "name": "Thapagau",
+   "type": "locality",
+   "lon": 85.450258,
+   "lat": 27.700354,
+   "node": 11464,
+   "inFlood": false,
+   "distFloodM": 1744
+  },
+  {
+   "id": 2251951709,
+   "name": "थापाटोल",
+   "type": "locality",
+   "lon": 85.391317,
+   "lat": 27.666287,
+   "node": 21726,
+   "inFlood": false,
+   "distFloodM": 433
+  },
+  {
+   "id": 2251951712,
+   "name": "Thasetar",
+   "type": "locality",
+   "lon": 85.476428,
+   "lat": 27.652498,
+   "node": 20202,
+   "inFlood": false,
+   "distFloodM": 3514
+  },
+  {
+   "id": 2251951715,
+   "name": "थिमिटार",
+   "type": "locality",
+   "lon": 85.37397,
+   "lat": 27.6691,
+   "node": 9895,
+   "inFlood": false,
+   "distFloodM": 187
+  },
+  {
+   "id": 2251951716,
+   "name": "Tigani",
+   "type": "locality",
+   "lon": 85.39162,
+   "lat": 27.696135,
+   "node": 539,
+   "inFlood": false,
+   "distFloodM": 12
+  },
+  {
+   "id": 2251951718,
+   "name": "Yangdol",
+   "type": "locality",
+   "lon": 85.453892,
+   "lat": 27.672639,
+   "node": 4209,
+   "inFlood": false,
+   "distFloodM": 557
+  },
+  {
+   "id": 2251961918,
+   "name": "Suryabinayak",
+   "type": "town",
+   "lon": 85.41501,
+   "lat": 27.658411,
+   "node": 221,
+   "inFlood": false,
+   "distFloodM": 1104
+  },
+  {
+   "id": 2257263977,
+   "name": "ओम शान्ति चोक",
+   "type": "hamlet",
+   "lon": 85.346588,
+   "lat": 27.691333,
+   "node": 3528,
+   "inFlood": false,
+   "distFloodM": 1427
+  },
+  {
+   "id": 2258052931,
+   "name": "छाउनी",
+   "type": "suburb",
+   "lon": 85.291692,
+   "lat": 27.705535,
+   "node": 25917,
+   "inFlood": false,
+   "distFloodM": 1815
+  },
+  {
+   "id": 2261069216,
+   "name": "पिपल बोट",
+   "type": "locality",
+   "lon": 85.344683,
+   "lat": 27.742802,
+   "node": 5491,
+   "inFlood": false,
+   "distFloodM": 6130
+  },
+  {
+   "id": 2266063803,
+   "name": "तिथली चौक",
+   "type": "locality",
+   "lon": 85.409319,
+   "lat": 27.648868,
+   "node": 15639,
+   "inFlood": false,
+   "distFloodM": 2298
+  },
+  {
+   "id": 2266081486,
+   "name": "लुभू",
+   "type": "suburb",
+   "lon": 85.371496,
+   "lat": 27.643478,
+   "node": 15736,
+   "inFlood": false,
+   "distFloodM": 527
+  },
+  {
+   "id": 2276618163,
+   "name": "Chardobato",
+   "type": "locality",
+   "lon": 85.410434,
+   "lat": 27.682221,
+   "node": 556,
+   "inFlood": false,
+   "distFloodM": 608
+  },
+  {
+   "id": 2279168973,
+   "name": "Kotdevi",
+   "type": "locality",
+   "lon": 85.431872,
+   "lat": 27.696297,
+   "node": 11451,
+   "inFlood": false,
+   "distFloodM": 2457
+  },
+  {
+   "id": 2280849625,
+   "name": "बानियाँटार",
+   "type": "neighbourhood",
+   "lon": 85.318451,
+   "lat": 27.748384,
+   "node": 12358,
+   "inFlood": false,
+   "distFloodM": 6159
+  },
+  {
+   "id": 2280849633,
+   "name": "जाल्पा चोक",
+   "type": "suburb",
+   "lon": 85.317571,
+   "lat": 27.747585,
+   "node": 12357,
+   "inFlood": false,
+   "distFloodM": 6056
+  },
+  {
+   "id": 2290196425,
+   "name": "Naya Basti",
+   "type": "locality",
+   "lon": 85.472769,
+   "lat": 27.70409,
+   "node": 283,
+   "inFlood": false,
+   "distFloodM": 1635
+  },
+  {
+   "id": 2293908128,
+   "name": "Pikhel",
+   "type": "locality",
+   "lon": 85.44002,
+   "lat": 27.700971,
+   "node": 26235,
+   "inFlood": false,
+   "distFloodM": 2382
+  },
+  {
+   "id": 2302082269,
+   "name": "टोखा चण्डेश्वरि",
+   "type": "suburb",
+   "lon": 85.330134,
+   "lat": 27.768715,
+   "node": 2865,
+   "inFlood": false,
+   "distFloodM": 8608
+  },
+  {
+   "id": 2302082270,
+   "name": "टोखा सरस्वती",
+   "type": "village",
+   "lon": 85.330279,
+   "lat": 27.762664,
+   "node": 2941,
+   "inFlood": false,
+   "distFloodM": 7965
+  },
+  {
+   "id": 2302566714,
+   "name": "Baguwa",
+   "type": "village",
+   "lon": 85.477549,
+   "lat": 27.691988,
+   "node": 5218,
+   "inFlood": false,
+   "distFloodM": 1246
+  },
+  {
+   "id": 2302576453,
+   "name": "Gurungtar",
+   "type": "locality",
+   "lon": 85.47462,
+   "lat": 27.692149,
+   "node": 5218,
+   "inFlood": false,
+   "distFloodM": 974
+  },
+  {
+   "id": 2306676936,
+   "name": "एकता टोल",
+   "type": "locality",
+   "lon": 85.312012,
+   "lat": 27.668817,
+   "node": 2300,
+   "inFlood": false,
+   "distFloodM": 805
+  },
+  {
+   "id": 2313807646,
+   "name": "Adhikarigau",
+   "type": "locality",
+   "lon": 85.300839,
+   "lat": 27.593599,
+   "node": 5199,
+   "inFlood": false,
+   "distFloodM": 711
+  },
+  {
+   "id": 2313807649,
+   "name": "Arubot",
+   "type": "locality",
+   "lon": 85.345576,
+   "lat": 27.611157,
+   "node": 20823,
+   "inFlood": false,
+   "distFloodM": 447
+  },
+  {
+   "id": 2313807650,
+   "name": "आरुबोट",
+   "type": "locality",
+   "lon": 85.379164,
+   "lat": 27.623735,
+   "node": 20813,
+   "inFlood": false,
+   "distFloodM": 2059
+  },
+  {
+   "id": 2313807653,
+   "name": "Badegau",
+   "type": "locality",
+   "lon": 85.356431,
+   "lat": 27.619634,
+   "node": 22621,
+   "inFlood": false,
+   "distFloodM": 153
+  },
+  {
+   "id": 2313807654,
+   "name": "Badikhel",
+   "type": "suburb",
+   "lon": 85.350411,
+   "lat": 27.591101,
+   "node": 1753,
+   "inFlood": false,
+   "distFloodM": 1521
+  },
+  {
+   "id": 2313807655,
+   "name": "बागडोल",
+   "type": "locality",
+   "lon": 85.303522,
+   "lat": 27.669659,
+   "node": 6560,
+   "inFlood": false,
+   "distFloodM": 421
+  },
+  {
+   "id": 2313807656,
+   "name": "बाहुनगाउँ",
+   "type": "locality",
+   "lon": 85.330261,
+   "lat": 27.623203,
+   "node": 16437,
+   "inFlood": false,
+   "distFloodM": 516
+  },
+  {
+   "id": 2313807661,
+   "name": "Baniyagau",
+   "type": "locality",
+   "lon": 85.311252,
+   "lat": 27.644307,
+   "node": 27194,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2313807663,
+   "name": "Barko",
+   "type": "locality",
+   "lon": 85.316039,
+   "lat": 27.637676,
+   "node": 18189,
+   "inFlood": false,
+   "distFloodM": 409
+  },
+  {
+   "id": 2313807678,
+   "name": "भालुटार",
+   "type": "neighbourhood",
+   "lon": 85.386796,
+   "lat": 27.630493,
+   "node": 12080,
+   "inFlood": false,
+   "distFloodM": 2124
+  },
+  {
+   "id": 2313807679,
+   "name": "Bhandarigau",
+   "type": "locality",
+   "lon": 85.332026,
+   "lat": 27.626322,
+   "node": 1732,
+   "inFlood": false,
+   "distFloodM": 558
+  },
+  {
+   "id": 2313807680,
+   "name": "Bharar",
+   "type": "locality",
+   "lon": 85.308587,
+   "lat": 27.623944,
+   "node": 27239,
+   "inFlood": false,
+   "distFloodM": 87
+  },
+  {
+   "id": 2313807687,
+   "name": "Bisnudol",
+   "type": "hamlet",
+   "lon": 85.363417,
+   "lat": 27.641088,
+   "node": 14897,
+   "inFlood": false,
+   "distFloodM": 170
+  },
+  {
+   "id": 2313807688,
+   "name": "Bistachhap",
+   "type": "locality",
+   "lon": 85.382381,
+   "lat": 27.615309,
+   "node": 23053,
+   "inFlood": false,
+   "distFloodM": 2035
+  },
+  {
+   "id": 2313807689,
+   "name": "Bistagau",
+   "type": "locality",
+   "lon": 85.335933,
+   "lat": 27.59382,
+   "node": 19071,
+   "inFlood": false,
+   "distFloodM": 1857
+  },
+  {
+   "id": 2313807690,
+   "name": "Bistagau",
+   "type": "locality",
+   "lon": 85.315637,
+   "lat": 27.60366,
+   "node": 18599,
+   "inFlood": false,
+   "distFloodM": 255
+  },
+  {
+   "id": 2313807691,
+   "name": "विष्टगाउँ",
+   "type": "locality",
+   "lon": 85.35372,
+   "lat": 27.662627,
+   "node": 33295,
+   "inFlood": false,
+   "distFloodM": 517
+  },
+  {
+   "id": 2313807693,
+   "name": "बोर्चा",
+   "type": "hamlet",
+   "lon": 85.363837,
+   "lat": 27.645244,
+   "node": 30479,
+   "inFlood": false,
+   "distFloodM": 53
+  },
+  {
+   "id": 2313807699,
+   "name": "चाकमाकल",
+   "type": "locality",
+   "lon": 85.377645,
+   "lat": 27.647134,
+   "node": 24960,
+   "inFlood": false,
+   "distFloodM": 1141
+  },
+  {
+   "id": 2313807700,
+   "name": "चाकुपाट",
+   "type": "suburb",
+   "lon": 85.326101,
+   "lat": 27.680831,
+   "node": 6704,
+   "inFlood": false,
+   "distFloodM": 321
+  },
+  {
+   "id": 2313807705,
+   "name": "Charghare",
+   "type": "locality",
+   "lon": 85.366064,
+   "lat": 27.631449,
+   "node": 18360,
+   "inFlood": false,
+   "distFloodM": 552
+  },
+  {
+   "id": 2313807706,
+   "name": "चेसिडोल",
+   "type": "locality",
+   "lon": 85.38471,
+   "lat": 27.646456,
+   "node": 15660,
+   "inFlood": false,
+   "distFloodM": 1838
+  },
+  {
+   "id": 2313807711,
+   "name": "Chhayasikot",
+   "type": "locality",
+   "lon": 85.308072,
+   "lat": 27.637178,
+   "node": 18280,
+   "inFlood": false,
+   "distFloodM": 30
+  },
+  {
+   "id": 2313807717,
+   "name": "Chokhel",
+   "type": "locality",
+   "lon": 85.322258,
+   "lat": 27.639011,
+   "node": 33208,
+   "inFlood": false,
+   "distFloodM": 916
+  },
+  {
+   "id": 2313807718,
+   "name": "चुनदेवी",
+   "type": "locality",
+   "lon": 85.311494,
+   "lat": 27.625829,
+   "node": 32612,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2313807719,
+   "name": "Chunikhel",
+   "type": "locality",
+   "lon": 85.309583,
+   "lat": 27.617836,
+   "node": 20817,
+   "inFlood": false,
+   "distFloodM": 20
+  },
+  {
+   "id": 2313807722,
+   "name": "Dadagau",
+   "type": "locality",
+   "lon": 85.341542,
+   "lat": 27.600547,
+   "node": 28428,
+   "inFlood": false,
+   "distFloodM": 951
+  },
+  {
+   "id": 2313807723,
+   "name": "Dadagau",
+   "type": "locality",
+   "lon": 85.382917,
+   "lat": 27.601187,
+   "node": 24537,
+   "inFlood": false,
+   "distFloodM": 2048
+  },
+  {
+   "id": 2313807724,
+   "name": "खड्का टोल",
+   "type": "hamlet",
+   "lon": 85.3832,
+   "lat": 27.634084,
+   "node": 25025,
+   "inFlood": false,
+   "distFloodM": 1638
+  },
+  {
+   "id": 2313807726,
+   "name": "दमाइटार",
+   "type": "locality",
+   "lon": 85.359507,
+   "lat": 27.625497,
+   "node": 14927,
+   "inFlood": false,
+   "distFloodM": 472
+  },
+  {
+   "id": 2313807728,
+   "name": "Danuwargau",
+   "type": "hamlet",
+   "lon": 85.289372,
+   "lat": 27.591151,
+   "node": 21272,
+   "inFlood": false,
+   "distFloodM": 288
+  },
+  {
+   "id": 2313807730,
+   "name": "दशघरे",
+   "type": "locality",
+   "lon": 85.343009,
+   "lat": 27.628533,
+   "node": 32073,
+   "inFlood": false,
+   "distFloodM": 107
+  },
+  {
+   "id": 2313807731,
+   "name": "दटिडोल",
+   "type": "locality",
+   "lon": 85.35192,
+   "lat": 27.65738,
+   "node": 30625,
+   "inFlood": false,
+   "distFloodM": 907
+  },
+  {
+   "id": 2313807735,
+   "name": "Dhad",
+   "type": "locality",
+   "lon": 85.377041,
+   "lat": 27.599786,
+   "node": 12611,
+   "inFlood": false,
+   "distFloodM": 1602
+  },
+  {
+   "id": 2313807736,
+   "name": "Dhaichhap",
+   "type": "locality",
+   "lon": 85.308348,
+   "lat": 27.612903,
+   "node": 25499,
+   "inFlood": false,
+   "distFloodM": 201
+  },
+  {
+   "id": 2313807738,
+   "name": "Dhamigau",
+   "type": "locality",
+   "lon": 85.341979,
+   "lat": 27.604367,
+   "node": 20852,
+   "inFlood": false,
+   "distFloodM": 732
+  },
+  {
+   "id": 2313807740,
+   "name": "Dhapakhel",
+   "type": "suburb",
+   "lon": 85.332353,
+   "lat": 27.627993,
+   "node": 21866,
+   "inFlood": false,
+   "distFloodM": 468
+  },
+  {
+   "id": 2313807741,
+   "name": "धापाखेल",
+   "type": "neighbourhood",
+   "lon": 85.33435,
+   "lat": 27.638895,
+   "node": 17787,
+   "inFlood": false,
+   "distFloodM": 75
+  },
+  {
+   "id": 2313807742,
+   "name": "धाराचौर",
+   "type": "locality",
+   "lon": 85.380223,
+   "lat": 27.631259,
+   "node": 18367,
+   "inFlood": false,
+   "distFloodM": 1525
+  },
+  {
+   "id": 2313807745,
+   "name": "धर्मेश्वर",
+   "type": "locality",
+   "lon": 85.365714,
+   "lat": 27.665514,
+   "node": 18683,
+   "inFlood": false,
+   "distFloodM": 201
+  },
+  {
+   "id": 2313807747,
+   "name": "धोबीघाट",
+   "type": "neighbourhood",
+   "lon": 85.30694,
+   "lat": 27.674508,
+   "node": 6595,
+   "inFlood": false,
+   "distFloodM": 897
+  },
+  {
+   "id": 2313807748,
+   "name": "Dhobikholagau",
+   "type": "locality",
+   "lon": 85.389395,
+   "lat": 27.616492,
+   "node": 12604,
+   "inFlood": false,
+   "distFloodM": 2725
+  },
+  {
+   "id": 2313807750,
+   "name": "Dhungasangu",
+   "type": "locality",
+   "lon": 85.370645,
+   "lat": 27.619527,
+   "node": 24192,
+   "inFlood": false,
+   "distFloodM": 1156
+  },
+  {
+   "id": 2313807752,
+   "name": "ढुंगेखानी",
+   "type": "locality",
+   "lon": 85.369108,
+   "lat": 27.625169,
+   "node": 24194,
+   "inFlood": false,
+   "distFloodM": 1144
+  },
+  {
+   "id": 2313807753,
+   "name": "Dhyavaskagau",
+   "type": "locality",
+   "lon": 85.404485,
+   "lat": 27.630167,
+   "node": 15378,
+   "inFlood": false,
+   "distFloodM": 3770
+  },
+  {
+   "id": 2313807756,
+   "name": "Dolchap",
+   "type": "locality",
+   "lon": 85.31223,
+   "lat": 27.592162,
+   "node": 24748,
+   "inFlood": false,
+   "distFloodM": 59
+  },
+  {
+   "id": 2313807763,
+   "name": "Ganglethok",
+   "type": "locality",
+   "lon": 85.344053,
+   "lat": 27.619749,
+   "node": 15009,
+   "inFlood": false,
+   "distFloodM": 89
+  },
+  {
+   "id": 2313807764,
+   "name": "गथेगाउँ",
+   "type": "locality",
+   "lon": 85.338421,
+   "lat": 27.623862,
+   "node": 21869,
+   "inFlood": false,
+   "distFloodM": 46
+  },
+  {
+   "id": 2313807766,
+   "name": "Ghartigau",
+   "type": "locality",
+   "lon": 85.317101,
+   "lat": 27.60091,
+   "node": 18597,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2313807769,
+   "name": "Ghimiregau",
+   "type": "locality",
+   "lon": 85.402287,
+   "lat": 27.618229,
+   "node": 25429,
+   "inFlood": false,
+   "distFloodM": 3991
+  },
+  {
+   "id": 2313807773,
+   "name": "Godamchaur",
+   "type": "suburb",
+   "lon": 85.365018,
+   "lat": 27.612876,
+   "node": 20801,
+   "inFlood": false,
+   "distFloodM": 345
+  },
+  {
+   "id": 2313807779,
+   "name": "Gulindaha",
+   "type": "locality",
+   "lon": 85.358376,
+   "lat": 27.600498,
+   "node": 21671,
+   "inFlood": false,
+   "distFloodM": 880
+  },
+  {
+   "id": 2313807785,
+   "name": "हरिसिद्धि",
+   "type": "suburb",
+   "lon": 85.340271,
+   "lat": 27.636272,
+   "node": 21446,
+   "inFlood": false,
+   "distFloodM": 407
+  },
+  {
+   "id": 2313807786,
+   "name": "Hasiphera",
+   "type": "locality",
+   "lon": 85.35615,
+   "lat": 27.59165,
+   "node": 21581,
+   "inFlood": false,
+   "distFloodM": 1551
+  },
+  {
+   "id": 2313807788,
+   "name": "इमाडोल",
+   "type": "suburb",
+   "lon": 85.344299,
+   "lat": 27.666822,
+   "node": 33315,
+   "inFlood": false,
+   "distFloodM": 381
+  },
+  {
+   "id": 2313807790,
+   "name": "Jainkhel",
+   "type": "locality",
+   "lon": 85.324678,
+   "lat": 27.637036,
+   "node": 28804,
+   "inFlood": false,
+   "distFloodM": 881
+  },
+  {
+   "id": 2313807795,
+   "name": "झम्सीखेल",
+   "type": "quarter",
+   "lon": 85.309409,
+   "lat": 27.67825,
+   "node": 417,
+   "inFlood": false,
+   "distFloodM": 1003
+  },
+  {
+   "id": 2313807797,
+   "name": "Jharuwarasi",
+   "type": "locality",
+   "lon": 85.345392,
+   "lat": 27.616231,
+   "node": 16380,
+   "inFlood": false,
+   "distFloodM": 310
+  },
+  {
+   "id": 2313807798,
+   "name": "Jhyalpati",
+   "type": "locality",
+   "lon": 85.32733,
+   "lat": 27.609238,
+   "node": 23477,
+   "inFlood": false,
+   "distFloodM": 879
+  },
+  {
+   "id": 2313807799,
+   "name": "Jorkhu",
+   "type": "locality",
+   "lon": 85.304909,
+   "lat": 27.598635,
+   "node": 1258,
+   "inFlood": false,
+   "distFloodM": 998
+  },
+  {
+   "id": 2313807800,
+   "name": "जयाकता",
+   "type": "locality",
+   "lon": 85.373727,
+   "lat": 27.634566,
+   "node": 12253,
+   "inFlood": false,
+   "distFloodM": 795
+  },
+  {
+   "id": 2313807803,
+   "name": "Jyathapakha",
+   "type": "locality",
+   "lon": 85.378767,
+   "lat": 27.634802,
+   "node": 23933,
+   "inFlood": false,
+   "distFloodM": 1204
+  },
+  {
+   "id": 2313807804,
+   "name": "Jyawalakhel",
+   "type": "locality",
+   "lon": 85.310207,
+   "lat": 27.628294,
+   "node": 27245,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2313807809,
+   "name": "Kamigau",
+   "type": "locality",
+   "lon": 85.380675,
+   "lat": 27.603087,
+   "node": 24193,
+   "inFlood": false,
+   "distFloodM": 1770
+  },
+  {
+   "id": 2313807814,
+   "name": "Kaprechhap",
+   "type": "locality",
+   "lon": 85.390975,
+   "lat": 27.608337,
+   "node": 5202,
+   "inFlood": false,
+   "distFloodM": 2707
+  },
+  {
+   "id": 2313807815,
+   "name": "Karkitar",
+   "type": "locality",
+   "lon": 85.365732,
+   "lat": 27.620815,
+   "node": 20792,
+   "inFlood": false,
+   "distFloodM": 710
+  },
+  {
+   "id": 2313807821,
+   "name": "Kerabari",
+   "type": "locality",
+   "lon": 85.301062,
+   "lat": 27.601682,
+   "node": 1257,
+   "inFlood": false,
+   "distFloodM": 682
+  },
+  {
+   "id": 2313807823,
+   "name": "Khadkagau",
+   "type": "locality",
+   "lon": 85.303888,
+   "lat": 27.641111,
+   "node": 17800,
+   "inFlood": false,
+   "distFloodM": 489
+  },
+  {
+   "id": 2313807824,
+   "name": "खड्कागाउ",
+   "type": "locality",
+   "lon": 85.359352,
+   "lat": 27.65563,
+   "node": 14904,
+   "inFlood": false,
+   "distFloodM": 249
+  },
+  {
+   "id": 2313807825,
+   "name": "खड्काटोल",
+   "type": "locality",
+   "lon": 85.372716,
+   "lat": 27.653282,
+   "node": 22829,
+   "inFlood": false,
+   "distFloodM": 664
+  },
+  {
+   "id": 2313807826,
+   "name": "Khaharegau",
+   "type": "locality",
+   "lon": 85.376623,
+   "lat": 27.597565,
+   "node": 32391,
+   "inFlood": false,
+   "distFloodM": 1719
+  },
+  {
+   "id": 2313807830,
+   "name": "Khasimara",
+   "type": "locality",
+   "lon": 85.349044,
+   "lat": 27.58863,
+   "node": 21691,
+   "inFlood": false,
+   "distFloodM": 1802
+  },
+  {
+   "id": 2313807833,
+   "name": "Khatrigau",
+   "type": "locality",
+   "lon": 85.312944,
+   "lat": 27.605361,
+   "node": 27430,
+   "inFlood": false,
+   "distFloodM": 235
+  },
+  {
+   "id": 2313807834,
+   "name": "Khatrigau",
+   "type": "neighbourhood",
+   "lon": 85.325988,
+   "lat": 27.618907,
+   "node": 24075,
+   "inFlood": false,
+   "distFloodM": 999
+  },
+  {
+   "id": 2313807838,
+   "name": "Khuipu",
+   "type": "locality",
+   "lon": 85.298308,
+   "lat": 27.617279,
+   "node": 24956,
+   "inFlood": false,
+   "distFloodM": 521
+  },
+  {
+   "id": 2313807839,
+   "name": "Khumaltar",
+   "type": "suburb",
+   "lon": 85.32851,
+   "lat": 27.653672,
+   "node": 17664,
+   "inFlood": false,
+   "distFloodM": 562
+  },
+  {
+   "id": 2313807841,
+   "name": "Kitachaur",
+   "type": "locality",
+   "lon": 85.379781,
+   "lat": 27.613046,
+   "node": 20804,
+   "inFlood": false,
+   "distFloodM": 1704
+  },
+  {
+   "id": 2313807842,
+   "name": "Kitini",
+   "type": "locality",
+   "lon": 85.367406,
+   "lat": 27.605648,
+   "node": 26396,
+   "inFlood": false,
+   "distFloodM": 452
+  },
+  {
+   "id": 2313807843,
+   "name": "Kodetar",
+   "type": "locality",
+   "lon": 85.36633,
+   "lat": 27.600722,
+   "node": 16187,
+   "inFlood": false,
+   "distFloodM": 827
+  },
+  {
+   "id": 2313807846,
+   "name": "कुपन्डोल",
+   "type": "suburb",
+   "lon": 85.318428,
+   "lat": 27.685361,
+   "node": 27568,
+   "inFlood": false,
+   "distFloodM": 254
+  },
+  {
+   "id": 2313807848,
+   "name": "कोटडांडा",
+   "type": "locality",
+   "lon": 85.380201,
+   "lat": 27.622737,
+   "node": 20813,
+   "inFlood": false,
+   "distFloodM": 2139
+  },
+  {
+   "id": 2313807850,
+   "name": "Itapukhu",
+   "type": "suburb",
+   "lon": 85.322812,
+   "lat": 27.671804,
+   "node": 211,
+   "inFlood": false,
+   "distFloodM": 1165
+  },
+  {
+   "id": 2313807852,
+   "name": "कुसुन्ती",
+   "type": "suburb",
+   "lon": 85.31332,
+   "lat": 27.662056,
+   "node": 6830,
+   "inFlood": false,
+   "distFloodM": 468
+  },
+  {
+   "id": 2313807854,
+   "name": "क्वाकों",
+   "type": "suburb",
+   "lon": 85.335577,
+   "lat": 27.673097,
+   "node": 21410,
+   "inFlood": false,
+   "distFloodM": 363
+  },
+  {
+   "id": 2313807861,
+   "name": "Loyachok",
+   "type": "locality",
+   "lon": 85.316061,
+   "lat": 27.645929,
+   "node": 2432,
+   "inFlood": false,
+   "distFloodM": 232
+  },
+  {
+   "id": 2313807871,
+   "name": "सैंबु ",
+   "type": "suburb",
+   "lon": 85.303588,
+   "lat": 27.64933,
+   "node": 12907,
+   "inFlood": false,
+   "distFloodM": 747
+  },
+  {
+   "id": 2313807872,
+   "name": "Mahadevdada",
+   "type": "locality",
+   "lon": 85.385305,
+   "lat": 27.604778,
+   "node": 12603,
+   "inFlood": false,
+   "distFloodM": 2174
+  },
+  {
+   "id": 2313807880,
+   "name": "मङ्गल बजार",
+   "type": "neighbourhood",
+   "lon": 85.324401,
+   "lat": 27.673432,
+   "node": 25130,
+   "inFlood": false,
+   "distFloodM": 926
+  },
+  {
+   "id": 2313807888,
+   "name": "Mulpani",
+   "type": "locality",
+   "lon": 85.373404,
+   "lat": 27.617306,
+   "node": 16194,
+   "inFlood": false,
+   "distFloodM": 1272
+  },
+  {
+   "id": 2313807892,
+   "name": "नखिपोट",
+   "type": "suburb",
+   "lon": 85.320765,
+   "lat": 27.650393,
+   "node": 2349,
+   "inFlood": false,
+   "distFloodM": 640
+  },
+  {
+   "id": 2313807893,
+   "name": "नख्खु  बजार",
+   "type": "neighbourhood",
+   "lon": 85.306087,
+   "lat": 27.662942,
+   "node": 2619,
+   "inFlood": false,
+   "distFloodM": 20
+  },
+  {
+   "id": 2313807894,
+   "name": "नख्खु ",
+   "type": "suburb",
+   "lon": 85.307012,
+   "lat": 27.66409,
+   "node": 27324,
+   "inFlood": false,
+   "distFloodM": 139
+  },
+  {
+   "id": 2313807896,
+   "name": "नख्खुडोल",
+   "type": "suburb",
+   "lon": 85.317806,
+   "lat": 27.653381,
+   "node": 22869,
+   "inFlood": false,
+   "distFloodM": 483
+  },
+  {
+   "id": 2313807900,
+   "name": "नरकतते",
+   "type": "locality",
+   "lon": 85.370291,
+   "lat": 27.649689,
+   "node": 23611,
+   "inFlood": false,
+   "distFloodM": 387
+  },
+  {
+   "id": 2313807903,
+   "name": "Nyopanegau",
+   "type": "locality",
+   "lon": 85.32919,
+   "lat": 27.592628,
+   "node": 21404,
+   "inFlood": false,
+   "distFloodM": 1239
+  },
+  {
+   "id": 2313807906,
+   "name": "Okhthali",
+   "type": "locality",
+   "lon": 85.309877,
+   "lat": 27.639626,
+   "node": 32981,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2313807907,
+   "name": "अर्पाच",
+   "type": "hamlet",
+   "lon": 85.359143,
+   "lat": 27.642511,
+   "node": 14929,
+   "inFlood": false,
+   "distFloodM": 143
+  },
+  {
+   "id": 2313807908,
+   "name": "पाडालि गाउँ",
+   "type": "locality",
+   "lon": 85.3857,
+   "lat": 27.623574,
+   "node": 24086,
+   "inFlood": false,
+   "distFloodM": 2487
+  },
+  {
+   "id": 2313807912,
+   "name": "Parigau",
+   "type": "locality",
+   "lon": 85.311334,
+   "lat": 27.601641,
+   "node": 15367,
+   "inFlood": false,
+   "distFloodM": 479
+  },
+  {
+   "id": 2313807913,
+   "name": "Patalechhap",
+   "type": "locality",
+   "lon": 85.394516,
+   "lat": 27.61432,
+   "node": 28767,
+   "inFlood": false,
+   "distFloodM": 3139
+  },
+  {
+   "id": 2313807914,
+   "name": "Patasimat",
+   "type": "locality",
+   "lon": 85.310903,
+   "lat": 27.588994,
+   "node": 26401,
+   "inFlood": false,
+   "distFloodM": 85
+  },
+  {
+   "id": 2313807915,
+   "name": "Pati",
+   "type": "locality",
+   "lon": 85.37289,
+   "lat": 27.600658,
+   "node": 25038,
+   "inFlood": false,
+   "distFloodM": 1217
+  },
+  {
+   "id": 2313807916,
+   "name": "Paudelgau",
+   "type": "locality",
+   "lon": 85.37058,
+   "lat": 27.597065,
+   "node": 32394,
+   "inFlood": false,
+   "distFloodM": 1377
+  },
+  {
+   "id": 2313807918,
+   "name": "Pharsidol",
+   "type": "locality",
+   "lon": 85.304517,
+   "lat": 27.608903,
+   "node": 1298,
+   "inFlood": false,
+   "distFloodM": 650
+  },
+  {
+   "id": 2313807919,
+   "name": "Phatthok",
+   "type": "locality",
+   "lon": 85.338369,
+   "lat": 27.618205,
+   "node": 22072,
+   "inFlood": false,
+   "distFloodM": 414
+  },
+  {
+   "id": 2313807920,
+   "name": "पौडेगाउँ",
+   "type": "town",
+   "lon": 85.36672,
+   "lat": 27.658028,
+   "node": 22310,
+   "inFlood": false,
+   "distFloodM": 368
+  },
+  {
+   "id": 2313807921,
+   "name": "फिलडोल",
+   "type": "locality",
+   "lon": 85.355548,
+   "lat": 27.665437,
+   "node": 19387,
+   "inFlood": false,
+   "distFloodM": 164
+  },
+  {
+   "id": 2313807930,
+   "name": "Pyangau",
+   "type": "locality",
+   "lon": 85.32912,
+   "lat": 27.597925,
+   "node": 1060,
+   "inFlood": false,
+   "distFloodM": 1103
+  },
+  {
+   "id": 2313807932,
+   "name": "Rachantar",
+   "type": "locality",
+   "lon": 85.376751,
+   "lat": 27.601596,
+   "node": 12599,
+   "inFlood": false,
+   "distFloodM": 1475
+  },
+  {
+   "id": 2313807939,
+   "name": "सल्यान",
+   "type": "locality",
+   "lon": 85.34192,
+   "lat": 27.590378,
+   "node": 21427,
+   "inFlood": false,
+   "distFloodM": 1825
+  },
+  {
+   "id": 2313807940,
+   "name": "Salyantar",
+   "type": "locality",
+   "lon": 85.314284,
+   "lat": 27.595807,
+   "node": 24756,
+   "inFlood": false,
+   "distFloodM": 117
+  },
+  {
+   "id": 2313807942,
+   "name": "सानेपा",
+   "type": "suburb",
+   "lon": 85.309353,
+   "lat": 27.683772,
+   "node": 18623,
+   "inFlood": false,
+   "distFloodM": 878
+  },
+  {
+   "id": 2313807944,
+   "name": "सानो खोकना",
+   "type": "neighbourhood",
+   "lon": 85.293918,
+   "lat": 27.643902,
+   "node": 29299,
+   "inFlood": false,
+   "distFloodM": 537
+  },
+  {
+   "id": 2313807948,
+   "name": "सफल टोल",
+   "type": "locality",
+   "lon": 85.34147,
+   "lat": 27.637222,
+   "node": 15006,
+   "inFlood": false,
+   "distFloodM": 504
+  },
+  {
+   "id": 2313807950,
+   "name": "Sarkidhik",
+   "type": "locality",
+   "lon": 85.35762,
+   "lat": 27.659926,
+   "node": 17763,
+   "inFlood": false,
+   "distFloodM": 303
+  },
+  {
+   "id": 2313807951,
+   "name": "Sarkigau",
+   "type": "locality",
+   "lon": 85.342597,
+   "lat": 27.610201,
+   "node": 20823,
+   "inFlood": false,
+   "distFloodM": 696
+  },
+  {
+   "id": 2313807952,
+   "name": "साशम्भु",
+   "type": "locality",
+   "lon": 85.389499,
+   "lat": 27.639685,
+   "node": 19077,
+   "inFlood": false,
+   "distFloodM": 2157
+  },
+  {
+   "id": 2313807953,
+   "name": "Satitar",
+   "type": "village",
+   "lon": 85.318712,
+   "lat": 27.626931,
+   "node": 32142,
+   "inFlood": false,
+   "distFloodM": 617
+  },
+  {
+   "id": 2313807957,
+   "name": "शंखदेवी",
+   "type": "locality",
+   "lon": 85.369343,
+   "lat": 27.628032,
+   "node": 18365,
+   "inFlood": false,
+   "distFloodM": 981
+  },
+  {
+   "id": 2313807961,
+   "name": "सिद्धिपुर",
+   "type": "suburb",
+   "lon": 85.356821,
+   "lat": 27.647365,
+   "node": 18857,
+   "inFlood": false,
+   "distFloodM": 632
+  },
+  {
+   "id": 2313807966,
+   "name": "Simako",
+   "type": "locality",
+   "lon": 85.319465,
+   "lat": 27.636027,
+   "node": 17967,
+   "inFlood": false,
+   "distFloodM": 787
+  },
+  {
+   "id": 2313807969,
+   "name": "सिम्थली",
+   "type": "locality",
+   "lon": 85.369466,
+   "lat": 27.634509,
+   "node": 23526,
+   "inFlood": false,
+   "distFloodM": 556
+  },
+  {
+   "id": 2313807973,
+   "name": "Sisneri",
+   "type": "locality",
+   "lon": 85.395564,
+   "lat": 27.621776,
+   "node": 16686,
+   "inFlood": false,
+   "distFloodM": 3366
+  },
+  {
+   "id": 2313807975,
+   "name": "सीतापाखा",
+   "type": "hamlet",
+   "lon": 85.343141,
+   "lat": 27.650689,
+   "node": 29202,
+   "inFlood": false,
+   "distFloodM": 748
+  },
+  {
+   "id": 2313807977,
+   "name": "सुब्बागाउँ",
+   "type": "locality",
+   "lon": 85.337419,
+   "lat": 27.626639,
+   "node": 12783,
+   "inFlood": false,
+   "distFloodM": 225
+  },
+  {
+   "id": 2313807979,
+   "name": "सुमेलगाउ",
+   "type": "locality",
+   "lon": 85.390537,
+   "lat": 27.642884,
+   "node": 23541,
+   "inFlood": false,
+   "distFloodM": 2294
+  },
+  {
+   "id": 2313807989,
+   "name": "तल्लो गाउँ",
+   "type": "suburb",
+   "lon": 85.296992,
+   "lat": 27.654074,
+   "node": 1713,
+   "inFlood": false,
+   "distFloodM": 379
+  },
+  {
+   "id": 2313807990,
+   "name": "Tasinchok",
+   "type": "locality",
+   "lon": 85.341947,
+   "lat": 27.608121,
+   "node": 31964,
+   "inFlood": false,
+   "distFloodM": 743
+  },
+  {
+   "id": 2313807991,
+   "name": "Taukhel",
+   "type": "locality",
+   "lon": 85.327392,
+   "lat": 27.592059,
+   "node": 28430,
+   "inFlood": false,
+   "distFloodM": 1097
+  },
+  {
+   "id": 2313807994,
+   "name": "टेकु दोभान",
+   "type": "locality",
+   "lon": 85.306547,
+   "lat": 27.690456,
+   "node": 6564,
+   "inFlood": false,
+   "distFloodM": 223
+  },
+  {
+   "id": 2313807995,
+   "name": "ठैबा",
+   "type": "suburb",
+   "lon": 85.34869,
+   "lat": 27.623387,
+   "node": 20699,
+   "inFlood": false,
+   "distFloodM": 473
+  },
+  {
+   "id": 2313807996,
+   "name": "थाइकोट",
+   "type": "village",
+   "lon": 85.364275,
+   "lat": 27.652803,
+   "node": 29518,
+   "inFlood": false,
+   "distFloodM": 86
+  },
+  {
+   "id": 2313807997,
+   "name": "थईना",
+   "type": "neighbourhood",
+   "lon": 85.329286,
+   "lat": 27.670394,
+   "node": 741,
+   "inFlood": false,
+   "distFloodM": 598
+  },
+  {
+   "id": 2313807998,
+   "name": "Thakurigau",
+   "type": "locality",
+   "lon": 85.400655,
+   "lat": 27.620146,
+   "node": 25431,
+   "inFlood": false,
+   "distFloodM": 3882
+  },
+  {
+   "id": 2313808000,
+   "name": "Thangu",
+   "type": "locality",
+   "lon": 85.350888,
+   "lat": 27.613718,
+   "node": 16192,
+   "inFlood": true,
+   "distFloodM": 0
+  },
+  {
+   "id": 2313808003,
+   "name": "Thapagau",
+   "type": "locality",
+   "lon": 85.351229,
+   "lat": 27.600592,
+   "node": 21577,
+   "inFlood": false,
+   "distFloodM": 472
+  },
+  {
+   "id": 2313808004,
+   "name": "Thapagau",
+   "type": "locality",
+   "lon": 85.317526,
+   "lat": 27.606098,
+   "node": 18544,
+   "inFlood": false,
+   "distFloodM": 46
+  },
+  {
+   "id": 2313808005,
+   "name": "थापागाउ",
+   "type": "locality",
+   "lon": 85.373677,
+   "lat": 27.630561,
+   "node": 12252,
+   "inFlood": false,
+   "distFloodM": 1132
+  },
+  {
+   "id": 2313808009,
+   "name": "ठुलधरा",
+   "type": "locality",
+   "lon": 85.382641,
+   "lat": 27.638313,
+   "node": 15727,
+   "inFlood": false,
+   "distFloodM": 1484
+  },
+  {
+   "id": 2313808018,
+   "name": "टिकाथली",
+   "type": "neighbourhood",
+   "lon": 85.36113,
+   "lat": 27.6632,
+   "node": 32634,
+   "inFlood": false,
+   "distFloodM": 4
+  },
+  {
+   "id": 2313808019,
+   "name": "टिखिडोल",
+   "type": "neighbourhood",
+   "lon": 85.31704,
+   "lat": 27.658105,
+   "node": 2256,
+   "inFlood": false,
+   "distFloodM": 529
+  },
+  {
+   "id": 2313808023,
+   "name": "Tokalmat",
+   "type": "locality",
+   "lon": 85.298897,
+   "lat": 27.598747,
+   "node": 5170,
+   "inFlood": false,
+   "distFloodM": 628
+  },
+  {
+   "id": 2313808024,
+   "name": "Tupikhel",
+   "type": "locality",
+   "lon": 85.376869,
+   "lat": 27.604793,
+   "node": 12601,
+   "inFlood": false,
+   "distFloodM": 1358
+  },
+  {
+   "id": 2313808025,
+   "name": "टुटेपानी",
+   "type": "neighbourhood",
+   "lon": 85.326113,
+   "lat": 27.652363,
+   "node": 17987,
+   "inFlood": false,
+   "distFloodM": 823
+  },
+  {
+   "id": 2313808028,
+   "name": "Wakhat",
+   "type": "neighbourhood",
+   "lon": 85.325137,
+   "lat": 27.628432,
+   "node": 23094,
+   "inFlood": false,
+   "distFloodM": 1011
+  },
+  {
+   "id": 2313808030,
+   "name": "जयामिरकोट",
+   "type": "locality",
+   "lon": 85.370915,
+   "lat": 27.624857,
+   "node": 24194,
+   "inFlood": false,
+   "distFloodM": 1303
+  },
+  {
+   "id": 2313813608,
+   "name": "हातिबन",
+   "type": "suburb",
+   "lon": 85.332544,
+   "lat": 27.649941,
+   "node": 16727,
+   "inFlood": false,
+   "distFloodM": 411
+  },
+  {
+   "id": 2313813611,
+   "name": "नास्ट अनुसन्धान केन्द्र",
+   "type": "neighbourhood",
+   "lon": 85.328271,
+   "lat": 27.655773,
+   "node": 2218,
+   "inFlood": false,
+   "distFloodM": 581
+  },
+  {
+   "id": 2319608070,
+   "name": "नयाँ नगर",
+   "type": "suburb",
+   "lon": 85.309692,
+   "lat": 27.663272,
+   "node": 3137,
+   "inFlood": false,
+   "distFloodM": 172
+  },
+  {
+   "id": 2323970100,
+   "name": "ऐरवा टोल",
+   "type": "neighbourhood",
+   "lon": 85.331999,
+   "lat": 27.646527,
+   "node": 2187,
+   "inFlood": false,
+   "distFloodM": 346
+  },
+  {
+   "id": 2342196221,
+   "name": "धुसलधारा",
+   "type": "locality",
+   "lon": 85.34464,
+   "lat": 27.630557,
+   "node": 23690,
+   "inFlood": false,
+   "distFloodM": 382
+  },
+  {
+   "id": 2351378207,
+   "name": "संगम बस्ती",
+   "type": "neighbourhood",
+   "lon": 85.338439,
+   "lat": 27.645896,
+   "node": 26970,
+   "inFlood": false,
+   "distFloodM": 298
+  },
+  {
+   "id": 2374676929,
+   "name": "सान्तिनगर",
+   "type": "suburb",
+   "lon": 85.28416,
+   "lat": 27.724003,
+   "node": 6323,
+   "inFlood": false,
+   "distFloodM": 3953
+  },
+  {
+   "id": 2374689270,
+   "name": "एराहिटी",
+   "type": "suburb",
+   "lon": 85.289504,
+   "lat": 27.728123,
+   "node": 18799,
+   "inFlood": false,
+   "distFloodM": 4143
+  },
+  {
+   "id": 2376864690,
+   "name": "थली",
+   "type": "neighbourhood",
+   "lon": 85.404449,
+   "lat": 27.727101,
+   "node": 16128,
+   "inFlood": false,
+   "distFloodM": 1343
+  },
+  {
+   "id": 2377634109,
+   "name": "Dhungehini",
+   "type": "neighbourhood",
+   "lon": 85.480282,
+   "lat": 27.696346,
+   "node": 11472,
+   "inFlood": false,
+   "distFloodM": 1672
+  },
+  {
+   "id": 2377634110,
+   "name": "Mahadevsthan",
+   "type": "neighbourhood",
+   "lon": 85.47876,
+   "lat": 27.694541,
+   "node": 23839,
+   "inFlood": false,
+   "distFloodM": 1450
+  },
+  {
+   "id": 2377642510,
+   "name": "Ratopati",
+   "type": "neighbourhood",
+   "lon": 85.44921,
+   "lat": 27.693878,
+   "node": 15902,
+   "inFlood": false,
+   "distFloodM": 1353
+  },
+  {
+   "id": 2478743722,
+   "name": "Lamsal Tol",
+   "type": "locality",
+   "lon": 85.429634,
+   "lat": 27.691169,
+   "node": 11448,
+   "inFlood": false,
+   "distFloodM": 2231
+  },
+  {
+   "id": 2478785819,
+   "name": "Lakhaju Tol",
+   "type": "village",
+   "lon": 85.427188,
+   "lat": 27.690175,
+   "node": 19445,
+   "inFlood": false,
+   "distFloodM": 2254
+  },
+  {
+   "id": 2478831013,
+   "name": "Dhulikhel Tol",
+   "type": "neighbourhood",
+   "lon": 85.470699,
+   "lat": 27.686682,
+   "node": 19169,
+   "inFlood": false,
+   "distFloodM": 610
+  },
+  {
+   "id": 2478854899,
+   "name": "Suwal Tol",
+   "type": "neighbourhood",
+   "lon": 85.423257,
+   "lat": 27.694279,
+   "node": 28123,
+   "inFlood": false,
+   "distFloodM": 2234
+  },
+  {
+   "id": 2478855585,
+   "name": "anjaan",
+   "type": "neighbourhood",
+   "lon": 85.417735,
+   "lat": 27.702222,
+   "node": 28147,
+   "inFlood": false,
+   "distFloodM": 1202
+  },
+  {
+   "id": 2478857625,
+   "name": "chaukote tol",
+   "type": "neighbourhood",
+   "lon": 85.464653,
+   "lat": 27.68581,
+   "node": 20686,
+   "inFlood": false,
+   "distFloodM": 282
+  },
+  {
+   "id": 2478858484,
+   "name": "Thapa tol",
+   "type": "neighbourhood",
+   "lon": 85.431184,
+   "lat": 27.691917,
+   "node": 15501,
+   "inFlood": false,
+   "distFloodM": 2161
+  },
+  {
+   "id": 2478862903,
+   "name": "sarki tol",
+   "type": "neighbourhood",
+   "lon": 85.426587,
+   "lat": 27.696899,
+   "node": 582,
+   "inFlood": false,
+   "distFloodM": 2183
+  },
+  {
+   "id": 2478863649,
+   "name": "Kasula Tol",
+   "type": "neighbourhood",
+   "lon": 85.421702,
+   "lat": 27.692835,
+   "node": 30813,
+   "inFlood": false,
+   "distFloodM": 2219
+  },
+  {
+   "id": 2478878160,
+   "name": "thapa tole pikhel",
+   "type": "neighbourhood",
+   "lon": 85.438882,
+   "lat": 27.704356,
+   "node": 11455,
+   "inFlood": false,
+   "distFloodM": 2019
+  },
+  {
+   "id": 2516946266,
+   "name": "एकता नगर चोक",
+   "type": "neighbourhood",
+   "lon": 85.359725,
+   "lat": 27.659533,
+   "node": 18015,
+   "inFlood": false,
+   "distFloodM": 143
+  },
+  {
+   "id": 2662582250,
+   "name": "नागीगुम्बा",
+   "type": "neighbourhood",
+   "lon": 85.381465,
+   "lat": 27.783398,
+   "node": 14570,
+   "inFlood": false,
+   "distFloodM": 7687
+  },
+  {
+   "id": 2807905852,
+   "name": "गल्कोपाखा",
+   "type": "suburb",
+   "lon": 85.312641,
+   "lat": 27.719913,
+   "node": 1602,
+   "inFlood": false,
+   "distFloodM": 2958
+  },
+  {
+   "id": 2910276766,
+   "name": "मित्रापार्क",
+   "type": "locality",
+   "lon": 85.345041,
+   "lat": 27.71336,
+   "node": 142,
+   "inFlood": false,
+   "distFloodM": 3490
+  },
+  {
+   "id": 3024124995,
+   "name": "Lapsiphedi",
+   "type": "village",
+   "lon": 85.480873,
+   "lat": 27.745783,
+   "node": 5241,
+   "inFlood": false,
+   "distFloodM": 2240
+  },
+  {
+   "id": 3094285263,
+   "name": "लुट चोक",
+   "type": "neighbourhood",
+   "lon": 85.31219,
+   "lat": 27.714814,
+   "node": 3662,
+   "inFlood": false,
+   "distFloodM": 2397
+  },
+  {
+   "id": 3103221658,
+   "name": "तेन्जिङ चोक",
+   "type": "neighbourhood",
+   "lon": 85.35903,
+   "lat": 27.72858,
+   "node": 25886,
+   "inFlood": false,
+   "distFloodM": 4016
+  },
+  {
+   "id": 3151907537,
+   "name": "ढुंगेधारा",
+   "type": "neighbourhood",
+   "lon": 85.386432,
+   "lat": 27.691965,
+   "node": 12990,
+   "inFlood": false,
+   "distFloodM": 88
+  },
+  {
+   "id": 3155824509,
+   "name": "Bungamati",
+   "type": "suburb",
+   "lon": 85.303669,
+   "lat": 27.628599,
+   "node": 1091,
+   "inFlood": false,
+   "distFloodM": 486
+  },
+  {
+   "id": 3163978067,
+   "name": "Yetkha",
+   "type": "suburb",
+   "lon": 85.306849,
+   "lat": 27.706149,
+   "node": 5847,
+   "inFlood": false,
+   "distFloodM": 1380
+  },
+  {
+   "id": 3164346752,
+   "name": "चमती",
+   "type": "suburb",
+   "lon": 85.297202,
+   "lat": 27.719824,
+   "node": 4627,
+   "inFlood": false,
+   "distFloodM": 3033
+  },
+  {
+   "id": 3232885374,
+   "name": "कुटु बाहल",
+   "type": "neighbourhood",
+   "lon": 85.341099,
+   "lat": 27.71491,
+   "node": 26652,
+   "inFlood": false,
+   "distFloodM": 3458
+  },
+  {
+   "id": 3232885375,
+   "name": "पनेकु टोल",
+   "type": "neighbourhood",
+   "lon": 85.33936,
+   "lat": 27.709126,
+   "node": 18850,
+   "inFlood": false,
+   "distFloodM": 2808
+  },
+  {
+   "id": 3232885376,
+   "name": "पन्ना हिटी",
+   "type": "neighbourhood",
+   "lon": 85.340137,
+   "lat": 27.713746,
+   "node": 19043,
+   "inFlood": false,
+   "distFloodM": 3302
+  },
+  {
+   "id": 3232887689,
+   "name": "Bulbulley",
+   "type": "neighbourhood",
+   "lon": 85.343282,
+   "lat": 27.716484,
+   "node": 7851,
+   "inFlood": false,
+   "distFloodM": 3709
+  },
+  {
+   "id": 3232887690,
+   "name": "बिनायक टोल",
+   "type": "neighbourhood",
+   "lon": 85.342756,
+   "lat": 27.717558,
+   "node": 10256,
+   "inFlood": false,
+   "distFloodM": 3793
+  },
+  {
+   "id": 3232897799,
+   "name": "गोपी कृष्ण नगर",
+   "type": "neighbourhood",
+   "lon": 85.347043,
+   "lat": 27.722414,
+   "node": 7988,
+   "inFlood": false,
+   "distFloodM": 4238
+  },
+  {
+   "id": 3232897800,
+   "name": "कुमारिगल",
+   "type": "neighbourhood",
+   "lon": 85.352157,
+   "lat": 27.715312,
+   "node": 30193,
+   "inFlood": false,
+   "distFloodM": 3305
+  },
+  {
+   "id": 3232897801,
+   "name": "माइजु बहल",
+   "type": "neighbourhood",
+   "lon": 85.349263,
+   "lat": 27.716603,
+   "node": 12741,
+   "inFlood": false,
+   "distFloodM": 3576
+  },
+  {
+   "id": 3232897802,
+   "name": "माइजु बहल",
+   "type": "neighbourhood",
+   "lon": 85.355536,
+   "lat": 27.718261,
+   "node": 13645,
+   "inFlood": false,
+   "distFloodM": 3389
+  },
+  {
+   "id": 3232897803,
+   "name": "सरस्वती नगर",
+   "type": "neighbourhood",
+   "lon": 85.349661,
+   "lat": 27.721998,
+   "node": 27065,
+   "inFlood": false,
+   "distFloodM": 4053
+  },
+  {
+   "id": 3262175892,
+   "name": "Tattagol",
+   "type": "hamlet",
+   "lon": 85.433677,
+   "lat": 27.720717,
+   "node": 28133,
+   "inFlood": false,
+   "distFloodM": 551
+  },
+  {
+   "id": 3262175893,
+   "name": "Khoria",
+   "type": "hamlet",
+   "lon": 85.437387,
+   "lat": 27.719388,
+   "node": 28133,
+   "inFlood": false,
+   "distFloodM": 473
+  },
+  {
+   "id": 3262198544,
+   "name": "Gagalphedi",
+   "type": "village",
+   "lon": 85.445625,
+   "lat": 27.751402,
+   "node": 636,
+   "inFlood": false,
+   "distFloodM": 2632
+  },
+  {
+   "id": 3293574284,
+   "name": "Nhaikantalla",
+   "type": "neighbourhood",
+   "lon": 85.310975,
+   "lat": 27.708016,
+   "node": 186,
+   "inFlood": false,
+   "distFloodM": 1638
+  },
+  {
+   "id": 3293613269,
+   "name": "Balkumari",
+   "type": "neighbourhood",
+   "lon": 85.311633,
+   "lat": 27.707107,
+   "node": 80,
+   "inFlood": false,
+   "distFloodM": 1556
+  },
+  {
+   "id": 3293614192,
+   "name": "भोटाहिटी",
+   "type": "neighbourhood",
+   "lon": 85.31321,
+   "lat": 27.707251,
+   "node": 10218,
+   "inFlood": false,
+   "distFloodM": 1609
+  },
+  {
+   "id": 3293614874,
+   "name": "Kamalachi",
+   "type": "neighbourhood",
+   "lon": 85.312692,
+   "lat": 27.70778,
+   "node": 79,
+   "inFlood": false,
+   "distFloodM": 1653
+  },
+  {
+   "id": 3315904180,
+   "name": "हात्तिसार",
+   "type": "locality",
+   "lon": 85.322142,
+   "lat": 27.712092,
+   "node": 58,
+   "inFlood": false,
+   "distFloodM": 2407
+  },
+  {
+   "id": 3315904182,
+   "name": "नक्साल",
+   "type": "locality",
+   "lon": 85.328703,
+   "lat": 27.712678,
+   "node": 3598,
+   "inFlood": false,
+   "distFloodM": 2755
+  },
+  {
+   "id": 3316605932,
+   "name": "धोबी चौर",
+   "type": "neighbourhood",
+   "lon": 85.322376,
+   "lat": 27.719061,
+   "node": 10816,
+   "inFlood": false,
+   "distFloodM": 3148
+  },
+  {
+   "id": 3316605933,
+   "name": "कैलाश चोक",
+   "type": "neighbourhood",
+   "lon": 85.321099,
+   "lat": 27.718583,
+   "node": 26127,
+   "inFlood": false,
+   "distFloodM": 3053
+  },
+  {
+   "id": 3316605934,
+   "name": "मिलिजुली टोल",
+   "type": "neighbourhood",
+   "lon": 85.3419,
+   "lat": 27.739156,
+   "node": 9937,
+   "inFlood": false,
+   "distFloodM": 5943
+  },
+  {
+   "id": 3318008704,
+   "name": "चुनदेवी",
+   "type": "neighbourhood",
+   "lon": 85.337767,
+   "lat": 27.735304,
+   "node": 7892,
+   "inFlood": false,
+   "distFloodM": 5378
+  },
+  {
+   "id": 3318008705,
+   "name": "गणेश बस्ती",
+   "type": "neighbourhood",
+   "lon": 85.338252,
+   "lat": 27.738126,
+   "node": 31333,
+   "inFlood": false,
+   "distFloodM": 5680
+  },
+  {
+   "id": 3318008706,
+   "name": "पन्चकन्या",
+   "type": "neighbourhood",
+   "lon": 85.336259,
+   "lat": 27.732226,
+   "node": 8072,
+   "inFlood": false,
+   "distFloodM": 5007
+  },
+  {
+   "id": 3318008707,
+   "name": "टुसाल",
+   "type": "neighbourhood",
+   "lon": 85.334566,
+   "lat": 27.734234,
+   "node": 11867,
+   "inFlood": false,
+   "distFloodM": 5138
+  },
+  {
+   "id": 3318030100,
+   "name": "आनन्द नगर",
+   "type": "neighbourhood",
+   "lon": 85.347565,
+   "lat": 27.727361,
+   "node": 8035,
+   "inFlood": false,
+   "distFloodM": 4663
+  },
+  {
+   "id": 3318030101,
+   "name": "दथु टोल",
+   "type": "neighbourhood",
+   "lon": 85.33621,
+   "lat": 27.716633,
+   "node": 5815,
+   "inFlood": false,
+   "distFloodM": 3465
+  },
+  {
+   "id": 3318030102,
+   "name": "किसान टोल",
+   "type": "neighbourhood",
+   "lon": 85.334989,
+   "lat": 27.714707,
+   "node": 5804,
+   "inFlood": false,
+   "distFloodM": 3225
+  },
+  {
+   "id": 3318030103,
+   "name": "कोटल टोल",
+   "type": "neighbourhood",
+   "lon": 85.335086,
+   "lat": 27.716116,
+   "node": 3160,
+   "inFlood": false,
+   "distFloodM": 3377
+  },
+  {
+   "id": 3318030104,
+   "name": "माली गाउँ",
+   "type": "neighbourhood",
+   "lon": 85.334835,
+   "lat": 27.715129,
+   "node": 17270,
+   "inFlood": false,
+   "distFloodM": 3265
+  },
+  {
+   "id": 3318180152,
+   "name": "सानो गौचरण",
+   "type": "neighbourhood",
+   "lon": 85.333575,
+   "lat": 27.711734,
+   "node": 10167,
+   "inFlood": false,
+   "distFloodM": 2870
+  },
+  {
+   "id": 3318253390,
+   "name": "बौद्ध",
+   "type": "suburb",
+   "lon": 85.361719,
+   "lat": 27.720563,
+   "node": 5965,
+   "inFlood": false,
+   "distFloodM": 3224
+  },
+  {
+   "id": 3318253391,
+   "name": "भुअल डाडा",
+   "type": "neighbourhood",
+   "lon": 85.371095,
+   "lat": 27.727454,
+   "node": 451,
+   "inFlood": false,
+   "distFloodM": 3191
+  },
+  {
+   "id": 3318253392,
+   "name": "चुचेपाटी",
+   "type": "neighbourhood",
+   "lon": 85.350981,
+   "lat": 27.719547,
+   "node": 25403,
+   "inFlood": false,
+   "distFloodM": 3756
+  },
+  {
+   "id": 3318253393,
+   "name": "धारा टोल",
+   "type": "neighbourhood",
+   "lon": 85.359899,
+   "lat": 27.722,
+   "node": 32304,
+   "inFlood": false,
+   "distFloodM": 3463
+  },
+  {
+   "id": 3318253394,
+   "name": "Pani Tanki",
+   "type": "neighbourhood",
+   "lon": 85.35479,
+   "lat": 27.722509,
+   "node": 13608,
+   "inFlood": false,
+   "distFloodM": 3817
+  },
+  {
+   "id": 3318253395,
+   "name": "पाटी टार",
+   "type": "neighbourhood",
+   "lon": 85.362156,
+   "lat": 27.718667,
+   "node": 12752,
+   "inFlood": false,
+   "distFloodM": 3063
+  },
+  {
+   "id": 3318253396,
+   "name": "शान्ति नगर",
+   "type": "neighbourhood",
+   "lon": 85.356431,
+   "lat": 27.727343,
+   "node": 4824,
+   "inFlood": false,
+   "distFloodM": 4106
+  },
+  {
+   "id": 3318253397,
+   "name": "सुन्दर टोल",
+   "type": "neighbourhood",
+   "lon": 85.367695,
+   "lat": 27.722256,
+   "node": 3149,
+   "inFlood": false,
+   "distFloodM": 2922
+  },
+  {
+   "id": 3318253399,
+   "name": "टुसाल",
+   "type": "neighbourhood",
+   "lon": 85.359168,
+   "lat": 27.719198,
+   "node": 9533,
+   "inFlood": false,
+   "distFloodM": 3278
+  },
+  {
+   "id": 3347570026,
+   "name": "ईटागोल",
+   "type": "neighbourhood",
+   "lon": 85.284758,
+   "lat": 27.667672,
+   "node": 2173,
+   "inFlood": false,
+   "distFloodM": 779
+  },
+  {
+   "id": 3361103287,
+   "name": "विजय चोक",
+   "type": "locality",
+   "lon": 85.346781,
+   "lat": 27.702197,
+   "node": 2505,
+   "inFlood": false,
+   "distFloodM": 2457
+  },
+  {
+   "id": 3432933474,
+   "name": "भैसेपाटी",
+   "type": "neighbourhood",
+   "lon": 85.306037,
+   "lat": 27.656168,
+   "node": 2103,
+   "inFlood": false,
+   "distFloodM": 313
+  },
+  {
+   "id": 3481360246,
+   "name": "तिन्चुली ",
+   "type": "suburb",
+   "lon": 85.36829,
+   "lat": 27.727273,
+   "node": 455,
+   "inFlood": false,
+   "distFloodM": 3323
+  },
+  {
+   "id": 3482933177,
+   "name": "Dholahiti",
+   "type": "locality",
+   "lon": 85.318481,
+   "lat": 27.641138,
+   "node": 18184,
+   "inFlood": false,
+   "distFloodM": 532
+  },
+  {
+   "id": 3482967558,
+   "name": "Thecho",
+   "type": "suburb",
+   "lon": 85.320673,
+   "lat": 27.614134,
+   "node": 22644,
+   "inFlood": false,
+   "distFloodM": 805
+  },
+  {
+   "id": 3486781262,
+   "name": "टुसाल",
+   "type": "neighbourhood",
+   "lon": 85.357807,
+   "lat": 27.720156,
+   "node": 118,
+   "inFlood": false,
+   "distFloodM": 3438
+  },
+  {
+   "id": 3492587396,
+   "name": "Sundhara Chowk",
+   "type": "locality",
+   "lon": 85.328044,
+   "lat": 27.669798,
+   "node": 10662,
+   "inFlood": false,
+   "distFloodM": 664
+  },
+  {
+   "id": 3493431689,
+   "name": "Bhadrabas",
+   "type": "village",
+   "lon": 85.422244,
+   "lat": 27.741704,
+   "node": 15049,
+   "inFlood": false,
+   "distFloodM": 1846
+  },
+  {
+   "id": 3496148173,
+   "name": "धरमपुर",
+   "type": "suburb",
+   "lon": 85.347105,
+   "lat": 27.754947,
+   "node": 24482,
+   "inFlood": false,
+   "distFloodM": 7028
+  },
+  {
+   "id": 3496148174,
+   "name": "खड्कागाउँ",
+   "type": "suburb",
+   "lon": 85.35,
+   "lat": 27.766667,
+   "node": 15271,
+   "inFlood": false,
+   "distFloodM": 7995
+  },
+  {
+   "id": 3496148179,
+   "name": "टोखा",
+   "type": "town",
+   "lon": 85.333333,
+   "lat": 27.75,
+   "node": 8253,
+   "inFlood": false,
+   "distFloodM": 6727
+  },
+  {
+   "id": 3497165161,
+   "name": "Gundu Gabisa Chowk",
+   "type": "locality",
+   "lon": 85.411048,
+   "lat": 27.650371,
+   "node": 15624,
+   "inFlood": false,
+   "distFloodM": 2072
+  },
+  {
+   "id": 3499930539,
+   "name": "Bhaktapur",
+   "type": "hamlet",
+   "lon": 85.452118,
+   "lat": 27.704332,
+   "node": 19356,
+   "inFlood": false,
+   "distFloodM": 1777
+  },
+  {
+   "id": 3499930541,
+   "name": "Mahānkāl",
+   "type": "village",
+   "lon": 85.445034,
+   "lat": 27.765892,
+   "node": 21164,
+   "inFlood": false,
+   "distFloodM": 4202
+  },
+  {
+   "id": 3504602589,
+   "name": "Kharipati",
+   "type": "locality",
+   "lon": 85.470716,
+   "lat": 27.702737,
+   "node": 15877,
+   "inFlood": false,
+   "distFloodM": 1562
+  },
+  {
+   "id": 3508175169,
+   "name": "Naghal",
+   "type": "neighbourhood",
+   "lon": 85.310392,
+   "lat": 27.709135,
+   "node": 177,
+   "inFlood": false,
+   "distFloodM": 1746
+  },
+  {
+   "id": 3511476818,
+   "name": "बागबजार",
+   "type": "suburb",
+   "lon": 85.319254,
+   "lat": 27.705775,
+   "node": 2613,
+   "inFlood": false,
+   "distFloodM": 1653
+  },
+  {
+   "id": 3524783701,
+   "name": "रुद्रेश्वर चोक",
+   "type": "locality",
+   "lon": 85.358775,
+   "lat": 27.771531,
+   "node": 14494,
+   "inFlood": false,
+   "distFloodM": 7985
+  },
+  {
+   "id": 3569872746,
+   "name": "Naradevi",
+   "type": "neighbourhood",
+   "lon": 85.307344,
+   "lat": 27.707656,
+   "node": 1813,
+   "inFlood": false,
+   "distFloodM": 1548
+  },
+  {
+   "id": 3569875743,
+   "name": "Thyaemaru",
+   "type": "neighbourhood",
+   "lon": 85.310106,
+   "lat": 27.708179,
+   "node": 81,
+   "inFlood": false,
+   "distFloodM": 1637
+  },
+  {
+   "id": 3575941522,
+   "name": "कुमारीपाटी",
+   "type": "neighbourhood",
+   "lon": 85.320719,
+   "lat": 27.670523,
+   "node": 4456,
+   "inFlood": false,
+   "distFloodM": 1358
+  },
+  {
+   "id": 3641456686,
+   "name": "शान्ती गोरेटो",
+   "type": "neighbourhood",
+   "lon": 85.348927,
+   "lat": 27.720545,
+   "node": 14872,
+   "inFlood": false,
+   "distFloodM": 3964
+  },
+  {
+   "id": 3686003043,
+   "name": "नामग्याल",
+   "type": "village",
+   "lon": 85.399528,
+   "lat": 27.740458,
+   "node": 3595,
+   "inFlood": false,
+   "distFloodM": 2751
+  },
+  {
+   "id": 3766822864,
+   "name": "निर्मल बस्ती",
+   "type": "locality",
+   "lon": 85.324608,
+   "lat": 27.660113,
+   "node": 25093,
+   "inFlood": false,
+   "distFloodM": 951
+  },
+  {
+   "id": 3981494409,
+   "name": "नारायण चोक",
+   "type": "neighbourhood",
+   "lon": 85.351849,
+   "lat": 27.728509,
+   "node": 4827,
+   "inFlood": false,
+   "distFloodM": 4533
+  },
+  {
+   "id": 4034389060,
+   "name": "Rudramati Chowk",
+   "type": "neighbourhood",
+   "lon": 85.351345,
+   "lat": 27.732987,
+   "node": 25115,
+   "inFlood": false,
+   "distFloodM": 4898
+  },
+  {
+   "id": 4094652848,
+   "name": "Nyakha Chok",
+   "type": "locality",
+   "lon": 85.32274,
+   "lat": 27.676576,
+   "node": 3822,
+   "inFlood": false,
+   "distFloodM": 833
+  },
+  {
+   "id": 4094694246,
+   "name": "Dhaugal",
+   "type": "neighbourhood",
+   "lon": 85.323532,
+   "lat": 27.674539,
+   "node": 19143,
+   "inFlood": false,
+   "distFloodM": 905
+  },
+  {
+   "id": 4094694248,
+   "name": "शोभाहिटी",
+   "type": "locality",
+   "lon": 85.316353,
+   "lat": 27.657258,
+   "node": 2257,
+   "inFlood": false,
+   "distFloodM": 419
+  },
+  {
+   "id": 4109404689,
+   "name": "घट्टेकुलो",
+   "type": "suburb",
+   "lon": 85.32828,
+   "lat": 27.701735,
+   "node": 11372,
+   "inFlood": false,
+   "distFloodM": 1669
+  },
+  {
+   "id": 4126328906,
+   "name": "Hakha Tol",
+   "type": "neighbourhood",
+   "lon": 85.326231,
+   "lat": 27.671374,
+   "node": 16065,
+   "inFlood": false,
+   "distFloodM": 906
+  },
+  {
+   "id": 4324791837,
+   "name": "Telkot",
+   "type": "locality",
+   "lon": 85.475092,
+   "lat": 27.712463,
+   "node": 288,
+   "inFlood": false,
+   "distFloodM": 877
+  },
+  {
+   "id": 4329099610,
+   "name": "दिपज्योति",
+   "type": "neighbourhood",
+   "lon": 85.309748,
+   "lat": 27.738275,
+   "node": 4887,
+   "inFlood": false,
+   "distFloodM": 4942
+  },
+  {
+   "id": 4329099611,
+   "name": "लोकतान्त्रिक चोक",
+   "type": "neighbourhood",
+   "lon": 85.310572,
+   "lat": 27.743838,
+   "node": 25594,
+   "inFlood": false,
+   "distFloodM": 5561
+  },
+  {
+   "id": 4330893783,
+   "name": "टेकु",
+   "type": "neighbourhood",
+   "lon": 85.303851,
+   "lat": 27.697507,
+   "node": 4800,
+   "inFlood": false,
+   "distFloodM": 484
+  },
+  {
+   "id": 4332840234,
+   "name": "बखुण्डोल",
+   "type": "neighbourhood",
+   "lon": 85.310073,
+   "lat": 27.689462,
+   "node": 1313,
+   "inFlood": false,
+   "distFloodM": 257
+  },
+  {
+   "id": 4384922569,
+   "name": "कमलपोखरी",
+   "type": "neighbourhood",
+   "lon": 85.323996,
+   "lat": 27.710156,
+   "node": 16992,
+   "inFlood": false,
+   "distFloodM": 2283
+  },
+  {
+   "id": 4411694206,
+   "name": "किमडोल",
+   "type": "suburb",
+   "lon": 85.287518,
+   "lat": 27.712486,
+   "node": 23085,
+   "inFlood": false,
+   "distFloodM": 2683
+  },
+  {
+   "id": 4515248689,
+   "name": "Ranikot",
+   "type": "village",
+   "lon": 85.430843,
+   "lat": 27.623593,
+   "node": 20858,
+   "inFlood": false,
+   "distFloodM": 4304
+  },
+  {
+   "id": 4523205706,
+   "name": "हत्तिगौडा चौक",
+   "type": "locality",
+   "lon": 85.349469,
+   "lat": 27.756928,
+   "node": 16891,
+   "inFlood": false,
+   "distFloodM": 7084
+  },
+  {
+   "id": 4677490403,
+   "name": "मकलबारी",
+   "type": "neighbourhood",
+   "lon": 85.385335,
+   "lat": 27.730778,
+   "node": 20639,
+   "inFlood": false,
+   "distFloodM": 2908
+  },
+  {
+   "id": 4719615889,
+   "name": "धुम्बाराही",
+   "type": "suburb",
+   "lon": 85.34074,
+   "lat": 27.725026,
+   "node": 10974,
+   "inFlood": false,
+   "distFloodM": 4486
+  },
+  {
+   "id": 4719615890,
+   "name": "धुम्बाराही पिपल बोट",
+   "type": "neighbourhood",
+   "lon": 85.339572,
+   "lat": 27.724217,
+   "node": 1024,
+   "inFlood": false,
+   "distFloodM": 4365
+  },
+  {
+   "id": 4742463421,
+   "name": "Biruwa",
+   "type": "village",
+   "lon": 85.392719,
+   "lat": 27.640814,
+   "node": 15649,
+   "inFlood": false,
+   "distFloodM": 2479
+  },
+  {
+   "id": 4781007952,
+   "name": "Tyangal",
+   "type": "neighbourhood",
+   "lon": 85.307663,
+   "lat": 27.708599,
+   "node": 82,
+   "inFlood": false,
+   "distFloodM": 1653
+  },
+  {
+   "id": 4897168591,
+   "name": "खड्का टोल",
+   "type": "locality",
+   "lon": 85.31156,
+   "lat": 27.668123,
+   "node": 2299,
+   "inFlood": false,
+   "distFloodM": 716
+  },
+  {
+   "id": 4907093186,
+   "name": "Thecho",
+   "type": "village",
+   "lon": 85.319442,
+   "lat": 27.613755,
+   "node": 16277,
+   "inFlood": false,
+   "distFloodM": 682
+  },
+  {
+   "id": 4923876671,
+   "name": "कोहिनूर हिल्स आवास",
+   "type": "suburb",
+   "lon": 85.285471,
+   "lat": 27.698565,
+   "node": 11152,
+   "inFlood": false,
+   "distFloodM": 1792
+  },
+  {
+   "id": 4932582630,
+   "name": "Chitpol",
+   "type": "village",
+   "lon": 85.47508,
+   "lat": 27.649878,
+   "node": 15747,
+   "inFlood": false,
+   "distFloodM": 3488
+  },
+  {
+   "id": 4979394278,
+   "name": "माइतिघर",
+   "type": "locality",
+   "lon": 85.319845,
+   "lat": 27.694346,
+   "node": 5983,
+   "inFlood": false,
+   "distFloodM": 561
+  },
+  {
+   "id": 5009084150,
+   "name": "Mahendra Jyoti",
+   "type": "hamlet",
+   "lon": 85.482614,
+   "lat": 27.622615,
+   "node": 28835,
+   "inFlood": false,
+   "distFloodM": 5855
+  },
+  {
+   "id": 5009333548,
+   "name": "Nasikasthan Sanga",
+   "type": "village",
+   "lon": 85.477963,
+   "lat": 27.645133,
+   "node": 22114,
+   "inFlood": false,
+   "distFloodM": 3963
+  },
+  {
+   "id": 5013263893,
+   "name": "Maane Dobhan",
+   "type": "village",
+   "lon": 85.433947,
+   "lat": 27.599225,
+   "node": 16700,
+   "inFlood": false,
+   "distFloodM": 6902
+  },
+  {
+   "id": 5083434984,
+   "name": "नमुना चोक",
+   "type": "neighbourhood",
+   "lon": 85.387189,
+   "lat": 27.7206,
+   "node": 13659,
+   "inFlood": false,
+   "distFloodM": 1795
+  },
+  {
+   "id": 5212357721,
+   "name": "पिपल बोट ",
+   "type": "neighbourhood",
+   "lon": 85.341914,
+   "lat": 27.704794,
+   "node": 20,
+   "inFlood": false,
+   "distFloodM": 2523
+  },
+  {
+   "id": 5217657597,
+   "name": "बाबा चोक",
+   "type": "hamlet",
+   "lon": 85.393547,
+   "lat": 27.712784,
+   "node": 13741,
+   "inFlood": false,
+   "distFloodM": 771
+  },
+  {
+   "id": 5217659939,
+   "name": "मुलपानी पिपलबोट",
+   "type": "hamlet",
+   "lon": 85.394229,
+   "lat": 27.706502,
+   "node": 14825,
+   "inFlood": false,
+   "distFloodM": 91
+  },
+  {
+   "id": 5246856539,
+   "name": "फाइका चोक",
+   "type": "locality",
+   "lon": 85.362334,
+   "lat": 27.732053,
+   "node": 4907,
+   "inFlood": false,
+   "distFloodM": 4095
+  },
+  {
+   "id": 5276773821,
+   "name": "डाकिन्धोका",
+   "type": "locality",
+   "lon": 85.38651,
+   "lat": 27.722232,
+   "node": 0,
+   "inFlood": false,
+   "distFloodM": 1987
+  },
+  {
+   "id": 5282973038,
+   "name": "Dallu",
+   "type": "neighbourhood",
+   "lon": 85.295996,
+   "lat": 27.710896,
+   "node": 5131,
+   "inFlood": false,
+   "distFloodM": 2135
+  },
+  {
+   "id": 5407834219,
+   "name": "Subedi Gaun",
+   "type": "village",
+   "lon": 85.432477,
+   "lat": 27.739273,
+   "node": 19798,
+   "inFlood": false,
+   "distFloodM": 1281
+  },
+  {
+   "id": 5425160179,
+   "name": "पक्नाजोल",
+   "type": "suburb",
+   "lon": 85.308458,
+   "lat": 27.715548,
+   "node": 304,
+   "inFlood": false,
+   "distFloodM": 2425
+  },
+  {
+   "id": 5450216420,
+   "name": "चोचेन",
+   "type": "neighbourhood",
+   "lon": 85.327034,
+   "lat": 27.674357,
+   "node": 15488,
+   "inFlood": false,
+   "distFloodM": 683
+  },
+  {
+   "id": 5450218405,
+   "name": "भिमछें",
+   "type": "neighbourhood",
+   "lon": 85.327678,
+   "lat": 27.674428,
+   "node": 6601,
+   "inFlood": false,
+   "distFloodM": 644
+  },
+  {
+   "id": 5840924300,
+   "name": "शिवनगर टोल",
+   "type": "neighbourhood",
+   "lon": 85.312641,
+   "lat": 27.742032,
+   "node": 25050,
+   "inFlood": false,
+   "distFloodM": 5379
+  },
+  {
+   "id": 5999458613,
+   "name": "बालाजु बाइपास",
+   "type": "suburb",
+   "lon": 85.302147,
+   "lat": 27.736717,
+   "node": 228,
+   "inFlood": false,
+   "distFloodM": 4783
+  },
+  {
+   "id": 6079118011,
+   "name": "लालिगुराँस चोक",
+   "type": "neighbourhood",
+   "lon": 85.337987,
+   "lat": 27.730848,
+   "node": 8042,
+   "inFlood": false,
+   "distFloodM": 4951
+  },
+  {
+   "id": 6089421238,
+   "name": "बस्नेतगाउँ",
+   "type": "neighbourhood",
+   "lon": 85.300342,
+   "lat": 27.674145,
+   "node": 6670,
+   "inFlood": false,
+   "distFloodM": 381
+  },
+  {
+   "id": 6126068402,
+   "name": "कालोपुल",
+   "type": "locality",
+   "lon": 85.336889,
+   "lat": 27.711815,
+   "node": 10171,
+   "inFlood": false,
+   "distFloodM": 2982
+  },
+  {
+   "id": 6135015912,
+   "name": "पबित्र वर्कसप चोक ",
+   "type": "locality",
+   "lon": 85.330855,
+   "lat": 27.729581,
+   "node": 5445,
+   "inFlood": false,
+   "distFloodM": 4521
+  },
+  {
+   "id": 6138287785,
+   "name": "Dhungedhara",
+   "type": "suburb",
+   "lon": 85.294592,
+   "lat": 27.72345,
+   "node": 27621,
+   "inFlood": false,
+   "distFloodM": 3493
+  },
+  {
+   "id": 6177973854,
+   "name": "भीमसेन गोला",
+   "type": "locality",
+   "lon": 85.344313,
+   "lat": 27.699837,
+   "node": 27555,
+   "inFlood": false,
+   "distFloodM": 2260
+  },
+  {
+   "id": 6177978137,
+   "name": "पिङ्गलस्थान",
+   "type": "locality",
+   "lon": 85.349696,
+   "lat": 27.702525,
+   "node": 2514,
+   "inFlood": false,
+   "distFloodM": 2295
+  },
+  {
+   "id": 6313765394,
+   "name": "दुलाल टोल",
+   "type": "neighbourhood",
+   "lon": 85.355009,
+   "lat": 27.782409,
+   "node": 701,
+   "inFlood": false,
+   "distFloodM": 9120
+  },
+  {
+   "id": 6332660759,
+   "name": "बालुवाखानी चोक",
+   "type": "neighbourhood",
+   "lon": 85.35542,
+   "lat": 27.743288,
+   "node": 14259,
+   "inFlood": false,
+   "distFloodM": 5501
+  },
+  {
+   "id": 6334955115,
+   "name": "Aakashedhara",
+   "type": "neighbourhood",
+   "lon": 85.355174,
+   "lat": 27.735349,
+   "node": 9441,
+   "inFlood": false,
+   "distFloodM": 4824
+  },
+  {
+   "id": 6335199071,
+   "name": "Panchakumari Chok",
+   "type": "neighbourhood",
+   "lon": 85.352849,
+   "lat": 27.733713,
+   "node": 14149,
+   "inFlood": false,
+   "distFloodM": 4848
+  },
+  {
+   "id": 6336976281,
+   "name": "Shivapuri Chok",
+   "type": "neighbourhood",
+   "lon": 85.351476,
+   "lat": 27.731109,
+   "node": 14216,
+   "inFlood": false,
+   "distFloodM": 4748
+  },
+  {
+   "id": 6336980230,
+   "name": "Bibek Chok",
+   "type": "neighbourhood",
+   "lon": 85.351423,
+   "lat": 27.730293,
+   "node": 13866,
+   "inFlood": false,
+   "distFloodM": 4692
+  },
+  {
+   "id": 6337088242,
+   "name": "सात तल्ले चोक",
+   "type": "neighbourhood",
+   "lon": 85.350511,
+   "lat": 27.726929,
+   "node": 4853,
+   "inFlood": false,
+   "distFloodM": 4458
+  },
+  {
+   "id": 6349584672,
+   "name": "महालक्ष्मी",
+   "type": "town",
+   "lon": 85.368509,
+   "lat": 27.64667,
+   "node": 32286,
+   "inFlood": false,
+   "distFloodM": 341
+  },
+  {
+   "id": 6413913540,
+   "name": "थापाथली",
+   "type": "suburb",
+   "lon": 85.320145,
+   "lat": 27.691595,
+   "node": 25645,
+   "inFlood": false,
+   "distFloodM": 362
+  },
+  {
+   "id": 6413913541,
+   "name": "लइनचौर",
+   "type": "suburb",
+   "lon": 85.315162,
+   "lat": 27.71941,
+   "node": 30060,
+   "inFlood": false,
+   "distFloodM": 2960
+  },
+  {
+   "id": 6434099596,
+   "name": "पाटन",
+   "type": "suburb",
+   "lon": 85.32453,
+   "lat": 27.67394,
+   "node": 1105,
+   "inFlood": false,
+   "distFloodM": 877
+  },
+  {
+   "id": 6434169987,
+   "name": "Godawari",
+   "type": "town",
+   "lon": 85.334558,
+   "lat": 27.615632,
+   "node": 22083,
+   "inFlood": false,
+   "distFloodM": 725
+  },
+  {
+   "id": 6499299310,
+   "name": "Kapahiti",
+   "type": "hamlet",
+   "lon": 85.428412,
+   "lat": 27.718904,
+   "node": 27115,
+   "inFlood": false,
+   "distFloodM": 619
+  },
+  {
+   "id": 6499299311,
+   "name": "Gaam dhoka",
+   "type": "hamlet",
+   "lon": 85.426525,
+   "lat": 27.716765,
+   "node": 27332,
+   "inFlood": false,
+   "distFloodM": 705
+  },
+  {
+   "id": 6499299312,
+   "name": "Halchap",
+   "type": "hamlet",
+   "lon": 85.422961,
+   "lat": 27.719848,
+   "node": 20996,
+   "inFlood": false,
+   "distFloodM": 238
+  },
+  {
+   "id": 6499299313,
+   "name": "Villaphant",
+   "type": "hamlet",
+   "lon": 85.423833,
+   "lat": 27.721884,
+   "node": 20995,
+   "inFlood": false,
+   "distFloodM": 109
+  },
+  {
+   "id": 6501703871,
+   "name": "Thapa Gaun",
+   "type": "hamlet",
+   "lon": 85.424775,
+   "lat": 27.720206,
+   "node": 27114,
+   "inFlood": false,
+   "distFloodM": 297
+  },
+  {
+   "id": 6502020594,
+   "name": "Magam Tol",
+   "type": "hamlet",
+   "lon": 85.428336,
+   "lat": 27.717084,
+   "node": 11461,
+   "inFlood": false,
+   "distFloodM": 787
+  },
+  {
+   "id": 6502040103,
+   "name": "Inbaha Tol",
+   "type": "village",
+   "lon": 85.42984,
+   "lat": 27.716204,
+   "node": 5106,
+   "inFlood": false,
+   "distFloodM": 945
+  },
+  {
+   "id": 6502040104,
+   "name": "Saangapha Twaa",
+   "type": "village",
+   "lon": 85.429508,
+   "lat": 27.716344,
+   "node": 23205,
+   "inFlood": false,
+   "distFloodM": 915
+  },
+  {
+   "id": 6502040105,
+   "name": "Balambu",
+   "type": "village",
+   "lon": 85.429006,
+   "lat": 27.716233,
+   "node": 11461,
+   "inFlood": false,
+   "distFloodM": 901
+  },
+  {
+   "id": 6502040106,
+   "name": "Iku Tol",
+   "type": "hamlet",
+   "lon": 85.427239,
+   "lat": 27.715854,
+   "node": 27111,
+   "inFlood": false,
+   "distFloodM": 828
+  },
+  {
+   "id": 6508542863,
+   "name": "Madhyapur Thimi",
+   "type": "town",
+   "lon": 85.38573,
+   "lat": 27.680006,
+   "node": 4484,
+   "inFlood": false,
+   "distFloodM": 884
+  },
+  {
+   "id": 6521011205,
+   "name": "Budathoki Gaun",
+   "type": "hamlet",
+   "lon": 85.432246,
+   "lat": 27.714185,
+   "node": 19347,
+   "inFlood": false,
+   "distFloodM": 1238
+  },
+  {
+   "id": 6521011206,
+   "name": "Pauwa",
+   "type": "hamlet",
+   "lon": 85.434847,
+   "lat": 27.715926,
+   "node": 30281,
+   "inFlood": false,
+   "distFloodM": 930
+  },
+  {
+   "id": 6521011207,
+   "name": "Chamthali",
+   "type": "hamlet",
+   "lon": 85.423811,
+   "lat": 27.71629,
+   "node": 21227,
+   "inFlood": false,
+   "distFloodM": 622
+  },
+  {
+   "id": 6521011208,
+   "name": "Kuinkel Gaun",
+   "type": "hamlet",
+   "lon": 85.421033,
+   "lat": 27.71836,
+   "node": 20994,
+   "inFlood": false,
+   "distFloodM": 283
+  },
+  {
+   "id": 6646454829,
+   "name": "गोकर्णेश्वर",
+   "type": "suburb",
+   "lon": 85.385794,
+   "lat": 27.737511,
+   "node": 19314,
+   "inFlood": false,
+   "distFloodM": 3459
+  },
+  {
+   "id": 6646454830,
+   "name": "कागेश्वरी मनोहरा",
+   "type": "town",
+   "lon": 85.408425,
+   "lat": 27.727908,
+   "node": 24837,
+   "inFlood": false,
+   "distFloodM": 1116
+  },
+  {
+   "id": 6646454833,
+   "name": "तारकेश्वर",
+   "type": "town",
+   "lon": 85.30992,
+   "lat": 27.753142,
+   "node": 21750,
+   "inFlood": false,
+   "distFloodM": 6585
+  },
+  {
+   "id": 6652889772,
+   "name": "Changunarayan",
+   "type": "town",
+   "lon": 85.443786,
+   "lat": 27.709461,
+   "node": 22186,
+   "inFlood": false,
+   "distFloodM": 1450
+  },
+  {
+   "id": 6653134799,
+   "name": "Asan Tol",
+   "type": "neighbourhood",
+   "lon": 85.312518,
+   "lat": 27.707552,
+   "node": 79,
+   "inFlood": false,
+   "distFloodM": 1624
+  },
+  {
+   "id": 6653134800,
+   "name": "ताहिटि",
+   "type": "neighbourhood",
+   "lon": 85.310779,
+   "lat": 27.710388,
+   "node": 4406,
+   "inFlood": false,
+   "distFloodM": 1889
+  },
+  {
+   "id": 6994682600,
+   "name": "बालुवापाटी चोक",
+   "type": "neighbourhood",
+   "lon": 85.317951,
+   "lat": 27.750357,
+   "node": 19399,
+   "inFlood": false,
+   "distFloodM": 6365
+  },
+  {
+   "id": 7345929841,
+   "name": "तिन्चुली चौक",
+   "type": "locality",
+   "lon": 85.368574,
+   "lat": 27.727052,
+   "node": 454,
+   "inFlood": false,
+   "distFloodM": 3287
+  },
+  {
+   "id": 7371674706,
+   "name": "Indra Chowk",
+   "type": "quarter",
+   "lon": 85.309612,
+   "lat": 27.706024,
+   "node": 179,
+   "inFlood": false,
+   "distFloodM": 1393
+  },
+  {
+   "id": 7511907972,
+   "name": "Sankhu",
+   "type": "suburb",
+   "lon": 85.461383,
+   "lat": 27.729023,
+   "node": 24884,
+   "inFlood": false,
+   "distFloodM": 647
+  },
+  {
+   "id": 7765273337,
+   "name": "Nhugha",
+   "type": "neighbourhood",
+   "lon": 85.304993,
+   "lat": 27.700624,
+   "node": 4798,
+   "inFlood": false,
+   "distFloodM": 789
+  },
+  {
+   "id": 7765273338,
+   "name": "भीमसेनथान",
+   "type": "neighbourhood",
+   "lon": 85.304347,
+   "lat": 27.70251,
+   "node": 1572,
+   "inFlood": false,
+   "distFloodM": 1006
+  },
+  {
+   "id": 7765273339,
+   "name": "Paropakar",
+   "type": "neighbourhood",
+   "lon": 85.302804,
+   "lat": 27.70196,
+   "node": 12576,
+   "inFlood": false,
+   "distFloodM": 982
+  },
+  {
+   "id": 7867791081,
+   "name": "महालक्ष्मी",
+   "type": "town",
+   "lon": 85.370992,
+   "lat": 27.646312,
+   "node": 16620,
+   "inFlood": false,
+   "distFloodM": 563
+  },
+  {
+   "id": 7979698241,
+   "name": "Danfe Tole",
+   "type": "neighbourhood",
+   "lon": 85.369584,
+   "lat": 27.675274,
+   "node": 8972,
+   "inFlood": false,
+   "distFloodM": 312
+  },
+  {
+   "id": 8009598336,
+   "name": "Changunarayan",
+   "type": "village",
+   "lon": 85.42866,
+   "lat": 27.716624,
+   "node": 11461,
+   "inFlood": false,
+   "distFloodM": 847
+  },
+  {
+   "id": 8187696685,
+   "name": "चङ्गाथली",
+   "type": "village",
+   "lon": 85.368263,
+   "lat": 27.654355,
+   "node": 15689,
+   "inFlood": false,
+   "distFloodM": 236
+  },
+  {
+   "id": 8209925518,
+   "name": "KarkiGau",
+   "type": "locality",
+   "lon": 85.427558,
+   "lat": 27.730314,
+   "node": 635,
+   "inFlood": false,
+   "distFloodM": 499
+  },
+  {
+   "id": 8210120523,
+   "name": "गङ्खु धर्मपुर",
+   "type": "locality",
+   "lon": 85.397353,
+   "lat": 27.690518,
+   "node": 7426,
+   "inFlood": false,
+   "distFloodM": 777
+  },
+  {
+   "id": 8210140469,
+   "name": "नागदेश",
+   "type": "suburb",
+   "lon": 85.384482,
+   "lat": 27.684568,
+   "node": 12970,
+   "inFlood": false,
+   "distFloodM": 805
+  },
+  {
+   "id": 8210155477,
+   "name": "फाल्का चौक",
+   "type": "locality",
+   "lon": 85.365855,
+   "lat": 27.735736,
+   "node": 12018,
+   "inFlood": false,
+   "distFloodM": 4243
+  },
+  {
+   "id": 8293018304,
+   "name": "Jharuwarasi",
+   "type": "suburb",
+   "lon": 85.339379,
+   "lat": 27.61205,
+   "node": 15013,
+   "inFlood": false,
+   "distFloodM": 999
+  },
+  {
+   "id": 8293018305,
+   "name": "Chhampi",
+   "type": "suburb",
+   "lon": 85.312004,
+   "lat": 27.603593,
+   "node": 18608,
+   "inFlood": false,
+   "distFloodM": 447
+  },
+  {
+   "id": 8293018306,
+   "name": "Bisankhunarayan",
+   "type": "suburb",
+   "lon": 85.382275,
+   "lat": 27.609186,
+   "node": 12603,
+   "inFlood": false,
+   "distFloodM": 1855
+  },
+  {
+   "id": 9175497673,
+   "name": "धोबीघाट",
+   "type": "suburb",
+   "lon": 85.301817,
+   "lat": 27.67819,
+   "node": 6695,
+   "inFlood": false,
+   "distFloodM": 278
+  },
+  {
+   "id": 9409626772,
+   "name": "भगवान बहाल",
+   "type": "locality",
+   "lon": 85.312668,
+   "lat": 27.715403,
+   "node": 3662,
+   "inFlood": false,
+   "distFloodM": 2471
+  },
+  {
+   "id": 9488566873,
+   "name": "Tadha Bahal",
+   "type": "locality",
+   "lon": 85.311686,
+   "lat": 27.705211,
+   "node": 10078,
+   "inFlood": false,
+   "distFloodM": 1354
+  },
+  {
+   "id": 9488566895,
+   "name": "सबल बाहल",
+   "type": "locality",
+   "lon": 85.311729,
+   "lat": 27.704752,
+   "node": 31950,
+   "inFlood": false,
+   "distFloodM": 1305
+  },
+  {
+   "id": 9527958411,
+   "name": "sunrise chwok",
+   "type": "locality",
+   "lon": 85.367314,
+   "lat": 27.69304,
+   "node": 5796,
+   "inFlood": false,
+   "distFloodM": 428
+  },
+  {
+   "id": 9527979537,
+   "name": "मेडिकल चोक",
+   "type": "locality",
+   "lon": 85.374085,
+   "lat": 27.695839,
+   "node": 5732,
+   "inFlood": false,
+   "distFloodM": 308
+  },
+  {
+   "id": 9529645931,
+   "name": "पबित्र वर्कसप ",
+   "type": "locality",
+   "lon": 85.33087,
+   "lat": 27.729585,
+   "node": 5445,
+   "inFlood": false,
+   "distFloodM": 4522
+  },
+  {
+   "id": 9622861293,
+   "name": "Pyangaun Bazaar",
+   "type": "village",
+   "lon": 85.325314,
+   "lat": 27.598326,
+   "node": 1061,
+   "inFlood": false,
+   "distFloodM": 770
+  },
+  {
+   "id": 9671848198,
+   "name": "MiZu chowk",
+   "type": "locality",
+   "lon": 85.410591,
+   "lat": 27.714729,
+   "node": 28612,
+   "inFlood": false,
+   "distFloodM": 56
+  },
+  {
+   "id": 9958455119,
+   "name": "भकुणडोल",
+   "type": "locality",
+   "lon": 85.312201,
+   "lat": 27.684042,
+   "node": 10639,
+   "inFlood": false,
+   "distFloodM": 702
+  },
+  {
+   "id": 9987524057,
+   "name": "देउबा चोक स्टप",
+   "type": "locality",
+   "lon": 85.36107,
+   "lat": 27.774844,
+   "node": 16913,
+   "inFlood": false,
+   "distFloodM": 8097
+  },
+  {
+   "id": 9999371550,
+   "name": "फूलबारी टोल",
+   "type": "locality",
+   "lon": 85.364546,
+   "lat": 27.774864,
+   "node": 16610,
+   "inFlood": false,
+   "distFloodM": 7875
+  },
+  {
+   "id": 9999371551,
+   "name": "बिस्ट टोल",
+   "type": "locality",
+   "lon": 85.3651,
+   "lat": 27.773462,
+   "node": 20523,
+   "inFlood": false,
+   "distFloodM": 7721
+  },
+  {
+   "id": 9999414697,
+   "name": "गणेश विद्यालय चौक",
+   "type": "locality",
+   "lon": 85.351952,
+   "lat": 27.760867,
+   "node": 12719,
+   "inFlood": false,
+   "distFloodM": 7338
+  },
+  {
+   "id": 9999414699,
+   "name": "चापाली चोक",
+   "type": "locality",
+   "lon": 85.355653,
+   "lat": 27.767584,
+   "node": 12718,
+   "inFlood": false,
+   "distFloodM": 7844
+  },
+  {
+   "id": 10007211926,
+   "name": "नयाँ कोलोनी बस्ती",
+   "type": "locality",
+   "lon": 85.317413,
+   "lat": 27.739437,
+   "node": 12378,
+   "inFlood": false,
+   "distFloodM": 5168
+  },
+  {
+   "id": 10007223713,
+   "name": "नव मिलन बस्ती",
+   "type": "neighbourhood",
+   "lon": 85.317371,
+   "lat": 27.739574,
+   "node": 12378,
+   "inFlood": false,
+   "distFloodM": 5182
+  },
+  {
+   "id": 10009810848,
+   "name": "श्री बिनायक टोल",
+   "type": "hamlet",
+   "lon": 85.324471,
+   "lat": 27.747558,
+   "node": 2911,
+   "inFlood": false,
+   "distFloodM": 6203
+  },
+  {
+   "id": 10052642488,
+   "name": "Shree Panchadeb toll",
+   "type": "suburb",
+   "lon": 85.400242,
+   "lat": 27.688559,
+   "node": 27788,
+   "inFlood": false,
+   "distFloodM": 1135
+  },
+  {
+   "id": 10068876011,
+   "name": "मारु टोले",
+   "type": "village",
+   "lon": 85.385457,
+   "lat": 27.676135,
+   "node": 4488,
+   "inFlood": false,
+   "distFloodM": 478
+  },
+  {
+   "id": 10068927129,
+   "name": "इनाया टोल",
+   "type": "village",
+   "lon": 85.385684,
+   "lat": 27.677947,
+   "node": 4487,
+   "inFlood": false,
+   "distFloodM": 668
+  },
+  {
+   "id": 10068927133,
+   "name": "maru tole",
+   "type": "village",
+   "lon": 85.385631,
+   "lat": 27.676489,
+   "node": 4488,
+   "inFlood": false,
+   "distFloodM": 520
+  },
+  {
+   "id": 10081035122,
+   "name": "चापाचो गणेश",
+   "type": "village",
+   "lon": 85.386134,
+   "lat": 27.681098,
+   "node": 4482,
+   "inFlood": false,
+   "distFloodM": 1011
+  },
+  {
+   "id": 10081035123,
+   "name": "गोंगाचिवा",
+   "type": "village",
+   "lon": 85.387144,
+   "lat": 27.682618,
+   "node": 4477,
+   "inFlood": false,
+   "distFloodM": 1091
+  },
+  {
+   "id": 10081039235,
+   "name": "बालकुमारी",
+   "type": "village",
+   "lon": 85.385437,
+   "lat": 27.675879,
+   "node": 4489,
+   "inFlood": false,
+   "distFloodM": 453
+  },
+  {
+   "id": 10081039236,
+   "name": "सिवा टोल",
+   "type": "village",
+   "lon": 85.386689,
+   "lat": 27.677744,
+   "node": 18547,
+   "inFlood": false,
+   "distFloodM": 693
+  },
+  {
+   "id": 10081039237,
+   "name": "निगु पुखु",
+   "type": "village",
+   "lon": 85.385796,
+   "lat": 27.678369,
+   "node": 4487,
+   "inFlood": false,
+   "distFloodM": 715
+  },
+  {
+   "id": 10106330083,
+   "name": "देवी नगर",
+   "type": "locality",
+   "lon": 85.331473,
+   "lat": 27.698087,
+   "node": 16367,
+   "inFlood": false,
+   "distFloodM": 1373
+  },
+  {
+   "id": 10148831431,
+   "name": "मारु टोल",
+   "type": "village",
+   "lon": 85.385585,
+   "lat": 27.676432,
+   "node": 4488,
+   "inFlood": false,
+   "distFloodM": 513
+  },
+  {
+   "id": 10148831432,
+   "name": "यामा",
+   "type": "village",
+   "lon": 85.384758,
+   "lat": 27.676459,
+   "node": 18548,
+   "inFlood": false,
+   "distFloodM": 481
+  },
+  {
+   "id": 10148831443,
+   "name": "Inaya Tole",
+   "type": "village",
+   "lon": 85.385681,
+   "lat": 27.678014,
+   "node": 4487,
+   "inFlood": false,
+   "distFloodM": 675
+  },
+  {
+   "id": 10220781674,
+   "name": "नमूना गाउँ",
+   "type": "neighbourhood",
+   "lon": 85.474761,
+   "lat": 27.639885,
+   "node": 25960,
+   "inFlood": false,
+   "distFloodM": 4000
+  },
+  {
+   "id": 10220781675,
+   "name": "इटाफु",
+   "type": "neighbourhood",
+   "lon": 85.488761,
+   "lat": 27.634412,
+   "node": 20705,
+   "inFlood": false,
+   "distFloodM": 5480
+  },
+  {
+   "id": 10262218893,
+   "name": "भाजंगल",
+   "type": "neighbourhood",
+   "lon": 85.284925,
+   "lat": 27.671811,
+   "node": 1703,
+   "inFlood": false,
+   "distFloodM": 651
+  },
+  {
+   "id": 10268953803,
+   "name": "बेन्सिगाउ",
+   "type": "neighbourhood",
+   "lon": 85.376244,
+   "lat": 27.725196,
+   "node": 13943,
+   "inFlood": false,
+   "distFloodM": 2738
+  },
+  {
+   "id": 10268980272,
+   "name": "नायाबस्ती",
+   "type": "neighbourhood",
+   "lon": 85.369978,
+   "lat": 27.717157,
+   "node": 7728,
+   "inFlood": false,
+   "distFloodM": 2360
+  },
+  {
+   "id": 10656616905,
+   "name": "अरनिको बस्ती",
+   "type": "neighbourhood",
+   "lon": 85.373325,
+   "lat": 27.673041,
+   "node": 22904,
+   "inFlood": false,
+   "distFloodM": 155
+  },
+  {
+   "id": 10720251882,
+   "name": "आर एन ए सी",
+   "type": "locality",
+   "lon": 85.313489,
+   "lat": 27.702768,
+   "node": 68,
+   "inFlood": false,
+   "distFloodM": 1149
+  },
+  {
+   "id": 10877471278,
+   "name": "Jayantipur Ekata Tol",
+   "type": "locality",
+   "lon": 85.312212,
+   "lat": 27.764189,
+   "node": 30756,
+   "inFlood": false,
+   "distFloodM": 7817
+  },
+  {
+   "id": 10877471279,
+   "name": "Bihani Chwok",
+   "type": "locality",
+   "lon": 85.319182,
+   "lat": 27.787953,
+   "node": 21250,
+   "inFlood": false,
+   "distFloodM": 10498
+  },
+  {
+   "id": 10939303582,
+   "name": "Pulchowk",
+   "type": "neighbourhood",
+   "lon": 85.315707,
+   "lat": 27.676082,
+   "node": 15555,
+   "inFlood": false,
+   "distFloodM": 1308
+  },
+  {
+   "id": 10956873574,
+   "name": "बसुन्धरा चौकी",
+   "type": "suburb",
+   "lon": 85.325216,
+   "lat": 27.738022,
+   "node": 11710,
+   "inFlood": false,
+   "distFloodM": 5210
+  },
+  {
+   "id": 10956894315,
+   "name": "गोपीकृष्ण",
+   "type": "locality",
+   "lon": 85.345638,
+   "lat": 27.721476,
+   "node": 25159,
+   "inFlood": false,
+   "distFloodM": 4223
+  },
+  {
+   "id": 10957035355,
+   "name": "Timalsina Chowk",
+   "type": "locality",
+   "lon": 85.339638,
+   "lat": 27.660624,
+   "node": 17197,
+   "inFlood": false,
+   "distFloodM": 363
+  },
+  {
+   "id": 10957035357,
+   "name": "Ratamakai Chowk",
+   "type": "locality",
+   "lon": 85.339783,
+   "lat": 27.663038,
+   "node": 2486,
+   "inFlood": false,
+   "distFloodM": 419
+  },
+  {
+   "id": 10958883841,
+   "name": "सुन्धारा",
+   "type": "locality",
+   "lon": 85.312985,
+   "lat": 27.700077,
+   "node": 192,
+   "inFlood": false,
+   "distFloodM": 857
+  },
+  {
+   "id": 10958883842,
+   "name": "न्यूरोड गेट",
+   "type": "locality",
+   "lon": 85.313142,
+   "lat": 27.703217,
+   "node": 69,
+   "inFlood": false,
+   "distFloodM": 1183
+  },
+  {
+   "id": 10997058829,
+   "name": "गठ्ठाघर",
+   "type": "suburb",
+   "lon": 85.373913,
+   "lat": 27.673914,
+   "node": 4502,
+   "inFlood": false,
+   "distFloodM": 237
+  },
+  {
+   "id": 10997066418,
+   "name": "मगर गाउ",
+   "type": "suburb",
+   "lon": 85.374888,
+   "lat": 27.687837,
+   "node": 31303,
+   "inFlood": false,
+   "distFloodM": 330
+  },
+  {
+   "id": 11007321951,
+   "name": "झिकुच राजकुलो चोक",
+   "type": "neighbourhood",
+   "lon": 85.354109,
+   "lat": 27.65939,
+   "node": 3805,
+   "inFlood": false,
+   "distFloodM": 653
+  },
+  {
+   "id": 11013450539,
+   "name": "Godhar Thapa Chowk",
+   "type": "locality",
+   "lon": 85.390299,
+   "lat": 27.707984,
+   "node": 13748,
+   "inFlood": false,
+   "distFloodM": 490
+  },
+  {
+   "id": 11029553071,
+   "name": "तारेभिर",
+   "type": "hamlet",
+   "lon": 85.390217,
+   "lat": 27.777503,
+   "node": 14560,
+   "inFlood": false,
+   "distFloodM": 6704
+  },
+  {
+   "id": 11291252567,
+   "name": "Lakuri Bhanjyang",
+   "type": "village",
+   "lon": 85.411584,
+   "lat": 27.615386,
+   "node": 26298,
+   "inFlood": false,
+   "distFloodM": 4812
+  },
+  {
+   "id": 11328837852,
+   "name": "Chapakharka",
+   "type": "village",
+   "lon": 85.403545,
+   "lat": 27.595074,
+   "node": 21547,
+   "inFlood": false,
+   "distFloodM": 4190
+  },
+  {
+   "id": 11330227103,
+   "name": "पुर्बेली तोल",
+   "type": "neighbourhood",
+   "lon": 85.370189,
+   "lat": 27.669833,
+   "node": 31955,
+   "inFlood": false,
+   "distFloodM": 104
+  },
+  {
+   "id": 11337026277,
+   "name": "दिव्य दर्शन टोल",
+   "type": "neighbourhood",
+   "lon": 85.372909,
+   "lat": 27.672093,
+   "node": 31719,
+   "inFlood": false,
+   "distFloodM": 61
+  },
+  {
+   "id": 11342904561,
+   "name": "सागबारी",
+   "type": "neighbourhood",
+   "lon": 85.368027,
+   "lat": 27.673253,
+   "node": 22918,
+   "inFlood": false,
+   "distFloodM": 77
+  },
+  {
+   "id": 11365375629,
+   "name": "सचेत मार्ग टोल",
+   "type": "neighbourhood",
+   "lon": 85.36239,
+   "lat": 27.675075,
+   "node": 17077,
+   "inFlood": false,
+   "distFloodM": 298
+  },
+  {
+   "id": 11368209725,
+   "name": "बबरमहल",
+   "type": "hamlet",
+   "lon": 85.324724,
+   "lat": 27.693235,
+   "node": 27656,
+   "inFlood": false,
+   "distFloodM": 700
+  },
+  {
+   "id": 11527994979,
+   "name": "हिन्दुनगर",
+   "type": "suburb",
+   "lon": 85.401779,
+   "lat": 27.682083,
+   "node": 29023,
+   "inFlood": false,
+   "distFloodM": 504
+  },
+  {
+   "id": 11931230854,
+   "name": "Akash Marg Tole",
+   "type": "locality",
+   "lon": 85.364271,
+   "lat": 27.679002,
+   "node": 17040,
+   "inFlood": false,
+   "distFloodM": 456
+  },
+  {
+   "id": 11933367256,
+   "name": "Ashok Rotary Park",
+   "type": "locality",
+   "lon": 85.323744,
+   "lat": 27.664878,
+   "node": 6798,
+   "inFlood": false,
+   "distFloodM": 976
+  },
+  {
+   "id": 11951508972,
+   "name": "Sirutar Awas Kshetra",
+   "type": "suburb",
+   "lon": 85.394032,
+   "lat": 27.691965,
+   "node": 7328,
+   "inFlood": false,
+   "distFloodM": 423
+  },
+  {
+   "id": 11951548830,
+   "name": "Sintitar Awas Kshetra",
+   "type": "suburb",
+   "lon": 85.3984,
+   "lat": 27.68875,
+   "node": 22147,
+   "inFlood": false,
+   "distFloodM": 981
+  }
+ ],
+ "hospitals": [
+  {
+   "id": 943246318,
+   "name": "मनमोहन मेमोरियल अस्पताल",
+   "type": "hospital",
+   "lon": 85.311244,
+   "lat": 27.717939,
+   "node": 1778,
+   "inFlood": false,
+   "distFloodM": 2719
+  },
+  {
+   "id": 1497172311,
+   "name": "सैनिक अस्पताल",
+   "type": "hospital",
+   "lon": 85.291321,
+   "lat": 27.711439,
+   "node": 6096,
+   "inFlood": false,
+   "distFloodM": 2397
+  },
+  {
+   "id": 1787063191,
+   "name": "ग्लोबल अस्पताल",
+   "type": "hospital",
+   "lon": 85.33302,
+   "lat": 27.667072,
+   "node": 29092,
+   "inFlood": false,
+   "distFloodM": 92
+  },
+  {
+   "id": 1891343745,
+   "name": "धन्वन्तरी आयुर्वेद अस्पताल तथा अनुसन्धान केन्द्र",
+   "type": "hospital",
+   "lon": 85.344353,
+   "lat": 27.732426,
+   "node": 9618,
+   "inFlood": false,
+   "distFloodM": 5305
+  },
+  {
+   "id": 1898593305,
+   "name": "आरोग्य आश्रम",
+   "type": "hospital",
+   "lon": 85.33049,
+   "lat": 27.717783,
+   "node": 11065,
+   "inFlood": false,
+   "distFloodM": 3329
+  },
+  {
+   "id": 1985458243,
+   "name": "CIWEC Hospital",
+   "type": "hospital",
+   "lon": 85.317881,
+   "lat": 27.720271,
+   "node": 11434,
+   "inFlood": false,
+   "distFloodM": 3120
+  },
+  {
+   "id": 2027886569,
+   "name": "चिरायु राष्ट्रिय अस्पताल तथा चिकित्सा संस्थान",
+   "type": "hospital",
+   "lon": 85.330162,
+   "lat": 27.69221,
+   "node": 2408,
+   "inFlood": false,
+   "distFloodM": 731
+  },
+  {
+   "id": 2027895182,
+   "name": "इन्फेरलिटी सेन्टर",
+   "type": "hospital",
+   "lon": 85.32902,
+   "lat": 27.690385,
+   "node": 10703,
+   "inFlood": false,
+   "distFloodM": 500
+  },
+  {
+   "id": 2077258831,
+   "name": "सुब्बा मेडिकल सेन्टर प्रा. लि",
+   "type": "hospital",
+   "lon": 85.323041,
+   "lat": 27.73782,
+   "node": 2960,
+   "inFlood": false,
+   "distFloodM": 5126
+  },
+  {
+   "id": 2121884151,
+   "name": "कुन्फेन तिब्बती चिकित्सा",
+   "type": "hospital",
+   "lon": 85.309237,
+   "lat": 27.713065,
+   "node": 12771,
+   "inFlood": false,
+   "distFloodM": 2158
+  },
+  {
+   "id": 2164877858,
+   "name": "सार्वजनिक अस्पताल",
+   "type": "hospital",
+   "lon": 85.305407,
+   "lat": 27.665658,
+   "node": 1934,
+   "inFlood": false,
+   "distFloodM": 258
+  },
+  {
+   "id": 2165424701,
+   "name": "नेपाल पशु अस्पताल",
+   "type": "hospital",
+   "lon": 85.311284,
+   "lat": 27.694821,
+   "node": 3078,
+   "inFlood": false,
+   "distFloodM": 258
+  },
+  {
+   "id": 2165424708,
+   "name": "ब्लु क्रस अस्पताल",
+   "type": "hospital",
+   "lon": 85.315258,
+   "lat": 27.693715,
+   "node": 2631,
+   "inFlood": false,
+   "distFloodM": 273
+  },
+  {
+   "id": 2176750961,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.298587,
+   "lat": 27.691375,
+   "node": 1678,
+   "inFlood": false,
+   "distFloodM": 284
+  },
+  {
+   "id": 2218658273,
+   "name": "दिव्या संजीवनी अस्पताल",
+   "type": "hospital",
+   "lon": 85.286762,
+   "lat": 27.706615,
+   "node": 359,
+   "inFlood": false,
+   "distFloodM": 2213
+  },
+  {
+   "id": 2236622338,
+   "name": "भारोसा अस्पताल",
+   "type": "hospital",
+   "lon": 85.337056,
+   "lat": 27.694324,
+   "node": 5999,
+   "inFlood": false,
+   "distFloodM": 1323
+  },
+  {
+   "id": 2282086109,
+   "name": "नेपाल डायग्नोस्टिक सेन्टर प्रा. लि.",
+   "type": "hospital",
+   "lon": 85.311634,
+   "lat": 27.701058,
+   "node": 191,
+   "inFlood": false,
+   "distFloodM": 908
+  },
+  {
+   "id": 2352666875,
+   "name": "Buddha Minimal Access International (MAI) Center",
+   "type": "hospital",
+   "lon": 85.304213,
+   "lat": 27.698003,
+   "node": 6395,
+   "inFlood": false,
+   "distFloodM": 523
+  },
+  {
+   "id": 2425005466,
+   "name": "नेपाल प्रहरी अस्पताल",
+   "type": "hospital",
+   "lon": 85.323571,
+   "lat": 27.731024,
+   "node": 12308,
+   "inFlood": false,
+   "distFloodM": 4425
+  },
+  {
+   "id": 2476338392,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.381086,
+   "lat": 27.729732,
+   "node": 20834,
+   "inFlood": false,
+   "distFloodM": 2968
+  },
+  {
+   "id": 2684770935,
+   "name": "मोबाइल पशु चिकित्सा अस्पताल",
+   "type": "hospital",
+   "lon": 85.311774,
+   "lat": 27.673742,
+   "node": 1226,
+   "inFlood": false,
+   "distFloodM": 1262
+  },
+  {
+   "id": 2857869822,
+   "name": "तारिनी स्वास्थ्य केन्द्र",
+   "type": "hospital",
+   "lon": 85.308422,
+   "lat": 27.704951,
+   "node": 32753,
+   "inFlood": false,
+   "distFloodM": 1257
+  },
+  {
+   "id": 3047240296,
+   "name": "नेत्रधाम आँखा सेवा केन्द्र",
+   "type": "hospital",
+   "lon": 85.316458,
+   "lat": 27.687378,
+   "node": 1657,
+   "inFlood": false,
+   "distFloodM": 162
+  },
+  {
+   "id": 3074585332,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.347579,
+   "lat": 27.717459,
+   "node": 7866,
+   "inFlood": false,
+   "distFloodM": 3747
+  },
+  {
+   "id": 4132097725,
+   "name": "सिटी अस्पताल",
+   "type": "hospital",
+   "lon": 85.324692,
+   "lat": 27.690977,
+   "node": 10423,
+   "inFlood": false,
+   "distFloodM": 450
+  },
+  {
+   "id": 4132510093,
+   "name": "काठमाडौं मेडिकल कलेज",
+   "type": "hospital",
+   "lon": 85.32759,
+   "lat": 27.701591,
+   "node": 4134,
+   "inFlood": false,
+   "distFloodM": 1642
+  },
+  {
+   "id": 4225138790,
+   "name": "Bhaktapur Hospital Emergency Block",
+   "type": "hospital",
+   "lon": 85.422086,
+   "lat": 27.672077,
+   "node": 11392,
+   "inFlood": false,
+   "distFloodM": 412
+  },
+  {
+   "id": 4243043791,
+   "name": "मध्यपुर अस्पताल",
+   "type": "hospital",
+   "lon": 85.387998,
+   "lat": 27.672581,
+   "node": 9899,
+   "inFlood": false,
+   "distFloodM": 114
+  },
+  {
+   "id": 4264064753,
+   "name": "Family Hospital",
+   "type": "hospital",
+   "lon": 85.319617,
+   "lat": 27.617975,
+   "node": 1066,
+   "inFlood": false,
+   "distFloodM": 772
+  },
+  {
+   "id": 4393701590,
+   "name": "संजीवनी हेल्थ केयर सेन्टर",
+   "type": "hospital",
+   "lon": 85.352024,
+   "lat": 27.67555,
+   "node": 22348,
+   "inFlood": false,
+   "distFloodM": 318
+  },
+  {
+   "id": 4537066892,
+   "name": "चाइना हस्पिटल (पी) लिमिटेड",
+   "type": "hospital",
+   "lon": 85.362216,
+   "lat": 27.720463,
+   "node": 127,
+   "inFlood": false,
+   "distFloodM": 3178
+  },
+  {
+   "id": 4579894969,
+   "name": "निदान अस्पताल प्रा.लि.",
+   "type": "hospital",
+   "lon": 85.321751,
+   "lat": 27.677334,
+   "node": 3829,
+   "inFlood": false,
+   "distFloodM": 879
+  },
+  {
+   "id": 4599786089,
+   "name": "अल्का अस्पताल प्रा. लि.",
+   "type": "hospital",
+   "lon": 85.309682,
+   "lat": 27.669864,
+   "node": 1177,
+   "inFlood": false,
+   "distFloodM": 821
+  },
+  {
+   "id": 4611193689,
+   "name": "कपन अस्पताल",
+   "type": "hospital",
+   "lon": 85.360242,
+   "lat": 27.734753,
+   "node": 13833,
+   "inFlood": false,
+   "distFloodM": 4458
+  },
+  {
+   "id": 4615993995,
+   "name": "पीपुल्स डेंटल कलेज र अस्पताल",
+   "type": "hospital",
+   "lon": 85.309085,
+   "lat": 27.719048,
+   "node": 11565,
+   "inFlood": false,
+   "distFloodM": 2815
+  },
+  {
+   "id": 4748269321,
+   "name": "स्वाकोन इन्टरनेशनल अस्पताल प्रा. लि.",
+   "type": "hospital",
+   "lon": 85.336409,
+   "lat": 27.70421,
+   "node": 3308,
+   "inFlood": false,
+   "distFloodM": 2192
+  },
+  {
+   "id": 4765971343,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.328396,
+   "lat": 27.621303,
+   "node": 21960,
+   "inFlood": false,
+   "distFloodM": 698
+  },
+  {
+   "id": 4795380222,
+   "name": "प्रस्तावित इशान महिला तथा बालबालिका अस्पताल",
+   "type": "hospital",
+   "lon": 85.333528,
+   "lat": 27.744565,
+   "node": 5410,
+   "inFlood": false,
+   "distFloodM": 6168
+  },
+  {
+   "id": 4795380223,
+   "name": "पेडिअट्रिक्स",
+   "type": "hospital",
+   "lon": 85.330626,
+   "lat": 27.736587,
+   "node": 9420,
+   "inFlood": false,
+   "distFloodM": 5241
+  },
+  {
+   "id": 4810801975,
+   "name": "ग्रान्डी सिटी अस्पताल",
+   "type": "hospital",
+   "lon": 85.314744,
+   "lat": 27.711016,
+   "node": 6881,
+   "inFlood": false,
+   "distFloodM": 2051
+  },
+  {
+   "id": 4928572762,
+   "name": "हाम्रो सहयात्री अस्पताल",
+   "type": "hospital",
+   "lon": 85.35355,
+   "lat": 27.676005,
+   "node": 19096,
+   "inFlood": false,
+   "distFloodM": 183
+  },
+  {
+   "id": 5068560173,
+   "name": "हिमालय उपचार केन्द्र",
+   "type": "hospital",
+   "lon": 85.370684,
+   "lat": 27.729194,
+   "node": 25686,
+   "inFlood": false,
+   "distFloodM": 3378
+  },
+  {
+   "id": 5068574573,
+   "name": "नेपाल मनमिन अस्पताल",
+   "type": "hospital",
+   "lon": 85.333644,
+   "lat": 27.663019,
+   "node": 17184,
+   "inFlood": false,
+   "distFloodM": 19
+  },
+  {
+   "id": 5239936321,
+   "name": "मानसिक शरण",
+   "type": "hospital",
+   "lon": 85.311591,
+   "lat": 27.683033,
+   "node": 25041,
+   "inFlood": false,
+   "distFloodM": 828
+  },
+  {
+   "id": 5308645122,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.332459,
+   "lat": 27.689165,
+   "node": 10949,
+   "inFlood": false,
+   "distFloodM": 600
+  },
+  {
+   "id": 5308740822,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.361024,
+   "lat": 27.604587,
+   "node": 21667,
+   "inFlood": false,
+   "distFloodM": 408
+  },
+  {
+   "id": 5358434921,
+   "name": "बिनायक अस्पताल",
+   "type": "hospital",
+   "lon": 85.313021,
+   "lat": 27.735097,
+   "node": 27399,
+   "inFlood": false,
+   "distFloodM": 4622
+  },
+  {
+   "id": 5568194823,
+   "name": "टेकु अस्पताल",
+   "type": "hospital",
+   "lon": 85.306488,
+   "lat": 27.694673,
+   "node": 9976,
+   "inFlood": false,
+   "distFloodM": 115
+  },
+  {
+   "id": 5715696859,
+   "name": "सुरुची होम केयर",
+   "type": "hospital",
+   "lon": 85.337725,
+   "lat": 27.693764,
+   "node": 9486,
+   "inFlood": false,
+   "distFloodM": 1326
+  },
+  {
+   "id": 5961692307,
+   "name": "दक्षिण एसियाली पोलिक्लिनिक तथा निदान केन्द्र",
+   "type": "hospital",
+   "lon": 85.326184,
+   "lat": 27.739061,
+   "node": 12331,
+   "inFlood": false,
+   "distFloodM": 5349
+  },
+  {
+   "id": 5961692317,
+   "name": "मरिई स्टोप्स नेपाल",
+   "type": "hospital",
+   "lon": 85.317437,
+   "lat": 27.734809,
+   "node": 2763,
+   "inFlood": false,
+   "distFloodM": 4668
+  },
+  {
+   "id": 5966565996,
+   "name": "वेलनेस हस्पिटल प्रा. लि.",
+   "type": "hospital",
+   "lon": 85.337859,
+   "lat": 27.742435,
+   "node": 15031,
+   "inFlood": false,
+   "distFloodM": 6099
+  },
+  {
+   "id": 6043144295,
+   "name": "ह्वावे अन्तर्राष्ट्रिय अस्पताल",
+   "type": "hospital",
+   "lon": 85.345285,
+   "lat": 27.713049,
+   "node": 142,
+   "inFlood": false,
+   "distFloodM": 3469
+  },
+  {
+   "id": 6052315070,
+   "name": "आरोग्य स्वस्थ्य सदन",
+   "type": "hospital",
+   "lon": 85.31184,
+   "lat": 27.673695,
+   "node": 1226,
+   "inFlood": false,
+   "distFloodM": 1263
+  },
+  {
+   "id": 6065425312,
+   "name": "मध्यपुर अस्पताल ठिमी",
+   "type": "hospital",
+   "lon": 85.388174,
+   "lat": 27.672254,
+   "node": 9905,
+   "inFlood": false,
+   "distFloodM": 74
+  },
+  {
+   "id": 6212383987,
+   "name": "महेन्द्र नारायण निधि मेमोरियल अस्पताल",
+   "type": "hospital",
+   "lon": 85.325326,
+   "lat": 27.737547,
+   "node": 11709,
+   "inFlood": false,
+   "distFloodM": 5163
+  },
+  {
+   "id": 6393788405,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.350709,
+   "lat": 27.67366,
+   "node": 6981,
+   "inFlood": false,
+   "distFloodM": 339
+  },
+  {
+   "id": 6474357289,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.311086,
+   "lat": 27.717672,
+   "node": 1777,
+   "inFlood": false,
+   "distFloodM": 2687
+  },
+  {
+   "id": 6578542186,
+   "name": "नर्भिक अन्तर्राष्ट्रिय स्वास्थ्य मूल्यांकन केन्द्र",
+   "type": "hospital",
+   "lon": 85.320063,
+   "lat": 27.689307,
+   "node": 2423,
+   "inFlood": false,
+   "distFloodM": 158
+  },
+  {
+   "id": 6794555925,
+   "name": "Family Beauty Parlour and Therapy Centre Pvt. Ltd.",
+   "type": "hospital",
+   "lon": 85.30968,
+   "lat": 27.711801,
+   "node": 1773,
+   "inFlood": false,
+   "distFloodM": 2025
+  },
+  {
+   "id": 7076752191,
+   "name": "गणेश मान सिंह मेमोरियल अस्पताल तथा अनुसन्धान केन्द्र",
+   "type": "hospital",
+   "lon": 85.318882,
+   "lat": 27.661472,
+   "node": 6786,
+   "inFlood": false,
+   "distFloodM": 870
+  },
+  {
+   "id": 7081616685,
+   "name": "स्टार अस्पताल",
+   "type": "hospital",
+   "lon": 85.302834,
+   "lat": 27.681665,
+   "node": 26823,
+   "inFlood": false,
+   "distFloodM": 333
+  },
+  {
+   "id": 7308290736,
+   "name": "अन्नपूर्ण न्यूरोलोजिकल इन्स्टिच्युट तथा एलाइड साइन्स",
+   "type": "hospital",
+   "lon": 85.321584,
+   "lat": 27.694819,
+   "node": 380,
+   "inFlood": false,
+   "distFloodM": 709
+  },
+  {
+   "id": 7786124691,
+   "name": "नेचर केयर अस्पताल",
+   "type": "hospital",
+   "lon": 85.334144,
+   "lat": 27.688783,
+   "node": 16587,
+   "inFlood": false,
+   "distFloodM": 713
+  },
+  {
+   "id": 7812122485,
+   "name": "मैत्री सामुदायिक अस्पताल",
+   "type": "hospital",
+   "lon": 85.345143,
+   "lat": 27.726892,
+   "node": 2359,
+   "inFlood": false,
+   "distFloodM": 4752
+  },
+  {
+   "id": 7817067188,
+   "name": "टेस्ला डायग्नोस्टिक सेन्टर र फार्मेसी",
+   "type": "hospital",
+   "lon": 85.33068,
+   "lat": 27.726811,
+   "node": 5450,
+   "inFlood": false,
+   "distFloodM": 4232
+  },
+  {
+   "id": 8023127285,
+   "name": "मेट्रो अस्पताल",
+   "type": "hospital",
+   "lon": 85.337135,
+   "lat": 27.739818,
+   "node": 15530,
+   "inFlood": false,
+   "distFloodM": 5805
+  },
+  {
+   "id": 8109802122,
+   "name": "करुणा अस्पताल",
+   "type": "hospital",
+   "lon": 85.362452,
+   "lat": 27.751293,
+   "node": 14426,
+   "inFlood": false,
+   "distFloodM": 5928
+  },
+  {
+   "id": 8173061117,
+   "name": "नागरिक सामुदायिक शिक्षण अस्पताल",
+   "type": "hospital",
+   "lon": 85.374905,
+   "lat": 27.673585,
+   "node": 10663,
+   "inFlood": false,
+   "distFloodM": 204
+  },
+  {
+   "id": 8190684073,
+   "name": "Cutis Care",
+   "type": "hospital",
+   "lon": 85.337671,
+   "lat": 27.695282,
+   "node": 14803,
+   "inFlood": false,
+   "distFloodM": 1442
+  },
+  {
+   "id": 8401828236,
+   "name": "प्रसुती गृह",
+   "type": "hospital",
+   "lon": 85.318779,
+   "lat": 27.689451,
+   "node": 2423,
+   "inFlood": false,
+   "distFloodM": 108
+  },
+  {
+   "id": 8832647902,
+   "name": "सम्पदा फार्मा/क्लिनिक",
+   "type": "hospital",
+   "lon": 85.286435,
+   "lat": 27.688127,
+   "node": 1832,
+   "inFlood": false,
+   "distFloodM": 1302
+  },
+  {
+   "id": 9056740817,
+   "name": "भिजन पोलिक्लिनिक",
+   "type": "hospital",
+   "lon": 85.344862,
+   "lat": 27.675433,
+   "node": 6953,
+   "inFlood": false,
+   "distFloodM": 349
+  },
+  {
+   "id": 9213713419,
+   "name": "समाज डेन्टल",
+   "type": "hospital",
+   "lon": 85.336939,
+   "lat": 27.691091,
+   "node": 3843,
+   "inFlood": false,
+   "distFloodM": 1082
+  },
+  {
+   "id": 9519208018,
+   "name": "Sundarijal Swastha Chauki",
+   "type": "hospital",
+   "lon": 85.42905,
+   "lat": 27.772802,
+   "node": 19482,
+   "inFlood": false,
+   "distFloodM": 4990
+  },
+  {
+   "id": 9526113217,
+   "name": "काठमाडौं जीवन ज्योति अस्पताल",
+   "type": "hospital",
+   "lon": 85.348972,
+   "lat": 27.718163,
+   "node": 7838,
+   "inFlood": false,
+   "distFloodM": 3737
+  },
+  {
+   "id": 9528649020,
+   "name": "All Nepal Hospital",
+   "type": "hospital",
+   "lon": 85.317566,
+   "lat": 27.735976,
+   "node": 3033,
+   "inFlood": false,
+   "distFloodM": 4797
+  },
+  {
+   "id": 9611991113,
+   "name": "अव्युदय स्वास्थ्य सेवा केन्द्र",
+   "type": "hospital",
+   "lon": 85.369883,
+   "lat": 27.661574,
+   "node": 12333,
+   "inFlood": false,
+   "distFloodM": 697
+  },
+  {
+   "id": 9614642353,
+   "name": "सूर्यविनायक नगरपालिका हस्पिटल",
+   "type": "hospital",
+   "lon": 85.391938,
+   "lat": 27.65651,
+   "node": 805,
+   "inFlood": false,
+   "distFloodM": 1494
+  },
+  {
+   "id": 9614642371,
+   "name": "ब्रोदर हेल्थ केयर एण्ड डाइग्नोस्टिक सेन्टर",
+   "type": "hospital",
+   "lon": 85.385562,
+   "lat": 27.669731,
+   "node": 4351,
+   "inFlood": false,
+   "distFloodM": 142
+  },
+  {
+   "id": 9622703382,
+   "name": "Patan Healthcare",
+   "type": "hospital",
+   "lon": 85.324326,
+   "lat": 27.599272,
+   "node": 1064,
+   "inFlood": false,
+   "distFloodM": 630
+  },
+  {
+   "id": 9662478422,
+   "name": "कीर्तिपुर आँखा अस्पताल र अनुसन्धान केन्द्र",
+   "type": "hospital",
+   "lon": 85.28418,
+   "lat": 27.676774,
+   "node": 1695,
+   "inFlood": false,
+   "distFloodM": 854
+  },
+  {
+   "id": 9719638257,
+   "name": "वत्सल्या प्राकृतिक आईवीएफ, फर्टिलिटी क्लिनिक",
+   "type": "hospital",
+   "lon": 85.325276,
+   "lat": 27.715584,
+   "node": 396,
+   "inFlood": false,
+   "distFloodM": 2881
+  },
+  {
+   "id": 9845843806,
+   "name": "DI Skin Hospital And Referral Center(DISHARC)",
+   "type": "hospital",
+   "lon": 85.345195,
+   "lat": 27.750237,
+   "node": 3764,
+   "inFlood": false,
+   "distFloodM": 6720
+  },
+  {
+   "id": 9914381748,
+   "name": "रिदम न्यूरोसाइकियाट्री अस्पताल र अनुसन्धान केन्द्र",
+   "type": "hospital",
+   "lon": 85.309802,
+   "lat": 27.669447,
+   "node": 1177,
+   "inFlood": false,
+   "distFloodM": 780
+  },
+  {
+   "id": 9916636691,
+   "name": "सोमलता पतंजलि आयुर्वेद केन्द्र प्रा.लि",
+   "type": "hospital",
+   "lon": 85.322919,
+   "lat": 27.705693,
+   "node": 41,
+   "inFlood": false,
+   "distFloodM": 1798
+  },
+  {
+   "id": 9926734918,
+   "name": "दिर्घजीवन स्वास्थ्य सेवा तथा अनुसन्धान केन्द्र प्रा. लि",
+   "type": "hospital",
+   "lon": 85.314697,
+   "lat": 27.693426,
+   "node": 5560,
+   "inFlood": false,
+   "distFloodM": 218
+  },
+  {
+   "id": 9933907318,
+   "name": "समता अस्पताल",
+   "type": "hospital",
+   "lon": 85.357209,
+   "lat": 27.716489,
+   "node": 17101,
+   "inFlood": false,
+   "distFloodM": 3134
+  },
+  {
+   "id": 9956485661,
+   "name": "एपेक्स पोलिक्लिनिक एण्ड डाइगोनोस्टिक सेन्टर प्रा. लि",
+   "type": "hospital",
+   "lon": 85.352746,
+   "lat": 27.675004,
+   "node": 10658,
+   "inFlood": false,
+   "distFloodM": 229
+  },
+  {
+   "id": 9956505746,
+   "name": "काठमाडौँ न्यूरो एण्ड जनरल अस्पताल",
+   "type": "hospital",
+   "lon": 85.318001,
+   "lat": 27.705956,
+   "node": 2399,
+   "inFlood": false,
+   "distFloodM": 1636
+  },
+  {
+   "id": 9967126985,
+   "name": "एड्भान्स ओरल डेन्टल अस्पताल",
+   "type": "hospital",
+   "lon": 85.347324,
+   "lat": 27.677836,
+   "node": 3475,
+   "inFlood": false,
+   "distFloodM": 707
+  },
+  {
+   "id": 9969484880,
+   "name": "काठमाडौं ईएनटी हस्पिटल प्रा. लि",
+   "type": "hospital",
+   "lon": 85.318441,
+   "lat": 27.703323,
+   "node": 2615,
+   "inFlood": false,
+   "distFloodM": 1371
+  },
+  {
+   "id": 10007887784,
+   "name": "अल नेपाल अस्पताल",
+   "type": "hospital",
+   "lon": 85.317706,
+   "lat": 27.735948,
+   "node": 3033,
+   "inFlood": false,
+   "distFloodM": 4797
+  },
+  {
+   "id": 10009815103,
+   "name": "आयानस अस्पताल",
+   "type": "hospital",
+   "lon": 85.330685,
+   "lat": 27.763547,
+   "node": 2942,
+   "inFlood": false,
+   "distFloodM": 8069
+  },
+  {
+   "id": 10013199477,
+   "name": "टोखा चन्देश्वरी अस्पताल",
+   "type": "hospital",
+   "lon": 85.329547,
+   "lat": 27.77016,
+   "node": 32020,
+   "inFlood": false,
+   "distFloodM": 8750
+  },
+  {
+   "id": 10013199480,
+   "name": "नेपाल अाखा अस्पताल",
+   "type": "hospital",
+   "lon": 85.330194,
+   "lat": 27.768702,
+   "node": 2866,
+   "inFlood": false,
+   "distFloodM": 8608
+  },
+  {
+   "id": 10016451848,
+   "name": "इशान बाल तथा महिला अस्पताल",
+   "type": "hospital",
+   "lon": 85.336916,
+   "lat": 27.748133,
+   "node": 5419,
+   "inFlood": false,
+   "distFloodM": 6651
+  },
+  {
+   "id": 10023832445,
+   "name": "क्रिस्टल डेन्टल अस्पताल",
+   "type": "hospital",
+   "lon": 85.374875,
+   "lat": 27.674109,
+   "node": 9107,
+   "inFlood": false,
+   "distFloodM": 260
+  },
+  {
+   "id": 10024492600,
+   "name": "नेपाल कोरिया मैत्री अस्पताल",
+   "type": "hospital",
+   "lon": 85.379534,
+   "lat": 27.6737,
+   "node": 9874,
+   "inFlood": false,
+   "distFloodM": 278
+  },
+  {
+   "id": 10050423448,
+   "name": "एनआरएन स्वास्थ्य सेवा प्रा. लि.",
+   "type": "hospital",
+   "lon": 85.382679,
+   "lat": 27.689867,
+   "node": 5886,
+   "inFlood": false,
+   "distFloodM": 245
+  },
+  {
+   "id": 10121388641,
+   "name": "कान्तिपुर अस्पताल",
+   "type": "hospital",
+   "lon": 85.345222,
+   "lat": 27.68588,
+   "node": 3466,
+   "inFlood": false,
+   "distFloodM": 1146
+  },
+  {
+   "id": 10121417227,
+   "name": "Pics Nepal",
+   "type": "hospital",
+   "lon": 85.347345,
+   "lat": 27.683042,
+   "node": 10213,
+   "inFlood": false,
+   "distFloodM": 831
+  },
+  {
+   "id": 10154815006,
+   "name": "कल्पना स्वास्थ्य सेवा केन्द्र",
+   "type": "hospital",
+   "lon": 85.30062,
+   "lat": 27.767043,
+   "node": 14661,
+   "inFlood": false,
+   "distFloodM": 8138
+  },
+  {
+   "id": 10198512117,
+   "name": "अलिफ स्वास्थ सेवा केन्द्र",
+   "type": "hospital",
+   "lon": 85.317815,
+   "lat": 27.761693,
+   "node": 21326,
+   "inFlood": false,
+   "distFloodM": 7601
+  },
+  {
+   "id": 10204311110,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.380951,
+   "lat": 27.721552,
+   "node": 329,
+   "inFlood": false,
+   "distFloodM": 2193
+  },
+  {
+   "id": 10214617417,
+   "name": "जिल्ला आयुर्वेद स्वास्थ्य केन्द्र",
+   "type": "hospital",
+   "lon": 85.349114,
+   "lat": 27.697497,
+   "node": 15831,
+   "inFlood": false,
+   "distFloodM": 1889
+  },
+  {
+   "id": 10230034943,
+   "name": "Spinal Injury Rehabilitation Center",
+   "type": "hospital",
+   "lon": 85.492346,
+   "lat": 27.636392,
+   "node": 22103,
+   "inFlood": false,
+   "distFloodM": 5669
+  },
+  {
+   "id": 10294835214,
+   "name": "लेट मी इन",
+   "type": "hospital",
+   "lon": 85.333848,
+   "lat": 27.737267,
+   "node": 1154,
+   "inFlood": false,
+   "distFloodM": 5420
+  },
+  {
+   "id": 10305102342,
+   "name": "ओम हस्पिटल एण्ड रिसर्च सेन्टर प्रा. लि",
+   "type": "hospital",
+   "lon": 85.344803,
+   "lat": 27.72142,
+   "node": 7767,
+   "inFlood": false,
+   "distFloodM": 4263
+  },
+  {
+   "id": 10610495708,
+   "name": "ओरिसन मेडिकल हल",
+   "type": "hospital",
+   "lon": 85.378997,
+   "lat": 27.707177,
+   "node": 13437,
+   "inFlood": false,
+   "distFloodM": 975
+  },
+  {
+   "id": 10610495807,
+   "name": "दिर्गजीवन मेडिकल हल",
+   "type": "hospital",
+   "lon": 85.379038,
+   "lat": 27.706729,
+   "node": 19329,
+   "inFlood": false,
+   "distFloodM": 947
+  },
+  {
+   "id": 10614867910,
+   "name": "आधारभूत स्वास्थ्य केन्द्र",
+   "type": "hospital",
+   "lon": 85.379392,
+   "lat": 27.707169,
+   "node": 13438,
+   "inFlood": false,
+   "distFloodM": 942
+  },
+  {
+   "id": 10629351305,
+   "name": "मेड स्टार हेल्थ केयर",
+   "type": "hospital",
+   "lon": 85.377914,
+   "lat": 27.69639,
+   "node": 6927,
+   "inFlood": false,
+   "distFloodM": 298
+  },
+  {
+   "id": 11331070169,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.385181,
+   "lat": 27.67597,
+   "node": 4489,
+   "inFlood": false,
+   "distFloodM": 449
+  },
+  {
+   "id": 11701254293,
+   "name": "Stupa community hospital",
+   "type": "hospital",
+   "lon": 85.351206,
+   "lat": 27.720303,
+   "node": 16035,
+   "inFlood": false,
+   "distFloodM": 3813
+  },
+  {
+   "id": 112117062,
+   "name": "National Trauma Center",
+   "type": "hospital",
+   "lon": 85.313127,
+   "lat": 27.704297,
+   "node": 5562,
+   "inFlood": false,
+   "distFloodM": 1294
+  },
+  {
+   "id": 120435385,
+   "name": "Tilganga Institute of Opthalmology",
+   "type": "hospital",
+   "lon": 85.350669,
+   "lat": 27.705359,
+   "node": 3873,
+   "inFlood": false,
+   "distFloodM": 2470
+  },
+  {
+   "id": 124304055,
+   "name": "Norvic Hospital",
+   "type": "hospital",
+   "lon": 85.319199,
+   "lat": 27.689967,
+   "node": 6428,
+   "inFlood": false,
+   "distFloodM": 178
+  },
+  {
+   "id": 124304057,
+   "name": "Paropakar Maternity Hospital",
+   "type": "hospital",
+   "lon": 85.318916,
+   "lat": 27.689346,
+   "node": 2423,
+   "inFlood": false,
+   "distFloodM": 105
+  },
+  {
+   "id": 124480166,
+   "name": "Everest Hospital",
+   "type": "hospital",
+   "lon": 85.332899,
+   "lat": 27.688495,
+   "node": 5577,
+   "inFlood": false,
+   "distFloodM": 591
+  },
+  {
+   "id": 138451637,
+   "name": "Ayurveda Hospital",
+   "type": "hospital",
+   "lon": 85.305394,
+   "lat": 27.70783,
+   "node": 1815,
+   "inFlood": false,
+   "distFloodM": 1572
+  },
+  {
+   "id": 170428974,
+   "name": "Animal Hospital",
+   "type": "hospital",
+   "lon": 85.311931,
+   "lat": 27.673378,
+   "node": 1226,
+   "inFlood": false,
+   "distFloodM": 1246
+  },
+  {
+   "id": 176768699,
+   "name": "National Institute of neurological and allied sciences",
+   "type": "hospital",
+   "lon": 85.345961,
+   "lat": 27.748718,
+   "node": 3763,
+   "inFlood": false,
+   "distFloodM": 6542
+  },
+  {
+   "id": 176772311,
+   "name": "Shahid Gangalal National Heart Centre",
+   "type": "hospital",
+   "lon": 85.343644,
+   "lat": 27.745821,
+   "node": 3759,
+   "inFlood": false,
+   "distFloodM": 6445
+  },
+  {
+   "id": 178927729,
+   "name": "Alka Hospital",
+   "type": "hospital",
+   "lon": 85.315074,
+   "lat": 27.674555,
+   "node": 5384,
+   "inFlood": false,
+   "distFloodM": 1488
+  },
+  {
+   "id": 179243141,
+   "name": "Ayurvedic Hospital",
+   "type": "hospital",
+   "lon": 85.289335,
+   "lat": 27.676792,
+   "node": 162,
+   "inFlood": false,
+   "distFloodM": 424
+  },
+  {
+   "id": 179243142,
+   "name": "Ayurvedic Teaching Hospital (OPD)",
+   "type": "hospital",
+   "lon": 85.290194,
+   "lat": 27.675783,
+   "node": 162,
+   "inFlood": false,
+   "distFloodM": 288
+  },
+  {
+   "id": 179469145,
+   "name": "BioMed Hospital",
+   "type": "hospital",
+   "lon": 85.331108,
+   "lat": 27.722718,
+   "node": 12498,
+   "inFlood": false,
+   "distFloodM": 3839
+  },
+  {
+   "id": 181427346,
+   "name": "ManMohan Cardiothoracic Vascular & Transplant Center",
+   "type": "hospital",
+   "lon": 85.328709,
+   "lat": 27.735821,
+   "node": 9413,
+   "inFlood": false,
+   "distFloodM": 5101
+  },
+  {
+   "id": 181575432,
+   "name": "Mental Hospital",
+   "type": "hospital",
+   "lon": 85.322368,
+   "lat": 27.667962,
+   "node": 2459,
+   "inFlood": false,
+   "distFloodM": 1122
+  },
+  {
+   "id": 185943152,
+   "name": "Nepal Eye Hospital",
+   "type": "hospital",
+   "lon": 85.313702,
+   "lat": 27.693087,
+   "node": 5941,
+   "inFlood": false,
+   "distFloodM": 152
+  },
+  {
+   "id": 185943727,
+   "name": "National Tuberculosis Center",
+   "type": "hospital",
+   "lon": 85.382623,
+   "lat": 27.673888,
+   "node": 9154,
+   "inFlood": false,
+   "distFloodM": 162
+  },
+  {
+   "id": 190889375,
+   "name": "Om Hospital and Research Center",
+   "type": "hospital",
+   "lon": 85.344867,
+   "lat": 27.721335,
+   "node": 7767,
+   "inFlood": false,
+   "distFloodM": 4252
+  },
+  {
+   "id": 194899597,
+   "name": "Spinal Injury Rahabilitation Center",
+   "type": "hospital",
+   "lon": 85.492079,
+   "lat": 27.637483,
+   "node": 20724,
+   "inFlood": false,
+   "distFloodM": 5588
+  },
+  {
+   "id": 198032237,
+   "name": "Nepal Medical College and Teaching Hospital",
+   "type": "hospital",
+   "lon": 85.380579,
+   "lat": 27.733513,
+   "node": 26631,
+   "inFlood": false,
+   "distFloodM": 3365
+  },
+  {
+   "id": 198407525,
+   "name": "Nepal Hypnosis",
+   "type": "hospital",
+   "lon": 85.334109,
+   "lat": 27.71759,
+   "node": 10840,
+   "inFlood": false,
+   "distFloodM": 3489
+  },
+  {
+   "id": 201027582,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.306487,
+   "lat": 27.694795,
+   "node": 9976,
+   "inFlood": false,
+   "distFloodM": 129
+  },
+  {
+   "id": 201380503,
+   "name": "Swatha Parichyan",
+   "type": "hospital",
+   "lon": 85.325059,
+   "lat": 27.705625,
+   "node": 6405,
+   "inFlood": false,
+   "distFloodM": 1900
+  },
+  {
+   "id": 205438152,
+   "name": "Ayurvedic Hospital",
+   "type": "hospital",
+   "lon": 85.289853,
+   "lat": 27.675972,
+   "node": 162,
+   "inFlood": false,
+   "distFloodM": 328
+  },
+  {
+   "id": 205718505,
+   "name": "Mahendra Narayan Nidhi Memorial Hospital",
+   "type": "hospital",
+   "lon": 85.345249,
+   "lat": 27.705757,
+   "node": 3671,
+   "inFlood": false,
+   "distFloodM": 2806
+  },
+  {
+   "id": 206902746,
+   "name": "Shri Tribhuwan Chandra Sainik Hospital",
+   "type": "hospital",
+   "lon": 85.313147,
+   "lat": 27.703688,
+   "node": 5561,
+   "inFlood": false,
+   "distFloodM": 1232
+  },
+  {
+   "id": 208175247,
+   "name": "Janamaitri Hospital",
+   "type": "hospital",
+   "lon": 85.30332,
+   "lat": 27.728184,
+   "node": 9363,
+   "inFlood": false,
+   "distFloodM": 3833
+  },
+  {
+   "id": 208681773,
+   "name": "Nepal Plastic Surgery Hospital",
+   "type": "hospital",
+   "lon": 85.337787,
+   "lat": 27.643462,
+   "node": 16430,
+   "inFlood": false,
+   "distFloodM": 274
+  },
+  {
+   "id": 209874600,
+   "name": "Mental hospital",
+   "type": "hospital",
+   "lon": 85.415594,
+   "lat": 27.735574,
+   "node": 15054,
+   "inFlood": false,
+   "distFloodM": 1448
+  },
+  {
+   "id": 211436969,
+   "name": "Laliguras Hospital",
+   "type": "hospital",
+   "lon": 85.321464,
+   "lat": 27.658335,
+   "node": 29102,
+   "inFlood": false,
+   "distFloodM": 922
+  },
+  {
+   "id": 211750710,
+   "name": "Sumeru Hospital",
+   "type": "hospital",
+   "lon": 85.325761,
+   "lat": 27.644825,
+   "node": 17414,
+   "inFlood": false,
+   "distFloodM": 875
+  },
+  {
+   "id": 211858815,
+   "name": "Shuvatara Hospital",
+   "type": "hospital",
+   "lon": 85.318803,
+   "lat": 27.661571,
+   "node": 6786,
+   "inFlood": false,
+   "distFloodM": 870
+  },
+  {
+   "id": 211897513,
+   "name": "Natural Health Hospital",
+   "type": "hospital",
+   "lon": 85.345555,
+   "lat": 27.695892,
+   "node": 10872,
+   "inFlood": false,
+   "distFloodM": 1894
+  },
+  {
+   "id": 215554749,
+   "name": "Helping Hands Community Hospital",
+   "type": "hospital",
+   "lon": 85.346202,
+   "lat": 27.717464,
+   "node": 27487,
+   "inFlood": false,
+   "distFloodM": 3822
+  },
+  {
+   "id": 216443708,
+   "name": "Nepal Beijing Friendship Hospital",
+   "type": "hospital",
+   "lon": 85.330015,
+   "lat": 27.731447,
+   "node": 17212,
+   "inFlood": false,
+   "distFloodM": 4684
+  },
+  {
+   "id": 216607338,
+   "name": "Welcare Hospital and Research Centre",
+   "type": "hospital",
+   "lon": 85.33526,
+   "lat": 27.707943,
+   "node": 3677,
+   "inFlood": false,
+   "distFloodM": 2525
+  },
+  {
+   "id": 216705743,
+   "name": "Maruti Children Hospital",
+   "type": "hospital",
+   "lon": 85.328622,
+   "lat": 27.735303,
+   "node": 9412,
+   "inFlood": false,
+   "distFloodM": 5045
+  },
+  {
+   "id": 218203441,
+   "name": "Green City Hospital",
+   "type": "hospital",
+   "lon": 85.322771,
+   "lat": 27.737245,
+   "node": 2961,
+   "inFlood": false,
+   "distFloodM": 5058
+  },
+  {
+   "id": 218984210,
+   "name": "New Life Health Care Pvt. Ltd.",
+   "type": "hospital",
+   "lon": 85.349997,
+   "lat": 27.71434,
+   "node": 26719,
+   "inFlood": false,
+   "distFloodM": 3328
+  },
+  {
+   "id": 219072866,
+   "name": "mhf",
+   "type": "hospital",
+   "lon": 85.330145,
+   "lat": 27.753688,
+   "node": 25183,
+   "inFlood": false,
+   "distFloodM": 7008
+  },
+  {
+   "id": 219627305,
+   "name": "North point Hospital",
+   "type": "hospital",
+   "lon": 85.346487,
+   "lat": 27.75204,
+   "node": 16884,
+   "inFlood": false,
+   "distFloodM": 6801
+  },
+  {
+   "id": 219973934,
+   "name": "Nepal Korea Friendship Hospital",
+   "type": "hospital",
+   "lon": 85.383778,
+   "lat": 27.678856,
+   "node": 14805,
+   "inFlood": false,
+   "distFloodM": 720
+  },
+  {
+   "id": 220113392,
+   "name": "Golfutar Eye Hospital",
+   "type": "hospital",
+   "lon": 85.345655,
+   "lat": 27.751323,
+   "node": 3765,
+   "inFlood": false,
+   "distFloodM": 6787
+  },
+  {
+   "id": 220213917,
+   "name": "Shechan Clinic & Hospice",
+   "type": "hospital",
+   "lon": 85.359913,
+   "lat": 27.724557,
+   "node": 15086,
+   "inFlood": false,
+   "distFloodM": 3644
+  },
+  {
+   "id": 220316414,
+   "name": "Punarjiban Hospital",
+   "type": "hospital",
+   "lon": 85.340767,
+   "lat": 27.672604,
+   "node": 24830,
+   "inFlood": false,
+   "distFloodM": 89
+  },
+  {
+   "id": 220336145,
+   "name": "Madhyapur Hospital",
+   "type": "hospital",
+   "lon": 85.386822,
+   "lat": 27.673133,
+   "node": 16930,
+   "inFlood": false,
+   "distFloodM": 224
+  },
+  {
+   "id": 220986127,
+   "name": "Gandhi Samudayik Hospital",
+   "type": "hospital",
+   "lon": 85.368402,
+   "lat": 27.696714,
+   "node": 31294,
+   "inFlood": false,
+   "distFloodM": 704
+  },
+  {
+   "id": 221047767,
+   "name": "Kathmandu E.N.T. Hospital and Research Center",
+   "type": "hospital",
+   "lon": 85.318187,
+   "lat": 27.703697,
+   "node": 10020,
+   "inFlood": false,
+   "distFloodM": 1402
+  },
+  {
+   "id": 221295252,
+   "name": "All Nepal Hospital",
+   "type": "hospital",
+   "lon": 85.31746,
+   "lat": 27.734527,
+   "node": 8363,
+   "inFlood": false,
+   "distFloodM": 4638
+  },
+  {
+   "id": 221295256,
+   "name": "International Friendship Children's Hospital",
+   "type": "hospital",
+   "lon": 85.326364,
+   "lat": 27.731289,
+   "node": 12301,
+   "inFlood": false,
+   "distFloodM": 4549
+  },
+  {
+   "id": 221344946,
+   "name": "Sarvanga Hospital",
+   "type": "hospital",
+   "lon": 85.316585,
+   "lat": 27.685625,
+   "node": 1730,
+   "inFlood": false,
+   "distFloodM": 311
+  },
+  {
+   "id": 221353886,
+   "name": "Blue Lotus Hospital",
+   "type": "hospital",
+   "lon": 85.310607,
+   "lat": 27.694226,
+   "node": 27101,
+   "inFlood": false,
+   "distFloodM": 170
+  },
+  {
+   "id": 221639848,
+   "name": "Rhythm Neuropsychiatry Hospital & Research Center",
+   "type": "hospital",
+   "lon": 85.30967,
+   "lat": 27.66931,
+   "node": 1177,
+   "inFlood": false,
+   "distFloodM": 762
+  },
+  {
+   "id": 221694253,
+   "name": "Kathmandu Model Hospital",
+   "type": "hospital",
+   "lon": 85.320119,
+   "lat": 27.702697,
+   "node": 6364,
+   "inFlood": false,
+   "distFloodM": 1374
+  },
+  {
+   "id": 221727449,
+   "name": "Kathmandu Model Hospital Dental Department",
+   "type": "hospital",
+   "lon": 85.318165,
+   "lat": 27.70651,
+   "node": 2398,
+   "inFlood": false,
+   "distFloodM": 1699
+  },
+  {
+   "id": 221824840,
+   "name": "Kundalini Hospital",
+   "type": "hospital",
+   "lon": 85.306316,
+   "lat": 27.679585,
+   "node": 16062,
+   "inFlood": false,
+   "distFloodM": 682
+  },
+  {
+   "id": 221824844,
+   "name": "Sumeru City Hospital",
+   "type": "hospital",
+   "lon": 85.314815,
+   "lat": 27.676018,
+   "node": 423,
+   "inFlood": false,
+   "distFloodM": 1346
+  },
+  {
+   "id": 222136578,
+   "name": "Vayodha Hospital",
+   "type": "hospital",
+   "lon": 85.298293,
+   "lat": 27.684238,
+   "node": 26096,
+   "inFlood": false,
+   "distFloodM": 66
+  },
+  {
+   "id": 222724349,
+   "name": "shiva jyoti hospital & research center",
+   "type": "hospital",
+   "lon": 85.298001,
+   "lat": 27.685583,
+   "node": 25863,
+   "inFlood": false,
+   "distFloodM": 149
+  },
+  {
+   "id": 222779972,
+   "name": "Kantipur Hospital",
+   "type": "hospital",
+   "lon": 85.344818,
+   "lat": 27.685566,
+   "node": 29383,
+   "inFlood": false,
+   "distFloodM": 1166
+  },
+  {
+   "id": 222864245,
+   "name": "Summit Hospital",
+   "type": "hospital",
+   "lon": 85.359636,
+   "lat": 27.67414,
+   "node": 16088,
+   "inFlood": false,
+   "distFloodM": 343
+  },
+  {
+   "id": 223033987,
+   "name": "Midat Hospital",
+   "type": "hospital",
+   "lon": 85.324882,
+   "lat": 27.666787,
+   "node": 2465,
+   "inFlood": false,
+   "distFloodM": 858
+  },
+  {
+   "id": 223275409,
+   "name": "Grande International Hospital",
+   "type": "hospital",
+   "lon": 85.325241,
+   "lat": 27.752919,
+   "node": 23366,
+   "inFlood": false,
+   "distFloodM": 6796
+  },
+  {
+   "id": 223502956,
+   "name": "People's Life Care Hospital",
+   "type": "hospital",
+   "lon": 85.460717,
+   "lat": 27.727504,
+   "node": 16229,
+   "inFlood": false,
+   "distFloodM": 681
+  },
+  {
+   "id": 223504501,
+   "name": "Tranquiliy Hospital and Research Center",
+   "type": "hospital",
+   "lon": 85.329952,
+   "lat": 27.651725,
+   "node": 2331,
+   "inFlood": false,
+   "distFloodM": 504
+  },
+  {
+   "id": 224724636,
+   "name": "Diyas Hospital",
+   "type": "hospital",
+   "lon": 85.304591,
+   "lat": 27.652764,
+   "node": 4547,
+   "inFlood": false,
+   "distFloodM": 708
+  },
+  {
+   "id": 225659856,
+   "name": "Centre For Liver Disease",
+   "type": "hospital",
+   "lon": 85.328674,
+   "lat": 27.689923,
+   "node": 27404,
+   "inFlood": false,
+   "distFloodM": 439
+  },
+  {
+   "id": 225660491,
+   "name": "Himal Hospital",
+   "type": "hospital",
+   "lon": 85.32821,
+   "lat": 27.710233,
+   "node": 11711,
+   "inFlood": false,
+   "distFloodM": 2496
+  },
+  {
+   "id": 226284392,
+   "name": "Kathmandu Hospital",
+   "type": "hospital",
+   "lon": 85.338097,
+   "lat": 27.642658,
+   "node": 19125,
+   "inFlood": false,
+   "distFloodM": 287
+  },
+  {
+   "id": 226284409,
+   "name": "Harisiddhi Community Hospital",
+   "type": "hospital",
+   "lon": 85.341898,
+   "lat": 27.637224,
+   "node": 15006,
+   "inFlood": false,
+   "distFloodM": 546
+  },
+  {
+   "id": 226335431,
+   "name": "Nepal orthopaedic Hospital",
+   "type": "hospital",
+   "lon": 85.381183,
+   "lat": 27.720169,
+   "node": 13582,
+   "inFlood": false,
+   "distFloodM": 2041
+  },
+  {
+   "id": 226429180,
+   "name": "Chest Hospital",
+   "type": "hospital",
+   "lon": 85.297104,
+   "lat": 27.699256,
+   "node": 6167,
+   "inFlood": false,
+   "distFloodM": 942
+  },
+  {
+   "id": 226429181,
+   "name": "Shree Jyoti Hospital and Research Center",
+   "type": "hospital",
+   "lon": 85.297437,
+   "lat": 27.698544,
+   "node": 25997,
+   "inFlood": false,
+   "distFloodM": 857
+  },
+  {
+   "id": 226429182,
+   "name": "Spark Health Homes Hospital",
+   "type": "hospital",
+   "lon": 85.294767,
+   "lat": 27.697647,
+   "node": 15443,
+   "inFlood": false,
+   "distFloodM": 955
+  },
+  {
+   "id": 226439738,
+   "name": "Kathmandu Hospital",
+   "type": "hospital",
+   "lon": 85.31102,
+   "lat": 27.694272,
+   "node": 3078,
+   "inFlood": false,
+   "distFloodM": 192
+  },
+  {
+   "id": 226690705,
+   "name": "National Kidney Center",
+   "type": "hospital",
+   "lon": 85.295765,
+   "lat": 27.724554,
+   "node": 22787,
+   "inFlood": false,
+   "distFloodM": 3575
+  },
+  {
+   "id": 226831608,
+   "name": "National Hospital and Cancer Research Center",
+   "type": "hospital",
+   "lon": 85.314734,
+   "lat": 27.673379,
+   "node": 1215,
+   "inFlood": false,
+   "distFloodM": 1376
+  },
+  {
+   "id": 226835291,
+   "name": "Chinese People Hospital Private Limited",
+   "type": "hospital",
+   "lon": 85.361819,
+   "lat": 27.720426,
+   "node": 5965,
+   "inFlood": false,
+   "distFloodM": 3206
+  },
+  {
+   "id": 226852863,
+   "name": "Hamro Sahayatri Hosp and Birthing Center",
+   "type": "hospital",
+   "lon": 85.352604,
+   "lat": 27.676555,
+   "node": 16941,
+   "inFlood": false,
+   "distFloodM": 275
+  },
+  {
+   "id": 226885065,
+   "name": "Medicare National Hospital and Research Center",
+   "type": "hospital",
+   "lon": 85.34638,
+   "lat": 27.718425,
+   "node": 7797,
+   "inFlood": false,
+   "distFloodM": 3902
+  },
+  {
+   "id": 226974435,
+   "name": "Venus International Hospital",
+   "type": "hospital",
+   "lon": 85.337601,
+   "lat": 27.697237,
+   "node": 1387,
+   "inFlood": false,
+   "distFloodM": 1599
+  },
+  {
+   "id": 226978803,
+   "name": "Ayush Hospital",
+   "type": "hospital",
+   "lon": 85.33588,
+   "lat": 27.686286,
+   "node": 10523,
+   "inFlood": false,
+   "distFloodM": 748
+  },
+  {
+   "id": 227085228,
+   "name": "Human Development Community Service(HDCS)",
+   "type": "hospital",
+   "lon": 85.299553,
+   "lat": 27.659052,
+   "node": 18000,
+   "inFlood": false,
+   "distFloodM": 183
+  },
+  {
+   "id": 227115386,
+   "name": "Nobel Hospital",
+   "type": "hospital",
+   "lon": 85.348202,
+   "lat": 27.698195,
+   "node": 33243,
+   "inFlood": false,
+   "distFloodM": 1995
+  },
+  {
+   "id": 227266290,
+   "name": "Shankarapur Hospital",
+   "type": "hospital",
+   "lon": 85.376564,
+   "lat": 27.721498,
+   "node": 7755,
+   "inFlood": false,
+   "distFloodM": 2354
+  },
+  {
+   "id": 227893818,
+   "name": "B & B Hospital",
+   "type": "hospital",
+   "lon": 85.329444,
+   "lat": 27.665053,
+   "node": 21965,
+   "inFlood": false,
+   "distFloodM": 417
+  },
+  {
+   "id": 227893819,
+   "name": "Global Hospital",
+   "type": "hospital",
+   "lon": 85.333006,
+   "lat": 27.66657,
+   "node": 4757,
+   "inFlood": false,
+   "distFloodM": 71
+  },
+  {
+   "id": 227894763,
+   "name": "BP Eye Foundation, Children's Hospital for Eye, ENT and Rehabilitation Services (CHEERS)",
+   "type": "hospital",
+   "lon": 85.353553,
+   "lat": 27.670668,
+   "node": 29127,
+   "inFlood": false,
+   "distFloodM": 59
+  },
+  {
+   "id": 227939182,
+   "name": "Shanti Sewa Griha",
+   "type": "hospital",
+   "lon": 85.350887,
+   "lat": 27.704607,
+   "node": 3258,
+   "inFlood": false,
+   "distFloodM": 2391
+  },
+  {
+   "id": 229128707,
+   "name": "People's Dental College & Hospital",
+   "type": "hospital",
+   "lon": 85.306603,
+   "lat": 27.724457,
+   "node": 11533,
+   "inFlood": false,
+   "distFloodM": 3405
+  },
+  {
+   "id": 229129612,
+   "name": "Metro Radiology and Imaging",
+   "type": "hospital",
+   "lon": 85.326096,
+   "lat": 27.715387,
+   "node": 4535,
+   "inFlood": false,
+   "distFloodM": 2894
+  },
+  {
+   "id": 231049689,
+   "name": "College of Dental Science and Hospital",
+   "type": "hospital",
+   "lon": 85.380271,
+   "lat": 27.733809,
+   "node": 21907,
+   "inFlood": false,
+   "distFloodM": 3407
+  },
+  {
+   "id": 231628208,
+   "name": "Life Care Hospital",
+   "type": "hospital",
+   "lon": 85.310458,
+   "lat": 27.699463,
+   "node": 1501,
+   "inFlood": false,
+   "distFloodM": 707
+  },
+  {
+   "id": 231630359,
+   "name": "Capital Hospital",
+   "type": "hospital",
+   "lon": 85.321744,
+   "lat": 27.702799,
+   "node": 16374,
+   "inFlood": false,
+   "distFloodM": 1464
+  },
+  {
+   "id": 239977016,
+   "name": "Nepal Bharat Maitri Hospital",
+   "type": "hospital",
+   "lon": 85.345595,
+   "lat": 27.71155,
+   "node": 25567,
+   "inFlood": false,
+   "distFloodM": 3318
+  },
+  {
+   "id": 240358404,
+   "name": "Swatha Parichyan",
+   "type": "hospital",
+   "lon": 85.324935,
+   "lat": 27.706017,
+   "node": 12680,
+   "inFlood": false,
+   "distFloodM": 1932
+  },
+  {
+   "id": 245265728,
+   "name": "Nutrition Rehabilitation Home (NRH)",
+   "type": "hospital",
+   "lon": 85.31545,
+   "lat": 27.635348,
+   "node": 18279,
+   "inFlood": false,
+   "distFloodM": 558
+  },
+  {
+   "id": 262821660,
+   "name": "Arayoga Hospital",
+   "type": "hospital",
+   "lon": 85.311776,
+   "lat": 27.673599,
+   "node": 1226,
+   "inFlood": false,
+   "distFloodM": 1251
+  },
+  {
+   "id": 301884716,
+   "name": "National Ayurvedic Research and Training Center",
+   "type": "hospital",
+   "lon": 85.28801,
+   "lat": 27.676716,
+   "node": 1697,
+   "inFlood": false,
+   "distFloodM": 525
+  },
+  {
+   "id": 302696153,
+   "name": "KIST hospital",
+   "type": "hospital",
+   "lon": 85.334152,
+   "lat": 27.662171,
+   "node": 25799,
+   "inFlood": false,
+   "distFloodM": 44
+  },
+  {
+   "id": 305050136,
+   "name": "UNIVERSAL COLLEGE OF MEDICAL SCIENCES & UCMS COLLEGE OF DENTAL SURGERY",
+   "type": "hospital",
+   "lon": 85.317981,
+   "lat": 27.706704,
+   "node": 2397,
+   "inFlood": false,
+   "distFloodM": 1716
+  },
+  {
+   "id": 341532571,
+   "name": "Motherland Hospital",
+   "type": "hospital",
+   "lon": 85.359916,
+   "lat": 27.689326,
+   "node": 12072,
+   "inFlood": false,
+   "distFloodM": 567
+  },
+  {
+   "id": 341610159,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.331536,
+   "lat": 27.592048,
+   "node": 21406,
+   "inFlood": false,
+   "distFloodM": 1479
+  },
+  {
+   "id": 342319745,
+   "name": "Valley Maternity Nursing Home",
+   "type": "hospital",
+   "lon": 85.322648,
+   "lat": 27.705301,
+   "node": 5564,
+   "inFlood": false,
+   "distFloodM": 1747
+  },
+  {
+   "id": 343650784,
+   "name": "मेघा अस्पताल",
+   "type": "hospital",
+   "lon": 85.302447,
+   "lat": 27.675349,
+   "node": 3066,
+   "inFlood": false,
+   "distFloodM": 454
+  },
+  {
+   "id": 344983946,
+   "name": "Shankarapur Hospital",
+   "type": "hospital",
+   "lon": 85.378044,
+   "lat": 27.721515,
+   "node": 333,
+   "inFlood": false,
+   "distFloodM": 2294
+  },
+  {
+   "id": 372781590,
+   "name": "Binayak Hospital",
+   "type": "hospital",
+   "lon": 85.318009,
+   "lat": 27.736354,
+   "node": 3031,
+   "inFlood": false,
+   "distFloodM": 4848
+  },
+  {
+   "id": 395026898,
+   "name": "Kapan Hospital",
+   "type": "hospital",
+   "lon": 85.352271,
+   "lat": 27.733611,
+   "node": 9606,
+   "inFlood": false,
+   "distFloodM": 4880
+  },
+  {
+   "id": 403031780,
+   "name": "Nepal Cancer Hospital",
+   "type": "hospital",
+   "lon": 85.338899,
+   "lat": 27.643465,
+   "node": 18207,
+   "inFlood": false,
+   "distFloodM": 372
+  },
+  {
+   "id": 438372625,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.367077,
+   "lat": 27.674656,
+   "node": 8976,
+   "inFlood": false,
+   "distFloodM": 215
+  },
+  {
+   "id": 454234690,
+   "name": "Nidan Hospital",
+   "type": "hospital",
+   "lon": 85.31571,
+   "lat": 27.679089,
+   "node": 10673,
+   "inFlood": false,
+   "distFloodM": 998
+  },
+  {
+   "id": 456506568,
+   "name": "Kathmandu Cancer Center",
+   "type": "hospital",
+   "lon": 85.46598,
+   "lat": 27.669452,
+   "node": 4215,
+   "inFlood": false,
+   "distFloodM": 1388
+  },
+  {
+   "id": 501780558,
+   "name": "Chirayu Hospital",
+   "type": "hospital",
+   "lon": 85.334001,
+   "lat": 27.741439,
+   "node": 21549,
+   "inFlood": false,
+   "distFloodM": 5857
+  },
+  {
+   "id": 501867918,
+   "name": "The Skin Hospital",
+   "type": "hospital",
+   "lon": 85.333226,
+   "lat": 27.736779,
+   "node": 12663,
+   "inFlood": false,
+   "distFloodM": 5348
+  },
+  {
+   "id": 501873471,
+   "name": "Metro Ktm Hospital",
+   "type": "hospital",
+   "lon": 85.337009,
+   "lat": 27.739484,
+   "node": 15531,
+   "inFlood": false,
+   "distFloodM": 5766
+  },
+  {
+   "id": 502280602,
+   "name": "Gautam Buddha International Cardiac hospital",
+   "type": "hospital",
+   "lon": 85.341301,
+   "lat": 27.674752,
+   "node": 29419,
+   "inFlood": false,
+   "distFloodM": 69
+  },
+  {
+   "id": 520758403,
+   "name": "BP Smriti Hospital",
+   "type": "hospital",
+   "lon": 85.326186,
+   "lat": 27.737405,
+   "node": 9418,
+   "inFlood": false,
+   "distFloodM": 5176
+  },
+  {
+   "id": 546246875,
+   "name": "Nepal Mediciti Hospital",
+   "type": "hospital",
+   "lon": 85.302803,
+   "lat": 27.662416,
+   "node": 4567,
+   "inFlood": false,
+   "distFloodM": 34
+  },
+  {
+   "id": 649080016,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.346253,
+   "lat": 27.733366,
+   "node": 17157,
+   "inFlood": false,
+   "distFloodM": 5283
+  },
+  {
+   "id": 695917198,
+   "name": "Patan Hospital",
+   "type": "hospital",
+   "lon": 85.320419,
+   "lat": 27.668441,
+   "node": 5982,
+   "inFlood": false,
+   "distFloodM": 1321
+  },
+  {
+   "id": 842195570,
+   "name": "Mulpani Primary Health Center",
+   "type": "hospital",
+   "lon": 85.393055,
+   "lat": 27.714355,
+   "node": 31675,
+   "inFlood": false,
+   "distFloodM": 951
+  },
+  {
+   "id": 855951184,
+   "name": "Gothatar Health Post",
+   "type": "hospital",
+   "lon": 85.371503,
+   "lat": 27.708103,
+   "node": 7485,
+   "inFlood": false,
+   "distFloodM": 1660
+  },
+  {
+   "id": 988003780,
+   "name": "Gothatar Health Post",
+   "type": "hospital",
+   "lon": 85.371615,
+   "lat": 27.708051,
+   "node": 7485,
+   "inFlood": false,
+   "distFloodM": 1651
+  },
+  {
+   "id": 1042083728,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.370372,
+   "lat": 27.720869,
+   "node": 25906,
+   "inFlood": false,
+   "distFloodM": 2633
+  },
+  {
+   "id": 1173885385,
+   "name": "Ishan Children and Women's Hospital (P) Ltd.",
+   "type": "hospital",
+   "lon": 85.332842,
+   "lat": 27.744624,
+   "node": 27461,
+   "inFlood": false,
+   "distFloodM": 6153
+  },
+  {
+   "id": 1210702139,
+   "name": "sumit hospital",
+   "type": "hospital",
+   "lon": 85.322869,
+   "lat": 27.72747,
+   "node": 8287,
+   "inFlood": false,
+   "distFloodM": 4031
+  },
+  {
+   "id": 2421673,
+   "name": "TU Teaching Hospital",
+   "type": "hospital",
+   "lon": 85.329987,
+   "lat": 27.736113,
+   "node": 9419,
+   "inFlood": false,
+   "distFloodM": 5171
+  },
+  {
+   "id": 2499492,
+   "name": "SAARC Tuberculosis and HIV/AIDS Center",
+   "type": "hospital",
+   "lon": 85.381095,
+   "lat": 27.673887,
+   "node": 24729,
+   "inFlood": false,
+   "distFloodM": 199
+  },
+  {
+   "id": 2499493,
+   "name": "",
+   "type": "hospital",
+   "lon": 85.381432,
+   "lat": 27.674101,
+   "node": 24729,
+   "inFlood": false,
+   "distFloodM": 208
+  },
+  {
+   "id": 2703533,
+   "name": "Military Hospital",
+   "type": "hospital",
+   "lon": 85.291196,
+   "lat": 27.711081,
+   "node": 6097,
+   "inFlood": false,
+   "distFloodM": 2368
+  },
+  {
+   "id": 2927139,
+   "name": "Stupa Community Hospital",
+   "type": "hospital",
+   "lon": 85.364826,
+   "lat": 27.720728,
+   "node": 5961,
+   "inFlood": false,
+   "distFloodM": 3001
+  },
+  {
+   "id": 4012472,
+   "name": "National Ayurvedic Research and Training Center",
+   "type": "hospital",
+   "lon": 85.288013,
+   "lat": 27.676672,
+   "node": 1697,
+   "inFlood": false,
+   "distFloodM": 522
+  },
+  {
+   "id": 10953873,
+   "name": "T.U. Teaching Hospital",
+   "type": "hospital",
+   "lon": 85.330559,
+   "lat": 27.735953,
+   "node": 9420,
+   "inFlood": false,
+   "distFloodM": 5172
+  },
+  {
+   "id": 10953874,
+   "name": "Bir Hospital",
+   "type": "hospital",
+   "lon": 85.313361,
+   "lat": 27.705185,
+   "node": 1780,
+   "inFlood": false,
+   "distFloodM": 1395
+  },
+  {
+   "id": 10953875,
+   "name": "KIST hospital",
+   "type": "hospital",
+   "lon": 85.335095,
+   "lat": 27.663107,
+   "node": 26111,
+   "inFlood": false,
+   "distFloodM": 29
+  },
+  {
+   "id": 10953876,
+   "name": "Civil Service Hospital",
+   "type": "hospital",
+   "lon": 85.339226,
+   "lat": 27.686553,
+   "node": 16881,
+   "inFlood": false,
+   "distFloodM": 921
+  },
+  {
+   "id": 10953877,
+   "name": "Kathmandu Medical college Teaching Hospital",
+   "type": "hospital",
+   "lon": 85.353542,
+   "lat": 27.696088,
+   "node": 44,
+   "inFlood": false,
+   "distFloodM": 1527
+  }
+ ]
+}

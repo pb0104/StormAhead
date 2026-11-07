@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { depthAt, FLOOR_H, M2_PER_PERSON, shelterOf, USABLE_FRACTION } from "../apps/web/src/buildings.ts";
-import { FLOOD_POLYS } from "../apps/web/src/mock/demo.ts";
+import type { FloodPoly } from "../packages/ports/index.ts";
 
 describe("console shelter reading (depth-driven)", () => {
   it("loses one floor per 3 m of water, rounded up", () => {
@@ -46,21 +46,23 @@ describe("console shelter reading (depth-driven)", () => {
 });
 
 describe("depth lookup against the observed flood extent", () => {
-  it("reads the depth of the patch a point falls in, and zero outside every patch", () => {
-    const depths = FLOOD_POLYS.map((_, i) => 1 + i * 0.01);
-    const ring = FLOOD_POLYS[0]!.ring;
-    const inside: [number, number] = [
-      ring.reduce((s, c) => s + c[0], 0) / ring.length,
-      ring.reduce((s, c) => s + c[1], 0) / ring.length,
-    ];
-    // The averaged point may fall outside a concave ring, so only assert it is a valid patch depth or zero.
-    const d = depthAt(inside[0], inside[1], depths, FLOOD_POLYS);
-    expect(d === 0 || depths.includes(d)).toBe(true);
-    expect(depthAt(100, 50, depths, FLOOD_POLYS)).toBe(0); // far outside the valley
+  // Two unit squares, so the expected answer is unambiguous. Explicit polygons rather than the demo fixture:
+  // the function takes them as an argument, so the test need not depend on whatever the console happens to ship.
+  const sq = (x: number, y: number): FloodPoly => ({ r: 0, ring: [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1], [x, y]] });
+  const polys = [sq(0, 0), sq(10, 10)];
+
+  it("reads the depth of the patch a point falls in", () => {
+    expect(depthAt(0.5, 0.5, [1.4, 2.8], polys)).toBe(1.4);
+    expect(depthAt(10.5, 10.5, [1.4, 2.8], polys)).toBe(2.8);
+  });
+  it("is zero outside every patch", () => {
+    expect(depthAt(5, 5, [1.4, 2.8], polys)).toBe(0);
+    expect(depthAt(-100, -100, [1.4, 2.8], polys)).toBe(0);
   });
   it("a dry forecast leaves every building dry", () => {
-    const dry = FLOOD_POLYS.map(() => 0);
-    const ring = FLOOD_POLYS[0]!.ring[0]!;
-    expect(depthAt(ring[0], ring[1], dry, FLOOD_POLYS)).toBe(0);
+    expect(depthAt(0.5, 0.5, [0, 0], polys)).toBe(0);
+  });
+  it("a missing depth for a patch reads as dry rather than undefined", () => {
+    expect(depthAt(10.5, 10.5, [1.4], polys)).toBe(0);
   });
 });

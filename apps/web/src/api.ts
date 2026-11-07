@@ -24,6 +24,29 @@ export type HindcastRun = {
 export type HindcastMeta = { available: boolean; provenance?: any; incidents?: any; evaluationIncidents?: number; defaults?: any };
 export type HindcastGeo = { roads: any; flood: any; places: { n: string; lon: number; lat: number }[]; hospitals: { n: string; lon: number; lat: number; inFlood: boolean }[];
   incidents: { id: number; title: string; lon: number; lat: number; hazard: string; floodRelated: boolean; hasImpact: boolean; distFloodM: number; on: string; loss: Record<string, number> }[] };
+export type AgentScore = {
+  agent: string; what: string; flaggedWards: number;
+  confusion: { tp: number; fp: number; fn: number; tn: number; precision: number | null; recall: number | null; f1: number | null; iou: number | null };
+  randomBaseline: { meanTp: number; meanF1: number; p: number };
+  proximityBaseline: { tp: number; f1: number | null };
+};
+export type Scorecard = {
+  wardScore: { wards: number; evaluatedIncidents: number; truthWards: number; permutations: number; agents: AgentScore[]; note: string };
+  network: { source: string; snapshot: string };
+  wards: { source: string; snapshot: string } | null;
+  incidents: { source: string; window: string[] };
+};
+/** The real engine's evaluation. null when the dataset is not prepared, so the console just omits the tab. */
+export const fetchScorecard = async (): Promise<Scorecard | null> => {
+  try { const r = await fetch("/api/scorecard"); return r.ok ? ((await r.json()) as Scorecard) : null; } catch { return null; }
+};
+
+export type Verification = { wards: any; incidents: any; summary: { wards: number; truthWards: number; evaluatedIncidents: number }; note: string };
+/** The scorecard as geography. null when the ward dataset is absent, so the console omits the layer. */
+export const fetchVerification = async (): Promise<Verification | null> => {
+  try { const r = await fetch("/api/verification"); return r.ok ? ((await r.json()) as Verification) : null; } catch { return null; }
+};
+
 export const hindcast = {
   meta: () => j<HindcastMeta>("/api/hindcast/meta"),
   geo: () => j<HindcastGeo>("/api/hindcast/geo"),

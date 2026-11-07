@@ -8,6 +8,8 @@ import { PhotorealView, savedToken } from "./PhotorealView.tsx";
 import { distKm } from "./affected.ts";
 import { ops } from "./api.ts";
 import { assess, buildingAdvice, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "./buildings.ts";
+import { SwipeHandle } from "./SwipeHandle.tsx";
+import { fetchScorecard, fetchVerification, type Scorecard, type Verification } from "./api.ts";
 import { mergeBipadIntoScene } from "./mergeBipad.ts";
 import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 import type { AssessmentResult, AtmosphereSnapshot, Entity, SceneSnapshot, TerrainResult, Weather } from "../../../packages/ports/index.ts";
@@ -51,6 +53,10 @@ export function OpsConsole() {
   const [assessBusy, setAssessBusy] = useState(false);
   const [atmosphere, setAtmosphere] = useState<AtmosphereSnapshot | null>(null);
   const [bldgLayer, setBldgLayer] = useState<BuildingLayer | null>(null);
+  const [scorecard, setScorecard] = useState<Scorecard | null>(null);
+  const [verify, setVerify] = useState<Verification | null>(null);
+  /** Before/after imagery swipe: null = off, otherwise the handle position as a fraction of map width. */
+  const [swipe, setSwipe] = useState<number | null>(null);
   const timer = useRef<number | undefined>(undefined);
 
   const of = (k: string) => (scene?.entities ?? []).filter((e) => e.kind === k);
@@ -58,6 +64,10 @@ export function OpsConsole() {
 
   useEffect(() => () => window.clearInterval(timer.current), []);
   useEffect(() => { fetchBuildings().then(setBldgLayer); }, []);
+  // How the REAL engine scored against withheld incident reports: the numbers (Details > Evaluation) and the
+  // same thing as geography (the Verification overlay). Both degrade to nothing when the dataset is absent.
+  useEffect(() => { fetchScorecard().then(setScorecard); }, []);
+  useEffect(() => { fetchVerification().then(setVerify); }, []);
 
   useEffect(() => {
     let dead = false;
@@ -132,6 +142,15 @@ export function OpsConsole() {
       geometry: { type: "Polygon" as const, coordinates: [b.ring] },
     })),
   }), [assessed]);
+  // Separate point layer for the markers: a circle layer on polygon geometry would draw one circle per vertex.
+  const bldgPts = useMemo(() => ({
+    type: "FeatureCollection" as const,
+    features: assessed.filter((b) => b.role !== "none").map((b) => ({
+      type: "Feature" as const,
+      properties: { id: `BL-${b.id}`, color: ROLE_COLOR[b.role], role: b.role },
+      geometry: { type: "Point" as const, coordinates: b.at },
+    })),
+  }), [assessed]);
   const buildingById = useMemo(() => new Map(assessed.filter((b) => b.role !== "none").map((b) => { const e = toEntity(b); return [e.id, e] as const; })), [assessed]);
   const evacuate = assessed.filter((b) => b.role === "at-risk-evacuate").length;
   const refuges = assessed.filter((b) => b.role === "refuge");
@@ -151,6 +170,7 @@ export function OpsConsole() {
   const pick = (k: string | null) => { setFocus(k); if (k && !ran && !busy) run(); };
   const startFly = () => { if (!selected) return; setMode("3d"); window.setTimeout(() => setFlying(true), view3d ? 50 : 1500); };
   const toggle = (k: string) => {
+    if (k === "swipe") { setSwipe((v) => (v === null ? 0.5 : null)); return; }
     setVis((v) => {
       const next = !v[k];
       if (k === "atmosphere" && next && !atmosphere) {
@@ -198,15 +218,24 @@ export function OpsConsole() {
 
   return (
     <div className="shell">
-      <MapStage scene={scene} ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingById={buildingById} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} atmosphere={atmosphere} />
+      <MapStage verify={verify} swipe={swipe} buildingPts={bldgPts} scene={scene} ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingById={buildingById} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} atmosphere={atmosphere} />
       {photo && selected && <PhotorealView token={token} setToken={setToken} ran={ran} selected={selected} depths={depths} floodPolys={scene.floodPolys} entities={scene.entities} linked={linkedIds} onClose={() => setPhoto(false)} />}
       <StatusStrip items={strip} focus={focus} setFocus={pick} openDetails={() => setDetails(true)} mode={mode} setMode={setMode} />
-      <CommandRail open={railOpen} setOpen={setRailOpen} vis={vis} toggle={toggle} stage={stage} setStage={setStage} ran={ran} busy={busy} run={run}
+      <CommandRail swipeOn={swipe !== null} open={railOpen} setOpen={setRailOpen} vis={vis} toggle={toggle} stage={stage} setStage={setStage} ran={ran} busy={busy} run={run}
         rain={rain} setRain={setRain} weather={weather} terrain={terrain} wet={wet} total={floodPolyCount} deepest={deepest} flowText={flowText}
         legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
-      {hint && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
+      {swipe !== null && <SwipeHandle value={swipe} onChange={setSwipe} onClose={() => setSwipe(null)} patches={floodPolyCount} />}
+      {vis.verify && verify && (
+        <div className="verifybar" role="status">
+          <strong>Verification overlay.</strong> Scores the <em>real</em> hindcast engine against {verify.summary.evaluatedIncidents} withheld
+          incident reports &mdash; <em>not</em> the demo closures on this map.{" "}
+          <i className="vk hit" />hit <i className="vk miss" />missed <i className="vk fa" />false alarm <i className="vk pt" />reported incident
+          <button className="link" onClick={() => setDetails(true)}>What does this mean?</button>
+        </div>
+      )}
+      {hint && !vis.verify && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
       <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} reasons={why} actions={acts} kindLabel={kindLabel} />
-      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} note={scene.note} agentLines={[`Weather agent (real, Open-Meteo ECMWF IFS 9 km): heaviest 24 h ${WEATHER.max24hMm} mm valley average, ending ${whenText(WEATHER.max24hEnd)}; peak ${WEATHER.peakMmH} mm/h at ${whenText(WEATHER.peakAt)}. Depth model is using ${weather.inches} in (${rain === OBSERVED_IN ? "observed" : "what-if"}).`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${floodPolyCount} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
+      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} note={scene.note} agentLines={[`Weather agent (real, Open-Meteo ECMWF IFS 9 km): heaviest 24 h ${WEATHER.max24hMm} mm valley average, ending ${whenText(WEATHER.max24hEnd)}; peak ${WEATHER.peakMmH} mm/h at ${whenText(WEATHER.peakAt)}. Depth model is using ${weather.inches} in (${rain === OBSERVED_IN ? "observed" : "what-if"}).`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${floodPolyCount} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
         bldgLayer
           ? `Shelter agent (REAL buildings, OpenStreetMap 2 Jan 2024): ${bldgLayer.list.length} shelter-relevant footprints. At this forecast ${assessed.filter((b) => b.role === "at-risk-vertical").length} flooded buildings keep floors above the water, ${evacuate} have none and must be evacuated, and ${refuges.length} dry upper-floor buildings in cut-off areas could take about ${refuges.reduce((s, b) => s + (b.capacity ?? 0), 0).toLocaleString("en-US")} people. ${bldgLayer.list.filter((b) => b.f === null).length} have no tagged height and get no judgement.`
           : "Shelter agent: real building footprints are not loaded (run scripts/fetch_buildings.mjs and start the API)."]} />

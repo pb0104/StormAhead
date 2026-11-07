@@ -10,7 +10,14 @@ Valley acquisitions (from each acquisition collection's temporal extent):
 | 2022-11-22, 2023-04-04, 2024-01-13 (x2), 2024-04-25 | **pre-event** | 15, 15, 20+10, 20 |
 | 2024-10-06 (two acquisitions) | **post-event** | 25, 15 |
 
-Latest pre-event scene is ~5 months before the flood; the post-event scene is ~8 days after. Per-scene cloud cover/usability is **not yet checked**.
+Latest pre-event scene is ~5 months before the flood; the post-event scene is ~8 days after.
+
+**Cloud/usability CHECKED 2026-11-07** by building both mosaics and looking at them (`scripts/build_maxar_mosaics.py`):
+- **13 Jan 2024 (pre-event): clear** across the whole valley. Good as a sharp pre-event reference.
+- **6 Oct 2024 (post-event): roughly half obscured by cloud**, scattered over the central urban area and the river
+  corridors — and taken 8 days after the 27-28 Sep peak, by which time the water had receded.
+So there is **no usable post-event optical image of the flood itself**. The pair is shown in the console as
+context, explicitly labelled as not being a flood before/after.
 
 ## Ground truth — UNOSAT (HDX, licence **CC BY-SA**)
 - The product you linked (**3993**, "Kathmandu … 30 Sep 2024") ships **no Kathmandu layers**: only Sentinel-1 extents for Koshi/Madhesh and Gandaki/Lumbini/Bagmati/Madhesh (max lon 84.97, west of the valley). Same in its geodatabase.
@@ -19,7 +26,7 @@ Latest pre-event scene is ~5 months before the flood; the post-event scene is ~8
 - Caveat: an optical flood-extent *product* is itself an analyst/algorithm output with its own error and cloud/urban limits; it is "best available reference", not perfect truth. Analysis extent (85.284–85.493 × 27.587–27.788) defines where "not flooded" can be asserted.
 
 ## Pre-event roads — OpenStreetMap
-- Overpass (overpass-api.de) **ignores the `[date:]` historical parameter** (verified: snapshot timestamp was today for both 2020 and 2024 queries). Its roads are **current (2026)** and must NOT be used as the pre-event network.
+- ~~Overpass ignores the `[date:]` historical parameter.~~ **CORRECTED 2026-11-07: attic queries DO work.** The earlier check read `osm3s.timestamp_osm_base`, which always reports the database's own date; the returned *data* is historical. Verified by building counts in this box: 241,174 (2018-01-01), 289,698 (2021-01-01), 356,900 (2024-01-02), 373,981 (today) — monotonic, so the date filter is honoured. A **2024-09-26** network (one day pre-event) is therefore obtainable; `scripts/fetch_network_attic.mjs` builds it, and it does not change the result (see hindcast-results.md).
 - Geofabrik publishes `nepal-240101.osm.pbf` (2 Jan 2024, 386 MB, ODbL) — a clean pre-event snapshot, but 9 months stale. No Aug/Sept 2024 snapshot is available (404).
 
 ## Preview of the evaluation scale (using CURRENT OSM, preview only — not a result)
