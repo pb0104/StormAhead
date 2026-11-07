@@ -112,7 +112,7 @@ Lives in `packages/analysis/cascade.ts`, served by `apps/api`. It is determinist
 5. **Shelter Agent**: reads 7,115 pre-event OSM building footprints (shelter-relevant types) and gives each a shelter reading — flooded with floors above the water (shelter in place), flooded with none (evacuate), or a dry upper-floor building inside a cut-off area (local refuge). A building with no usable `building:levels` gets **no judgement**, never a guessed height.
 6. **Verification Agent**: scores afterwards against withheld BIPAD reports, two ways. (a) `scoreAgainstIncidents` — the point test, with a random baseline (permutation test, 2,000 sets), a nearest-the-flood baseline, and sensitivity to the closure threshold and match radius; landslides scored separately as an out-of-model check. (b) `scoreByWard` — a **per-agent scorecard** over 203 ward polygons, reporting each agent's hits, **false alarms**, precision, recall and F1 against the same baselines, plus the given hazard as the bar to beat. See [Per-agent scorecard](#per-agent-scorecard).
 
-**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `GET /api/buildings` (real footprints for the console), `GET /api/scorecard` (the per-agent evaluation, cached), `GET /api/verification` (the same scorecard as map geometry), `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. The server also serves the built web app from `apps/web/dist`.
+**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `GET /api/buildings` (real footprints for the console), `GET /api/scorecard` (the per-agent evaluation, cached), `GET /api/verification` (the same scorecard as map geometry), `GET /api/llm/status` and `POST /api/llm/generate` (Gemini on Vertex AI, off by default), `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. The server also serves the built web app from `apps/web/dist`.
 
 **Spatial pre-computation** (per-road flooded share, per-place in-flood flag and distance to flood) is done offline by `scripts/prepare_kathmandu.py` and committed as derived data. The impact reasoning itself is all in TypeScript.
 
@@ -185,6 +185,83 @@ every Copernicus GFM Sentinel-1 pass between 27 Sep and 7 Oct reports **zero flo
 UNOSAT's optical product mapped 112 polygons there — SAR cannot see flooding under dense urban cover. UNOSAT's own
 affected-building layer is derived from the extent the model is *given*, so it cannot score the model either. That
 leaves the 19 BIPAD reports as the only independent record, and they bound how much any evaluation can conclude.
+
+---
+
+## Gemini on Vertex AI (optional adapter)
+
+An `LlmPort` adapter for Gemini text generation. **Off by default** — a fresh clone runs with no Google Cloud
+credentials, makes no call and bills nobody. Turn it on per-developer.
+
+### Why there is no API key
+
+Our Google Cloud organisation **disallows API keys by policy** ("API keys are disallowed. Please use Application
+Default Credentials (ADC) instead"), so the adapter authenticates with ADC and has no key field anywhere. Nothing
+secret goes in the repo, the environment or a config file — which is why there is nothing to leak or rotate.
+
+### Setup (once per machine)
+
+```bash
+gcloud auth login
+gcloud config set project <project-id>
+gcloud services enable aiplatform.googleapis.com      # needs project permissions
+gcloud auth application-default login
+gcloud auth application-default set-quota-project <project-id>   # without this you get a confusing 403
+```
+
+Then in `apps/web/.env.local` or your shell:
+
+```bash
+LLM_ADAPTER=vertex
+GOOGLE_CLOUD_PROJECT=<project-id>
+GOOGLE_CLOUD_LOCATION=global          # or us-central1
+VERTEX_MODEL=gemini-2.5-flash         # optional
+```
+
+### Check your setup before using it
+
+```bash
+curl localhost:3001/api/llm/status
+```
+
+`GET /api/llm/status` resolves the credential **without calling a model**, so it costs nothing and tells you
+exactly what is missing — unset project, no ADC, or the command to fix it. Use it first; the raw Google auth
+errors mention neither the fix nor the policy.
+
+```bash
+curl -X POST localhost:3001/api/llm/generate \
+  -H 'content-type: application/json' \
+  -d '{"prompt":"Summarise flood risk in one sentence."}'
+```
+
+From server-side code, use the service rather than the adapter, so the guards apply:
+
+```ts
+const { text } = await getServices().llm.generate({ prompt, system, maxOutputTokens: 300 });
+```
+
+### Cost, and why the guards exist
+
+Calls bill to the project's billing account, and the budget is shared. Google's $300 trial credit covers Gemini
+**through Vertex AI** but **not** the AI Studio / Generative Language API — that exclusion is the other reason
+this adapter targets Vertex. Three guards, all in code rather than convention:
+
+| Guard | Where |
+|---|---|
+| Output capped at 2,048 tokens, whatever the caller asks | `packages/adapters/vertex/index.ts` |
+| 20 generations per minute, per process | `LlmService` in `packages/app/index.ts` |
+| Off unless `LLM_ADAPTER=vertex` | `apps/api/composition.ts` |
+
+The rate limit guards a finite shared balance against a runaway loop in someone's dev server. It is not a
+security control.
+
+**Set a budget alert** on the billing account before anyone starts generating. Credits run out quietly.
+
+### The mock
+
+`MockLlmAdapter` returns a response explicitly labelled `[MOCK RESPONSE — no model was called]` rather than
+plausible prose. If mock output ever reaches the UI it must be obviously fake: this project's whole discipline
+is keeping real and simulated separate, and a convincing fake would undermine it.
 
 ---
 

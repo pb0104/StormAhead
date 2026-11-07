@@ -5,6 +5,7 @@ import { MockAssetsAdapter, OverpassAssetsAdapter } from "../../packages/adapter
 import { RunoffFlowAdapter } from "../../packages/adapters/runoff/index.ts";
 import { TerrariumTerrainAdapter } from "../../packages/adapters/terrarium/index.ts";
 import { CachingTileAdapter } from "../../packages/adapters/tiles/index.ts";
+import { MockLlmAdapter, VertexLlmAdapter } from "../../packages/adapters/vertex/index.ts";
 import { createServices, type Services } from "../../packages/app/index.ts";
 import type { Container } from "../../packages/ports/index.ts";
 
@@ -16,6 +17,8 @@ export function buildContainer(env: NodeJS.ProcessEnv = process.env): Container 
   const atmosphere = weatherMode === "mock" ? new MockAtmosphereAdapter() : new OpenMeteoAtmosphereAdapter();
   const assetsMode = (env.ASSETS_ADAPTER ?? "overpass").toLowerCase();
   const assets = assetsMode === "mock" ? new MockAssetsAdapter(scene) : new OverpassAssetsAdapter();
+  // Defaults to mock: a fresh clone must run with no Google Cloud credentials and bill nobody.
+  const llm = (env.LLM_ADAPTER ?? "mock").toLowerCase() === "vertex" ? new VertexLlmAdapter(env) : new MockLlmAdapter();
   return {
     scene,
     weather,
@@ -24,6 +27,7 @@ export function buildContainer(env: NodeJS.ProcessEnv = process.env): Container 
     flow: new RunoffFlowAdapter(),
     tiles,
     assets,
+    llm,
   };
 }
 

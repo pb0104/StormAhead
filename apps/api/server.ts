@@ -25,6 +25,33 @@ export async function buildServer() {
 
   app.get("/api/scene", async () => S().scene.load());
 
+  // --- Gemini on Vertex AI -------------------------------------------------
+  // Status is free: it checks the credential without calling a model, so the team can confirm their ADC setup
+  // without spending anything. Generation is OFF unless LLM_ADAPTER=vertex, and rate-limited in LlmService.
+  app.get("/api/llm/status", async () => S().llm.status());
+  app.post("/api/llm/generate", async (req) => {
+    const b = z.object({
+      prompt: z.string().min(1),
+      system: z.string().optional(),
+      maxOutputTokens: z.number().int().positive().optional(),
+      temperature: z.number().min(0).max(2).optional(),
+    }).parse(req.body ?? {});
+    try {
+      return await S().llm.generate(b);
+    } catch (err) {
+      // Google's auth errors are long and mention neither the fix nor the policy, so re-frame them.
+      const m = (err as Error).message ?? "";
+      if (/rate limit/i.test(m)) throw new HttpError(429, m);
+      if (/could not load the default credentials|ADC|credential/i.test(m)) {
+        throw new HttpError(503, `Vertex AI is not authenticated: ${m}. Run \`gcloud auth application-default login\`. See GET /api/llm/status.`);
+      }
+      if (/permission|403|IAM/i.test(m)) {
+        throw new HttpError(403, `Vertex AI refused the call: ${m}. You likely need roles/aiplatform.user on the project, and the Vertex AI API enabled.`);
+      }
+      throw new HttpError(502, m || "Vertex AI call failed");
+    }
+  });
+
   app.get("/api/weather/seed", async () => S().weatherSeed.seed());
 
   /** Cloud cover + MSL pressure bands (Kathmandu). Disk-cached under data/cache/weather/. */

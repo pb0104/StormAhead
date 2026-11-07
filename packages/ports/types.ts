@@ -142,3 +142,44 @@ export type AtmosphereSnapshot = {
   /** Reserved for later tornado / severe overlays. */
   extensions: Record<string, unknown>;
 };
+
+// ---------------------------------------------------------------------------
+// Text generation (Gemini on Vertex AI)
+// ---------------------------------------------------------------------------
+
+/**
+ * Whether the LLM adapter can actually be used right now.
+ *
+ * This exists because the usual failure is environmental, not programmatic: the credential is missing, the
+ * caller lacks the IAM role, or the API is not enabled on the project. Those produce confusing 401/403s deep
+ * inside a request, so the adapter reports them up front instead and the UI can stay disabled until it is ready.
+ */
+export type LlmStatus = {
+  /** True when a generate() call has a realistic chance of succeeding. */
+  ready: boolean;
+  /** "mock" | "vertex" */
+  adapter: string;
+  model: string | null;
+  project: string | null;
+  location: string | null;
+  /** Plain-language reason when not ready, including the exact command to fix it where there is one. */
+  detail: string;
+};
+
+export type LlmResult = {
+  text: string;
+  model: string;
+  adapter: string;
+  /** Null when the provider does not report usage. */
+  usage: { inputTokens: number | null; outputTokens: number | null } | null;
+  finishReason: string | null;
+};
+
+export type LlmRequest = {
+  prompt: string;
+  /** Steering text sent as a system instruction. */
+  system?: string;
+  /** Hard cap on generated tokens. The adapter clamps this; it is a cost control, not a hint. */
+  maxOutputTokens?: number;
+  temperature?: number;
+};

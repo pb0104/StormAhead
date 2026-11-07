@@ -1,5 +1,6 @@
 import type {
-  AssessmentResult, AssetsSnapshot, AtmosphereSnapshot, SceneSnapshot, TileBytes, Weather, WeatherSeed,
+  AssessmentResult, AssetsSnapshot, AtmosphereSnapshot, LlmRequest, LlmResult, LlmStatus,
+  SceneSnapshot, TileBytes, Weather, WeatherSeed,
 } from "./types.ts";
 
 export interface ScenePort {
@@ -56,6 +57,17 @@ export interface AtmospherePort {
   load(opts?: { refresh?: boolean }): Promise<AtmosphereSnapshot>;
 }
 
+/**
+ * Text generation. Implemented against Gemini on Vertex AI, which the team's Google Cloud org requires be
+ * reached with Application Default Credentials: API keys are disabled by org policy, so there is deliberately
+ * no key field anywhere in this interface.
+ */
+export interface LlmPort {
+  /** Cheap, no-network-cost check that the credential and project are usable. Never throws. */
+  status(): Promise<LlmStatus>;
+  generate(req: LlmRequest): Promise<LlmResult>;
+}
+
 export type Container = {
   scene: ScenePort;
   weather: WeatherPort;
@@ -64,4 +76,5 @@ export type Container = {
   tiles: TileCachePort;
   assets: AssetsPort;
   atmosphere: AtmospherePort;
+  llm: LlmPort;
 };
