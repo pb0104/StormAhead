@@ -1,11 +1,13 @@
 # Three-minute demo script
 
-Setup: `npm start`, open http://127.0.0.1:3001.
+Setup: `npm start`, open http://127.0.0.1:3001. Everything on screen except the roads and satellite base is demo data, and the console says so.
 
-**0:00–0:30 — Problem.** "A flood map shows where water is. The costly surprises are knock-on effects nobody listed — roads and places that stay dry but get cut off. Can we predict those? We test it on the real Sept 2024 Kathmandu floods."
+**0:00–0:30, Problem.** "A flood map shows where water is. The costly surprises are knock-on effects: roads that close and places that get cut off. Authorities need to see that and know where to send response. This is a demo console on the real Sept 2024 Kathmandu valley."
 
-**0:30–1:15 — Setup.** Point at the map: the cyan extent is the *observed* flood, given to the model (we do not forecast floods). Roads are a **pre-event** OSM snapshot. Incident reports are hidden until after prediction.
+**0:30–1:15, Run.** Point at the muted road network and the faint hazard context. Press **Run cascade assessment**. Closed roads reveal one by one in red, then cut-off road pockets, landslide zones and grid outages. Read the status strip counts.
 
-**1:15–2:15 — Prediction.** Click **Run hindcast**. Red = roads treated as closed (54 bridges); purple = dry roads cut off; KPI tiles show the cascade counts. Open the Activity tab: real tool calls, in order.
+**1:15–2:15, Response.** Click a closed road. The map zooms to it and the drawer opens: *What failed, and why* (terrain, weather, dam, social, radio, hospitals) and *Recommended response* (QRT evacuation, food, shelter, grid crew, public alert). Assign a QRT and issue the alert preview. Say plainly: simulated, nothing is sent. Click **landslide zones** in the status strip to zoom to the affected areas and see the roads through them.
 
-**2:15–3:00 — Honesty.** Read the "compared with chance" bars: 16 of 19 reports are near predicted items, but random sets average 18.7 and the nearest-the-flood baseline ties. Verdict: no demonstrated skill yet. Show sensitivity and radius tables, then Sources. Close with next steps: better cascade targets, Maxar imagery, population weighting.
+**2:15–2:45, Look around.** Toggle input layers (towers, social, radio, dams). Switch to **3D** to tilt over the terrain.
+
+**2:45–3:00, Honesty.** Open **Details**: real vs mock sources. "The research engine behind this scores its predictions against real incident reports, and today it shows no skill beyond baselines. See docs/hindcast-results.md. Next: better targets, Maxar imagery, population."
