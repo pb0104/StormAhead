@@ -5,6 +5,7 @@ import maxarPreUrl from "./assets/maxar-pre-2024-01-13.jpg?url";
 import maxarPostUrl from "./assets/maxar-post-2024-10-06.jpg?url";
 import { affected } from "./affected.ts";
 import { MERGED_FC } from "./mergedPack.ts";
+import riversFc from "../../../data/real/kathmandu/rivers.geojson";
 import type { AtmosphereSnapshot, Entity, Grid, SceneSnapshot } from "../../../packages/ports/index.ts";
 import { drawIcon, RING, type BuildingKind } from "./icons.ts";
 export type FlowField = { grid: Grid; gx: Float32Array; gy: Float32Array; acc: Float32Array };
@@ -34,6 +35,21 @@ export type MapProps = {
   /** Live radio stations with a known position, drawn as small DOM markers. */
   stations?: { id: string; lon: number; lat: number; name: string; playing: boolean }[];
   onStation?: (id: string) => void;
+  /** Places where analysts logged actions: a green label ("QRT-2 sent · 14:20 · 40 evacuated"). */
+  actionPins?: { id: string; lon: number; lat: number; name: string; label: string; active: boolean }[];
+  onActionPin?: (id: string) => void;
+  /** Fly the camera to a point (key changes to repeat). */
+  flyTo?: { lon: number; lat: number; key: number } | null;
+  /** Base imagery: Google 2D satellite (sharper, native z20) or Esri (disk-cached, works offline). Esri always sits underneath. */
+  base?: "google" | "esri";
+  /** Called after the camera settles, for the imagery attribution of the current view. */
+  onView?: (v: { zoom: number; n: number; s: number; e: number; w: number }) => void;
+  /** 0..1: how full the flood patches are right now (1 = the depth the assessment computed). Eased, so it rises gradually. */
+  waterLevel?: number;
+  /** 0..1: how swollen the rivers are (from the real Bagmati gauge when the river agent ran). */
+  riverLevel?: number;
+  /** Crosshair cursor while the analyst picks a location on the map. */
+  picking?: boolean;
   /** Padding to keep pins clear of floating panels when fitting. */
   panelPad?: { left: number; right: number; top: number; bottom: number };
 };
@@ -82,6 +98,9 @@ const BASE_OPACITY: Record<string, number> = {
 export function MapStage(p: MapProps) {
   const box = useRef<HTMLDivElement>(null), tip = useRef<HTMLDivElement>(null);
   const radioPins = useRef(new Map<string, { mk: any; el: HTMLDivElement }>());
+  /** Water levels as currently drawn (eased toward the props). */
+  const lvl = useRef({ water: 0, river: 0, raf: 0, dash: 0 });
+  const actPins = useRef(new Map<string, { mk: any; el: HTMLDivElement }>());
   const pins = useRef(new Map<string, { mk: any; el: HTMLDivElement }>()), popup = useRef<any>(null);
   const map = useRef<any>(null), ready = useRef(false), props = useRef(p), markers = useRef<any[]>([]), raf = useRef(0), bar = useRef<HTMLElement | null>(null), floodRef = useRef<unknown>(null), verifyRef = useRef<unknown>(null), postCv = useRef<HTMLCanvasElement | null>(null), postImg = useRef<HTMLImageElement | null>(null), bldgRef = useRef<unknown>(null), flowCv = useRef<HTMLCanvasElement | null>(null), runoffUrl = useRef<string | null>(null);
   props.current = p;
@@ -101,7 +120,7 @@ export function MapStage(p: MapProps) {
         layers: [{ id: "bg", type: "background", paint: { "background-color": "#0A1217" } }],
       },
       bounds: [[BBOX[0], BBOX[1]], [BBOX[2], BBOX[3]]], fitBoundsOptions: { padding: { top: 64, bottom: 24, left: props.current.compact ? 16 : (props.current.padLeft ?? 310), right: 16 } },
-      maxZoom: 18,
+      maxZoom: 20,
     });
     map.current = m;
     m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "Real + simulated layers (see Details) · Rain: Open-Meteo (CC BY 4.0) · Facilities, alerts, gauges: BIPAD · Base: Esri World Imagery (Maxar), cached · Roads: © OpenStreetMap contributors" }), "bottom-right");
@@ -141,6 +160,9 @@ export function MapStage(p: MapProps) {
       // Sharper imagery streamed as tiles (about 0.5 m near Kathmandu). The dimmed 10 m mosaic above stays as the offline fallback.
       m.addSource("esri", { type: "raster", tiles: ["/api/tiles/esri/{z}/{y}/{x}"], tileSize: 256, maxzoom: 18, attribution: "Imagery: Esri, Maxar, Earthstar Geographics (proxied+cached)" });
       m.addLayer({ id: "esri", type: "raster", source: "esri", paint: { "raster-opacity": 0.92, "raster-saturation": -0.35, "raster-brightness-max": 0.92, "raster-contrast": 0.12, "raster-fade-duration": 250 } });
+      // Google imagery is drawn as delivered (their terms don't allow altering it). Missing / over-budget tiles fall through to Esri.
+      m.addSource("google", { type: "raster", tiles: ["/api/tiles/google/{z}/{x}/{y}"], tileSize: 256, maxzoom: 20 });
+      m.addLayer({ id: "google", type: "raster", source: "google", layout: { visibility: props.current.base === "google" ? "visible" : "none" }, paint: { "raster-opacity": 1, "raster-fade-duration": 250 } });
       m.addLayer({ id: "maxar-pre", type: "raster", source: "maxar-pre", layout: { visibility: "none" }, paint: { "raster-opacity": 1, "raster-fade-duration": 0 } });
       m.addLayer({ id: "maxar-post", type: "raster", source: "maxar-post", layout: { visibility: "none" }, paint: { "raster-opacity": 1, "raster-fade-duration": 0 } });
       // Redraw the clipped post-event image for the current handle position and camera.
@@ -166,6 +188,11 @@ export function MapStage(p: MapProps) {
       m.addLayer({ id: "low", type: "fill", source: "low", paint: { "fill-color": "#2B7BFF", "fill-opacity": 0.28, "fill-outline-color": "#6FB0FF" } });
       // Flood water: the observed extent, tinted, with a rippling pattern that is advanced frame by frame.
       for (let k = 0; k < WAVE_FRAMES; k++) m.addImage(`wave-${k}`, waveFrame(k), { pixelRatio: 2 });
+      // Rivers (OSM): drawn under the flood patches; width, colour and flow speed follow the river level.
+      m.addSource("rivers", { type: "geojson", data: riversFc as any });
+      m.addLayer({ id: "river-glow", type: "line", source: "rivers", layout: { visibility: "none", "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#38BDF8", "line-blur": 6, "line-opacity": 0 } });
+      m.addLayer({ id: "river", type: "line", source: "rivers", layout: { visibility: "none", "line-cap": "round", "line-join": "round" }, paint: { "line-color": "#3B82C4", "line-opacity": 0.9 } });
+      m.addLayer({ id: "river-flow", type: "line", source: "rivers", filter: ["==", ["get", "kind"], "river"], layout: { visibility: "none", "line-cap": "butt", "line-join": "round" }, paint: { "line-color": "#E0F2FE", "line-width": 1.2, "line-opacity": 0, "line-dasharray": [0, 4, 3] } });
       m.addLayer({ id: "flood-fill", type: "fill", source: "flood", paint: { "fill-color": ["interpolate", ["linear"], ["get", "d"], 0, "#8CCBF5", 0.5, "#4A9BE6", 1.5, "#2368C4", 3, "#123C8A"], "fill-opacity": 0, "fill-opacity-transition": { duration: 1800 } } });
       m.addLayer({ id: "flood-waves", type: "fill", source: "flood", paint: { "fill-pattern": "wave-0", "fill-opacity": 0, "fill-opacity-transition": { duration: 1800 } } });
       m.addLayer({ id: "flood-edge", type: "line", source: "flood", paint: { "line-color": "#A8DCFF", "line-width": 1.1, "line-opacity": 0, "line-opacity-transition": { duration: 1800 } } });
@@ -328,16 +355,18 @@ export function MapStage(p: MapProps) {
       };
       m.addLayer({ id: "pick-ring", type: "line", source: "pick", paint: { "line-color": "#FFFFFF", "line-width": 2, "line-dasharray": [2, 2] } });
       m.on("click", (e: any) => {
+        // While the analyst is placing an action, every map click is a location, never a selection.
+        if (props.current.picking) { props.current.onMapClick?.([e.lngLat.lng, e.lngLat.lat]); return; }
         const f = query(e.point).find((x) => lookup(x.properties?.id));
         props.current.onSelect(f ? lookup(f.properties.id)! : null);
         if (!f) props.current.onMapClick?.([e.lngLat.lng, e.lngLat.lat]);
       });
       m.on("mousemove", (e: any) => {
         const f = query(e.point).find((x) => lookup(x.properties?.id)), t = tip.current;
-        m.getCanvas().style.cursor = f ? "pointer" : "";
+        m.getCanvas().style.cursor = props.current.picking ? "crosshair" : f ? "pointer" : "";
         if (!t) return;
         const w = !f && props.current.ran && m.getLayer("flood-fill") ? (m.queryRenderedFeatures(e.point, { layers: ["flood-fill"] }) as any[])[0] : null;
-        if (w) { t.textContent = `Flood water, about ${Number(w.properties.d).toFixed(1)} m deep`; t.style.display = "block"; t.style.left = e.point.x + 14 + "px"; t.style.top = e.point.y + 14 + "px"; return; }
+        if (w) { t.textContent = `Flood water, about ${(Number(w.properties.d) * lvl.current.water).toFixed(1)} m deep now`; t.style.display = "block"; t.style.left = e.point.x + 14 + "px"; t.style.top = e.point.y + 14 + "px"; return; }
         const vf = !f && props.current.vis["verify"] && m.getLayer("verify-fill")
           ? (m.queryRenderedFeatures(e.point, { layers: ["verify-pt", "verify-fill"] }) as any[])[0] : null;
         if (vf) {
@@ -351,6 +380,8 @@ export function MapStage(p: MapProps) {
       });
       m.on("mouseout", () => { if (tip.current) tip.current.style.display = "none"; });
       ready.current = true;
+      const view = () => { const b = m.getBounds(); props.current.onView?.({ zoom: m.getZoom(), n: b.getNorth(), s: b.getSouth(), e: b.getEast(), w: b.getWest() }); };
+      m.on("moveend", view); view();
       apply();
     });
 
@@ -372,7 +403,7 @@ export function MapStage(p: MapProps) {
       // Flood water rises in when the assessment runs; a larger share of the observed extent is shown as time advances (demo).
       const flowOn = ran && g("runoff");
       show("runoff-raster", g("runoff"));
-      mm.setPaintProperty("runoff-raster", "raster-opacity", flowOn ? 0.85 : 0);
+      (mm as any).__water?.();
       if (q.flowUrl && runoffUrl.current !== q.flowUrl) {
         runoffUrl.current = q.flowUrl;
         (mm.getSource("runoff") as any)?.updateImage({ url: q.flowUrl, coordinates: [[BBOX[0], BBOX[3]], [BBOX[2], BBOX[3]], [BBOX[2], BBOX[1]], [BBOX[0], BBOX[1]]] });
@@ -380,9 +411,10 @@ export function MapStage(p: MapProps) {
       const water = ran && g("flood");
       if (floodRef.current !== q.flood) { floodRef.current = q.flood; (mm.getSource("flood") as any)?.setData(q.flood); }
       for (const id of ["flood-fill", "flood-waves", "flood-edge"]) { show(id, g("flood")); mm.setFilter(id, [">", ["get", "d"], 0]); }
-      mm.setPaintProperty("flood-fill", "fill-opacity", water ? 0.5 : 0);
-      mm.setPaintProperty("flood-waves", "fill-opacity", water ? 0.9 : 0);
-      mm.setPaintProperty("flood-edge", "line-opacity", water ? 0.75 : 0);
+      void water;
+      const riversOn = ran && g("rivers");
+      show("river", riversOn); show("river-glow", riversOn); show("river-flow", riversOn);
+      (mm as any).__water?.();
       show("pts-hospital", g("buildings")); show("pts-school", g("schools")); show("pts-airport", g("airports")); show("pts-helipad", g("helipads")); show("pts-army", g("army")); show("pts-tower", g("towers")); show("pts-dam", g("dams")); show("pts-social", g("social"));
       show("pts-shelter", g("shelter")); show("pts-food", g("food")); show("pts-qrt", g("qrt"));
       for (const k of ["landslide", "outage", "alert"]) {
@@ -395,8 +427,9 @@ export function MapStage(p: MapProps) {
       const dim = (id: string) => (q.focus && !(GROUP[q.focus] ?? []).includes(id) && Object.values(GROUP).flat().includes(id) ? 0.22 : 1);
       const set = (id: string, on: boolean, mult = 1) => mm.getLayer(id) && mm.setPaintProperty(id, OPACITY_PROP[id]!, on ? (BASE_OPACITY[id] ?? 1) * dim(id) * mult : 0);
       const closuresOn = ran && g("closures"), done = q.revealN >= GEO.closures.features.length;
-      set("closures-muted", !ran && g("closures")); set("closures", closuresOn); set("closures-glow", closuresOn); set("closures-minor", closuresOn && done);
-      set("pockets", closuresOn && q.showPockets); set("pockets-minor", closuresOn && q.showPockets);
+      set("closures-muted", !ran && g("closures")); set("closures", closuresOn); set("closures-glow", closuresOn); set("closures-minor", closuresOn && done && q.stage >= 2);
+      // Minor closures and cut-off pockets only once the water is high (stage follows the water level during playback).
+      set("pockets", closuresOn && q.showPockets && q.stage >= 2); set("pockets-minor", closuresOn && q.showPockets && q.stage >= 2);
       set("z-landslide-fill", ran && g("landslides")); set("z-landslide-line", ran && g("landslides")); set("z-outage-fill", ran && g("outages")); set("z-outage-line", ran && g("outages"));
       if (mm.getLayer("z-alert-fill")) { mm.setPaintProperty("z-alert-fill", "fill-opacity", ran && g("alerts") ? 0.22 : 0); mm.setPaintProperty("z-alert-line", "line-opacity", ran && g("alerts") ? 0.9 : 0); }
       mm.setLayoutProperty("pts-hospital", "icon-image", ran ? ["concat", "hospital-", ["get", "access"]] : "hospital-none");
@@ -463,6 +496,29 @@ export function MapStage(p: MapProps) {
       });
     };
     (m as any).__apply = apply;
+    // Draw the current water levels. Flood depth = assessed depth × level, evaluated on the GPU (no data re-upload), so
+    // shallow patches stay dry until the level is high enough and the wet area spreads as it rises.
+    (m as any).__water = () => {
+      const q = props.current, mm = map.current; if (!mm || !ready.current) return;
+      const g = (k: string) => q.vis[k] === true, L = lvl.current.water, R = lvl.current.river;
+      const water = q.ran && g("flood"), D = ["*", ["get", "d"], L];
+      const ramp = (top: number) => (water ? ["interpolate", ["linear"], D, 0.12, 0, 0.4, top] : 0);
+      mm.setPaintProperty("flood-fill", "fill-color", ["interpolate", ["linear"], D, 0, "#8CCBF5", 0.5, "#4A9BE6", 1.5, "#2368C4", 3, "#123C8A"]);
+      mm.setPaintProperty("flood-fill", "fill-opacity", ramp(0.55));
+      mm.setPaintProperty("flood-waves", "fill-opacity", ramp(0.9));
+      mm.setPaintProperty("flood-edge", "line-opacity", ramp(0.75));
+      mm.setPaintProperty("runoff-raster", "raster-opacity", q.ran && g("runoff") ? 0.85 * Math.min(1, 0.12 + L) : 0);
+      if (q.ran && g("rivers")) {
+        const f = 0.55 + 1.75 * R, kindW = ["match", ["get", "kind"], "river", 1, 0.45];
+        const width = (mult: number) => ["interpolate", ["exponential", 1.6], ["zoom"], 10, ["*", kindW, 1 * f * mult], 13, ["*", kindW, 2.6 * f * mult], 16, ["*", kindW, 9 * f * mult], 18, ["*", kindW, 24 * f * mult]];
+        mm.setPaintProperty("river", "line-width", width(1));
+        mm.setPaintProperty("river-glow", "line-width", width(2.4));
+        mm.setPaintProperty("river-glow", "line-opacity", 0.12 + 0.4 * R);
+        const mix = (a: number[], b: number[]) => `rgb(${a.map((v, i) => Math.round(v + (b[i]! - v) * R)).join(",")})`;
+        mm.setPaintProperty("river", "line-color", mix([59, 110, 170], [56, 189, 248]));
+        mm.setPaintProperty("river-flow", "line-opacity", 0.2 + 0.55 * R);
+      }
+    };
     return () => { m.remove(); map.current = null; ready.current = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -483,6 +539,38 @@ export function MapStage(p: MapProps) {
     (m.getSource("atm-isobars") as any)?.setData(a?.isobars ?? EMPTY_FC);
     (m.getSource("atm-centers") as any)?.setData(a?.centers ?? EMPTY_FC);
   }, [p.atmosphere]);
+
+  // Ease the drawn water levels toward their targets, so water rises (and drains) gradually instead of jumping.
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    const target = { water: Math.max(0, Math.min(1, p.waterLevel ?? 1)), river: Math.max(0, Math.min(1, p.riverLevel ?? p.waterLevel ?? 1)) };
+    cancelAnimationFrame(lvl.current.raf);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { lvl.current.water = target.water; lvl.current.river = target.river; (m as any).__water?.(); return; }
+    let last = performance.now();
+    const step = (now: number) => {
+      const dt = Math.min(0.1, (now - last) / 1000); last = now;
+      const k = Math.min(1, dt * 1.6), c = lvl.current;
+      c.water += (target.water - c.water) * k; c.river += (target.river - c.river) * k;
+      (m as any).__water?.();
+      if (Math.abs(target.water - c.water) > 0.002 || Math.abs(target.river - c.river) > 0.002) c.raf = requestAnimationFrame(step);
+      else { c.water = target.water; c.river = target.river; (m as any).__water?.(); }
+    };
+    lvl.current.raf = requestAnimationFrame(step);
+  }, [p.waterLevel, p.riverLevel, p.ran]);
+
+  // River current: dashes that march downstream, faster when the river is high.
+  useEffect(() => {
+    const m = map.current; if (!m || !p.ran || !p.vis["rivers"] || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const SEQ = [[0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5], [2, 4, 1], [2.5, 4, 0.5], [3, 4, 0], [0, 0.5, 3, 3.5], [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2], [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5]];
+    let raf = 0, last = 0, i = 0;
+    const tick = (now: number) => {
+      const every = 140 - 95 * lvl.current.river; // ms per step: faster current at high water
+      if (now - last > every && ready.current && m.getLayer("river-flow")) { last = now; i = (i + 1) % SEQ.length; m.setPaintProperty("river-flow", "line-dasharray", SEQ[i]); }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [p.ran, p.vis]);
 
   // Flow streaks: calm particles that run down the slope of the real elevation grid. They are drawn at screen resolution and move at
   // a fixed gentle speed on screen, they start mostly in the main channels, and they stop when the map moves. Skipped when the
@@ -515,7 +603,7 @@ export function MapStage(p: MapProps) {
       const cx = grid.w / 2, cy = grid.h / 2, a = m.project([lonAt(cx), latAt(cy)]), b = m.project([lonAt(cx + 1), latAt(cy)]);
       const pxPerCell = Math.max(0.2, Math.hypot(b.x - a.x, b.y - a.y));
       ctx.globalCompositeOperation = "destination-out"; ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0, 0, cv.clientWidth, cv.clientHeight);
-      ctx.globalCompositeOperation = "source-over"; ctx.strokeStyle = "rgba(210,240,255,0.8)"; ctx.lineWidth = 1.6; ctx.lineCap = "round"; ctx.beginPath();
+      ctx.globalCompositeOperation = "source-over"; ctx.strokeStyle = `rgba(210,240,255,${(0.12 + 0.68 * lvl.current.water).toFixed(3)})`; ctx.lineWidth = 1.6; ctx.lineCap = "round"; ctx.beginPath();
       for (let i = 0; i < N; i++) {
         const k = Math.floor(py[i]!) * grid.w + Math.floor(px[i]!), ax = -gx[k]!, ay = -gy[k]!, mag = Math.hypot(ax, ay);
         if (life[i]! <= 0 || mag < 0.003 || px[i]! < 2 || py[i]! < 2 || px[i]! > grid.w - 3 || py[i]! > grid.h - 3) { spawn(i); continue; }
@@ -678,6 +766,40 @@ export function MapStage(p: MapProps) {
     }
   }, [p.stations]);
   useEffect(() => () => { for (const pin of radioPins.current.values()) pin.mk.remove(); radioPins.current.clear(); }, []);
+
+  // Analyst actions: one label per location.
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    const want = new Map((p.actionPins ?? []).map((a) => [a.id, a]));
+    for (const [id, pin] of actPins.current) if (!want.has(id)) { pin.mk.remove(); actPins.current.delete(id); }
+    for (const a of want.values()) {
+      let pin = actPins.current.get(a.id);
+      if (!pin) {
+        const el = document.createElement("div");
+        el.addEventListener("click", (ev) => { ev.stopPropagation(); props.current.onActionPin?.(a.id); });
+        el.setAttribute("role", "button"); el.tabIndex = 0;
+        el.addEventListener("keydown", (ev) => { if (ev.key === "Enter") props.current.onActionPin?.(a.id); });
+        pin = { mk: new maplibregl.Marker({ element: el, anchor: "bottom-left", offset: [-11, 0] }).setLngLat([a.lon, a.lat]).addTo(m), el };
+        actPins.current.set(a.id, pin);
+      }
+      pin.mk.setLngLat([a.lon, a.lat]);
+      pin.el.innerHTML = `<span class="fx-apin-dot"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="fx-apin-txt"><b>${esc(a.name)}</b><span>${esc(a.label)}</span></span>`;
+      setOwnClasses(pin.el, `fx-apin${a.active ? " active" : ""}`);
+      pin.el.setAttribute("aria-label", `${a.name}: ${a.label}`);
+    }
+  }, [p.actionPins]);
+  useEffect(() => () => { for (const pin of actPins.current.values()) pin.mk.remove(); actPins.current.clear(); }, []);
+
+  useEffect(() => {
+    const m = map.current, t = p.flyTo; if (!m || !t) return;
+    m.flyTo({ center: [t.lon, t.lat], zoom: Math.max(m.getZoom(), 14), padding: props.current.panelPad ?? { left: 40, right: 40, top: 80, bottom: 200 }, duration: 1100, essential: true });
+  }, [p.flyTo?.key]);
+  useEffect(() => { const c = map.current?.getCanvas?.(); if (c) c.style.cursor = p.picking ? "crosshair" : ""; }, [p.picking]);
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    const go = () => m.getLayer("google") && m.setLayoutProperty("google", "visibility", p.base === "google" ? "visible" : "none");
+    if (ready.current) go(); else m.once("load", go);
+  }, [p.base]);
 
   // Selecting an alert flies to it and opens a small card.
   useEffect(() => {

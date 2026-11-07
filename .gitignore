@@ -1,6 +1,8 @@
 node_modules
 dist
 data/cache
+# Analyst action log + last forecast targets (written at runtime)
+data/runtime
 .cache/
 
 .env

@@ -23,7 +23,8 @@ export default defineConfig({
   server: {
     port: 5173,
     fs: { allow: [repoRoot] },
-    proxy: { "/api": { target: "http://127.0.0.1:3001", changeOrigin: true } },
+    // API_TARGET lets a second copy run against another API port (default: the usual :3001).
+    proxy: { "/api": { target: process.env.API_TARGET ?? "http://127.0.0.1:3001", changeOrigin: true } },
   },
   build: { outDir: "dist", emptyOutDir: true },
 });

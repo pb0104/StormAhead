@@ -11,7 +11,7 @@ export type AgentResult = {
   headline: string; risk: Risk; facts: Record<string, string | number>; alerts: MapAlert[]; caveats: string[]; map?: Record<string, unknown>;
   thinking: string[]; watch: string; by: "stackai" | "rules"; llmError?: string;
 };
-export type Combined = { id: string; priority: "P1" | "P2"; lon: number; lat: number; place: string; agents: string[]; title: string; why: string[]; at: number | null; when: string | null; severity: Severity };
+export type Combined = { coverage?: import("./actionsApi.ts").Coverage; id: string; priority: "P1" | "P2"; lon: number; lat: number; place: string; agents: string[]; title: string; why: string[]; at: number | null; when: string | null; severity: Severity };
 export type ForecastEvent =
   | { type: "run"; runId: string; question: string; window: Window; agents: string[]; llm: LlmStatus }
   | { type: "agent"; id: string; status: "running" }

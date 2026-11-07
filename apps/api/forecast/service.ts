@@ -8,6 +8,7 @@ import { randomUUID } from "node:crypto";
 import type { Services } from "../../../packages/app/index.ts";
 import { AGENTS, AGENT_BY_ID, inValley, idxOf, isoLocal, nearestPlace, NOW_LOCAL, resourcePack, SEASON_HOURS, when, type Ctx, type Findings, type MapAlert, type Risk, type Severity } from "./agents.ts";
 import { complete, llmStatus, parseJsonLoose } from "./stackai.ts";
+import { actionsForPrompt, coverageAt, setLastRun, type Coverage, type Target } from "../actions/actions.ts";
 
 export type ForecastEvent =
   | { type: "run"; runId: string; question: string; window: Window; agents: string[]; llm: ReturnType<typeof llmStatus> }
@@ -23,7 +24,7 @@ export type ForecastEvent =
 
 export type Window = { startIdx: number; start: string; end: string; startLabel: string; endLabel: string; hours: number; label: string; replayNote: string };
 export type AgentResult = Findings & { thinking: string[]; watch: string; by: "stackai" | "rules"; llmError?: string };
-export type Combined = { id: string; priority: "P1" | "P2"; lon: number; lat: number; place: string; agents: string[]; title: string; why: string[]; at: number | null; when: string | null; severity: Severity };
+export type Combined = { coverage?: Coverage; id: string; priority: "P1" | "P2"; lon: number; lat: number; place: string; agents: string[]; title: string; why: string[]; at: number | null; when: string | null; severity: Severity };
 
 // ---------------------------------------------------------------- intent
 const SUGGEST: { re: RegExp; ids: string[] }[] = [
@@ -89,7 +90,7 @@ Reply with JSON only, no prose:
 {"thinking": ["3 to 5 short reasoning steps, each under 24 words, that interpret the facts for the operator and cite numbers"], "headline": "one sentence under 22 words", "risk": "low|moderate|high|severe", "watch": "the single thing the operator should watch next, under 18 words"}`;
 }
 
-function reportPrompt(question: string, w: Window, results: [string, AgentResult][], combined: Combined[]) {
+function reportPrompt(question: string, w: Window, results: [string, AgentResult][], combined: Combined[], actions: string) {
   const agents = results.map(([id, r]) => `### ${AGENT_BY_ID.get(id)!.name} (risk: ${r.risk})
 Headline: ${r.headline}
 Facts: ${JSON.stringify(r.facts)}
@@ -110,6 +111,9 @@ ${combined.length ? combined.map((c) => `- ${c.priority} ${c.place}: ${c.why.joi
 
 RESOURCES AVAILABLE: ${JSON.stringify(resourcePack())}
 
+ACTIONS ANALYSTS HAVE ALREADY TAKEN ON THE GROUND:
+${actions}
+
 Write GitHub-flavoured markdown with exactly these sections, in this order:
 ## Bottom line
 Two or three sentences: how bad, when, where.
@@ -120,7 +124,7 @@ Bullets grouped by: people & facilities, roads & access, power & communications,
 ## How to prepare
 Numbered actions with a deadline relative to the peak (e.g. "by T-24 h"), most urgent first.
 ## Resource allocation
-A markdown table with columns: Resource | Send to | Why | When. Use only the resources listed. Route around the cut-off pockets and closed bridges.
+A markdown table with columns: Resource | Send to | Why | When. Use only the resources listed. Route around the cut-off pockets and closed bridges. Take the logged actions into account: an action never closes a place. Where help is on site but people likely remain, say what is there and recommend more for that place. Put areas with NO ACTION YET first. Do not repeat what has already been done.
 ## Public messaging (draft, needs approval)
 One short alert in English and the same in Nepali.
 ## Confidence and gaps
@@ -149,7 +153,7 @@ ${alerts.slice(0, 8).map((a) => `- **${a.when}** — ${a.title}`).join("\n") || 
 ${results.map(([id, r]) => `- **${AGENT_BY_ID.get(id)!.factor}:** ${r.headline}`).join("\n")}
 
 ## How to prepare
-${combined.slice(0, 5).map((c, i) => `${i + 1}. **${c.priority} · ${c.place}** — ${c.why.join(" + ")}. Stage a response before ${c.when ?? "the peak"}.`).join("\n") || "1. Keep monitoring; no combined finding."}
+${combined.slice(0, 5).map((c, i) => `${i + 1}. **${c.priority} · ${c.place}** — ${c.why.join(" + ")}. ${c.coverage?.status === "none" || !c.coverage ? `No action logged yet: stage a response before ${c.when ?? "the peak"}.` : c.coverage.status === "partial" ? `${c.coverage.resources.join(", ") || "Help"} already on site, but about ${c.coverage.remaining} people may remain (estimate): send more.` : `Help already logged (${c.coverage.resources.join(", ") || "team"}); keep watching.`}`).join("\n") || "1. Keep monitoring; no combined finding."}
 
 ## Resource allocation
 | Resource | Send to | Why | When |
@@ -256,7 +260,18 @@ export async function runForecast(services: Services, body: { question: string; 
   const all = ids.flatMap((id) => results.get(id)?.alerts ?? []);
   emit({ type: "fusion_step", text: `Coordinator: merging ${all.length} alerts from ${ids.length} agents.` });
   await sleep(500);
-  const combined = fuse(all, names);
+  const RANK = { none: 0, partial: 1, covered: 2 } as const;
+  const combined = fuse(all, names)
+    .map((c) => ({ ...c, coverage: coverageAt(c.lon, c.lat) }))
+    // Within a priority, places nobody has helped yet come first; covered places move down, never out.
+    .sort((a, b) => (a.priority === b.priority ? RANK[a.coverage.status] - RANK[b.coverage.status] || b.agents.length - a.agents.length : a.priority === "P1" ? -1 : 1));
+  const SEV = { severe: 0, high: 1, moderate: 2, info: 3 } as const;
+  const targets: Target[] = [
+    ...combined.map((c) => ({ id: c.id, title: c.title, place: c.place, lon: c.lon, lat: c.lat, priority: c.priority, agents: c.agents.length, severity: c.severity })),
+    ...all.filter((a) => a.severity === "severe" || a.severity === "high").sort((a, b) => SEV[a.severity] - SEV[b.severity])
+      .map((a) => ({ id: a.id, title: a.title, place: nearestPlace([a.lon, a.lat]), lon: a.lon, lat: a.lat, priority: a.severity === "severe" ? "Severe alert" : "High alert", agents: 1, severity: a.severity })),
+  ];
+  setLastRun({ at: new Date().toISOString(), question: body.question, window: w.label, targets });
   emit({ type: "fusion_step", text: combined.length ? `Found ${combined.length} places where agents agree; ${combined.filter((c) => c.priority === "P1").length} are Priority 1.` : "No place is flagged by more than one agent." });
   emit({ type: "fusion", findings: combined });
 
@@ -264,7 +279,7 @@ export async function runForecast(services: Services, body: { question: string; 
   const ordered = ids.map((id) => [id, results.get(id)!] as [string, AgentResult]);
   let md: string | null = null, err: string | undefined;
   if (llm.configured) {
-    try { md = await complete(reportPrompt(body.question, w, ordered, combined)); } catch (e) { err = (e as Error).message; }
+    try { md = await complete(reportPrompt(body.question, w, ordered, combined, actionsForPrompt(targets))); } catch (e) { err = (e as Error).message; }
   }
   emit({ type: "report", markdown: md ?? ruleReport(body.question, w, ordered, combined), by: md ? "stackai" : "rules", ...(err ? { error: err } : !llm.configured ? { error: `StackAI not configured (missing ${llm.missing.join(", ")})` } : {}) });
   emit({ type: "done", ms: Date.now() - t0 });

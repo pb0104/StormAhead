@@ -63,3 +63,35 @@ describe("radio directory", () => {
     expect(k.distKm).toBeGreaterThan(0);
   });
 });
+
+import { resolvePlace, ruleParse } from "../apps/api/actions/actions.ts";
+import { needNear } from "../apps/api/actions/need.ts";
+describe("analyst action updates", () => {
+  it("rule parser splits a field update into a dispatch and an evacuation from the same place", () => {
+    const a = ruleParse("Sent QRT-2 to Balkhu, 40 people moved to Kalimati open space.");
+    expect(a).toEqual([
+      { kind: "dispatch", resource: "QRT-2", people: null, placeText: "Balkhu", destText: null },
+      { kind: "evacuate", resource: null, people: 40, placeText: "Balkhu", destText: "Kalimati open space" },
+    ]);
+  });
+  it("matches places to real gazetteer entries, never invents one", () => {
+    expect(resolvePlace("Khokana")?.kind).toBe("place");
+    expect(resolvePlace("Kalimati open space")?.kind).toBe("open space");
+    expect(resolvePlace("Lalitpur-12")?.kind).toBe("ward");
+    expect(resolvePlace("Zzyzx Nowhere")).toBeNull();
+  });
+  it("estimates people on flooded ground, and gives no estimate where nothing flooded", () => {
+    const wet = needNear(85.30207, 27.67577); // Balkhu, by the Bagmati
+    expect(wet.people).toBeGreaterThan(0);
+    expect(needNear(85.44, 27.78).people).toBeNull(); // dry hillside to the north-east
+  });
+});
+
+import { googleStatus, googleTile } from "../apps/api/googleTiles.ts";
+describe("Google base imagery proxy", () => {
+  it("rejects tiles outside the zoom grid before spending budget", async () => {
+    await expect(googleTile(3, 8, 0)).rejects.toThrow("out of range");
+    await expect(googleTile(23, 0, 0)).rejects.toThrow("out of range");
+    expect(googleStatus().usedToday).toBe(0);
+  });
+});

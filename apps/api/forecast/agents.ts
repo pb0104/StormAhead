@@ -211,10 +211,38 @@ const rivers: AgentDef = {
       ...warning.slice(0, 3).map((g, i) => ({ id: `rivers-w${i}`, agent: "rivers", lon: g.at[0], lat: g.at[1], severity: "high" as Severity, title: `Above warning · ${g.name}`, detail: `Crosses warning (${g.warningLevel} m) at ${when(idxOf(g.firstWarning!))}.`, at: idxOf(g.firstWarning!), when: when(idxOf(g.firstWarning!)) })),
     ];
     const risk: Risk = danger.length >= 3 ? "severe" : danger.length ? "high" : warning.length ? "moderate" : "low";
+    // Hourly river level for the map, from REAL readings: the gauge with the most readings in the window (a gauge that went
+    // silent can't drive the animation). Gaps are interpolated only BETWEEN readings, never carried past the last one; the
+    // client falls back to the rain model where the series is null. Level is 0..1 from the window's low to its peak.
+    const withData = hourly.map((h) => ({ h, a: (h.stage["2024"] ?? []).slice(ctx.start, ctx.end) }))
+      .map((x) => ({ ...x, n: x.a.filter((v) => v !== null).length })).sort((a, b) => b.n - a.n || Number(/bagmati/i.test(b.h.title)) - Number(/bagmati/i.test(a.h.title)));
+    // A gauge that stops reporting while above danger is a signal in itself (it was probably flooded or lost power).
+    for (const x of withData) {
+      const lastI = x.a.reduce<number>((li, v, i) => (v !== null ? i : li), -1);
+      const lastV = lastI >= 0 ? x.a[lastI]! : null;
+      if (lastV !== null && lastV >= x.h.warningLevel && x.a.length - 1 - lastI > 12) {
+        await step("found", `${x.h.title} went silent at ${when(ctx.start + lastI)} while reading ${r1(lastV)} m (danger ${x.h.dangerLevel} m) — likely flooded or lost power.`);
+      }
+    }
+    let mapLevel: Record<string, unknown> | undefined;
+    const ref = withData[0];
+    if (ref && ref.n >= Math.min(24, ref.a.length / 3)) {
+      const a = ref.a, known = a.map((v, i) => [i, v] as const).filter((x): x is readonly [number, number] => x[1] !== null);
+      const filled = a.map((v, i) => {
+        if (v !== null) return v;
+        const prev = [...known].reverse().find(([k]) => k < i), next = known.find(([k]) => k > i);
+        return prev && next ? prev[1] + ((next[1] - prev[1]) * (i - prev[0])) / (next[0] - prev[0]) : null;
+      });
+      const vals = filled.filter((v): v is number => v !== null);
+      const lo = Math.min(...vals), hi = Math.max(...vals), span = Math.max(0.05, hi - lo);
+      await step("calc", `River level for the map: ${ref.h.title}, ${ref.n} of ${a.length} hourly readings, ${r1(lo)}–${r1(hi)} m.`);
+      mapLevel = { station: ref.h.title, warningLevel: ref.h.warningLevel, dangerLevel: ref.h.dangerLevel, stageM: filled.map((v) => (v === null ? null : r1(v))), level: filled.map((v) => (v === null ? null : Math.round(((v - lo) / span) * 100) / 100)) };
+    }
     return {
       headline: danger.length ? `${danger.length} of ${G.length} stations go above danger, first ${when(idxOf(danger[0]!.firstDanger!))}.` : warning.length ? `${warning.length} stations reach warning; none reach danger.` : "Rivers stay below warning levels.",
       risk, alerts, caveats: [REPLAY],
       facts: { stations: G.length, aboveDanger: danger.length, aboveWarningOnly: warning.length, firstDanger: danger[0] ? `${danger[0].name}, ${when(idxOf(danger[0].firstDanger!))}` : "none" },
+      ...(mapLevel ? { map: mapLevel } : {}),
     };
   },
 };

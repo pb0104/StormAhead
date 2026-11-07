@@ -10,6 +10,8 @@ import { HeleneService } from "./helene.ts";
 import compress from "@fastify/compress";
 import { PipelineService } from "./pipeline.ts";
 import { radioClick, radioStations } from "./radio.ts";
+import { googleAttribution, googleStatus, googleTile, TileError } from "./googleTiles.ts";
+import { coverageAt, deleteAction, listActions, locations, nextRecommendation, parseUpdate, saveActions } from "./actions/actions.ts";
 import { factorList, parseIntent, runForecast, type ForecastEvent } from "./forecast/service.ts";
 
 export async function buildServer() {
@@ -69,6 +71,26 @@ export async function buildServer() {
     reply.header("Cache-Control", "public, max-age=31536000, immutable");
     reply.header("X-Cache", t.cacheHit ? "HIT" : "MISS");
     return reply.send(t.body);
+  });
+
+  // Google 2D satellite tiles (higher resolution base imagery). Key stays server-side; memory-cached only, per Google's terms.
+  app.get("/api/tiles/google/status", async () => googleStatus());
+  app.get("/api/tiles/google/attribution", async (req) => {
+    const q = z.object({ zoom: z.coerce.number().min(0).max(22), n: z.coerce.number(), s: z.coerce.number(), e: z.coerce.number(), w: z.coerce.number() }).parse(req.query);
+    try { return { copyright: await googleAttribution(q.zoom, q.n, q.s, q.e, q.w) }; }
+    catch (e) { throw new HttpError(e instanceof TileError ? e.status : 502, (e as Error).message); }
+  });
+  app.get("/api/tiles/google/:z/:x/:y", async (req, reply) => {
+    const p = z.object({ z: z.coerce.number().int(), x: z.coerce.number().int(), y: z.coerce.number().int() }).parse(req.params);
+    try {
+      const t = await googleTile(p.z, p.x, p.y);
+      reply.header("Content-Type", t.type);
+      reply.header("Cache-Control", "private, max-age=86400");
+      reply.header("X-Cache", t.hit ? "HIT" : "MISS");
+      return reply.send(t.body);
+    } catch (e) {
+      throw new HttpError(e instanceof TileError ? e.status : 502, (e as Error).message);
+    }
   });
 
   /** Photoreal / Cesium ion proxy. Pass full upstream URL as ?u= */
@@ -152,6 +174,36 @@ export async function buildServer() {
   app.post("/api/radio/click/:id", async (req) => {
     const p = z.object({ id: z.string().uuid() }).parse(req.params);
     return { counted: await radioClick(p.id) };
+  });
+
+  // Analyst action updates: a typed sentence → structured actions (LLM) → confirmed → saved to the location's history.
+  const resolved = z.object({ name: z.string().max(200), lon: z.number().min(85.2).max(85.6), lat: z.number().min(27.5).max(27.9), kind: z.string().max(40) }).nullable();
+  const draft = z.object({
+    kind: z.enum(["dispatch", "evacuate", "supply", "shelter", "rescue", "alert", "road", "other"]), resource: z.string().max(60).nullable(),
+    people: z.number().int().min(0).max(1_000_000).nullable(), summary: z.string().max(120), placeText: z.string().max(80).nullable(),
+    destText: z.string().max(80).nullable(), place: resolved, dest: resolved,
+  });
+  const actionsView = () => ({ items: listActions(), locations: locations(), next: nextRecommendation() });
+  app.get("/api/actions", async () => actionsView());
+  app.post("/api/actions/parse", async (req) => {
+    const b = z.object({ text: z.string().trim().min(3).max(600) }).parse(req.body ?? {});
+    return parseUpdate(b.text);
+  });
+  app.post("/api/actions", async (req) => {
+    const b = z.object({ text: z.string().max(600), by: z.enum(["stackai", "rules"]), actions: z.array(draft).min(1).max(6) }).parse(req.body ?? {});
+    const saved = saveActions(b.text, b.actions, b.by);
+    const at = saved.find((a) => a.place)?.place ?? null;
+    return { ...actionsView(), saved, followup: nextRecommendation(at), coverage: at ? coverageAt(at.lon, at.lat) : null };
+  });
+  // Live coverage for the places a forecast flagged, so the priority list updates as actions are logged.
+  app.post("/api/actions/coverage", async (req) => {
+    const b = z.object({ points: z.array(z.object({ id: z.string().max(80), lon: z.number(), lat: z.number() })).max(200) }).parse(req.body ?? {});
+    return Object.fromEntries(b.points.map((p) => [p.id, coverageAt(p.lon, p.lat)]));
+  });
+  app.delete("/api/actions/:id", async (req) => {
+    const p = z.object({ id: z.string().uuid() }).parse(req.params);
+    if (!deleteAction(p.id)) throw new HttpError(404, "No such action");
+    return actionsView();
   });
 
   // Forecast console: question → factors → parallel agents (streamed as server-sent events) → fusion → LLM report.
