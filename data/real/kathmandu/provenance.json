@@ -40,5 +40,43 @@
   "places": 718,
   "hospitals": 185,
   "edgesTouchingFlood": 464
+ },
+ "merged": {
+  "generatedAt": "2026-11-07T19:59:43Z",
+  "files": [
+   "merged.geojson",
+   "event_log.json"
+  ],
+  "script": "scripts/build_kathmandu_merged.py",
+  "bbox": [
+   85.284,
+   27.587,
+   85.493,
+   27.788
+  ],
+  "counts": {
+   "flood": 1,
+   "hospital": 203,
+   "road_impact": 462,
+   "power_dark": 19,
+   "landslide": 18,
+   "maxar_footprint": 120,
+   "ndrrma_summary": 1
+  },
+  "maxarFootprints": 120,
+  "maxarError": null,
+  "ndrrma": {
+   "note": "Report-derived summary point; national figures are not valley-only",
+   "source": "NDRRMA SitRep #4 (16 Oct 2024) + Preliminary Loss and Damage Assessment (Sept 2024)",
+   "url": "https://reliefweb.int/report/nepal/nepal-national-disaster-risk-reduction-and-management-authority-preliminary-loss-and-damage-assessment-flood-and-landslide-september-2024"
+  },
+  "licenceNotes": [
+   "UNOSAT flood: CC BY-SA",
+   "OSM network / road_impact: ODbL",
+   "Maxar footprints: CC BY-NC 4.0 (non-commercial)",
+   "BIPAD: confirm licence before redistribution",
+   "NASA Black Marble: free with citation",
+   "NDRRMA: government report figures"
+  ]
  }
 }
