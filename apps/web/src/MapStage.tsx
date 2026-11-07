@@ -1,6 +1,8 @@
 import { useEffect, useRef } from "react";
 import { maplibregl } from "./mapsetup.ts";
 import satUrl from "./assets/valley.jpg?url";
+import maxarPreUrl from "./assets/maxar-pre-2024-01-13.jpg?url";
+import maxarPostUrl from "./assets/maxar-post-2024-10-06.jpg?url";
 import { affected, BBOX, BY_ID, GEO, type Entity } from "./mock/demo.ts";
 import { drawIcon, RING, type BuildingKind } from "./icons.ts";
 import type { Grid } from "./hydro.ts";
@@ -11,7 +13,7 @@ export type Rec = { id: string; kind: string; at: [number, number]; label: strin
 export const REC_COLOR: Record<string, string> = { qrt: "#93C5FD", food: "#FDE68A", shelter: "#86EFAC", grid: "#FFD23F", alert: "#3DD6E0", air: "#A5D8FF", army: "#C9D58B" };
 export type MapProps = {
   ran: boolean; revealN: number; showPockets: boolean; stage: number; vis: Vis; focus: string | null;
-  selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingPts: unknown; buildingById: Map<string, Entity>; verify: { wards: unknown; incidents: unknown } | null; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
+  selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingPts: unknown; buildingById: Map<string, Entity>; verify: { wards: unknown; incidents: unknown } | null; swipe: number | null; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
 };
 
 const WAVE_FRAMES = 8;
@@ -44,7 +46,7 @@ const BASE_OPACITY: Record<string, number> = {
 
 export function MapStage(p: MapProps) {
   const box = useRef<HTMLDivElement>(null), tip = useRef<HTMLDivElement>(null);
-  const map = useRef<any>(null), ready = useRef(false), props = useRef(p), markers = useRef<any[]>([]), raf = useRef(0), bar = useRef<HTMLElement | null>(null), floodRef = useRef<unknown>(null), bldgRef = useRef<unknown>(null), verifyRef = useRef<unknown>(null), flowCv = useRef<HTMLCanvasElement | null>(null), runoffUrl = useRef<string | null>(null);
+  const map = useRef<any>(null), ready = useRef(false), props = useRef(p), markers = useRef<any[]>([]), raf = useRef(0), bar = useRef<HTMLElement | null>(null), floodRef = useRef<unknown>(null), bldgRef = useRef<unknown>(null), verifyRef = useRef<unknown>(null), postCv = useRef<HTMLCanvasElement | null>(null), postImg = useRef<HTMLImageElement | null>(null), flowCv = useRef<HTMLCanvasElement | null>(null), runoffUrl = useRef<string | null>(null);
   props.current = p;
 
   useEffect(() => {
@@ -76,7 +78,39 @@ export function MapStage(p: MapProps) {
       m.addLayer({ id: "sat", type: "raster", source: "sat", paint: { "raster-opacity": 0.9, "raster-saturation": -0.45, "raster-brightness-max": 0.95, "raster-contrast": 0.15 } });
       // Sharper imagery streamed as tiles (about 0.5 m near Kathmandu). The dimmed 10 m mosaic above stays as the offline fallback.
       m.addSource("esri", { type: "raster", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize: 256, maxzoom: 18, attribution: "Imagery: Esri, Maxar, Earthstar Geographics" });
+      // Before / after: Maxar Open Data, 13 Jan 2024 (clear) and 6 Oct 2024 (about half cloud, and eight days
+      // after the peak, so it does NOT show the flood). Context only — the UI labels it as such.
+      const corner: [[number, number], [number, number], [number, number], [number, number]] =
+        [[BBOX[0], BBOX[3]], [BBOX[2], BBOX[3]], [BBOX[2], BBOX[1]], [BBOX[0], BBOX[1]]];
+      m.addSource("maxar-pre", { type: "image", url: maxarPreUrl, coordinates: corner });
+      // The post-event mosaic lives on a CANVAS source: each frame we clear it and redraw only the part east of
+      // the swipe handle, so the transparent remainder lets the pre-event image show through. Cropping the
+      // image source's coordinates instead would squash the picture rather than clip it.
+      const pc = document.createElement("canvas");
+      pc.width = 2048; pc.height = 1970;
+      postCv.current = pc;
+      const pimg = new Image();
+      pimg.onload = () => { postImg.current = pimg; (m as any).__redrawSwipe?.(); };
+      pimg.src = maxarPostUrl;
+      m.addSource("maxar-post", { type: "canvas", canvas: pc, coordinates: corner, animate: false });
       m.addLayer({ id: "esri", type: "raster", source: "esri", paint: { "raster-opacity": 0.92, "raster-saturation": -0.35, "raster-brightness-max": 0.92, "raster-contrast": 0.12, "raster-fade-duration": 250 } });
+      m.addLayer({ id: "maxar-pre", type: "raster", source: "maxar-pre", layout: { visibility: "none" }, paint: { "raster-opacity": 1, "raster-fade-duration": 0 } });
+      m.addLayer({ id: "maxar-post", type: "raster", source: "maxar-post", layout: { visibility: "none" }, paint: { "raster-opacity": 1, "raster-fade-duration": 0 } });
+      // Redraw the clipped post-event image for the current handle position and camera.
+      const redrawSwipe = () => {
+        const cv = postCv.current, img = postImg.current, frac = props.current.swipe;
+        if (!cv || !img || frac === null) return;
+        const g = cv.getContext("2d")!;
+        g.clearRect(0, 0, cv.width, cv.height);
+        const cutLng = m.unproject([m.getCanvas().clientWidth * frac, 0]).lng;
+        const t = Math.min(1, Math.max(0, (cutLng - BBOX[0]) / (BBOX[2] - BBOX[0])));
+        const x = Math.round(t * cv.width);
+        if (x < cv.width) g.drawImage(img, x, 0, cv.width - x, cv.height, x, 0, cv.width - x, cv.height);
+        (m.getSource("maxar-post") as any)?.play?.();
+        (m.getSource("maxar-post") as any)?.pause?.();
+      };
+      (m as any).__redrawSwipe = redrawSwipe;
+      m.on("move", () => { if (props.current.swipe !== null) redrawSwipe(); });
       m.addLayer({ id: "hill", type: "hillshade", source: "dem", layout: { visibility: "none" }, paint: { "hillshade-exaggeration": 0.55, "hillshade-shadow-color": "#000000", "hillshade-highlight-color": "#BFD2DA", "hillshade-accent-color": "#4A5B64" } });
       m.addLayer({ id: "rain", type: "fill", source: "rain", paint: { "fill-color": "#4DA3FF", "fill-opacity": ["interpolate", ["linear"], ["get", "v"], 2, 0.1, 3, 0.18] } });
       m.addLayer({ id: "low", type: "fill", source: "low", paint: { "fill-color": "#2B7BFF", "fill-opacity": 0.28, "fill-outline-color": "#6FB0FF" } });
@@ -239,6 +273,12 @@ export function MapStage(p: MapProps) {
         (mm.getSource("bldg") as any)?.setData(q.buildings ?? { type: "FeatureCollection", features: [] });
         (mm.getSource("bldgpt") as any)?.setData(q.buildingPts ?? { type: "FeatureCollection", features: [] });
       }
+      // Before / after swipe: both mosaics are drawn, and the post-event one is clipped to the right of the
+      // handle so dragging reveals it. null = swipe off.
+      const sw = q.swipe;
+      show("maxar-pre", sw !== null); show("maxar-post", sw !== null);
+      if (sw !== null) (mm as any).__redrawSwipe?.();
+
       // Verification overlay (independent of the demo run: it scores the real engine, not what is on screen).
       const vOn = g("verify") && !!q.verify;
       if (verifyRef.current !== q.verify) {
@@ -281,7 +321,7 @@ export function MapStage(p: MapProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d, p.verify]);
+  useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d, p.verify, p.swipe]);
 
   // Flow streaks: calm particles that run down the slope of the real elevation grid. They are drawn at screen resolution and move at
   // a fixed gentle speed on screen, they start mostly in the main channels, and they stop when the map moves. Skipped when the

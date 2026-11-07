@@ -5,6 +5,7 @@ import { StatusStrip, type StripItem } from "./StatusStrip.tsx";
 import { ContextDrawer, type Done } from "./ContextDrawer.tsx";
 import { DetailsDialog } from "./DetailsDialog.tsx";
 import { PhotorealView, savedToken } from "./PhotorealView.tsx";
+import { SwipeHandle } from "./SwipeHandle.tsx";
 import { actions, distKm } from "./mock/advice.ts";
 import { FLOOD_POLYS, OF, type Entity } from "./mock/demo.ts";
 import { depthImage, runoff, slopeField, type Runoff } from "./hydro.ts";
@@ -48,6 +49,8 @@ export function App() {
   const [bldgLayer, setBldgLayer] = useState<BuildingLayer | null>(null);
   const [scorecard, setScorecard] = useState<Scorecard | null>(null);
   const [verify, setVerify] = useState<Verification | null>(null);
+  /** Before/after swipe: null = off, otherwise the handle position as a fraction of map width. */
+  const [swipe, setSwipe] = useState<number | null>(null);
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearInterval(timer.current), []);
@@ -118,7 +121,10 @@ export function App() {
 
   const pick = (k: string | null) => { setFocus(k); if (k && !ran && !busy) run(); };
   const startFly = () => { if (!selected) return; setMode("3d"); window.setTimeout(() => setFlying(true), view3d ? 50 : 1500); };
-  const toggle = (k: string) => setVis((v) => ({ ...v, [k]: !v[k] }));
+  const toggle = (k: string) => {
+    if (k === "swipe") { setSwipe((v) => (v === null ? 0.5 : null)); return; }
+    setVis((v) => ({ ...v, [k]: !v[k] }));
+  };
   const select = (e: Entity | null) => { setFlying(false); setPhoto(false); setSelected(e); if (e && narrow) setRailOpen(false); };
   const recs = useMemo<Rec[]>(() => {
     if (!selected) return [];
@@ -141,12 +147,13 @@ export function App() {
 
   return (
     <div className="shell">
-      <MapStage ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingPts={bldgPts} buildingById={buildingById} verify={verify} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flow?.url ?? null} field={field && terrain.grid ? { grid: terrain.grid, gx: field.gx, gy: field.gy, acc: field.acc } : null} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} />
+      <MapStage ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingPts={bldgPts} buildingById={buildingById} verify={verify} swipe={swipe} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flow?.url ?? null} field={field && terrain.grid ? { grid: terrain.grid, gx: field.gx, gy: field.gy, acc: field.acc } : null} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} />
       {photo && selected && <PhotorealView token={token} setToken={setToken} ran={ran} selected={selected} depths={depths} linked={linkedIds} onClose={() => setPhoto(false)} />}
       <StatusStrip items={strip} focus={focus} setFocus={pick} openDetails={() => setDetails(true)} mode={mode} setMode={setMode} />
       <CommandRail open={railOpen} setOpen={setRailOpen} vis={vis} toggle={toggle} stage={stage} setStage={setStage} ran={ran} busy={busy} run={run}
         rain={rain} setRain={setRain} weather={weather} terrain={terrain} wet={wet} total={FLOOD_POLYS.length} deepest={deepest} flowText={flowText}
-        legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
+        swipeOn={swipe !== null} legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
+      {swipe !== null && <SwipeHandle value={swipe} onChange={setSwipe} onClose={() => setSwipe(null)} />}
       {vis.verify && verify && (
         <div className="verifybar" role="status">
           <strong>Verification overlay.</strong> Scores the <em>real</em> hindcast engine against {verify.summary.evaluatedIncidents} withheld

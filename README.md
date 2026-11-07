@@ -81,6 +81,7 @@ Audience: authorities only. There is no public view.
 | `icons.ts`, `Glyph.tsx` | Per-building-type icon shapes for the map (canvas) and UI (SVG) |
 | `mock/network.json` | Fixture: OSM road geometry plus the selected closures and pockets |
 | `assets/valley.jpg` | Bundled Sentinel-2 mosaic, the offline fallback base |
+| `SwipeHandle.tsx`, `assets/maxar-*.jpg` | Before/after imagery swipe (pre-event clear, post-event clouded) |
 | `styles.css` | Console styles |
 | `HindcastView.tsx`, `hindcast.css`, `api.ts` | The earlier research view of the real hindcast. **Kept, but not rendered.** Render `<HindcastView />` from `App.tsx` to bring it back |
 
@@ -160,7 +161,7 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | **Sentinel-2 cloudless 2020** (EOX WMS), bundled as `assets/valley.jpg` | Offline fallback satellite base | CC BY-NC-SA 4.0 (non-commercial). Contains modified Copernicus Sentinel data | 10 m resolution, so soft when zoomed. Shown dimmed |
 | **Esri World Imagery** tiles (Esri, Maxar, Earthstar Geographics) | Sharper streamed satellite base | Esri public tile service terms | Needs internet. Public service, no licensed key: check the terms before anything beyond a demo |
 | **AWS Terrain Tiles** (Mapzen, terrarium encoding) | 3D terrain, hill-shading, and the terrain agent's elevation reads | Public dataset, attribution shown on the map | Needs internet. 3D only |
-| **Maxar Open Data**, "Nepal Floods Sept 2024" collection | Identified (pre-event 13 Jan 2024, post-event 6 Oct 2024 scenes for the valley). **Not used in the app** | CC BY-NC 4.0 | The 6 Oct scene is heavily clouded over much of the valley. See [docs/real-data-findings.md](docs/real-data-findings.md) |
+| **Maxar Open Data**, "Nepal Floods Sept 2024" collection | **Used**: the before/after imagery swipe (13 Jan 2024 and 6 Oct 2024 mosaics, built by `scripts/build_maxar_mosaics.py` from the public `visual` COGs) | **CC BY-NC 4.0 (non-commercial)** | Confirmed by inspection: the 6 Oct scene is about **half cloud** over the valley and is **8 days after the peak**, so it does not show flooding. Shown as context, labelled as such in the UI. The 13 Jan scene is clear |
 | **Google Photorealistic 3D Tiles** via Cesium ion (asset 2275207) | Optional photoreal close-up of a selected item | Cesium ion Community plan is free for personal and non-commercial use, capped at 1,000 root tiles a month. Google attribution is shown. Subject to the Google Maps Platform terms | Needs a Cesium ion token and internet. Check the plan terms before commercial use |
 | **Google Fonts** (Bricolage Grotesque, IBM Plex Sans/Mono) | UI typography | Open fonts | Loaded from the web. Falls back to system fonts offline |
 | All other console inputs and outputs | Towers, weather, dams, social, radio, shelters, depots, QRT, outages, alerts, landslide zones | **Invented** for the demo | Clearly labelled DEMO DATA |
@@ -175,6 +176,7 @@ The derived data under `data/real/kathmandu/` is committed. To rebuild it:
 node scripts/fetch_bipad.mjs                     # incidents.json (evaluation only)
 node scripts/fetch_buildings.mjs                 # buildings.json (pre-event footprints; needs internet)
 node scripts/fetch_wards.mjs                     # wards.json (evaluation units; needs internet)
+python -I scripts/build_maxar_mosaics.py         # before/after imagery mosaics (needs internet + Pillow)
 node scripts/fetch_network_attic.mjs --date 2024-09-26 --out data/real/kathmandu-0926   # optional: 1-day-pre-event network
 pip install -r scripts/requirements.txt
 python -I scripts/prepare_kathmandu.py --osm nepal-240101.osm.pbf \
@@ -207,6 +209,19 @@ Stack: TypeScript, React 19, Vite, MapLibre GL JS, Fastify, Zod, Vitest. No data
 - **Done:** the real-data hindcast engine and API (tested); the ops console UI with mock data, 2D/3D, status-strip zoom-to-affected, selection drawer and simulated actions.
 - **Not done:** the console still draws a static closure fixture rather than calling the cascade engine. The building layer *is* wired through (real footprints, served by the API, read by the console). Real power, telecom, dam, weather and social/radio feeds. Maxar imagery in the app. Better cascade targets: buildings were tried and did not help, so the hospital set is next (population weighting still untried). Landslide, power and telecom cascades. Two hypotheses for the no-skill result are now tested and rejected (target set, stale network); the hospital set is the remaining one (see the results doc).
 - **Removed earlier:** the synthetic-data staging planner (commit `7489b10`, "V1 demo").
+
+### Before / after imagery (context, not validation)
+
+**Before / after imagery** in the command rail swipes between two Maxar Open Data mosaics of the valley:
+13 Jan 2024 and 6 Oct 2024, built by `scripts/build_maxar_mosaics.py`.
+
+**It is not a flood before/after, and the UI says so on screen.** The 6 Oct scene is the only optical image of the
+valley after the event, and it is roughly **half obscured by cloud** and was taken **eight days after the
+27–28 Sep peak**, by which time the water had receded. It shows the valley, not the flood. The pre-event scene is
+clear across the whole valley and is genuinely useful as a sharp, true pre-event reference.
+
+Maxar Open Data is **CC BY-NC 4.0 — non-commercial**. Check the licence before using these images for anything
+beyond a demo.
 
 ### Predictions against what actually happened
 

@@ -15,7 +15,7 @@ const STAGES: [number, string][] = [[1, "Now"], [2, "+6 h"], [3, "Peak +12 h"]];
 export type RailProps = {
   open: boolean; setOpen: (b: boolean) => void; vis: Vis; toggle: (k: string) => void; stage: number; setStage: (n: number) => void;
   rain: number; setRain: (n: number) => void; weather: Weather; terrain: Terrain; wet: number; total: number; deepest: number; flowText: string;
-  ran: boolean; busy: boolean; run: () => void; legendOpen: boolean; setLegendOpen: (b: boolean) => void; actionsDone: number; openDetails: () => void;
+  ran: boolean; busy: boolean; run: () => void; swipeOn: boolean; legendOpen: boolean; setLegendOpen: (b: boolean) => void; actionsDone: number; openDetails: () => void;
 };
 
 export function CommandRail(p: RailProps) {
@@ -64,7 +64,10 @@ export function CommandRail(p: RailProps) {
 
         <section>
           <h2 className="lbl">Outputs</h2>
-          <div className="chips">{OUTPUTS.map(([k, l]) => <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>)}</div>
+          <div className="chips">
+            {OUTPUTS.map(([k, l]) => <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>)}
+            <button className="chip out" aria-pressed={p.swipeOn} onClick={() => p.toggle("swipe")}>Before / after imagery</button>
+          </div>
         </section>
 
         <section className="legend">
