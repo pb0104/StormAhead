@@ -111,9 +111,10 @@ Lives in `packages/analysis/cascade.ts`, served by `apps/api`. It is determinist
 2. **Hazard Agent**: loads the observed flood extent.
 3. **Infrastructure Agent**: closes roads by an adjustable rule: a bridge touching the flood, or at least `closeShare` (default 30%) of the road's length flooded. *Exposed does not mean closed.*
 4. **Access Agent** (`analyzeCascade`): multi-source Dijkstra from open hospitals on the full network and on the network with closures. Reports dry places that lose all hospital access (*isolated*) or whose trip gets at least +10 min and at least 1.5× slower (*degraded*), and dry open roads cut off from the main network (*stranded*). A flooded hospital counts as unavailable.
-5. **Verification Agent** (`scoreAgainstIncidents`): scores afterwards against BIPAD reports with a random baseline (permutation test, 2,000 sets), a nearest-the-flood baseline, and sensitivity to the closure threshold and match radius. Landslide incidents are scored separately as an out-of-model check.
+5. **Shelter Agent**: reads 7,115 pre-event OSM building footprints (shelter-relevant types) and gives each a shelter reading — flooded with floors above the water (shelter in place), flooded with none (evacuate), or a dry upper-floor building inside a cut-off area (local refuge). A building with no usable `building:levels` gets **no judgement**, never a guessed height.
+6. **Verification Agent**: scores afterwards against withheld BIPAD reports, two ways. (a) `scoreAgainstIncidents` — the point test, with a random baseline (permutation test, 2,000 sets), a nearest-the-flood baseline, and sensitivity to the closure threshold and match radius; landslides scored separately as an out-of-model check. (b) `scoreByWard` — a **per-agent scorecard** over 203 ward polygons, reporting each agent's hits, **false alarms**, precision, recall and F1 against the same baselines, plus the given hazard as the bar to beat. See [Per-agent scorecard](#per-agent-scorecard).
 
-**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. The server also serves the built web app from `apps/web/dist`.
+**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `GET /api/buildings` (real footprints for the console), `GET /api/scorecard` (the per-agent evaluation, cached), `GET /api/verification` (the same scorecard as map geometry), `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. The server also serves the built web app from `apps/web/dist`.
 
 **Spatial pre-computation** (per-road flooded share, per-place in-flood flag and distance to flood) is done offline by `scripts/prepare_kathmandu.py` and committed as derived data. The impact reasoning itself is all in TypeScript.
 
@@ -127,12 +128,65 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | Places directly flooded | 9 of 718 |
 | Cascade: dry places with no hospital access / degraded | 1 / 0 |
 | Cascade: dry roads stranded | 428 |
+| Shelter-relevant buildings loaded / in the flood extent / dry but cut off | 7,115 / 11 / 12 |
 | Scored incidents (verified BIPAD flood/rain reports with impact) | 19, none inside the flood extent |
 | Within 1,000 m of a predicted cascade item | 16 of 19 (84%) |
 | Random same-size sets (mean) | 18.7 (p ≈ 1.0) |
 | Nearest-the-flood baseline | 16 |
 
-**Verdict: no demonstrated predictive skill.** The 84% headline is not evidence, because random sets of the same size do as well and the proximity baseline ties it. Exploratory checks (added after seeing the result, so not primary): at 250 m the model gets 0 of 19 against random 8.5, and at 500 m 7 of 19 against 15.9. The landslide check (15 of 17 against random 14.6, p ≈ 0.55) also shows no skill. Likely reasons are in the results doc: OSM lists 185 hospital features (many small clinics) so hospital access rarely breaks, stranded roads cluster while reports are spread, the optical flood extent probably under-detects urban flooding, and 19 incidents is a small sample.
+**Verdict: no demonstrated predictive skill.** The 84% headline is not evidence, because random sets of the same size do as well and the proximity baseline ties it. Exploratory checks (added after seeing the result, so not primary): at 250 m the model gets 0 of 19 against random 8.5, and at 500 m 7 of 19 against 15.9. The landslide check (15 of 17 against random 14.6, p ≈ 0.55) also shows no skill. Adding the 7,115 real building footprints as cascade targets (exploratory) **did not change this**, and nor did rebuilding the road network one day before the event instead of nine months earlier — so two hypotheses are now tested and rejected. Likely reasons are in the results doc: OSM lists 185 hospital features (many small clinics) so hospital access rarely breaks, stranded roads cluster while reports are spread, the optical flood extent probably under-detects urban flooding, and 19 incidents is a small sample.
+
+### Per-agent scorecard
+
+Visible in the console under **Details → Evaluation**, which opens on this tab and leads with a plain-language
+verdict — what the engine got right, what it got wrong, why that is not skill, what it does *not* mean, and what
+would change the answer — followed by a generated one-sentence reading of every row, so the prose cannot drift from
+the numbers. Served by `GET /api/scorecard`, computed in `packages/analysis/wards.ts`.
+
+The 1 km point test could not discriminate: in a dense valley almost any same-size set covers the incidents, so
+every baseline tied. Scoring on **wards** (the unit BIPAD reports are actually collected in) makes false alarms
+countable, so an agent can no longer look good by flagging everything. 19 scorable incidents fall in 10 of 203 wards.
+
+| Agent | Wards flagged | Hit | False alarm | Precision | Recall | F1 | Random F1 | p |
+|---|---|---|---|---|---|---|---|---|
+| *Hazard (GIVEN — not a prediction)* | 67 | 6 | 61 | 0.09 | 0.60 | 0.16 | 0.09 | 0.067 |
+| Infrastructure Agent | 59 | 6 | 53 | 0.10 | 0.60 | 0.17 | 0.08 | 0.030 |
+| Access Agent | 102 | 6 | 96 | 0.06 | 0.60 | 0.11 | 0.09 | 0.392 |
+| Shelter Agent | 10 | 2 | 8 | 0.20 | 0.20 | 0.20 | 0.05 | 0.082 |
+| All agents combined | 125 | 9 | 116 | 0.07 | 0.90 | 0.13 | 0.09 | 0.056 |
+
+The hazard row is a model *input*, so it is the bar: an agent that does not beat it adds nothing to the flood map.
+**The Access Agent flags half the valley** (102 of 203 wards) to find the same wards the Infrastructure Agent finds
+with 59, at p = 0.39. The **Shelter Agent raises the fewest and most precise concerns**, on 2 hits. The
+Infrastructure Agent is the only one under p < 0.05, **and it does not replicate**: on a 1-day-pre-event network it
+becomes p = 0.052. Read the table as negative. Full tables in [docs/hindcast-results.md](docs/hindcast-results.md).
+
+### Predictions against what actually happened
+
+The engine does **not** predict the flood — the observed extent is a *given input* — so there is no
+predicted-vs-actual flood map to draw, and drawing one would imply skill the model does not claim. What it predicts
+is the knock-on effects, so that is what gets verified.
+
+Turn on **Verification (real)** in the command rail. Each of the 203 wards is drawn by outcome, with the withheld
+incident reports as white dots: **9 hit, 1 missed (Lalitpur-12), 116 false alarms, 77 correctly left alone.** The
+116 false alarms are drawn, faintly but visibly, because over-flagging is the main finding. A banner stays on
+screen while the overlay is active, since the closures drawn underneath are demo data and are not what is scored.
+
+### Before / after imagery (context, not validation)
+
+**Before / after imagery** in the command rail swipes between two Maxar Open Data mosaics, 13 Jan 2024 and
+6 Oct 2024, built by `scripts/build_maxar_mosaics.py`. The observed UNOSAT footprint is drawn in cyan over both
+sides so the imagery has a referent.
+
+**It is not a flood before/after, and the UI says so on screen.** The 6 Oct scene is the only optical image of the
+valley after the event, and it is roughly **half obscured by cloud** and was taken **eight days after the
+27–28 Sep peak**, by which time the water had receded. Maxar Open Data is **CC BY-NC 4.0 — non-commercial**.
+
+**No independent satellite ground truth exists for this valley.** Copernicus EMS never activated for the event, and
+every Copernicus GFM Sentinel-1 pass between 27 Sep and 7 Oct reports **zero flood pixels** over the valley while
+UNOSAT's optical product mapped 112 polygons there — SAR cannot see flooding under dense urban cover. UNOSAT's own
+affected-building layer is derived from the extent the model is *given*, so it cannot score the model either. That
+leaves the 19 BIPAD reports as the only independent record, and they bound how much any evaluation can conclude.
 
 ---
 
@@ -152,8 +206,11 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | Flood extent | **Real**: UNOSAT SPOT-6, observed 30 Sep 2024 |
 | Flood depth | **Illustrative**: ordering from real elevation tiles (terrain agent), scale assumed |
 | Terrain low-ground patches, rain cells | **Mock** (drawn) |
-| Landslide zones (4), grid outages (3), public-alert zones (2) | **Mock** (drawn) |
-| Cell towers (16, 3 down), dams (2), social posts (8), radio call-ins (6) | **Mock** |
+| Power outages (9 dark areas) | **Real, observed**: NASA Black Marble nightly lights. Cells whose lights fell below half of normal on clear nights 29 Sep to 2 Oct, against 19 Aug to 25 Sep (103 dark cells of 906 seen; 0.3% false-dark rate on ordinary nights). 28 Sep was clouded over. "Likely lost power", not confirmed |
+| Landslide zones (4), public-alert zones (2) | **Mock** (drawn) |
+| Cell sites (328, merged from 902 cells) | **Real positions** from OpenCelliD (crowd-sourced estimates; current database, `firstSeen` marks sites that may postdate the flood). Status is **modelled**: inside the observed flood extent = down; within 200 m of it, or in a night-lights dark cell = at risk |
+| Regional internet connectivity (chart in the drawer for cell sites and pockets) | **Real**: IODA, Bagmati zone. Networks visible fell 24% at 07:45 on 28 Sep, Nepal time. Regional only |
+| Dams (2), social posts (8), radio call-ins (6) | **Mock** |
 | QRT staging (4), food depots (3), shelters (5) | **Mock** |
 | Evidence text, recommended actions, headcounts, stock, households | **Mock** (generated from the fixtures) |
 
@@ -171,6 +228,9 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | **AWS Terrain Tiles** (Mapzen, terrarium encoding) | 3D terrain, hill-shading, and the terrain agent's elevation reads | Public dataset, attribution shown on the map | Needs internet. 3D only |
 | **Maxar Open Data**, "Nepal Floods Sept 2024" collection | Identified (pre-event 13 Jan 2024, post-event 6 Oct 2024 scenes for the valley). **Not used in the app** | CC BY-NC 4.0 | The 6 Oct scene is heavily clouded over much of the valley. See [docs/real-data-findings.md](docs/real-data-findings.md) |
 | **Google Photorealistic 3D Tiles** via Cesium ion (asset 2275207) | Optional photoreal close-up of a selected item | Cesium ion Community plan is free for personal and non-commercial use, capped at 1,000 root tiles a month. Google attribution is shown. Subject to the Google Maps Platform terms | Needs a Cesium ion token and internet. Check the plan terms before commercial use |
+| **OpenCelliD** per-country download (MCC 429), via `scripts/fetch_opencellid.mjs` (needs `OPENCELLID_KEY` in `.env`) | Cell-site positions (`data/real/kathmandu/cell_sites.json`) | CC BY-SA 4.0, attribute OpenCelliD | Positions are estimates from phone reports. Database is current, not pre-event. Flood-time site status is not public |
+| **NASA Black Marble** VNP46A2 v2 via `scripts/fetch_blackmarble.py` (needs `EARTHDATA_TOKEN`, an Earthdata Login token; downloads from the Earthdata Cloud mirror; ~1.4 GB of tiles cached outside the repo) | Power outages (`data/real/kathmandu/night_lights.json`) | NASA data, free with citation (doi:10.5067/VIIRS/VNP46A2.002) | Monsoon cloud: 28 Sep fully clouded, 26–27 Sep missing. Thin cloud can also dim lights |
+| **IODA** (Georgia Tech) API, via `scripts/fetch_ioda.mjs` (no key) | Regional internet connectivity, 20 Sep to 5 Oct 2024 (`data/real/kathmandu/ioda.json`) | Free for research; credit IODA | Finest unit is the old Bagmati zone, so it shows when, not where |
 | **Google Fonts** (Bricolage Grotesque, IBM Plex Sans/Mono) | UI typography | Open fonts | Loaded from the web. Falls back to system fonts offline |
 | All other console inputs and outputs | Towers, weather, dams, social, radio, shelters, depots, QRT, outages, alerts, landslide zones | **Invented** for the demo | Clearly labelled DEMO DATA |
 
@@ -182,6 +242,10 @@ The derived data under `data/real/kathmandu/` is committed. To rebuild it:
 
 ```bash
 node scripts/fetch_bipad.mjs                     # incidents.json (evaluation only)
+node scripts/fetch_buildings.mjs                 # buildings.json (pre-event footprints; needs internet)
+node scripts/fetch_wards.mjs                     # wards.json (evaluation units; needs internet)
+python -I scripts/build_maxar_mosaics.py         # before/after imagery mosaics (needs internet + Pillow)
+node scripts/fetch_network_attic.mjs --date 2024-09-26 --out data/real/kathmandu-0926   # optional: 1-day-pre-event network
 pip install -r scripts/requirements.txt
 python -I scripts/prepare_kathmandu.py --osm nepal-240101.osm.pbf \
   --flood Spot6_20240930_FloodExtent_Kathmandu.shp --out data/real/kathmandu

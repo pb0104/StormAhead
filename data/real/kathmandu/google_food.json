@@ -1,0 +1,1770 @@
+{
+  "source": "Google Places API (New) + Routes API; status modelled with UNOSAT flood, NASA night lights, OpenCelliD, OSM network",
+  "retrievedAt": "2026-11-07T20:47:50.559Z",
+  "bbox": [
+    85.284,
+    27.587,
+    85.493,
+    27.788
+  ],
+  "depots": [
+    {
+      "id": "FD-1",
+      "name": "Food depot, central",
+      "at": [
+        85.358,
+        27.703
+      ],
+      "packs": 4200
+    },
+    {
+      "id": "FD-2",
+      "name": "Food depot, west",
+      "at": [
+        85.308,
+        27.722
+      ],
+      "packs": 2600
+    },
+    {
+      "id": "FD-3",
+      "name": "Food depot, east",
+      "at": [
+        85.405,
+        27.692
+      ],
+      "packs": 3100
+    }
+  ],
+  "counts": {
+    "shops": 59,
+    "grocery": 35,
+    "convenience": 16,
+    "wholesaler": 8,
+    "lost": 0,
+    "degraded": 7,
+    "usable": 52
+  },
+  "shops": [
+    {
+      "id": "ChIJA1XCJe4Z6zkRRaMHc66MJDw",
+      "name": "Bhat-Bhateni Super Store - Koteshwor",
+      "at": [
+        85.34454,
+        27.67477
+      ],
+      "address": "M8FV+WR3, कोटेश्वर मार्ग, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJJUDiaOgY6zkRwzWeGbNyKa0",
+      "name": "Bhat-Bhateni Super Store - Balaju",
+      "at": [
+        85.30218,
+        27.72633
+      ],
+      "address": "Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "department_store",
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJbdj6nmsR6zkRheF-2nL5y6Q",
+      "name": "Bhat-Bhateni Super Store - Siddhipur",
+      "at": [
+        85.35619,
+        27.65047
+      ],
+      "address": "Bagmati Province, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ4-DcttgZ6zkRZG81BRsG0v8",
+      "name": "Bhatbhateni Supermarket Anamnagar",
+      "at": [
+        85.32855,
+        27.6928
+      ],
+      "address": "M8RH+X73, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "degraded",
+      "why": "Night lights went dark here after the flood — no refrigeration (dry goods still usable).",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJT3yRN4ga6zkRdJntipAwF3Q",
+      "name": "Bhat-Bhateni Super Store - Madhyapur Thimi Bhaktapur",
+      "at": [
+        85.39731,
+        27.67516
+      ],
+      "address": "New, Radhe Radhe Rd, Madhyapur Thimi, Bagmati Province, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "book_store",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ9fPehMkZ6zkRqRFe6WqkipU",
+      "name": "Bhat-Bhateni Supermarket Krishna Galli",
+      "at": [
+        85.31952,
+        27.67951
+      ],
+      "address": "262 Krishna Galli Marg, Lalitpur, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJIwc8zfwY6zkRnqxGygAhrvQ",
+      "name": "MASALA BEADS",
+      "at": [
+        85.31252,
+        27.7136
+      ],
+      "address": "Amrit Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "cosmetics_store",
+        "supermarket",
+        "grocery_store",
+        "clothing_store",
+        "food_store",
+        "store",
+        "food",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJR52_dEYZ6zkRgn4E75DUH64",
+      "name": "Bhat-Bhateni Supermarket Maharajgunj",
+      "at": [
+        85.33921,
+        27.73944
+      ],
+      "address": "P8QQ+QMG, Ring Rd, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "department_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "degraded",
+      "why": "Night lights went dark here after the flood — no refrigeration (dry goods still usable).",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJk3GupG8Y6zkR5jezS34nhJU",
+      "name": "Bhat-Bhateni Supermarket",
+      "at": [
+        85.28472,
+        27.69083
+      ],
+      "address": "रिङ्ग रोड, Kathmandu, Bagmati Province 44614, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "department_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJaYTom_EZ6zkRbEnGNBA4l3I",
+      "name": "Bhat-Bhateni Super Store - Tokha",
+      "at": [
+        85.32463,
+        27.74942
+      ],
+      "address": "P8XF+QV6, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "supermarket",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJv9bV0WIZ6zkRn4l_Vp7v_EM",
+      "name": "Bhat-Bhateni Super-Store Bouddha",
+      "at": [
+        85.35306,
+        27.71925
+      ],
+      "address": "Boudhanath Sadak, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "supermarket",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJx5ZemhsZ6zkRKKU6kudDj9I",
+      "name": "Bigmart Lazimpat",
+      "at": [
+        85.31955,
+        27.72054
+      ],
+      "address": "Lazimpat Rd, Kathmandu, Bagmati Province 44616, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "degraded",
+      "why": "Night lights went dark here after the flood — no refrigeration (dry goods still usable).",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJP4VlOAQb6zkROKpc65jy5zs",
+      "name": "Big Mart Lokanthali",
+      "at": [
+        85.36386,
+        27.67899
+      ],
+      "address": "M9F5+GQH, Thimi, Madhyapur Thimi, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "general_store",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJq989EQAZ6zkRcBCdvz_D5kE",
+      "name": "Prince Mart Pvt. Ltd. - Tinkune",
+      "at": [
+        85.34663,
+        27.68554
+      ],
+      "address": "TINKUNE, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJu3xqKdwZ6zkRvuwmKKnqlb8",
+      "name": "Bigmart Baluwatar",
+      "at": [
+        85.33136,
+        27.72367
+      ],
+      "address": "P8FJ+FG9, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJv_eJNEgb6zkR0oZCG9eMxMM",
+      "name": "Arjun Complex",
+      "at": [
+        85.3749,
+        27.69734
+      ],
+      "address": "रायमाझी मार्ग, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJW5TJalYZ6zkReu4mvWx-qik",
+      "name": "Bigmart Chyasal",
+      "at": [
+        85.33319,
+        27.6727
+      ],
+      "address": "Balkumari Rd, Lalitpur, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJfy-qspQb6zkRJ1-tw4gNpuU",
+      "name": "Bigmart Supermarket - Kapan",
+      "at": [
+        85.35575,
+        27.72692
+      ],
+      "address": "6 Saraswatinagar Rd, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJu7SZgS8Z6zkRb29kMIyMC6o",
+      "name": "Bigmart Supermarket - TokhaRoad",
+      "at": [
+        85.32133,
+        27.74029
+      ],
+      "address": "P8RC+4G8, Tokha, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJf7zRxMkZ6zkRsTvm60JMEV8",
+      "name": "Nepal Army Canteen नेपाली सेना क्यानटिन",
+      "at": [
+        85.31683,
+        27.69422
+      ],
+      "address": "Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "degraded",
+      "why": "Night lights went dark here after the flood — no refrigeration (dry goods still usable).",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJeZtcC6QZ6zkRLI7Nsc7Ga-E",
+      "name": "Big Mart - Anamnagar",
+      "at": [
+        85.32882,
+        27.69853
+      ],
+      "address": "M8XH+CG8, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJh7k3rLQZ6zkRff0zwkQXLV0",
+      "name": "Bigmart Supermarket - Kupondol",
+      "at": [
+        85.31387,
+        27.68712
+      ],
+      "address": "Kupondole Rd, Lalitpur, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "grocery_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJC7rzAyEZ6zkR6BGjuqfUPrg",
+      "name": "Bigmart Samakhusi",
+      "at": [
+        85.3165,
+        27.73213
+      ],
+      "address": "P8J8+VJ2, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJdTeEdsAZ6zkRKMXO4lSUTKU",
+      "name": "Bigmart Sahyoginagar",
+      "at": [
+        85.33922,
+        27.67811
+      ],
+      "address": "M8GQ+Q2M, Sahyoginagar Marga, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJj885qXsX6zkRcDO3O_69bro",
+      "name": "Big Mart",
+      "at": [
+        85.32011,
+        27.64723
+      ],
+      "address": "J8WC+F2 Sangpang Chowk, Satdobato-Tikabhairab Rd, Lalitpur, Bagmati Province 44700, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ6eXrZIEZ6zkRr4IE72QZYMQ",
+      "name": "Red Pineapple Store",
+      "at": [
+        85.31398,
+        27.71438
+      ],
+      "address": "Keshar Mahal Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "convenience_store",
+        "general_store",
+        "asian_grocery_store",
+        "liquor_store",
+        "supermarket",
+        "grocery_store",
+        "department_store",
+        "food_store",
+        "store",
+        "food",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJdbMgn5cZ6zkR-5bXTfI8k1A",
+      "name": "Japanese Mart Nepal",
+      "at": [
+        85.33734,
+        27.69303
+      ],
+      "address": "M8VP+6W8, Devkota Sadak, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "degraded",
+      "why": "Night lights went dark here after the flood — no refrigeration (dry goods still usable).",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ4-B1AawZ6zkRLGLhNfq8OXs",
+      "name": "KK MART MAHAPAL",
+      "at": [
+        85.32356,
+        27.67277
+      ],
+      "address": "Lalitpur, Bagmati Province 44700, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJy86xMkgZ6zkRvAwCnUAKdaU",
+      "name": "Seoul Korean Pasal",
+      "at": [
+        85.31319,
+        27.71463
+      ],
+      "address": "Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJzSa7Q9AZ6zkRgUJ-8O1YYcg",
+      "name": "KK MART NA-TOLE",
+      "at": [
+        85.3182,
+        27.67588
+      ],
+      "address": "Natole Rd, Lalitpur, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJnQ2ZxPYb6zkRuiJrZI6ynxg",
+      "name": "SalesBerry Express Lokanthali",
+      "at": [
+        85.35962,
+        27.67304
+      ],
+      "address": "Madhyapur Thimi, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJs5T9nOIZ6zkRaf8Cs2W1iwU",
+      "name": "KK MART BISHALNAGAR",
+      "at": [
+        85.33684,
+        27.72365
+      ],
+      "address": "P8FP+FP4, Banshidhar Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJc2wjYAAZ6zkR7orAQP_OTpI",
+      "name": "Dahal Store",
+      "at": [
+        85.35312,
+        27.74393
+      ],
+      "address": "Baluwakhani, sangam chwok, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJNakQaQAb6zkRYPRnsVM2paU",
+      "name": "Metro Market Pepsicola",
+      "at": [
+        85.367,
+        27.6924
+      ],
+      "address": "M9R8+WRQ, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ03rWNasX6zkRvVKX2tVv5mc",
+      "name": "Wai wai chock",
+      "at": [
+        85.30483,
+        27.64254
+      ],
+      "address": "J8R3+XWG, Ekantakuna Marg, Karyabinayak, Bagmati Province 44700, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJw47BAgAb6zkR-Rc2yeQnjCI",
+      "name": "Zentrix Mart",
+      "at": [
+        85.36993,
+        27.69119
+      ],
+      "address": "Suncity chowk, Bhaktapur, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "general_store",
+        "housing_complex",
+        "warehouse_store",
+        "asian_grocery_store",
+        "discount_supermarket",
+        "food_delivery",
+        "convenience_store",
+        "supermarket",
+        "grocery_store",
+        "food_store",
+        "home_goods_store",
+        "store",
+        "food",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJhQ7tdgAZ6zkRn5VNQqgSpzE",
+      "name": "Metro Market Jhamsikhel",
+      "at": [
+        85.30704,
+        27.67972
+      ],
+      "address": "M8H4+VRM, Om Shanti Galli, Lalitpur, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJpZatc0kY6zkRJqpkVqGu9Ss",
+      "name": "Mustang Mini Mart",
+      "at": [
+        85.3068,
+        27.68396
+      ],
+      "address": "M8M4+HPM, Lane 2, Lalitpur, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "convenience_store",
+        "liquor_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJyUZd1nUZ6zkRQUv6vfksPLE",
+      "name": "KK MART KALIKASTHAN",
+      "at": [
+        85.32729,
+        27.7047
+      ],
+      "address": "P83G+VWF, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJhaQNmkMY6zkRCeyEXYkxmOw",
+      "name": "Subha Shingal International Pvt. Ltd.",
+      "at": [
+        85.30162,
+        27.68518
+      ],
+      "address": "Lalitpur, Bagmati Province 44700, Nepal",
+      "shopKind": "convenience",
+      "types": [
+        "convenience_store",
+        "food_store",
+        "store",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJZ-0lBQAb6zkRCxHlCXlvR-s",
+      "name": "Luna Mart Kathmandu",
+      "at": [
+        85.36113,
+        27.71877
+      ],
+      "address": "Boudhadwar Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "supermarket",
+        "food_delivery",
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJbaj50egb6zkRtY0YfR-2XhE",
+      "name": "Big mart, Bahakha Bazaar, Nagadesh",
+      "at": [
+        85.38479,
+        27.68279
+      ],
+      "address": "Nagadesh, M9MM+4W7, पुरानो बाटो, मध्यपुर थिमि, बागमती प्रदेश 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJzWeMKgEb6zkRwS-Twy0X9o0",
+      "name": "MUDULA MART - KADAGHARI",
+      "at": [
+        85.37482,
+        27.69725
+      ],
+      "address": "Chautari Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJzXnZ7ncb6zkRH30cTDB8rlc",
+      "name": "Q Mart",
+      "at": [
+        85.3708,
+        27.69381
+      ],
+      "address": "Kageshwari Manohara-09, Madhyapur Thimi, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJFdbRPJgZ6zkRKZioJ4mS9x8",
+      "name": "Gps mart",
+      "at": [
+        85.348,
+        27.72176
+      ],
+      "address": "P8CX+P62, गोपी कृष्ण मार्ग, Kathmandu, Bagmati Province 44602, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJazD8cQAb6zkRutU6p1BQSYs",
+      "name": "Mangalam mini mart",
+      "at": [
+        85.37068,
+        27.69293
+      ],
+      "address": "M9VC+56G, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJI0zY7vwY6zkR4Kh25kED-K0",
+      "name": "Center Mart Departmental Store",
+      "at": [
+        85.31022,
+        27.7149
+      ],
+      "address": "Chaksibari Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "department_store",
+        "point_of_interest",
+        "store",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ-ZAuocEb6zkR5Szp5dnMCrk",
+      "name": "Bigmart Supermarket - Tikathali",
+      "at": [
+        85.3572,
+        27.66502
+      ],
+      "address": "M974+XVQ, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ5drj0cwe6zkRuboJCcwLzQQ",
+      "name": "Family Mini Mart",
+      "at": [
+        85.32723,
+        27.75307
+      ],
+      "address": "Q83G+6VH, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "degraded",
+      "why": "Night lights went dark here after the flood — no refrigeration (dry goods still usable).",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJfVu3agAZ6zkRPSPLyqD-yDc",
+      "name": "Manakamana Mart pvt ltd sukedhara Kathmandu",
+      "at": [
+        85.34602,
+        27.72768
+      ],
+      "address": "P8HW+44W, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "general_store",
+        "point_of_interest",
+        "food_store",
+        "store",
+        "food",
+        "establishment"
+      ],
+      "status": "degraded",
+      "why": "Night lights went dark here after the flood — no refrigeration (dry goods still usable).",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJrbOoBg8Z6zkRBDxw93NXwZ8",
+      "name": "Wholesale Supply Nepal",
+      "at": [
+        85.28411,
+        27.69946
+      ],
+      "address": "M7XM+QJQ, Gyanodaya Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "wholesaler",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJY4MbHYsZ6zkR7_TwNmVJV9g",
+      "name": "Vistaar Trade Pvt Ltd",
+      "at": [
+        85.30417,
+        27.6995
+      ],
+      "address": "Near, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "wholesaler",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJc8OTWIwZ6zkRJIcFxy3FxW8",
+      "name": "Wholesale Bazaar Nepal",
+      "at": [
+        85.34621,
+        27.68239
+      ],
+      "address": "338/4053, Samudayeek marg Tinkune Marg, काठमाडौँ, बागमती प्रदेश 44600, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJT20-vFYY6zkRUSJJxLHhuO0",
+      "name": "Sankata Consumer Co-Operativ Shop",
+      "at": [
+        85.30752,
+        27.70017
+      ],
+      "address": "P825+326, Nisthanad Marg, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "shopping_mall",
+        "grocery_store",
+        "food_store",
+        "store",
+        "wholesaler",
+        "service",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJTyy2VAAZ6zkRPodxXJ39hqI",
+      "name": "Luggage Bag Wholesale",
+      "at": [
+        85.30996,
+        27.70424
+      ],
+      "address": "Ranjana Galli, Kathmandu, Bagmati Province 44600, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "market",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJ3TwGzeIY6zkRGo5jzTXiYOY",
+      "name": "WholesaleNepal WSN Group leading suppliers in Kathmandu",
+      "at": [
+        85.31144,
+        27.7145
+      ],
+      "address": "720 Thamel Marg, Kathmandu, Bagmati Province 44601, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "wholesaler",
+        "jewelry_store",
+        "store",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJd_QKQbsb6zkRyR-15mG71W0",
+      "name": "Khadka And Sons Kirana Store - खड्का स्टाेर",
+      "at": [
+        85.38035,
+        27.71837
+      ],
+      "address": "Prithvinagar Bagmati Corridor Marga Gokarneshwor 5, काठमाडौँ, बागमती प्रदेश 44600, Nepal",
+      "shopKind": "grocery",
+      "types": [
+        "grocery_store",
+        "supermarket",
+        "food_delivery",
+        "convenience_store",
+        "shopping_mall",
+        "shipping_service",
+        "food_store",
+        "store",
+        "wholesaler",
+        "service",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJlc_Il5gZ6zkRMIkn1BY50lA",
+      "name": "Suvam Wholesale Mart",
+      "at": [
+        85.33881,
+        27.7188
+      ],
+      "address": "Rudra Mati Marg, Pahelopool, Bagmati Province 44600, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "wholesaler",
+        "service",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    },
+    {
+      "id": "ChIJNfwIP30Z6zkR7R1vh_pX-aU",
+      "name": "Thulo Pasal",
+      "at": [
+        85.32014,
+        27.68535
+      ],
+      "address": "Lalitpur, Bagmati Province 44700, Nepal",
+      "shopKind": "wholesaler",
+      "types": [
+        "wholesaler",
+        "service",
+        "food",
+        "point_of_interest",
+        "establishment"
+      ],
+      "status": "usable",
+      "why": "Dry, powered, and reachable under the observed flood layers.",
+      "access": "ok",
+      "extraMin": null,
+      "googleMin": null
+    }
+  ],
+  "pocketSupply": [
+    {
+      "id": "SP-1",
+      "name": "Cut-off pocket · Central valley",
+      "mid": [
+        85.39892,
+        27.67015
+      ],
+      "shopIds": [
+        "ChIJT3yRN4ga6zkRdJntipAwF3Q"
+      ],
+      "nearbyIds": [
+        "ChIJT3yRN4ga6zkRdJntipAwF3Q"
+      ],
+      "counts": {
+        "grocery": 1,
+        "convenience": 0,
+        "wholesaler": 0
+      },
+      "nearbyStatus": {
+        "total": 1,
+        "usable": 1,
+        "degraded": 0,
+        "lost": 0
+      },
+      "localSummary": "This pocket has 1 grocery store. Use local supply first, and send trucks only for what's missing.",
+      "statusSummary": "1 food shop nearby. 1 usable.",
+      "summary": "This pocket has 1 grocery store. Use local supply first, and send trucks only for what's missing. 1 food shop nearby. 1 usable."
+    },
+    {
+      "id": "SP-2",
+      "name": "Cut-off pocket · South west valley",
+      "mid": [
+        85.28901,
+        27.63086
+      ],
+      "shopIds": [],
+      "nearbyIds": [],
+      "counts": {
+        "grocery": 0,
+        "convenience": 0,
+        "wholesaler": 0
+      },
+      "nearbyStatus": {
+        "total": 0,
+        "usable": 0,
+        "degraded": 0,
+        "lost": 0
+      },
+      "localSummary": "No Google-listed food shops inside this pocket. Trucks must bring all supply.",
+      "statusSummary": "No Google-listed food shops within 1.5 km.",
+      "summary": "No Google-listed food shops inside this pocket. Trucks must bring all supply. No Google-listed food shops within 1.5 km."
+    },
+    {
+      "id": "SP-3",
+      "name": "Cut-off pocket · Central valley",
+      "mid": [
+        85.38394,
+        27.69783
+      ],
+      "shopIds": [],
+      "nearbyIds": [
+        "ChIJv_eJNEgb6zkR0oZCG9eMxMM",
+        "ChIJzWeMKgEb6zkRwS-Twy0X9o0",
+        "ChIJzXnZ7ncb6zkRH30cTDB8rlc",
+        "ChIJazD8cQAb6zkRutU6p1BQSYs"
+      ],
+      "counts": {
+        "grocery": 0,
+        "convenience": 0,
+        "wholesaler": 0
+      },
+      "nearbyStatus": {
+        "total": 4,
+        "usable": 4,
+        "degraded": 0,
+        "lost": 0
+      },
+      "localSummary": "No Google-listed food shops inside this pocket. Trucks must bring all supply.",
+      "statusSummary": "4 food shops nearby. 4 usable.",
+      "summary": "No Google-listed food shops inside this pocket. Trucks must bring all supply. 4 food shops nearby. 4 usable."
+    },
+    {
+      "id": "SP-4",
+      "name": "Cut-off pocket · Central valley",
+      "mid": [
+        85.40164,
+        27.67271
+      ],
+      "shopIds": [
+        "ChIJT3yRN4ga6zkRdJntipAwF3Q"
+      ],
+      "nearbyIds": [
+        "ChIJT3yRN4ga6zkRdJntipAwF3Q"
+      ],
+      "counts": {
+        "grocery": 1,
+        "convenience": 0,
+        "wholesaler": 0
+      },
+      "nearbyStatus": {
+        "total": 1,
+        "usable": 1,
+        "degraded": 0,
+        "lost": 0
+      },
+      "localSummary": "This pocket has 1 grocery store. Use local supply first, and send trucks only for what's missing.",
+      "statusSummary": "1 food shop nearby. 1 usable.",
+      "summary": "This pocket has 1 grocery store. Use local supply first, and send trucks only for what's missing. 1 food shop nearby. 1 usable."
+    },
+    {
+      "id": "SP-5",
+      "name": "Cut-off pocket · Central valley",
+      "mid": [
+        85.42026,
+        27.67015
+      ],
+      "shopIds": [],
+      "nearbyIds": [],
+      "counts": {
+        "grocery": 0,
+        "convenience": 0,
+        "wholesaler": 0
+      },
+      "nearbyStatus": {
+        "total": 0,
+        "usable": 0,
+        "degraded": 0,
+        "lost": 0
+      },
+      "localSummary": "No Google-listed food shops inside this pocket. Trucks must bring all supply.",
+      "statusSummary": "No Google-listed food shops within 1.5 km.",
+      "summary": "No Google-listed food shops inside this pocket. Trucks must bring all supply. No Google-listed food shops within 1.5 km."
+    },
+    {
+      "id": "SP-6",
+      "name": "Cut-off pocket · Central east valley",
+      "mid": [
+        85.48155,
+        27.67744
+      ],
+      "shopIds": [],
+      "nearbyIds": [],
+      "counts": {
+        "grocery": 0,
+        "convenience": 0,
+        "wholesaler": 0
+      },
+      "nearbyStatus": {
+        "total": 0,
+        "usable": 0,
+        "degraded": 0,
+        "lost": 0
+      },
+      "localSummary": "No Google-listed food shops inside this pocket. Trucks must bring all supply.",
+      "statusSummary": "No Google-listed food shops within 1.5 km.",
+      "summary": "No Google-listed food shops inside this pocket. Trucks must bring all supply. No Google-listed food shops within 1.5 km."
+    }
+  ],
+  "travel": [
+    {
+      "pocketId": "SP-1",
+      "depots": [
+        {
+          "id": "FD-1",
+          "name": "Food depot, central",
+          "googleMin": 25,
+          "nowMin": 19
+        },
+        {
+          "id": "FD-2",
+          "name": "Food depot, west",
+          "googleMin": 38,
+          "nowMin": 28
+        },
+        {
+          "id": "FD-3",
+          "name": "Food depot, east",
+          "googleMin": 15,
+          "nowMin": 13
+        }
+      ],
+      "closestId": "FD-3",
+      "fastestNowId": "FD-3",
+      "summary": "Normally 15 min, now 13 min from east."
+    },
+    {
+      "pocketId": "SP-2",
+      "depots": [
+        {
+          "id": "FD-1",
+          "name": "Food depot, central",
+          "googleMin": 41,
+          "nowMin": 26
+        },
+        {
+          "id": "FD-2",
+          "name": "Food depot, west",
+          "googleMin": 33,
+          "nowMin": 25
+        },
+        {
+          "id": "FD-3",
+          "name": "Food depot, east",
+          "googleMin": 50,
+          "nowMin": 35
+        }
+      ],
+      "closestId": "FD-2",
+      "fastestNowId": "FD-2",
+      "summary": "Normally 33 min, now 25 min from west."
+    },
+    {
+      "pocketId": "SP-3",
+      "depots": [
+        {
+          "id": "FD-1",
+          "name": "Food depot, central",
+          "googleMin": 23,
+          "nowMin": 17
+        },
+        {
+          "id": "FD-2",
+          "name": "Food depot, west",
+          "googleMin": 33,
+          "nowMin": 25
+        },
+        {
+          "id": "FD-3",
+          "name": "Food depot, east",
+          "googleMin": 13,
+          "nowMin": 24
+        }
+      ],
+      "closestId": "FD-3",
+      "fastestNowId": "FD-1",
+      "summary": "Normally 23 min from central, now 17 min. The closest depot is no longer the fastest one."
+    },
+    {
+      "pocketId": "SP-4",
+      "depots": [
+        {
+          "id": "FD-1",
+          "name": "Food depot, central",
+          "googleMin": 23,
+          "nowMin": 16
+        },
+        {
+          "id": "FD-2",
+          "name": "Food depot, west",
+          "googleMin": 35,
+          "nowMin": 25
+        },
+        {
+          "id": "FD-3",
+          "name": "Food depot, east",
+          "googleMin": 12,
+          "nowMin": 11
+        }
+      ],
+      "closestId": "FD-3",
+      "fastestNowId": "FD-3",
+      "summary": "Normally 12 min, now 11 min from east."
+    },
+    {
+      "pocketId": "SP-5",
+      "depots": [
+        {
+          "id": "FD-1",
+          "name": "Food depot, central",
+          "googleMin": 26,
+          "nowMin": 18
+        },
+        {
+          "id": "FD-2",
+          "name": "Food depot, west",
+          "googleMin": 39,
+          "nowMin": 26
+        },
+        {
+          "id": "FD-3",
+          "name": "Food depot, east",
+          "googleMin": 12,
+          "nowMin": 10
+        }
+      ],
+      "closestId": "FD-3",
+      "fastestNowId": "FD-3",
+      "summary": "Normally 12 min, now 10 min from east."
+    },
+    {
+      "pocketId": "SP-6",
+      "depots": [
+        {
+          "id": "FD-1",
+          "name": "Food depot, central",
+          "googleMin": 41,
+          "nowMin": 36
+        },
+        {
+          "id": "FD-2",
+          "name": "Food depot, west",
+          "googleMin": 53,
+          "nowMin": 45
+        },
+        {
+          "id": "FD-3",
+          "name": "Food depot, east",
+          "googleMin": 27,
+          "nowMin": 29
+        }
+      ],
+      "closestId": "FD-3",
+      "fastestNowId": "FD-3",
+      "summary": "Normally 27 min, now 29 min from east."
+    }
+  ]
+}

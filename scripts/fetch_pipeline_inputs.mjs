@@ -1,5 +1,5 @@
 // Fetch the inputs for the forward pipeline from the public BIPAD API (no key):
-//   wards.json             ward centroids/bboxes for the valley
+//   wards_bipad.json       ward centroids/bboxes + census for the valley (wards.json is the OSM ward boundaries, see fetch_wards.mjs)
 //   gauges.json            hourly rain + river level for valley stations, monsoon windows 2021-2026
 //   incidents_history.json verified incidents for the same windows (labels; never a model input for the same day)
 // Raw responses are cached under .cache/bipad so reruns are cheap and the API is not hit twice.
@@ -89,7 +89,7 @@ for (let url = "demographic/?format=json&limit=500&census_year=2021", n = 0; url
   for (const d of j.results) if (d.municipality && d.censusYear === "2021") census.set(d.municipality, d.totalPopulation);
   url = j.next && j.results.length ? j.next : null;
 }
-writeFileSync(OUT + "wards.json", JSON.stringify({
+writeFileSync(OUT + "wards_bipad.json", JSON.stringify({
   source: "BIPAD Portal /api/v1/ward/ and /api/v1/demographic/ (census 2021)", retrievedAt: new Date().toISOString(),
   note: "Centroid inside the analysis extent. BIPAD exposes centroid + bbox here, not ward polygons. Census population is per municipality, not per ward.",
   wards: wards.map((w) => ({ id: w.id, name: `${munis.get(w.municipality) ?? w.municipality}-${w.title}`, municipality: w.municipality, municipalityPop2021: census.get(w.municipality) ?? null, lon: w.centroid.coordinates[0], lat: w.centroid.coordinates[1], bbox: w.bbox })),

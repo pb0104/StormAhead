@@ -4,6 +4,8 @@
  * under the observed UNOSAT flood of 30 Sep 2024, which is the flood the console draws. Nothing here is a forecast.
  */
 import raw from "../../../../data/real/kathmandu/ops_layers.json";
+import googleRaw from "../../../../data/real/kathmandu/google_places.json";
+import foodRaw from "../../../../data/real/kathmandu/google_food.json";
 import type { Entity, Geometry } from "../../../../packages/ports/index.ts";
 
 type Status = { access: "ok" | "degraded" | "lost" | "unknown"; why: string; extraMin: number | null; nearestClosedM: number | null; nearestClosed: string | null };
@@ -26,11 +28,58 @@ export const PROVENANCE = {
   placeModelled: { tag: "real", text: "Real place (BIPAD). Status modelled from the observed flood" },
   record: { tag: "real", text: "Real record (BIPAD)" },
   post: { tag: "real", text: "Real post (Reddit, via Arctic Shift). Place matched by name" },
+  cellModelled: { tag: "modelled", text: "Real OpenCelliD position. Status modelled from flood + night lights" },
+  nightLights: { tag: "real", text: "NASA Black Marble night lights · likely power loss" },
+  googlePlaces: { tag: "real", text: "Google Places (live snapshot). Status not flood-modelled" },
   modelled: { tag: "modelled", text: "Modelled from the observed flood (UNOSAT, 30 Sep 2024)" },
   simulated: { tag: "simulated", text: "Simulated for the demo. No public feed" },
 } as const;
 
+type GPlace = { id: string; name: string; at: [number, number]; address?: string | null; types?: string[]; kind: string };
+type GooglePack = { careHomes: GPlace[]; fireStations: GPlace[]; police: GPlace[]; hospitals: GPlace[] };
+export const GOOGLE = googleRaw as unknown as GooglePack;
+
+type FoodShop = {
+  id: string; name: string; at: [number, number]; address?: string | null;
+  shopKind: "grocery" | "convenience" | "wholesaler"; status: "lost" | "degraded" | "usable"; why: string;
+};
+type PocketFood = {
+  id: string; name: string; mid: [number, number]; localSummary: string; statusSummary: string; summary: string;
+  counts: Record<string, number>; nearbyStatus: Record<string, number>;
+};
+type PocketTravel = {
+  pocketId: string; summary: string; closestId: string | null; fastestNowId: string | null;
+  depots: { id: string; name: string; googleMin: number | null; nowMin: number | null }[];
+};
+type FoodPack = {
+  depots: { id: string; name: string; at: [number, number]; packs: number }[];
+  shops: FoodShop[];
+  pocketSupply: PocketFood[];
+  travel: PocketTravel[];
+};
+export const FOOD = foodRaw as unknown as FoodPack;
+export const POCKET_FOOD = new Map(FOOD.pocketSupply.map((p) => [p.id, p]));
+export const POCKET_TRAVEL = new Map(FOOD.travel.map((t) => [t.pocketId, t]));
+
 const pt = (at: [number, number]): Extract<Geometry, { type: "Point" }> => ({ type: "Point", coordinates: at });
+
+/** Simulated relief depots (stock invented) + Google Places shops with modelled status. */
+export const FOOD_DEPOTS: Entity[] = FOOD.depots.map((d) => ({
+  kind: "food" as const, id: d.id, name: d.name, at: d.at, geom: pt(d.at),
+  props: { packs: d.packs, role: "depot", shopKind: "depot", status: "usable", prov: "simulated" },
+}));
+const shopAccess = (s: FoodShop) => (s.status === "lost" ? "lost" : s.status === "degraded" ? "degraded" : "ok");
+export const FOOD_SHOPS: Entity[] = FOOD.shops.map((s, i) => ({
+  kind: "food" as const,
+  id: `FS-${i + 1}`,
+  name: s.name,
+  at: s.at,
+  geom: pt(s.at),
+  props: {
+    packs: 0, role: "shop", shopKind: s.shopKind, status: s.status, access: shopAccess(s),
+    why: s.why, address: s.address ?? "", placeId: s.id, prov: "googlePlaces",
+  },
+}));
 const circle = (at: [number, number], m: number): Extract<Geometry, { type: "Polygon" }> => {
   const ring: [number, number][] = [];
   for (let i = 0; i <= 24; i++) { const a = (i / 24) * Math.PI * 2; ring.push([at[0] + (Math.cos(a) * m) / 98600, at[1] + (Math.sin(a) * m) / 110600]); }
@@ -74,9 +123,42 @@ export const SHELTERS: Entity[] = OPS.openSpaces.filter((o) => o.source === "IOM
   kind: "shelter", id: `OS-${o.id}`, name: o.name, at: o.at, geom: pt(o.at), props: { ...statusProps(o), designated: "IOM humanitarian open space" },
 }));
 
+/** Google Places elderly / nursing homes — net-new vs BIPAD; drawn as shelters. */
+export const CARE_HOMES: Entity[] = GOOGLE.careHomes.map((p, i) => ({
+  kind: "shelter" as const,
+  id: `GH-${i + 1}`,
+  name: p.name,
+  at: p.at,
+  geom: pt(p.at),
+  props: {
+    access: "none", why: "Google Places snapshot — flood road status not modelled yet",
+    extraMin: 0, closureM: 0, closure: "",
+    designated: "Elderly / nursing care (Google Places)",
+    address: p.address ?? "", placeId: p.id, prov: "googlePlaces",
+  },
+}));
+
 /** Fire engines and police: real bases that response can come from. */
 export const RESPONDERS: Entity[] = OPS.responders.map((r) => ({
   kind: "qrt", id: `RB-${r.id}`, name: /^(fire engine|police( station)?)$/i.test(r.name.trim()) || r.name.length <= 3 ? `${r.type} base ${r.id}` : r.name, at: r.at, geom: pt(r.at), props: { ...statusProps(r), unit: r.type },
+}));
+
+/** Google fire + police — skip if within ~120 m of an existing BIPAD responder. */
+const nearBipad = (at: [number, number]) => RESPONDERS.some((r) => dm(r.at, at) < 120);
+export const GOOGLE_RESPONDERS: Entity[] = [
+  ...GOOGLE.fireStations.map((p, i) => ({ p, i, unit: "Fire" as const })),
+  ...GOOGLE.police.map((p, i) => ({ p, i: i + 1000, unit: "Police" as const })),
+].filter(({ p }) => !nearBipad(p.at)).map(({ p, i, unit }) => ({
+  kind: "qrt" as const,
+  id: `GR-${i + 1}`,
+  name: p.name,
+  at: p.at,
+  geom: pt(p.at),
+  props: {
+    access: "none", why: "Google Places snapshot — flood road status not modelled yet",
+    extraMin: 0, closureM: 0, closure: "",
+    unit, address: p.address ?? "", placeId: p.id, prov: "googlePlaces",
+  },
 }));
 
 export const ARMY: Entity[] = OPS.army.map((a) => ({

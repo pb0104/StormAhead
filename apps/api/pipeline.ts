@@ -8,7 +8,7 @@ import type { AgentEvent } from "../../packages/shared/events.ts";
 import { HttpError } from "./common.ts";
 import { KTM_DIR } from "./hindcast.ts";
 
-const FILES = ["gauges", "wards", "terrain", "incidents_history", "network", "places"];
+const FILES = ["gauges", "wards_bipad", "terrain", "incidents_history", "network", "places"];
 const OUTLET_RIVER_ID = 4; // Bagmati at Khokana: the valley outlet
 const STEEP_DEG = 30;      // assumption: ground this steep beside a road counts as landslide-exposed
 
@@ -39,7 +39,7 @@ export class PipelineService {
       edges: net.edges.map((e: any[]) => ({ u: e[0], v: e[1], minutes: e[2], lengthM: e[3], cls: e[4], bridge: !!e[5], floodedShare: e[6], name: e[7], osmWayId: e[8], mid: e[9], distFloodM: e[10], via: e[11] })),
     };
     const terrainById = new Map(this.terrain.wards.map((w) => [w.id, w]));
-    const wards = estimateWardPopulation((read("wards").wards as WardInfo[]).map((w) => ({ ...w, ...terrainById.get(w.id)! })));
+    const wards = estimateWardPopulation((read("wards_bipad").wards as WardInfo[]).map((w) => ({ ...w, ...terrainById.get(w.id)! })));
     const years = [...new Set(Object.values(this.gauges.rain).flatMap((s) => Object.keys(s.mm).map(Number)))].sort();
     this.days = buildWardDays(this.gauges, wards, years);
   }

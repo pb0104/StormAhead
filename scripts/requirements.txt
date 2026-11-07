@@ -5,3 +5,5 @@ rasterio
 pandas
 anthropic
 openai
+Pillow
+h5py

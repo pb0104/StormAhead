@@ -1,22 +1,23 @@
 import type { Vis } from "./MapStage.tsx";
 import { Glyph } from "./Glyph.tsx";
 import type { TerrainResult as Terrain, Weather } from "../../../packages/ports/index.ts";
+import { MERGED_CHIPS } from "./mergedPack.ts";
 import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 
 const INPUTS: { group: string; items: [string, string][] }[] = [
-  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell towers"]] },
+  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell sites"]] },
   { group: "Live feeds", items: [["weather", "Weather"], ["atmosphere", "Atmosphere"], ["dams", "River gauges"], ["social", "Social media"]] },
   { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["helipads", "Helipads"], ["army", "Army sites"]] },
 ];
 const OUTPUTS: [string, string][] = [
-  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "Responder bases"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Official alerts"],
+  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "Responder bases"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Official alerts"], ["verify", "Verification (real)"],
 ];
 const STAGES: [number, string][] = [[1, "Now"], [2, "+6 h"], [3, "Peak +12 h"]];
 
 export type RailProps = {
   open: boolean; setOpen: (b: boolean) => void; vis: Vis; toggle: (k: string) => void; stage: number; setStage: (n: number) => void;
   rain: number; setRain: (n: number) => void; weather: Weather; terrain: Terrain; wet: number; total: number; deepest: number; flowText: string;
-  ran: boolean; busy: boolean; run: () => void; legendOpen: boolean; setLegendOpen: (b: boolean) => void; actionsDone: number; openDetails: () => void;
+  ran: boolean; busy: boolean; run: () => void; swipeOn: boolean; legendOpen: boolean; setLegendOpen: (b: boolean) => void; actionsDone: number; openDetails: () => void;
 };
 
 export function CommandRail(p: RailProps) {
@@ -27,7 +28,7 @@ export function CommandRail(p: RailProps) {
           <div className="brand"><span className="b1">Cascade</span><span className="b2">IQ</span></div>
           <button className="icon rail-close" onClick={() => p.setOpen(false)} aria-label="Close command rail">×</button>
         </div>
-        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges and social posts are <b>real</b>; towers, outages, radio and food depots are <b>simulated</b>.</p>
+        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges, cell sites, night-light outages and social posts are <b>real</b> (status modelled where noted); radio and depot stock are <b>simulated</b>.</p>
 
         <section>
           <label className="lbl" htmlFor="scn">Scenario</label>
@@ -67,7 +68,20 @@ export function CommandRail(p: RailProps) {
 
         <section>
           <h2 className="lbl">Outputs</h2>
-          <div className="chips">{OUTPUTS.map(([k, l]) => <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>)}</div>
+          <div className="chips">
+            {OUTPUTS.map(([k, l]) => <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>)}
+            <button className="chip out" aria-pressed={p.swipeOn} onClick={() => p.toggle("swipe")}>Before / after imagery</button>
+          </div>
+          {p.swipeOn && (
+            <div className="grp" style={{ marginTop: 10 }}>
+              <span className="grp-n">Merged evidence (on with swipe)</span>
+              <div className="chips">
+                {MERGED_CHIPS.map(([k, l]) => (
+                  <button key={k} className="chip out" aria-pressed={!!p.vis[k]} onClick={() => p.toggle(k)}>{l}</button>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="legend">
@@ -80,9 +94,15 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw fill" style={{ background: "#3E8FD3A0", borderColor: "#CDF0FF" }} />Pooled runoff, with flow streaks</li>
             <li><i className="sw line dash" style={{ borderColor: "#FFB020" }} />Cut-off road pocket</li>
             <li><i className="sw fill" style={{ background: "#FF7A1A55", borderColor: "#FF7A1A" }} />Landslide zone</li>
-            <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Grid outage</li>
+            <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Night-lights outage</li>
+            <li><i className="sw line" style={{ background: "#FF6B4A" }} />Merged road impact <em className="real">real∩modelled</em></li>
+            <li><i className="sw line dash" style={{ borderColor: "#E8F0FF" }} />Maxar STAC footprint <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#A78BFA", borderColor: "#FFFFFF" }} />NDRRMA summary <em className="real">report</em></li>
             <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
             <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#46D68C80", borderColor: "#46D68C" }} />Ward correctly flagged <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#FF4A3D8C", borderColor: "#FF4A3D" }} />Ward missed: damage reported, nothing flagged <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#FFB02024", borderColor: "#FFB020" }} />Ward false alarm <em className="real">real</em></li>
             {p.legendOpen && (
               <>
                 <li><i className="sw fill" style={{ background: "#FFB020cc", borderColor: "#FFB020" }} />Building, shelter on upper floors <em className="real">real</em></li>
@@ -97,9 +117,8 @@ export function CommandRail(p: RailProps) {
                 <li><Glyph kind="airport" ring="#46D68C" />Airport, access ok · <Glyph kind="airport" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="helipad" ring="#46D68C" />Helipad, access ok · <Glyph kind="helipad" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="army" ring="#46D68C" />Army base, access ok · <Glyph kind="army" ring="#FFB020" badge />limited</li>
-                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell tower up</li>
-                <li><i className="sw dot sm" style={{ background: "#FF8E7A" }} />Cell tower down</li>
-                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />Dam</li>
+                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell site (OpenCelliD) · <i className="sw dot sm" style={{ background: "#FFB020" }} />at risk · <i className="sw dot sm" style={{ background: "#FF8E7A" }} />down, modelled</li>
+                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />River gauge</li>
                 <li><Glyph kind="qrt" ring="#0B1318" />QRT · <Glyph kind="shelter" ring="#0B1318" />Shelter · <Glyph kind="food" ring="#0B1318" />Food</li>
                 <li><i className="sw fill" style={{ background: "#2B7BFF47", borderColor: "#6FB0FF" }} />Low ground · <i className="sw fill" style={{ background: "#4DA3FF30", borderColor: "#4DA3FF" }} />Rain</li>
               </>

@@ -4,7 +4,7 @@ Terrain stage of the forward pipeline: elevation -> HAND + slope, attached to ro
 Input  (download once, ~45 MB, no key):
   https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N27_00_E085_00_DEM/Copernicus_DSM_COG_10_N27_00_E085_00_DEM.tif
 Run:   python -I scripts/prepare_terrain.py --dem <that .tif> --out data/real/kathmandu
-Needs: network.json, places.json (prepare_kathmandu.py) and wards.json (fetch_pipeline_inputs.mjs) in --out.
+Needs: network.json, places.json (prepare_kathmandu.py) and wards_bipad.json (fetch_pipeline_inputs.mjs) in --out.
 
 HAND = Height Above Nearest Drainage: how far a cell sits above the stream it drains to. It uses no flood imagery, so it is
 a PRE-event susceptibility layer, not a forecast. Drainage comes from a priority-flood traversal: each cell drains along the
@@ -115,7 +115,7 @@ def rc(lon, lat):
 
 net = json.load(open(out + "network.json"))
 pl = json.load(open(out + "places.json"))
-wards = json.load(open(out + "wards.json"))["wards"]
+wards = json.load(open(out + "wards_bipad.json"))["wards"]
 nodes = net["nodes"]
 wxy = np.array([[w["lon"] * KX, w["lat"] * KY] for w in wards])
 

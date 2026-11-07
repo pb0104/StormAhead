@@ -105,7 +105,7 @@ With no flood imagery as input, low HAND ranks UNOSAT's flooded roads well (AUC 
 - **Population is a rough estimate.** Municipal census is spread over wards by road length.
 - **Ward areas are approximate.** They use nearest centroid, because this feed has no polygons.
 - **Terrain is a surface model.** GLO-30 includes buildings and trees. Its false dam at the valley gorge needed breaching (fill reached 52 m).
-- **Licences:** BIPAD states none, so confirm before redistributing `gauges.json`, `wards.json` and `incidents_history.json`.
+- **Licences:** BIPAD states none, so confirm before redistributing `gauges.json`, `wards_bipad.json` and `incidents_history.json`.
 
 ## Next steps
 

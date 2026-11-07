@@ -5,7 +5,16 @@ import { fileURLToPath } from "node:url";
 const root = fileURLToPath(new URL(".", import.meta.url));
 export default defineConfig({
   root,
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: "geojson-as-json",
+      transform(src, id) {
+        if (!id.split("?")[0].endsWith(".geojson")) return;
+        return { code: `export default ${src}`, map: null };
+      },
+    },
+  ],
   server: {
     port: 5173,
     fs: { allow: [fileURLToPath(new URL("../..", import.meta.url))] },

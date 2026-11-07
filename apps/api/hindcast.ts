@@ -2,6 +2,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { analyzeCascade, DEFAULT_PARAMS, DEFAULT_SCORE, scoreAgainstIncidents, SHELTER, type CascadeParams, type CascadeResult, type Incident, type RealArea, type RealBuilding, type ScoreResult } from "../../packages/analysis/cascade.ts";
+import { DEFAULT_WARD_SCORE, scoreByWard, type Ward, type WardScorecard } from "../../packages/analysis/wards.ts";
 import type { AgentEvent } from "../../packages/shared/events.ts";
 import { HttpError } from "./common.ts";
 
@@ -33,6 +34,11 @@ export class HindcastService {
   /** Footprint rings, parallel to area.buildings. Kept out of RealBuilding: the engine reasons about centroids. */
   private buildingRings: [number, number][][] | null = null;
   private buildingsGeoCache: unknown = null;
+  private scorecardCache: unknown = null;
+  private verifyGeoCache: unknown = null;
+  /** Ward polygons: EVALUATION geometry only, never a model input. */
+  wards: Ward[] = [];
+  wardsMeta: Record<string, unknown> | null = null;
   private roadsGeo: unknown = null;
 
   constructor(dir = KTM_DIR) {
@@ -57,6 +63,11 @@ export class HindcastService {
       edges: net.edges.map((e: any[]) => ({ u: e[0], v: e[1], minutes: e[2], lengthM: e[3], cls: e[4], bridge: !!e[5], floodedShare: e[6], name: e[7], osmWayId: e[8], mid: e[9], distFloodM: e[10], via: e[11] })),
       places: pl.places, hospitals: pl.hospitals, buildings,
     };
+    if (existsSync(dir + "wards.json")) {
+      const wf = JSON.parse(readFileSync(dir + "wards.json", "utf8"));
+      this.wards = wf.wards;
+      this.wardsMeta = { source: wf.source, snapshot: wf.snapshot, licence: wf.licence, role: wf.role, counts: wf.counts };
+    }
     this.floodGeo = JSON.parse(readFileSync(dir + "flood_extent.geojson", "utf8"));
     const inc = JSON.parse(readFileSync(dir + "incidents.json", "utf8"));
     this.incidents = inc.incidents; this.incidentsMeta = { source: inc.source, window: inc.window, retrievedAt: inc.retrievedAt, note: inc.note, nationalIncidentsInWindow: inc.nationalIncidentsInWindow };
@@ -65,7 +76,7 @@ export class HindcastService {
   static available(dir = KTM_DIR) { return ["provenance", "network", "places", "flood_extent", "incidents"].every((f) => existsSync(dir + f + (f === "flood_extent" ? ".geojson" : ".json"))); }
 
   meta() {
-    return { available: true, provenance: this.prov, incidents: this.incidentsMeta, buildings: this.buildingsMeta, shelterAssumptions: SHELTER, evaluationIncidents: this.incidents.length, defaults: { params: DEFAULT_PARAMS, score: DEFAULT_SCORE } };
+    return { available: true, provenance: this.prov, incidents: this.incidentsMeta, buildings: this.buildingsMeta, wards: this.wardsMeta, shelterAssumptions: SHELTER, evaluationIncidents: this.incidents.length, defaults: { params: DEFAULT_PARAMS, score: DEFAULT_SCORE } };
   }
 
   /**
@@ -84,6 +95,60 @@ export class HindcastService {
       })),
     };
     return this.buildingsGeoCache;
+  }
+
+  /**
+   * Per-agent ward scorecard on its own, without the sensitivity sweeps that make a full run slow.
+   * This evaluates the REAL hindcast engine against withheld incident reports — it says nothing about the
+   * demo console's mock closures, and the UI that shows it must say so.
+   */
+  scorecard() {
+    if (!this.wards.length) return null;
+    this.scorecardCache ??= {
+      wardScore: scoreByWard(this.area, analyzeCascade(this.area, DEFAULT_PARAMS), this.incidents, this.wards, DEFAULT_WARD_SCORE),
+      network: { source: this.prov.network.source, snapshot: this.prov.network.snapshot },
+      wards: this.wardsMeta,
+      incidents: { source: this.incidentsMeta.source, window: this.incidentsMeta.window },
+    };
+    return this.scorecardCache;
+  }
+
+  /**
+   * The verification map: ward polygons carrying their outcome (hit / false alarm / miss), plus the incident
+   * points that form the ground truth. This is the scorecard drawn as geography.
+   */
+  verificationGeo() {
+    const sc = this.scorecard() as { wardScore: WardScorecard } | null;
+    if (!sc) return null;
+    this.verifyGeoCache ??= (() => {
+      const byId = new Map(this.wards.map((w) => [w.id, w]));
+      const scored = this.incidents.filter((i) => i.floodRelated && i.hasImpact && DEFAULT_WARD_SCORE.primaryHazards.includes(i.hazard));
+      return {
+        wards: {
+          type: "FeatureCollection",
+          features: sc.wardScore.detail.flatMap((d) => {
+            const w = byId.get(d.id);
+            if (!w) return [];
+            return [{
+              type: "Feature",
+              properties: { id: d.id, name: d.name, outcome: d.outcome, reported: d.reported ? 1 : 0, incidents: d.incidents, flaggedBy: d.flaggedBy.join(", ") },
+              geometry: { type: "Polygon", coordinates: w.rings },
+            }];
+          }),
+        },
+        incidents: {
+          type: "FeatureCollection",
+          features: scored.map((i) => ({
+            type: "Feature",
+            properties: { id: i.id, title: i.title, hazard: i.hazard, on: i.incidentOn.slice(0, 10) },
+            geometry: { type: "Point", coordinates: [i.lon, i.lat] },
+          })),
+        },
+        summary: { wards: sc.wardScore.wards, truthWards: sc.wardScore.truthWards, evaluatedIncidents: sc.wardScore.evaluatedIncidents },
+        note: "Scores the REAL hindcast engine against withheld BIPAD reports. The closures drawn on the console map are demo data and are NOT what is scored here.",
+      };
+    })();
+    return this.verifyGeoCache;
   }
 
   /** Static geometry for the map; cached. Edge index `i` is the key used by results. */
@@ -159,8 +224,19 @@ export class HindcastService {
       buildingsOnly: strip(scoreAgainstIncidents(this.area, res, this.incidents, { ...DEFAULT_SCORE, buildingsOnly: true })),
       note: "EXPLORATORY: target set chosen after seeing the primary null result. Baselines draw the same number of items per class from the same dry pools, so a larger target set cannot flatter the model.",
     } : null;
+    // Ward-level scorecard: each agent's concerns against the wards that actually reported damage.
+    let wardScore: WardScorecard | null = null;
+    if (this.wards.length) {
+      wardScore = scoreByWard(this.area, res, this.incidents, this.wards, DEFAULT_WARD_SCORE);
+      const line = wardScore.agents.map((a) => {
+        const c = a.confusion;
+        return `${a.agent}: flagged ${a.flaggedWards}, hit ${c.tp}/${wardScore!.truthWards} (random ${a.randomBaseline.meanTp.toFixed(1)}, p=${a.randomBaseline.p.toFixed(3)}), ${c.fp} false alarms`;
+      }).join(" | ");
+      emit("Verification Agent", "scoreByWard", { wards: wardScore.wards, truthWards: wardScore.truthWards },
+        `Ward-level scorecard over ${wardScore.wards} wards; ${wardScore.truthWards} reported damage. ${line}`, ["EV-KTM-BIPAD", "EV-KTM-WARDS"]);
+    }
     emit("Coordinator", "sensitivityAnalysis", { closeShare: [0.1, 0.3, 0.5] }, `Headline recomputed at three closure thresholds; landslide incidents scored separately as an out-of-model check.`, []);
-    return { runId, params: p, result: compact(res), score, sensitivity: sens, radiusSensitivity, landslideCheck: strip(slide), buildingTargets, events };
+    return { runId, params: p, result: compact(res), score, sensitivity: sens, radiusSensitivity, landslideCheck: strip(slide), buildingTargets, wardScore, events };
   }
 }
 

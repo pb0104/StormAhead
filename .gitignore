@@ -6,3 +6,9 @@ data/cache
 .env
 .env.local
 *.local
+
+# kathmandu-0926 shares the hazard and ground truth with kathmandu/ — copied in, never a second copy in git
+# (scripts/fetch_network_attic.mjs prints the cp command)
+data/real/kathmandu-0926/flood_extent.geojson
+data/real/kathmandu-0926/incidents.json
+data/real/kathmandu-0926/wards.json
