@@ -3,7 +3,7 @@ import { Glyph } from "./Glyph.tsx";
 import type { Terrain, Weather } from "./agents.ts";
 
 const INPUTS: { group: string; items: [string, string][] }[] = [
-  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell towers"]] },
+  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell sites"]] },
   { group: "Live feeds", items: [["weather", "Weather"], ["dams", "Dams"], ["social", "Social media"], ["radio", "Radio"]] },
   { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["army", "Army bases"]] },
 ];
@@ -92,8 +92,7 @@ export function CommandRail(p: RailProps) {
                 <li><Glyph kind="school" ring="#FF4A3D" badge />School, high risk</li>
                 <li><Glyph kind="airport" ring="#46D68C" />Airport, access ok · <Glyph kind="airport" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="army" ring="#46D68C" />Army base, access ok · <Glyph kind="army" ring="#FFB020" badge />limited</li>
-                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell tower up</li>
-                <li><i className="sw dot sm" style={{ background: "#FF8E7A" }} />Cell tower down</li>
+                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell site (OpenCelliD) · <i className="sw dot sm" style={{ background: "#FFB020" }} />at risk · <i className="sw dot sm" style={{ background: "#FF8E7A" }} />down, modelled</li>
                 <li><i className="sw dot" style={{ background: "#7CC4FF" }} />Dam gauge</li>
                 <li><i className="sw dot sm" style={{ background: "#9BC2D6" }} />Social post · <i className="sw dot sm" style={{ background: "#B8E0C4" }} />Radio call</li>
                 <li><Glyph kind="qrt" ring="#0B1318" />QRT · <Glyph kind="shelter" ring="#0B1318" />Shelter · <Glyph kind="food" ring="#0B1318" />Food</li>

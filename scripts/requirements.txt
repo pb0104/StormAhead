@@ -1,2 +1,4 @@
 pyogrio
 shapely
+h5py
+numpy
