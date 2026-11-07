@@ -104,3 +104,40 @@ describe("per-agent ward scorecard", () => {
     expect(JSON.stringify(a.agents)).toEqual(JSON.stringify(b.agents));
   });
 });
+
+describe("per-ward outcomes, for the verification map", () => {
+  const wards = [85.30, 85.32, 85.34, 85.36, 85.38].map((lon, i) => W(i + 1, lon));
+  const res = analyzeCascade(area);
+  const opt = { ...DEFAULT_WARD_SCORE, permutations: 100 };
+
+  it("labels every ward exactly once, and the labels agree with the confusion matrix", () => {
+    const s = scoreByWard(area, res, [inc(1, 85.36)], wards, opt);
+    expect(s.detail).toHaveLength(wards.length);
+    const n = (o: string) => s.detail.filter((d) => d.outcome === o).length;
+    expect(n("hit") + n("false-alarm") + n("miss") + n("correct-reject")).toBe(wards.length);
+    const combined = s.agents.find((a) => a.agent === "All agents combined")!.confusion;
+    expect(n("hit")).toBe(combined.tp);
+    expect(n("false-alarm")).toBe(combined.fp);
+    expect(n("miss")).toBe(combined.fn);
+    expect(n("correct-reject")).toBe(combined.tn);
+  });
+  it("a flagged ward that reported damage is a hit; an unflagged one that did is a miss", () => {
+    const s = scoreByWard(area, res, [inc(1, 85.36)], wards, opt);
+    for (const d of s.detail) {
+      if (d.outcome === "hit") { expect(d.flaggedBy.length).toBeGreaterThan(0); expect(d.reported).toBe(true); }
+      if (d.outcome === "miss") { expect(d.flaggedBy).toEqual([]); expect(d.reported).toBe(true); }
+      if (d.outcome === "false-alarm") { expect(d.flaggedBy.length).toBeGreaterThan(0); expect(d.reported).toBe(false); }
+      if (d.outcome === "correct-reject") { expect(d.flaggedBy).toEqual([]); expect(d.reported).toBe(false); }
+    }
+  });
+  it("the given hazard is never counted as a prediction on the map", () => {
+    const s = scoreByWard(area, res, [inc(1, 85.36)], wards, opt);
+    for (const d of s.detail) expect(d.flaggedBy.join()).not.toMatch(/Hazard|GIVEN/);
+  });
+  it("counts the reports behind each damaged ward", () => {
+    const s = scoreByWard(area, res, [inc(1, 85.36), inc(2, 85.36), inc(3, 85.30)], wards, opt);
+    const reported = s.detail.filter((d) => d.reported);
+    expect(reported.reduce((t, d) => t + d.incidents, 0)).toBe(3);
+    expect(Math.max(...reported.map((d) => d.incidents))).toBe(2);
+  });
+});

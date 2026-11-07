@@ -35,6 +35,7 @@ export class HindcastService {
   private buildingRings: [number, number][][] | null = null;
   private buildingsGeoCache: unknown = null;
   private scorecardCache: unknown = null;
+  private verifyGeoCache: unknown = null;
   /** Ward polygons: EVALUATION geometry only, never a model input. */
   wards: Ward[] = [];
   wardsMeta: Record<string, unknown> | null = null;
@@ -110,6 +111,44 @@ export class HindcastService {
       incidents: { source: this.incidentsMeta.source, window: this.incidentsMeta.window },
     };
     return this.scorecardCache;
+  }
+
+  /**
+   * The verification map: ward polygons carrying their outcome (hit / false alarm / miss), plus the incident
+   * points that form the ground truth. This is the scorecard drawn as geography.
+   */
+  verificationGeo() {
+    const sc = this.scorecard() as { wardScore: WardScorecard } | null;
+    if (!sc) return null;
+    this.verifyGeoCache ??= (() => {
+      const byId = new Map(this.wards.map((w) => [w.id, w]));
+      const scored = this.incidents.filter((i) => i.floodRelated && i.hasImpact && DEFAULT_WARD_SCORE.primaryHazards.includes(i.hazard));
+      return {
+        wards: {
+          type: "FeatureCollection",
+          features: sc.wardScore.detail.flatMap((d) => {
+            const w = byId.get(d.id);
+            if (!w) return [];
+            return [{
+              type: "Feature",
+              properties: { id: d.id, name: d.name, outcome: d.outcome, reported: d.reported ? 1 : 0, incidents: d.incidents, flaggedBy: d.flaggedBy.join(", ") },
+              geometry: { type: "Polygon", coordinates: w.rings },
+            }];
+          }),
+        },
+        incidents: {
+          type: "FeatureCollection",
+          features: scored.map((i) => ({
+            type: "Feature",
+            properties: { id: i.id, title: i.title, hazard: i.hazard, on: i.incidentOn.slice(0, 10) },
+            geometry: { type: "Point", coordinates: [i.lon, i.lat] },
+          })),
+        },
+        summary: { wards: sc.wardScore.wards, truthWards: sc.wardScore.truthWards, evaluatedIncidents: sc.wardScore.evaluatedIncidents },
+        note: "Scores the REAL hindcast engine against withheld BIPAD reports. The closures drawn on the console map are demo data and are NOT what is scored here.",
+      };
+    })();
+    return this.verifyGeoCache;
   }
 
   /** Static geometry for the map; cached. Edge index `i` is the key used by results. */

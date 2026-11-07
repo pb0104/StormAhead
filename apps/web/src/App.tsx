@@ -10,7 +10,7 @@ import { FLOOD_POLYS, OF, type Entity } from "./mock/demo.ts";
 import { depthImage, runoff, slopeField, type Runoff } from "./hydro.ts";
 import { floodDepths, STAGE_FRACTION, TERRAIN_IDLE, terrainAgent, weatherAgent, type Terrain } from "./agents.ts";
 import { assess, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "./buildings.ts";
-import { fetchScorecard, type Scorecard } from "./api.ts";
+import { fetchScorecard, fetchVerification, type Scorecard, type Verification } from "./api.ts";
 
 /**
  * Authority ops console, DEMO build. Every layer except OSM road geometry and the satellite base is mock.
@@ -47,6 +47,7 @@ export function App() {
   const [terrain, setTerrain] = useState<Terrain>(TERRAIN_IDLE);
   const [bldgLayer, setBldgLayer] = useState<BuildingLayer | null>(null);
   const [scorecard, setScorecard] = useState<Scorecard | null>(null);
+  const [verify, setVerify] = useState<Verification | null>(null);
   const timer = useRef<number | undefined>(undefined);
 
   useEffect(() => () => window.clearInterval(timer.current), []);
@@ -55,6 +56,7 @@ export function App() {
   useEffect(() => { fetchBuildings().then(setBldgLayer); }, []);
   // How well the REAL engine scored against withheld incident reports. Shown in Details > Evaluation.
   useEffect(() => { fetchScorecard().then(setScorecard); }, []);
+  useEffect(() => { fetchVerification().then(setVerify); }, []);
   const [flow, setFlow] = useState<{ url: string; r: Runoff } | null>(null);
   const [flowBusy, setFlowBusy] = useState(false);
   const field = useMemo(() => (terrain.grid ? slopeField(terrain.grid) : null), [terrain]);
@@ -139,13 +141,20 @@ export function App() {
 
   return (
     <div className="shell">
-      <MapStage ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingPts={bldgPts} buildingById={buildingById} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flow?.url ?? null} field={field && terrain.grid ? { grid: terrain.grid, gx: field.gx, gy: field.gy, acc: field.acc } : null} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} />
+      <MapStage ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingPts={bldgPts} buildingById={buildingById} verify={verify} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flow?.url ?? null} field={field && terrain.grid ? { grid: terrain.grid, gx: field.gx, gy: field.gy, acc: field.acc } : null} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} />
       {photo && selected && <PhotorealView token={token} setToken={setToken} ran={ran} selected={selected} depths={depths} linked={linkedIds} onClose={() => setPhoto(false)} />}
       <StatusStrip items={strip} focus={focus} setFocus={pick} openDetails={() => setDetails(true)} mode={mode} setMode={setMode} />
       <CommandRail open={railOpen} setOpen={setRailOpen} vis={vis} toggle={toggle} stage={stage} setStage={setStage} ran={ran} busy={busy} run={run}
         rain={rain} setRain={setRain} weather={weather} terrain={terrain} wet={wet} total={FLOOD_POLYS.length} deepest={deepest} flowText={flowText}
         legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
-      {hint && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
+      {vis.verify && verify && (
+        <div className="verifybar" role="status">
+          <strong>Verification overlay.</strong> Scores the <em>real</em> hindcast engine against {verify.summary.evaluatedIncidents} withheld
+          incident reports — <em>not</em> the demo closures on this map.{" "}
+          <i className="vk hit" />hit <i className="vk miss" />missed <i className="vk fa" />false alarm <i className="vk pt" />reported incident
+        </div>
+      )}
+      {hint && !vis.verify && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
       <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} />
       <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} agentLines={[`Weather agent (mock forecast): ${weather.label.toLowerCase()} rain, ${weather.inches} in (${Math.round(weather.mm)} mm) in 24 h, range ${weather.lowIn} to ${weather.highIn} in, peak about ${weather.peakMmH} mm/h.`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${FLOOD_POLYS.length} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
         bldgLayer

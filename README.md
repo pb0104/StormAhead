@@ -101,7 +101,7 @@ Lives in `packages/analysis/cascade.ts`, served by `apps/api`. It is determinist
 5. **Shelter Agent**: reads 7,115 pre-event OSM building footprints (shelter-relevant types) and gives each a shelter reading — flooded with floors above the water (shelter in place), flooded with none (evacuate), or a dry upper-floor building inside a cut-off area (local refuge). A building with no usable `building:levels` gets **no judgement**, never a guessed height.
 6. **Verification Agent**: scores afterwards against withheld BIPAD reports, two ways. (a) `scoreAgainstIncidents` — the original point test, with a random baseline (permutation test, 2,000 sets), a nearest-the-flood baseline, and sensitivity to the closure threshold and match radius; landslides scored separately as an out-of-model check. (b) `scoreByWard` — a **per-agent scorecard** over 203 ward polygons, reporting each agent's hits, **false alarms**, precision, recall and F1 against the same baselines, plus the given hazard as the bar to beat. See [Per-agent scorecard](#per-agent-scorecard).
 
-**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `GET /api/buildings` (real footprints for the console), `GET /api/scorecard` (the per-agent evaluation, cached), `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. When `buildings.json` is present the response also carries `buildingTargets`: the same scoring re-run with buildings as cascade targets, reported **alongside** the primary headline rather than replacing it. The server also serves the built web app from `apps/web/dist`.
+**API** (Fastify, `apps/api/server.ts`): `GET /api/health`, `GET /api/hindcast/meta`, `GET /api/hindcast/geo`, `GET /api/buildings` (real footprints for the console), `GET /api/scorecard` (the per-agent evaluation, cached), `GET /api/verification` (the same scorecard as map geometry), `POST /api/hindcast/run` (optional body: `closeShare`, `bridgeClosesOnAnyContact`, `degradeMinutes`, `degradeRatio`). Agent events are in the run response. When `buildings.json` is present the response also carries `buildingTargets`: the same scoring re-run with buildings as cascade targets, reported **alongside** the primary headline rather than replacing it. The server also serves the built web app from `apps/web/dist`.
 
 **Spatial pre-computation** (per-road flooded share, per-place in-flood flag and distance to flood) is done offline by `scripts/prepare_kathmandu.py` and committed as derived data. The impact reasoning itself is all in TypeScript.
 
@@ -207,6 +207,28 @@ Stack: TypeScript, React 19, Vite, MapLibre GL JS, Fastify, Zod, Vitest. No data
 - **Done:** the real-data hindcast engine and API (tested); the ops console UI with mock data, 2D/3D, status-strip zoom-to-affected, selection drawer and simulated actions.
 - **Not done:** the console still draws a static closure fixture rather than calling the cascade engine. The building layer *is* wired through (real footprints, served by the API, read by the console). Real power, telecom, dam, weather and social/radio feeds. Maxar imagery in the app. Better cascade targets: buildings were tried and did not help, so the hospital set is next (population weighting still untried). Landslide, power and telecom cascades. Two hypotheses for the no-skill result are now tested and rejected (target set, stale network); the hospital set is the remaining one (see the results doc).
 - **Removed earlier:** the synthetic-data staging planner (commit `7489b10`, "V1 demo").
+
+### Predictions against what actually happened
+
+The engine does **not** predict the flood — the observed extent is a *given input* — so there is no
+predicted-vs-actual flood map to draw, and drawing one would imply skill the model does not claim. What the engine
+predicts is the knock-on effects, so that is what gets verified.
+
+Turn on **Verification (real)** in the command rail. Each of the 203 wards is drawn by outcome, with the withheld
+incident reports as white dots on top:
+
+| | Wards | Meaning |
+|---|---|---|
+| Green | 9 | **Hit** — flagged, and damage was reported |
+| Red | 1 | **Missed** — damage reported, nothing flagged (Lalitpur-12) |
+| Faint amber | 116 | **False alarm** — flagged, nothing reported |
+| Not drawn | 77 | Correctly left alone |
+
+The 116 false alarms are drawn, faintly but visibly, because over-flagging is the main finding — hiding them
+would flatter the model. Hover any ward for which agents flagged it, or any dot for the report behind it.
+
+A banner stays on screen while the overlay is active, because the closures drawn underneath are demo data and the
+overlay is not scoring them.
 
 ### Per-agent scorecard
 

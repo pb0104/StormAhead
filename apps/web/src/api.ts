@@ -39,6 +39,12 @@ export const fetchScorecard = async (): Promise<Scorecard | null> => {
   try { const r = await fetch("/api/scorecard"); return r.ok ? ((await r.json()) as Scorecard) : null; } catch { return null; }
 };
 
+export type Verification = { wards: any; incidents: any; summary: { wards: number; truthWards: number; evaluatedIncidents: number }; note: string };
+/** The scorecard as geography. null when the ward dataset is absent, so the console omits the layer. */
+export const fetchVerification = async (): Promise<Verification | null> => {
+  try { const r = await fetch("/api/verification"); return r.ok ? ((await r.json()) as Verification) : null; } catch { return null; }
+};
+
 export const hindcast = {
   meta: () => j<HindcastMeta>("/api/hindcast/meta"),
   geo: () => j<HindcastGeo>("/api/hindcast/geo"),

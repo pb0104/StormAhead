@@ -109,6 +109,16 @@ added nothing to simply knowing where the water was.
   of 0.17 barely exceeds the given hazard's 0.16, so even at face value it adds almost nothing to the flood map.
 - **Combined, the agents reach 0.90 recall by flagging 62% of the valley.** Operationally that is not a warning.
 
+### The same result as a map
+
+`GET /api/verification` returns the ward polygons carrying their outcome, with the withheld reports as points;
+the console draws it under **Verification (real)**. Of 203 wards: **9 hit, 1 missed (Lalitpur-12), 116 false
+alarms, 77 correctly left alone.** The picture is the finding — a thin scatter of correct calls inside a wash of
+false alarms. Note that the given hazard is excluded from the map's "flagged" set, since it is an input.
+
+There is deliberately **no predicted-vs-actual flood map**: the flood extent is given to the engine, not
+predicted by it, so such a map would credit the model with the hazard it was handed.
+
 ## Does the stale road network explain any of it? No (run 2026-11-07)
 
 The committed network is the Geofabrik snapshot of **2 Jan 2024**, nine months before the event, so roads built

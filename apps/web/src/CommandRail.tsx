@@ -8,7 +8,7 @@ const INPUTS: { group: string; items: [string, string][] }[] = [
   { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["army", "Army bases"]] },
 ];
 const OUTPUTS: [string, string][] = [
-  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "QRT staging"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Public alerts"],
+  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "QRT staging"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Public alerts"], ["verify", "Verification (real)"],
 ];
 const STAGES: [number, string][] = [[1, "Now"], [2, "+6 h"], [3, "Peak +12 h"]];
 
@@ -78,6 +78,9 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Grid outage</li>
             <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
             <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#46D68C80", borderColor: "#46D68C" }} />Ward correctly flagged <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#FF4A3D8C", borderColor: "#FF4A3D" }} />Ward missed: damage reported, nothing flagged <em className="real">real</em></li>
+            <li><i className="sw fill" style={{ background: "#FFB02024", borderColor: "#FFB020" }} />Ward false alarm <em className="real">real</em></li>
             {p.legendOpen && (
               <>
                 <li><i className="sw fill" style={{ background: "#3DD6E022", borderColor: "#3DD6E0" }} />Public alert zone</li>

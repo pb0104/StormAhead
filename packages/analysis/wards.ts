@@ -78,10 +78,27 @@ export type AgentScore = {
   proximityBaseline: { tp: number; f1: number | null };
 };
 
+/**
+ * What happened in one ward, for drawing the verification map.
+ *  hit            - we flagged it and it reported damage
+ *  false-alarm    - we flagged it and nothing was reported
+ *  miss           - it reported damage and we said nothing
+ *  correct-reject - we said nothing and nothing was reported
+ */
+export type WardOutcome = "hit" | "false-alarm" | "miss" | "correct-reject";
+export type WardDetail = {
+  id: number; name: string; at: [number, number];
+  outcome: WardOutcome; reported: boolean; incidents: number;
+  /** Which agents flagged this ward (the given-hazard row is excluded: it is an input, not a prediction). */
+  flaggedBy: string[];
+};
+
 export type WardScorecard = {
   wards: number; evaluatedIncidents: number; truthWards: number;
   permutations: number;
   agents: AgentScore[];
+  /** Per-ward result, so the table can be drawn as a map. */
+  detail: WardDetail[];
   note: string;
 };
 
@@ -156,8 +173,25 @@ export function scoreByWard(
     score("All agents combined", "wards flagged by any agent", allW),
   ];
 
+  // Per-ward outcome. The hazard row is deliberately left out of `flaggedBy`: it is the model's input, so
+  // counting it as a prediction would make the map look better than the model is.
+  const predictors: [string, Set<number>][] = [
+    ["Infrastructure", closedW], ["Access", accessW],
+    ...(area.buildings?.length ? [["Shelter", shelterW] as [string, Set<number>]] : []),
+  ];
+  const incidentCount = new Map<number, number>();
+  for (const i of scored) { const w = find(i.lon, i.lat); if (w >= 0) incidentCount.set(w, (incidentCount.get(w) ?? 0) + 1); }
+  const detail: WardDetail[] = wards.map((w, i) => {
+    const flaggedBy = predictors.filter(([, set]) => set.has(i)).map(([n]) => n);
+    const reported = truth.has(i);
+    const outcome: WardOutcome = flaggedBy.length
+      ? (reported ? "hit" : "false-alarm")
+      : (reported ? "miss" : "correct-reject");
+    return { id: w.id, name: w.name, at: w.at, outcome, reported, incidents: incidentCount.get(i) ?? 0, flaggedBy };
+  });
+
   return {
-    wards: N, evaluatedIncidents: scored.length, truthWards: truth.size, permutations: opt.permutations, agents,
+    wards: N, evaluatedIncidents: scored.length, truthWards: truth.size, permutations: opt.permutations, agents, detail,
     note: "Ground truth is REPORTED damage: a ward with no report is not proven undamaged, so recall is a lower bound and " +
       "false alarms may include real damage that went unreported. The hazard row is the observed flood extent, which is a " +
       "model INPUT, not a prediction — it is the bar the agents must beat to have added anything.",

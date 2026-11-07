@@ -11,7 +11,7 @@ export type Rec = { id: string; kind: string; at: [number, number]; label: strin
 export const REC_COLOR: Record<string, string> = { qrt: "#93C5FD", food: "#FDE68A", shelter: "#86EFAC", grid: "#FFD23F", alert: "#3DD6E0", air: "#A5D8FF", army: "#C9D58B" };
 export type MapProps = {
   ran: boolean; revealN: number; showPockets: boolean; stage: number; vis: Vis; focus: string | null;
-  selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingPts: unknown; buildingById: Map<string, Entity>; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
+  selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingPts: unknown; buildingById: Map<string, Entity>; verify: { wards: unknown; incidents: unknown } | null; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
 };
 
 const WAVE_FRAMES = 8;
@@ -28,7 +28,7 @@ function waveFrame(k: number): { width: number; height: number; data: Uint8Clamp
   return { width: S, height: S, data: g.getImageData(0, 0, S, S).data };
 }
 const RED = "#FF4A3D", AMBER = "#FFB020";
-const HIT = ["bldg-halo", "bldg-dot", "bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-army", "pts-tower", "pts-dam", "pts-social", "pts-radio", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
+const HIT = ["verify-pt", "verify-fill", "bldg-halo", "bldg-dot", "bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-army", "pts-tower", "pts-dam", "pts-social", "pts-radio", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
 const GROUP: Record<string, string[]> = {
   closures: ["closures-glow", "closures", "closures-minor", "closures-muted"], pockets: ["pockets", "pockets-minor"],
   landslides: ["z-landslide-fill", "z-landslide-line"], hospitals: ["pts-hospital"], schools: ["pts-school"], outages: ["z-outage-fill", "z-outage-line"],
@@ -44,7 +44,7 @@ const BASE_OPACITY: Record<string, number> = {
 
 export function MapStage(p: MapProps) {
   const box = useRef<HTMLDivElement>(null), tip = useRef<HTMLDivElement>(null);
-  const map = useRef<any>(null), ready = useRef(false), props = useRef(p), markers = useRef<any[]>([]), raf = useRef(0), bar = useRef<HTMLElement | null>(null), floodRef = useRef<unknown>(null), bldgRef = useRef<unknown>(null), flowCv = useRef<HTMLCanvasElement | null>(null), runoffUrl = useRef<string | null>(null);
+  const map = useRef<any>(null), ready = useRef(false), props = useRef(p), markers = useRef<any[]>([]), raf = useRef(0), bar = useRef<HTMLElement | null>(null), floodRef = useRef<unknown>(null), bldgRef = useRef<unknown>(null), verifyRef = useRef<unknown>(null), flowCv = useRef<HTMLCanvasElement | null>(null), runoffUrl = useRef<string | null>(null);
   props.current = p;
 
   useEffect(() => {
@@ -69,6 +69,8 @@ export function MapStage(p: MapProps) {
       m.addSource("affected", { type: "geojson", data: empty });
       m.addSource("bldg", { type: "geojson", data: empty });
       m.addSource("bldgpt", { type: "geojson", data: empty });
+      m.addSource("verify", { type: "geojson", data: empty });
+      m.addSource("verifypt", { type: "geojson", data: empty });
       m.addSource("dem", { type: "raster-dem", tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"], encoding: "terrarium", tileSize: 256, maxzoom: 15, attribution: "Terrain: Mapzen / AWS Terrain Tiles" });
 
       m.addLayer({ id: "sat", type: "raster", source: "sat", paint: { "raster-opacity": 0.9, "raster-saturation": -0.45, "raster-brightness-max": 0.95, "raster-contrast": 0.15 } });
@@ -97,6 +99,19 @@ export function MapStage(p: MapProps) {
         m.addLayer({ id: `z-${k}-fill`, type: "fill", source: "zones", filter: ["==", ["get", "kind"], k], paint: { "fill-color": col, "fill-opacity": 0, ...TF } });
         m.addLayer({ id: `z-${k}-line`, type: "line", source: "zones", filter: ["==", ["get", "kind"], k], paint: { "line-color": col, "line-width": 2, "line-opacity": 0, "line-dasharray": k === "landslide" ? [1, 0] : [3, 2], ...TL } });
       }
+      // Verification: the ward scorecard drawn as geography. Hits and misses are bold; the 116 false alarms are
+      // drawn faintly but ARE drawn — over-flagging is the main finding and hiding it would flatter the model.
+      const OUT_COLOR: any = ["match", ["get", "outcome"], "hit", "#46D68C", "miss", "#FF4A3D", "false-alarm", "#FFB020", "rgba(0,0,0,0)"];
+      m.addLayer({ id: "verify-fill", type: "fill", source: "verify", filter: ["!=", ["get", "outcome"], "correct-reject"], paint: {
+        "fill-color": OUT_COLOR,
+        "fill-opacity": ["match", ["get", "outcome"], "hit", 0.5, "miss", 0.55, 0.14] } });
+      m.addLayer({ id: "verify-line", type: "line", source: "verify", filter: ["!=", ["get", "outcome"], "correct-reject"], paint: {
+        "line-color": OUT_COLOR,
+        "line-width": ["match", ["get", "outcome"], "hit", 2, "miss", 2.4, 0.7],
+        "line-opacity": ["match", ["get", "outcome"], "hit", 1, "miss", 1, 0.5] } });
+      m.addLayer({ id: "verify-pt", type: "circle", source: "verifypt", paint: {
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 3.6, 15, 6],
+        "circle-color": "#FFFFFF", "circle-stroke-color": "#0A1217", "circle-stroke-width": 1.6 } });
       // REAL OSM building footprints, coloured by the shelter reading. Flat fill in 2D; extruded by the real
       // storey count in 3D, so a building's height on screen is its tagged height, not a stylistic choice.
       m.addLayer({ id: "bldg-fill", type: "fill", source: "bldg", paint: { "fill-color": ["get", "color"], "fill-opacity": 0, "fill-opacity-transition": { duration: 600 } } });
@@ -162,6 +177,15 @@ export function MapStage(p: MapProps) {
         if (!t) return;
         const w = !f && props.current.ran && m.getLayer("flood-fill") ? (m.queryRenderedFeatures(e.point, { layers: ["flood-fill"] }) as any[])[0] : null;
         if (w) { t.textContent = `Flood water, about ${Number(w.properties.d).toFixed(1)} m deep`; t.style.display = "block"; t.style.left = e.point.x + 14 + "px"; t.style.top = e.point.y + 14 + "px"; return; }
+        const vf = !f && props.current.vis["verify"] && m.getLayer("verify-fill")
+          ? (m.queryRenderedFeatures(e.point, { layers: ["verify-pt", "verify-fill"] }) as any[])[0] : null;
+        if (vf) {
+          const q = vf.properties;
+          t.textContent = q.title
+            ? `Reported: ${q.title} (${q.hazard}, ${q.on})`
+            : `${q.name} — ${q.outcome === "hit" ? `correctly flagged by ${q.flaggedBy}` : q.outcome === "miss" ? "damage reported, nothing flagged" : `flagged by ${q.flaggedBy}, nothing reported`}`;
+          t.style.display = "block"; t.style.left = e.point.x + 14 + "px"; t.style.top = e.point.y + 14 + "px"; return;
+        }
         if (f) { const ent = lookup(f.properties.id)!; t.textContent = ent.kind === "building" ? `${ent.name} — ${ent.props.roleLabel}` : ent.name; t.style.display = "block"; t.style.left = e.point.x + 14 + "px"; t.style.top = e.point.y + 14 + "px"; } else t.style.display = "none";
       });
       m.on("mouseout", () => { if (tip.current) tip.current.style.display = "none"; });
@@ -215,6 +239,15 @@ export function MapStage(p: MapProps) {
         (mm.getSource("bldg") as any)?.setData(q.buildings ?? { type: "FeatureCollection", features: [] });
         (mm.getSource("bldgpt") as any)?.setData(q.buildingPts ?? { type: "FeatureCollection", features: [] });
       }
+      // Verification overlay (independent of the demo run: it scores the real engine, not what is on screen).
+      const vOn = g("verify") && !!q.verify;
+      if (verifyRef.current !== q.verify) {
+        verifyRef.current = q.verify;
+        (mm.getSource("verify") as any)?.setData(q.verify?.wards ?? { type: "FeatureCollection", features: [] });
+        (mm.getSource("verifypt") as any)?.setData(q.verify?.incidents ?? { type: "FeatureCollection", features: [] });
+      }
+      for (const id of ["verify-fill", "verify-line", "verify-pt"]) show(id, vOn);
+
       const bOn = ran && g("shelterBuildings");
       show("bldg-fill", bOn && !q.view3d); show("bldg-line", bOn && !q.view3d); show("bldg-3d", bOn && q.view3d);
       show("bldg-halo", bOn); show("bldg-dot", bOn);
@@ -248,7 +281,7 @@ export function MapStage(p: MapProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d]);
+  useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d, p.verify]);
 
   // Flow streaks: calm particles that run down the slope of the real elevation grid. They are drawn at screen resolution and move at
   // a fixed gentle speed on screen, they start mostly in the main channels, and they stop when the map moves. Skipped when the
