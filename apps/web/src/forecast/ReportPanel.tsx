@@ -86,6 +86,13 @@ export function ReportPanel(p: ReportProps) {
                   <b>{c.title}</b>
                   <span className="fx-prio-why">{c.why.join(" · ")}</span>
                   <span className="fx-prio-meta">{c.agents.map((a) => name.get(a)).join(" + ")}{c.when ? ` · from ${c.when}` : ""}</span>
+                  {c.coverage && (
+                    <span className={`fx-cov ${c.coverage.status}`}>
+                      {c.coverage.status === "none" ? "No action yet"
+                        : c.coverage.status === "partial" ? `${c.coverage.resources.join(", ") || "Help"} on site · ~${c.coverage.remaining?.toLocaleString("en-US")} may remain (est.)`
+                        : `${c.coverage.resources.join(", ") || "Help"} on site · looks covered`}
+                    </span>
+                  )}
                 </span>
               </button>
             ))}

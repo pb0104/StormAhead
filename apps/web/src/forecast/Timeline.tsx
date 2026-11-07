@@ -11,6 +11,10 @@ export function labelAt(startIso: string, h: number) {
 export type TimelineProps = {
   startIso: string; hours: number; hourly: number[]; ticks: { h: number; severity: string }[];
   cursor: number; setCursor: (h: number) => void; playing: boolean; setPlaying: (b: boolean) => void; peak: number | null;
+  /** Live line under the time, e.g. water level and river stage. */
+  readout?: string;
+  /** 0..1 water level per hour, drawn as a filled curve behind the rain bars. */
+  level?: number[] | null;
 };
 
 export function Timeline(p: TimelineProps) {
@@ -32,10 +36,14 @@ export function Timeline(p: TimelineProps) {
           <b>{labelAt(p.startIso, p.cursor)} · {(p.hourly[Math.min(p.cursor, p.hourly.length - 1)] ?? 0).toFixed(1)} mm/h</b>
           <span>{labelAt(p.startIso, p.hours)}</span>
         </div>
+        {p.readout && <div className="fx-tl-readout"><i />{p.readout}</div>}
         <svg ref={svg} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="fx-tl-svg" role="slider" aria-label="Forecast time" aria-valuemin={0} aria-valuemax={p.hours} aria-valuenow={p.cursor} tabIndex={0}
           onKeyDown={(e) => { if (e.key === "ArrowRight") p.setCursor(Math.min(p.hours, p.cursor + 3)); if (e.key === "ArrowLeft") p.setCursor(Math.max(0, p.cursor - 3)); }}
           onPointerDown={(e) => { (e.target as Element).setPointerCapture?.(e.pointerId); p.setPlaying(false); scrub(e.clientX); }}
           onPointerMove={(e) => { if (e.buttons) scrub(e.clientX); }}>
+          {p.level && p.level.length > 1 && (
+            <path className="water" d={`M0 ${H} ${p.level.map((v, i) => `L${(i * bw).toFixed(1)} ${(H - 2 - v * (H - 10)).toFixed(1)}`).join(" ")} L${((p.level.length - 1) * bw).toFixed(1)} ${H} Z`} />
+          )}
           {p.hourly.map((v, i) => v > 0 && (
             <rect key={i} x={i * bw} width={Math.max(0.6, bw * 0.8)} y={H - 6 - (v / max) * (H - 14)} height={(v / max) * (H - 14)} className={i <= p.cursor ? "past" : ""} />
           ))}

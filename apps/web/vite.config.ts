@@ -23,7 +23,9 @@ export default defineConfig({
   server: {
     port: 5173,
     fs: { allow: [repoRoot] },
-    proxy: { "/api": { target: "http://127.0.0.1:3001", changeOrigin: true, ws: true } },
+    // API_TARGET lets a second copy run against another API port (default: the usual :3001).
+    // ws: true keeps Gemini Live (ORACLE) working through the Vite proxy when not on localhost direct.
+    proxy: { "/api": { target: process.env.API_TARGET ?? "http://127.0.0.1:3001", changeOrigin: true, ws: true } },
   },
   build: { outDir: "dist", emptyOutDir: true },
 });
