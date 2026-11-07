@@ -1,14 +1,14 @@
 import type { Vis } from "./MapStage.tsx";
 import { Glyph } from "./Glyph.tsx";
-import type { Terrain, Weather } from "./agents.ts";
+import type { TerrainResult as Terrain, Weather } from "../../../packages/ports/index.ts";
 
 const INPUTS: { group: string; items: [string, string][] }[] = [
   { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell towers"]] },
-  { group: "Live feeds", items: [["weather", "Weather"], ["dams", "Dams"], ["social", "Social media"], ["radio", "Radio"]] },
-  { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["army", "Army bases"]] },
+  { group: "Live feeds", items: [["weather", "Weather"], ["atmosphere", "Atmosphere"], ["dams", "Dams"]] },
+  { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["helipads", "Helipads"], ["army", "Army bases"]] },
 ];
 const OUTPUTS: [string, string][] = [
-  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "QRT staging"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Public alerts"],
+  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "QRT staging"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"],
 ];
 const STAGES: [number, string][] = [[1, "Now"], [2, "+6 h"], [3, "Peak +12 h"]];
 
@@ -71,6 +71,8 @@ export function CommandRail(p: RailProps) {
           <button className="link" onClick={() => p.setLegendOpen(!p.legendOpen)} aria-expanded={p.legendOpen}>Legend {p.legendOpen ? "▴" : "▾"}</button>
           <ul>
             <li><i className="sw line" style={{ background: "#FF4A3D" }} />Closed road</li>
+            <li><i className="sw fill" style={{ background: "#FFFFFF33", borderColor: "#C8D4DC" }} />Cloud cover</li>
+            <li><i className="sw line" style={{ background: "#9BB0C0" }} />Pressure isobar · H / L</li>
             <li><i className="sw fill" style={{ background: "#2A78C880", borderColor: "#A8DCFF" }} />Flood water</li>
             <li><i className="sw fill" style={{ background: "#3E8FD3A0", borderColor: "#CDF0FF" }} />Pooled runoff, with flow streaks</li>
             <li><i className="sw line dash" style={{ borderColor: "#FFB020" }} />Cut-off road pocket</li>
@@ -80,7 +82,6 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
             {p.legendOpen && (
               <>
-                <li><i className="sw fill" style={{ background: "#3DD6E022", borderColor: "#3DD6E0" }} />Public alert zone</li>
                 <li><i className="sw fill" style={{ background: "#FFB020cc", borderColor: "#FFB020" }} />Building, shelter on upper floors <em className="real">real</em></li>
                 <li><i className="sw fill" style={{ background: "#86EFACcc", borderColor: "#86EFAC" }} />Building usable as a refuge <em className="real">real</em></li>
                 <li><i className="sw fill" style={{ background: "#9BA8B0cc", borderColor: "#9BA8B0" }} />Building, height not tagged — no judgement <em className="real">real</em></li>
@@ -91,11 +92,11 @@ export function CommandRail(p: RailProps) {
                 <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
                 <li><Glyph kind="school" ring="#FF4A3D" badge />School, high risk</li>
                 <li><Glyph kind="airport" ring="#46D68C" />Airport, access ok · <Glyph kind="airport" ring="#FFB020" badge />limited</li>
+                <li><Glyph kind="helipad" ring="#46D68C" />Helipad, access ok · <Glyph kind="helipad" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="army" ring="#46D68C" />Army base, access ok · <Glyph kind="army" ring="#FFB020" badge />limited</li>
                 <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell tower up</li>
                 <li><i className="sw dot sm" style={{ background: "#FF8E7A" }} />Cell tower down</li>
-                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />Dam gauge</li>
-                <li><i className="sw dot sm" style={{ background: "#9BC2D6" }} />Social post · <i className="sw dot sm" style={{ background: "#B8E0C4" }} />Radio call</li>
+                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />Dam</li>
                 <li><Glyph kind="qrt" ring="#0B1318" />QRT · <Glyph kind="shelter" ring="#0B1318" />Shelter · <Glyph kind="food" ring="#0B1318" />Food</li>
                 <li><i className="sw fill" style={{ background: "#2B7BFF47", borderColor: "#6FB0FF" }} />Low ground · <i className="sw fill" style={{ background: "#4DA3FF30", borderColor: "#4DA3FF" }} />Rain</li>
               </>

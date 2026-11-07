@@ -1,4 +1,5 @@
 import type { AgentEvent } from "../../../packages/shared/events.ts";
+import type { AssessmentResult, AssetsSnapshot, AtmosphereSnapshot, SceneSnapshot, WeatherSeed } from "../../../packages/ports/index.ts";
 
 async function j<T>(url: string, init?: RequestInit): Promise<T> {
   const r = await fetch(url, { ...init, headers: init?.body ? { "Content-Type": "application/json" } : {} });
@@ -26,4 +27,18 @@ export const hindcast = {
   meta: () => j<HindcastMeta>("/api/hindcast/meta"),
   geo: () => j<HindcastGeo>("/api/hindcast/geo"),
   run: (p: Record<string, unknown>) => j<HindcastRun>("/api/hindcast/run", send("POST", p)),
+};
+
+export const ops = {
+  scene: () => j<SceneSnapshot>("/api/scene"),
+  weatherSeed: () => j<WeatherSeed>("/api/weather/seed"),
+  atmosphere: (refresh = false) => j<AtmosphereSnapshot>(`/api/weather/atmosphere${refresh ? "?refresh=1" : ""}`),
+  assessment: (rainIn: number, stage: number) => j<AssessmentResult>(`/api/assessment?rainIn=${rainIn}&stage=${stage}`),
+  assets: (refresh = false) => j<AssetsSnapshot>(`/api/assets${refresh ? "?refresh=1" : ""}`),
+};
+
+export const TILE = {
+  esri: (z: number, y: number, x: number) => `/api/tiles/esri/${z}/${y}/${x}`,
+  terrarium: (z: number, x: number, y: number) => `/api/tiles/terrarium/${z}/${x}/${y}.png`,
+  cesiumProxy: (upstreamUrl: string) => `/api/tiles/cesium?u=${encodeURIComponent(upstreamUrl)}`,
 };

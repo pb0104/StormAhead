@@ -1,12 +1,13 @@
 /** One shape per building type, drawn the same way on the map (canvas) and in the UI (inline SVG). 24 x 24 box. */
-export type BuildingKind = "hospital" | "school" | "shelter" | "food" | "qrt" | "airport" | "army";
+export type BuildingKind = "hospital" | "school" | "shelter" | "food" | "qrt" | "airport" | "helipad" | "army";
 
 export const GLYPH: Record<BuildingKind, { body: string; mark: string; markStroke?: boolean; fill: string; label: string }> = {
   hospital: { body: "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z", mark: "M10.5 6.5h3v4h4v3h-4v4h-3v-4h-4v-3h4z", fill: "#FFFFFF", label: "Hospital" },
   school: { body: "M12 2.5 2.5 9v12.5h19V9z", mark: "M9.5 21.5v-6.5h5v6.5M12 2.5V.5M12 .8h3.6v2", markStroke: true, fill: "#FFFFFF", label: "School" },
   shelter: { body: "M12 3 2.5 20.5h19z", mark: "M12 20.5 9.5 14.5h5z", fill: "#86EFAC", label: "Shelter" },
   food: { body: "M3.5 6.5h17v14h-17z", mark: "M3.5 11h17M3.5 15.5h17", markStroke: true, fill: "#FDE68A", label: "Food depot" },
-  airport: { body: "M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-1.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-4.5z", mark: "M11.5 9v9", markStroke: true, fill: "#A5D8FF", label: "Airport or helipad" },
+  airport: { body: "M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-1.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-4.5z", mark: "M11.5 9v9", markStroke: true, fill: "#A5D8FF", label: "Airport" },
+  helipad: { body: "M4 4h16v16H4z", mark: "M9 7.5v9M15 7.5v9M9 12h6", markStroke: true, fill: "#C4E4FF", label: "Helipad" },
   army: { body: "M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7.3L12 17.8 5.7 21.5l1.7-7.3L2 9.5l7.1-.6z", mark: "M8.7 13.2 12 10.8l3.3 2.4", markStroke: true, fill: "#C9D58B", label: "Army base" },
   qrt: { body: "M12 2.5 20.5 7.5v9L12 21.5 3.5 16.5v-9z", mark: "M7.8 13.5 12 9.3l4.2 4.2", markStroke: true, fill: "#93C5FD", label: "QRT staging" },
 };

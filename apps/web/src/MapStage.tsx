@@ -1,17 +1,20 @@
 import { useEffect, useRef } from "react";
 import { maplibregl } from "./mapsetup.ts";
 import satUrl from "./assets/valley.jpg?url";
-import { affected, BBOX, BY_ID, GEO, type Entity } from "./mock/demo.ts";
+import { affected } from "./affected.ts";
+import type { AtmosphereSnapshot, Entity, Grid, SceneSnapshot } from "../../../packages/ports/index.ts";
 import { drawIcon, RING, type BuildingKind } from "./icons.ts";
-import type { Grid } from "./hydro.ts";
 export type FlowField = { grid: Grid; gx: Float32Array; gy: Float32Array; acc: Float32Array };
 
 export type Vis = Record<string, boolean>;
 export type Rec = { id: string; kind: string; at: [number, number]; label: string; target?: string };
 export const REC_COLOR: Record<string, string> = { qrt: "#93C5FD", food: "#FDE68A", shelter: "#86EFAC", grid: "#FFD23F", alert: "#3DD6E0", air: "#A5D8FF", army: "#C9D58B" };
+const EMPTY_FC = { type: "FeatureCollection" as const, features: [] };
 export type MapProps = {
+  scene: SceneSnapshot;
   ran: boolean; revealN: number; showPockets: boolean; stage: number; vis: Vis; focus: string | null;
   selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingById: Map<string, Entity>; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
+  atmosphere?: AtmosphereSnapshot | null;
 };
 
 const WAVE_FRAMES = 8;
@@ -28,14 +31,14 @@ function waveFrame(k: number): { width: number; height: number; data: Uint8Clamp
   return { width: S, height: S, data: g.getImageData(0, 0, S, S).data };
 }
 const RED = "#FF4A3D", AMBER = "#FFB020";
-const HIT = ["bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-army", "pts-tower", "pts-dam", "pts-social", "pts-radio", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
+const HIT = ["bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-helipad", "pts-army", "pts-tower", "pts-dam", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill"];
 const GROUP: Record<string, string[]> = {
   closures: ["closures-glow", "closures", "closures-minor", "closures-muted"], pockets: ["pockets", "pockets-minor"],
   landslides: ["z-landslide-fill", "z-landslide-line"], hospitals: ["pts-hospital"], schools: ["pts-school"], outages: ["z-outage-fill", "z-outage-line"],
 };
 const OPACITY_PROP: Record<string, string> = {
   "closures-glow": "line-opacity", closures: "line-opacity", "closures-minor": "line-opacity", "closures-muted": "line-opacity", pockets: "line-opacity", "pockets-minor": "line-opacity",
-  "z-landslide-fill": "fill-opacity", "z-landslide-line": "line-opacity", "pts-hospital": "icon-opacity", "pts-school": "icon-opacity", "pts-airport": "icon-opacity", "pts-army": "icon-opacity", "z-outage-fill": "fill-opacity", "z-outage-line": "line-opacity",
+  "z-landslide-fill": "fill-opacity", "z-landslide-line": "line-opacity", "pts-hospital": "icon-opacity", "pts-school": "icon-opacity", "pts-airport": "icon-opacity", "pts-helipad": "icon-opacity", "pts-army": "icon-opacity", "z-outage-fill": "fill-opacity", "z-outage-line": "line-opacity",
 };
 const BASE_OPACITY: Record<string, number> = {
   "closures-glow": 0.45, closures: 1, "closures-minor": 0.8, "closures-muted": 0.4, pockets: 1, "pockets-minor": 0.7,
@@ -49,14 +52,23 @@ export function MapStage(p: MapProps) {
 
   useEffect(() => {
     if (!box.current) return;
+    const scene = props.current.scene;
+    const BBOX = scene.bbox;
+    const GEO = scene.geo;
+    const BY_ID = new Map(scene.entities.map((e) => [e.id, e]));
     const m = new maplibregl.Map({
       container: box.current, attributionControl: false, dragRotate: false, pitchWithRotate: true, maxPitch: 78,
-      style: { version: 8, sources: {}, layers: [{ id: "bg", type: "background", paint: { "background-color": "#0A1217" } }] },
+      style: {
+        version: 8,
+        glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
+        sources: {},
+        layers: [{ id: "bg", type: "background", paint: { "background-color": "#0A1217" } }],
+      },
       bounds: [[BBOX[0], BBOX[1]], [BBOX[2], BBOX[3]]], fitBoundsOptions: { padding: { top: 64, bottom: 24, left: props.current.compact ? 16 : 310, right: 16 } },
       maxZoom: 18,
     });
     map.current = m;
-    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "DEMO DATA · Base: Esri World Imagery (Maxar), Sentinel-2 EOX fallback · Roads: © OpenStreetMap contributors" }), "bottom-right");
+    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "DEMO DATA · Base: Esri World Imagery (Maxar), cached · Roads: © OpenStreetMap contributors" }), "bottom-right");
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     m.on("load", () => {
       const TL = { "line-opacity-transition": { duration: 600 } }, TF = { "fill-opacity-transition": { duration: 600 } };
@@ -68,13 +80,16 @@ export function MapStage(p: MapProps) {
       m.addSource("rec", { type: "geojson", data: empty });
       m.addSource("affected", { type: "geojson", data: empty });
       m.addSource("bldg", { type: "geojson", data: empty });
-      m.addSource("dem", { type: "raster-dem", tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"], encoding: "terrarium", tileSize: 256, maxzoom: 15, attribution: "Terrain: Mapzen / AWS Terrain Tiles" });
+      m.addSource("dem", { type: "raster-dem", tiles: ["/api/tiles/terrarium/{z}/{x}/{y}.png"], encoding: "terrarium", tileSize: 256, maxzoom: 15, attribution: "Terrain: Mapzen / AWS Terrain Tiles (proxied+cached)" });
 
       m.addLayer({ id: "sat", type: "raster", source: "sat", paint: { "raster-opacity": 0.9, "raster-saturation": -0.45, "raster-brightness-max": 0.95, "raster-contrast": 0.15 } });
       // Sharper imagery streamed as tiles (about 0.5 m near Kathmandu). The dimmed 10 m mosaic above stays as the offline fallback.
-      m.addSource("esri", { type: "raster", tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"], tileSize: 256, maxzoom: 18, attribution: "Imagery: Esri, Maxar, Earthstar Geographics" });
+      m.addSource("esri", { type: "raster", tiles: ["/api/tiles/esri/{z}/{y}/{x}"], tileSize: 256, maxzoom: 18, attribution: "Imagery: Esri, Maxar, Earthstar Geographics (proxied+cached)" });
       m.addLayer({ id: "esri", type: "raster", source: "esri", paint: { "raster-opacity": 0.92, "raster-saturation": -0.35, "raster-brightness-max": 0.92, "raster-contrast": 0.12, "raster-fade-duration": 250 } });
       m.addLayer({ id: "hill", type: "hillshade", source: "dem", layout: { visibility: "none" }, paint: { "hillshade-exaggeration": 0.55, "hillshade-shadow-color": "#000000", "hillshade-highlight-color": "#BFD2DA", "hillshade-accent-color": "#4A5B64" } });
+      m.addSource("atm-clouds", { type: "geojson", data: EMPTY_FC });
+      m.addSource("atm-isobars", { type: "geojson", data: EMPTY_FC });
+      m.addSource("atm-centers", { type: "geojson", data: EMPTY_FC });
       m.addLayer({ id: "rain", type: "fill", source: "rain", paint: { "fill-color": "#4DA3FF", "fill-opacity": ["interpolate", ["linear"], ["get", "v"], 2, 0.1, 3, 0.18] } });
       m.addLayer({ id: "low", type: "fill", source: "low", paint: { "fill-color": "#2B7BFF", "fill-opacity": 0.28, "fill-outline-color": "#6FB0FF" } });
       // Flood water: the observed extent, tinted, with a rippling pattern that is advanced frame by frame.
@@ -91,8 +106,8 @@ export function MapStage(p: MapProps) {
         "line-color": ["match", ["get", "c"], 0, "#E4ECF0", 1, "#D3DEE4", 2, "#A9BAC4", "#8497A2"],
         "line-width": ["interpolate", ["linear"], ["zoom"], 10, ["match", ["get", "c"], 0, 1.3, 1, 1.1, 0.6], 15, ["match", ["get", "c"], 0, 4, 1, 3.4, 2, 2.4, 1.6]],
         "line-opacity": 0.75 } });
-      for (const k of ["landslide", "outage", "alert"]) {
-        const col = k === "landslide" ? "#FF7A1A" : k === "outage" ? "#FFD23F" : "#3DD6E0";
+      for (const k of ["landslide", "outage"]) {
+        const col = k === "landslide" ? "#FF7A1A" : "#FFD23F";
         m.addLayer({ id: `z-${k}-fill`, type: "fill", source: "zones", filter: ["==", ["get", "kind"], k], paint: { "fill-color": col, "fill-opacity": 0, ...TF } });
         m.addLayer({ id: `z-${k}-line`, type: "line", source: "zones", filter: ["==", ["get", "kind"], k], paint: { "line-color": col, "line-width": 2, "line-opacity": 0, "line-dasharray": k === "landslide" ? [1, 0] : [3, 2], ...TL } });
       }
@@ -118,11 +133,9 @@ export function MapStage(p: MapProps) {
       const dot = (id: string, kind: string, color: any, r: number, ring?: any) =>
         m.addLayer({ id: `pts-${id}`, type: "circle", source: "points", filter: ["==", ["get", "kind"], kind], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, r, 15, r + 3], "circle-color": color, "circle-stroke-color": ring ?? "#0A1217", "circle-stroke-width": ring ? 2.4 : 1.2, "circle-opacity": 1, "circle-opacity-transition": { duration: 600 } } });
       dot("dam", "dam", "#7CC4FF", 5);
-      dot("social", "social", "#9BC2D6", 3.4);
-      dot("radio", "radio", "#B8E0C4", 3.4);
       dot("tower", "tower", ["case", ["==", ["get", "status"], "down"], "#FF8E7A", "#59E0D0"], 3.6);
       // Building types get their own icons (hospital cross, school house, shelter tent, food crate, QRT shield).
-      const kinds: [BuildingKind, string[]][] = [["hospital", ["none", "ok", "degraded", "lost"]], ["school", ["none", "ok", "risk", "high"]], ["airport", ["none", "ok", "degraded", "lost"]], ["army", ["none", "ok", "degraded", "lost"]], ["shelter", ["base"]], ["food", ["base"]], ["qrt", ["base"]]];
+      const kinds: [BuildingKind, string[]][] = [["hospital", ["none", "ok", "degraded", "lost"]], ["school", ["none", "ok", "risk", "high"]], ["airport", ["none", "ok", "degraded", "lost"]], ["helipad", ["none", "ok", "degraded", "lost"]], ["army", ["none", "ok", "degraded", "lost"]], ["shelter", ["base"]], ["food", ["base"]], ["qrt", ["base"]]];
       for (const [k, states] of kinds) for (const st of states) {
         const ring = (RING as Record<string, string>)[st === "base" ? "base" : st] ?? RING.none;
         m.addImage(`${k}-${st}`, drawIcon(k, ring, st === "risk" || st === "high" || st === "degraded" || st === "lost"), { pixelRatio: 2 });
@@ -132,15 +145,56 @@ export function MapStage(p: MapProps) {
           layout: { "icon-image": image, "icon-size": ["interpolate", ["linear"], ["zoom"], 10, 0.62, 14, 0.95, 17, 1.25], "icon-allow-overlap": true, "icon-ignore-placement": true },
           paint: { "icon-opacity": 1, "icon-opacity-transition": { duration: 600 } } });
       sym("shelter", "shelter", "shelter-base"); sym("food", "food", "food-base"); sym("qrt", "qrt", "qrt-base");
-      sym("school", "school", "school-none"); sym("airport", "airport", "airport-none"); sym("army", "army", "army-none"); sym("hospital", "hospital", "hospital-none");
+      sym("school", "school", "school-none"); sym("airport", "airport", "airport-none"); sym("helipad", "helipad", "helipad-none"); sym("army", "army", "army-none"); sym("hospital", "hospital", "hospital-none");
+      // Atmosphere above flood/runoff/zones: soft heatmap clouds + smoothed isobars.
+      m.addLayer({
+        id: "atm-clouds", type: "heatmap", source: "atm-clouds", layout: { visibility: "none" },
+        paint: {
+          "heatmap-weight": ["interpolate", ["linear"], ["get", "cloud_cover"], 0, 0, 40, 0.45, 100, 1],
+          "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 10, 0.7, 14, 1.15],
+          "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 10, 28, 12, 42, 15, 64],
+          "heatmap-opacity": 0.72,
+          "heatmap-color": [
+            "interpolate", ["linear"], ["heatmap-density"],
+            0, "rgba(232,240,248,0)",
+            0.2, "rgba(210,224,236,0.25)",
+            0.45, "rgba(200,216,230,0.45)",
+            0.7, "rgba(230,238,246,0.62)",
+            1, "rgba(248,252,255,0.78)",
+          ],
+        },
+      });
+      m.addLayer({
+        id: "atm-isobars-glow", type: "line", source: "atm-isobars", layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
+        paint: { "line-color": "#9EB6C8", "line-width": 5, "line-blur": 2.5, "line-opacity": 0.45 },
+      });
+      m.addLayer({
+        id: "atm-isobars", type: "line", source: "atm-isobars", layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
+        paint: { "line-color": "#F2F7FB", "line-width": 1.6, "line-opacity": 0.92 },
+      });
+      m.addLayer({
+        id: "atm-centers", type: "symbol", source: "atm-centers", layout: {
+          visibility: "none",
+          "text-field": ["get", "label"],
+          "text-size": 18,
+          "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+          "text-allow-overlap": true,
+          "text-ignore-placement": true,
+        },
+        paint: {
+          "text-color": ["match", ["get", "kind"], "high", "#FFFFFF", "low", "#9FD0FF", "#E8EEF2"],
+          "text-halo-color": "#0A1217",
+          "text-halo-width": 2,
+        },
+      });
       m.addLayer({ id: "rec-pt", type: "circle", source: "rec", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": ["case", ["==", ["get", "hot"], 1], 16, 12], "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": ["get", "color"], "circle-stroke-width": ["case", ["==", ["get", "hot"], 1], 4, 2.6] } });
       m.addLayer({ id: "sel-pt", type: "circle", source: "sel", filter: ["==", ["geometry-type"], "Point"], paint: { "circle-radius": 13, "circle-color": "rgba(0,0,0,0)", "circle-stroke-color": "#FFFFFF", "circle-stroke-width": 3 } });
 
+      const lookup = (id: string | undefined): Entity | undefined => (id === undefined ? undefined : BY_ID.get(id) ?? props.current.buildingById.get(id));
       const query = (pt: { x: number; y: number }) => {
         const layers = HIT.filter((id) => m.getLayer(id) && m.getLayoutProperty(id, "visibility") !== "none");
         return m.queryRenderedFeatures([[pt.x - 7, pt.y - 7], [pt.x + 7, pt.y + 7]], { layers }) as any[];
       };
-      const lookup = (id: string | undefined): Entity | undefined => (id === undefined ? undefined : BY_ID.get(id) ?? props.current.buildingById.get(id));
       m.on("click", (e: any) => { const f = query(e.point).find((x) => lookup(x.properties?.id)); props.current.onSelect(f ? lookup(f.properties.id)! : null); });
       m.on("mousemove", (e: any) => {
         const f = query(e.point).find((x) => lookup(x.properties?.id)), t = tip.current;
@@ -162,6 +216,14 @@ export function MapStage(p: MapProps) {
       const vm = new Map(Object.entries(q.vis)), g = (k: string) => vm.get(k) === true, ran = q.ran;
       show("flood-fill", g("flood")); show("flood-waves", g("flood")); show("flood-edge", g("flood"));
       show("rain", g("weather")); show("low", g("terrain")); show("roads", g("roads"));
+      const atm = q.atmosphere;
+      if (atm) {
+        (mm.getSource("atm-clouds") as any)?.setData(atm.clouds);
+        (mm.getSource("atm-isobars") as any)?.setData(atm.isobars);
+        (mm.getSource("atm-centers") as any)?.setData(atm.centers);
+      }
+      const atmOn = g("atmosphere") && !!atm && ((atm.clouds?.features?.length ?? 0) + (atm.isobars?.features?.length ?? 0) > 0);
+      show("atm-clouds", atmOn); show("atm-isobars-glow", atmOn); show("atm-isobars", atmOn); show("atm-centers", atmOn);
       // Flood water rises in when the assessment runs; a larger share of the observed extent is shown as time advances (demo).
       const flowOn = ran && g("runoff");
       show("runoff-raster", g("runoff"));
@@ -176,9 +238,9 @@ export function MapStage(p: MapProps) {
       mm.setPaintProperty("flood-fill", "fill-opacity", water ? 0.5 : 0);
       mm.setPaintProperty("flood-waves", "fill-opacity", water ? 0.9 : 0);
       mm.setPaintProperty("flood-edge", "line-opacity", water ? 0.75 : 0);
-      show("pts-hospital", g("buildings")); show("pts-school", g("schools")); show("pts-airport", g("airports")); show("pts-army", g("army")); show("pts-tower", g("towers")); show("pts-dam", g("dams")); show("pts-social", g("social")); show("pts-radio", g("radio"));
+      show("pts-hospital", g("buildings")); show("pts-school", g("schools")); show("pts-airport", g("airports")); show("pts-helipad", g("helipads")); show("pts-army", g("army")); show("pts-tower", g("towers")); show("pts-dam", g("dams"));
       show("pts-shelter", g("shelter")); show("pts-food", g("food")); show("pts-qrt", g("qrt"));
-      for (const k of ["landslide", "outage", "alert"]) { const on = ran && g(k === "landslide" ? "landslides" : k === "outage" ? "outages" : "alerts"); show(`z-${k}-fill`, on); show(`z-${k}-line`, on); }
+      for (const k of ["landslide", "outage"]) { const on = ran && g(k === "landslide" ? "landslides" : "outages"); show(`z-${k}-fill`, on); show(`z-${k}-line`, on); }
       const filt = ["all", ["<=", ["get", "stage"], q.stage], ["<", ["get", "order"], q.revealN]];
       mm.setFilter("closures", filt); mm.setFilter("closures-glow", filt);
       mm.setFilter("closures-muted", ["<=", ["get", "stage"], q.stage]);
@@ -191,9 +253,12 @@ export function MapStage(p: MapProps) {
       mm.setLayoutProperty("pts-hospital", "icon-image", ran ? ["concat", "hospital-", ["get", "access"]] : "hospital-none");
       mm.setLayoutProperty("pts-school", "icon-image", ran ? ["concat", "school-", ["get", "risk"]] : "school-none");
       mm.setLayoutProperty("pts-airport", "icon-image", ran ? ["concat", "airport-", ["get", "access"]] : "airport-none");
+      mm.setLayoutProperty("pts-helipad", "icon-image", ran ? ["concat", "helipad-", ["get", "access"]] : "helipad-none");
       mm.setLayoutProperty("pts-army", "icon-image", ran ? ["concat", "army-", ["get", "access"]] : "army-none");
       set("pts-hospital", g("buildings")); set("pts-school", g("schools"));
-      for (const id of ["pts-airport", "pts-army"]) mm.setPaintProperty(id, "icon-opacity", g(id === "pts-airport" ? "airports" : "army") ? 1 : 0);
+      for (const [id, key] of [["pts-airport", "airports"], ["pts-helipad", "helipads"], ["pts-army", "army"]] as const) {
+        mm.setPaintProperty(id, "icon-opacity", g(key) ? 1 : 0);
+      }
       // Real building footprints: flat in 2D, extruded by their real storey count in 3D. Only shown after a run,
       // because the shelter reading depends on the flood depth the agents compute.
       if (bldgRef.current !== q.buildings) { bldgRef.current = q.buildings; (mm.getSource("bldg") as any)?.setData(q.buildings ?? { type: "FeatureCollection", features: [] }); }
@@ -201,7 +266,6 @@ export function MapStage(p: MapProps) {
       show("bldg-fill", bOn && !q.view3d); show("bldg-line", bOn && !q.view3d); show("bldg-3d", bOn && q.view3d);
       mm.setPaintProperty("bldg-fill", "fill-opacity", bOn && !q.view3d ? 0.7 : 0);
       mm.setPaintProperty("bldg-line", "line-opacity", bOn && !q.view3d ? 0.9 : 0);
-
       const sel = mm.getSource("sel"), rec = mm.getSource("rec");
       sel?.setData(q.selected ? { type: "Feature", properties: {}, geometry: q.selected.kind === "closure" || q.selected.kind === "pocket" || q.selected.kind === "landslide" || q.selected.kind === "outage" || q.selected.kind === "alert" || q.selected.kind === "building" ? q.selected.geom : { type: "Point", coordinates: q.selected.at } } : { type: "FeatureCollection", features: [] });
       const recs = q.selected ? q.recs : [];
@@ -227,7 +291,16 @@ export function MapStage(p: MapProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d]);
+  useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d, p.atmosphere]);
+
+  useEffect(() => {
+    const m = map.current;
+    if (!m || !ready.current) return;
+    const a = p.atmosphere;
+    (m.getSource("atm-clouds") as any)?.setData(a?.clouds ?? EMPTY_FC);
+    (m.getSource("atm-isobars") as any)?.setData(a?.isobars ?? EMPTY_FC);
+    (m.getSource("atm-centers") as any)?.setData(a?.centers ?? EMPTY_FC);
+  }, [p.atmosphere]);
 
   // Flow streaks: calm particles that run down the slope of the real elevation grid. They are drawn at screen resolution and move at
   // a fixed gentle speed on screen, they start mostly in the main channels, and they stop when the map moves. Skipped when the
@@ -287,19 +360,19 @@ export function MapStage(p: MapProps) {
   }, [p.ran]);
 
   // Status-strip filter: zoom to the affected area and light up the affected roads.
-  const closuresDone = p.ran && p.revealN >= GEO.closures.features.length;
+  const closuresDone = p.ran && p.revealN >= p.scene.geo.closures.features.length;
   useEffect(() => {
     const m = map.current; if (!m) return;
     const go = () => {
       const src = m.getSource("affected"); if (!src) return;
       if (p.focus && closuresDone) {
-        const a = affected(p.focus, p.stage); src.setData(a.fc);
+        const a = affected(p.scene, p.focus, p.stage); src.setData(a.fc);
         const wide = window.innerWidth > 900;
         if (a.bounds && !props.current.selected) m.fitBounds(a.bounds, { padding: wide ? { top: 80, bottom: 50, left: 330, right: 60 } : { top: 80, bottom: 50, left: 24, right: 24 }, maxZoom: 14.3, duration: 900 });
       } else src.setData({ type: "FeatureCollection", features: [] });
     };
     if (ready.current) go(); else m.once("load", go);
-  }, [p.focus, p.stage, closuresDone]);
+  }, [p.focus, p.stage, closuresDone, p.scene]);
 
   // 2D / 3D: terrain, hillshade and a tilted camera.
   useEffect(() => {

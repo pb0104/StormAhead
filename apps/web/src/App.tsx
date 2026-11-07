@@ -5,25 +5,28 @@ import { StatusStrip, type StripItem } from "./StatusStrip.tsx";
 import { ContextDrawer, type Done } from "./ContextDrawer.tsx";
 import { DetailsDialog } from "./DetailsDialog.tsx";
 import { PhotorealView, savedToken } from "./PhotorealView.tsx";
-import { actions, distKm } from "./mock/advice.ts";
-import { FLOOD_POLYS, OF, type Entity } from "./mock/demo.ts";
-import { depthImage, runoff, slopeField, type Runoff } from "./hydro.ts";
-import { floodDepths, STAGE_FRACTION, TERRAIN_IDLE, terrainAgent, weatherAgent, type Terrain } from "./agents.ts";
-import { assess, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "./buildings.ts";
+import { distKm } from "./affected.ts";
+import { ops } from "./api.ts";
+import { assess, buildingAdvice, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "./buildings.ts";
+import type { AssessmentResult, AtmosphereSnapshot, Entity, SceneSnapshot, TerrainResult, Weather } from "../../../packages/ports/index.ts";
 
 /**
- * Authority ops console, DEMO build. Every layer except OSM road geometry and the satellite base is mock.
- * The research hindcast view (HindcastView.tsx) is still in the repo but is no longer the primary screen.
+ * Authority ops console. Scene, weather seed, terrain and flow come from the modular API.
+ * Hospitals, schools, dams, airports, towers and shelters are merged server-side from OSM.
+ * Building footprints for shelter/evacuate come from GET /api/buildings.
  */
 const DEFAULT_VIS: Vis = {
-  terrain: true, roads: true, towers: false, weather: true, dams: false, social: false, radio: false, buildings: true, schools: true, airports: true, army: true,
-  closures: true, flood: true, runoff: true, landslides: true, qrt: false, food: false, shelter: false, outages: true, alerts: false,
+  terrain: true, roads: true, towers: false, weather: true, atmosphere: false, dams: true, buildings: true, schools: true, airports: true, helipads: true, army: true,
+  closures: true, flood: true, runoff: true, landslides: true, qrt: false, food: false, shelter: false, outages: true,
   shelterBuildings: true,
 };
-const TOTAL = OF("closure").length;
+const TERRAIN_IDLE: TerrainResult = { status: "idle", depth0: [], medianDepth: 0, note: "Terrain agent has not run yet." };
+const WEATHER_IDLE: Weather = { inches: 10, mm: 254, lowIn: 8, highIn: 12, peakMmH: 28, label: "Heavy" };
 
 export function App() {
   const narrow = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches;
+  const [scene, setScene] = useState<SceneSnapshot | null>(null);
+  const [loadErr, setLoadErr] = useState<string | null>(null);
   const [vis, setVis] = useState<Vis>(DEFAULT_VIS);
   const [stage, setStage] = useState(3);
   const [ran, setRan] = useState(false);
@@ -43,40 +46,84 @@ export function App() {
   const [hover, setHover] = useState<string | null>(null);
   const [flying, setFlying] = useState(false);
   const [rain, setRain] = useState(10);
-  const [terrain, setTerrain] = useState<Terrain>(TERRAIN_IDLE);
+  const [assessResult, setAssessResult] = useState<AssessmentResult | null>(null);
+  const [assessBusy, setAssessBusy] = useState(false);
+  const [atmosphere, setAtmosphere] = useState<AtmosphereSnapshot | null>(null);
   const [bldgLayer, setBldgLayer] = useState<BuildingLayer | null>(null);
   const timer = useRef<number | undefined>(undefined);
 
-  useEffect(() => () => window.clearInterval(timer.current), []);
-  useEffect(() => { setTerrain({ ...TERRAIN_IDLE, status: "loading", note: "Terrain agent is reading elevation tiles…" }); terrainAgent().then(setTerrain); }, []);
-  // Real OSM building footprints, served by the API. Absent (static preview, offline) → the console runs without them.
-  useEffect(() => { fetchBuildings().then(setBldgLayer); }, []);
-  const [flow, setFlow] = useState<{ url: string; r: Runoff } | null>(null);
-  const [flowBusy, setFlowBusy] = useState(false);
-  const field = useMemo(() => (terrain.grid ? slopeField(terrain.grid) : null), [terrain]);
-  useEffect(() => {
-    if (!terrain.grid || !field || !ran) { setFlow(null); return; }
-    let dead = false;
-    setFlowBusy(true);
-    const t = window.setTimeout(async () => {
-      const r = await runoff(terrain.grid!, rain * 25.4 * (STAGE_FRACTION[stage] ?? 1), () => dead, field);
-      if (dead || !r) return;
-      setFlow({ url: depthImage(terrain.grid!, r.depth), r }); setFlowBusy(false);
-    }, 250);
-    return () => { dead = true; window.clearTimeout(t); };
-  }, [terrain, field, rain, stage, ran]);
-  const flowText = !terrain.grid ? "Flow agent needs the elevation grid, which could not be built." : !ran ? "Flow agent: run the assessment to route the rain downhill." : flowBusy || !flow ? "Flow agent is routing the rain downhill…" : `Flow agent: water drains off slopes and pools in about ${flow.r.pooledKm2.toFixed(1)} km² of low ground, typically about ${flow.r.maxDepth.toFixed(1)} m deep.`;
-  const weather = useMemo(() => weatherAgent(rain), [rain]);
-  const depths = useMemo(() => floodDepths(terrain, rain, STAGE_FRACTION[stage] ?? 1), [terrain, rain, stage]);
-  const floodFc = useMemo(() => ({ type: "FeatureCollection" as const, features: FLOOD_POLYS.map((p, i) => ({ type: "Feature" as const, properties: { d: Math.round((depths[i] ?? 0) * 100) / 100, i }, geometry: { type: "Polygon" as const, coordinates: [p.ring] } })) }), [depths]);
-  const wet = depths.filter((d) => d > 0).length, deepest = Math.max(0, ...depths);
+  const of = (k: string) => (scene?.entities ?? []).filter((e) => e.kind === k);
+  const TOTAL = of("closure").length;
 
-  // A building counts as cut off when it sits close to a stranded pocket road: that is when people there cannot
-  // easily be moved out, so a dry upper-floor building nearby becomes a refuge rather than just another building.
-  const pocketPts = useMemo(() => OF("pocket").flatMap((p) => (p.geom.type === "MultiLineString" ? p.geom.coordinates.flat() : [])), []);
+  useEffect(() => () => window.clearInterval(timer.current), []);
+  useEffect(() => { fetchBuildings().then(setBldgLayer); }, []);
+
+  useEffect(() => {
+    let dead = false;
+    (async () => {
+      try {
+        const [s, seed, atm] = await Promise.all([
+          ops.scene(),
+          ops.weatherSeed().catch(() => null),
+          ops.atmosphere().catch(() => null),
+        ]);
+        if (dead) return;
+        // /api/scene already merges OSM assets (real dam names, hospitals, …).
+        setScene(s);
+        if (seed) setRain(seed.inches);
+        if (atm) setAtmosphere(atm);
+      } catch (e) {
+        if (!dead) setLoadErr((e as Error).message);
+      }
+    })();
+    return () => { dead = true; };
+  }, []);
+
+  useEffect(() => {
+    if (!scene) return;
+    let dead = false;
+    setAssessBusy(true);
+    const t = window.setTimeout(async () => {
+      try {
+        const a = await ops.assessment(rain, stage);
+        if (!dead) setAssessResult(a);
+      } catch {
+        if (!dead) setAssessResult(null);
+      } finally {
+        if (!dead) setAssessBusy(false);
+      }
+    }, 200);
+    return () => { dead = true; window.clearTimeout(t); };
+  }, [scene, rain, stage]);
+
+  const weather = assessResult?.weather ?? { ...WEATHER_IDLE, inches: rain, mm: rain * 25.4 };
+  const terrain = assessResult?.terrain ?? (assessBusy ? { ...TERRAIN_IDLE, status: "loading" as const, note: "Terrain agent is reading elevation tiles…" } : TERRAIN_IDLE);
+  const depths = assessResult?.depths ?? [];
+  const floodFc = assessResult?.floodFc ?? { type: "FeatureCollection" as const, features: [] };
+  const flowUrl = assessResult?.flow ? `data:image/png;base64,${assessResult.flow.imagePngBase64}` : null;
+  const field = assessResult?.flow ? {
+    grid: assessResult.flow.grid,
+    gx: Float32Array.from(assessResult.flow.field.gx),
+    gy: Float32Array.from(assessResult.flow.field.gy),
+    acc: Float32Array.from(assessResult.flow.field.acc),
+  } : null;
+  const flowText = !ran
+    ? "Flow agent: run the assessment to route the rain downhill."
+    : assessBusy || !assessResult
+      ? "Flow agent is routing the rain downhill…"
+      : assessResult.flowText;
+  const wet = assessResult?.wet ?? 0;
+  const deepest = assessResult?.deepest ?? 0;
+  const floodPolyCount = scene?.floodPolys.length ?? 0;
+
+  // A building counts as cut off when it sits close to a stranded pocket road.
+  const pocketPts = useMemo(() => of("pocket").flatMap((p) => (p.geom.type === "MultiLineString" ? p.geom.coordinates.flat() : [])), [scene]);
   const isCutOff = useMemo(() => (lon: number, lat: number) =>
     pocketPts.some((c) => Math.hypot((c[0]! - lon) * 98.6, (c[1]! - lat) * 110.6) < 0.35), [pocketPts]);
-  const assessed = useMemo(() => (bldgLayer ? assess(bldgLayer.list, depths, isCutOff) : []), [bldgLayer, depths, isCutOff]);
+  const assessed = useMemo(
+    () => (bldgLayer && scene ? assess(bldgLayer.list, depths, scene.floodPolys, isCutOff) : []),
+    [bldgLayer, depths, scene, isCutOff],
+  );
   const bldgFc = useMemo(() => ({
     type: "FeatureCollection" as const,
     features: assessed.filter((b) => b.role !== "none").map((b) => ({
@@ -90,7 +137,7 @@ export function App() {
   const refuges = assessed.filter((b) => b.role === "refuge");
 
   const run = () => {
-    if (busy) return;
+    if (busy || !scene) return;
     window.clearInterval(timer.current);
     setBusy(true); setRan(true); setSelected(null); setPockets(false); setRevealN(0);
     if (narrow) setRailOpen(false);
@@ -103,38 +150,63 @@ export function App() {
 
   const pick = (k: string | null) => { setFocus(k); if (k && !ran && !busy) run(); };
   const startFly = () => { if (!selected) return; setMode("3d"); window.setTimeout(() => setFlying(true), view3d ? 50 : 1500); };
-  const toggle = (k: string) => setVis((v) => ({ ...v, [k]: !v[k] }));
+  const toggle = (k: string) => {
+    setVis((v) => {
+      const next = !v[k];
+      if (k === "atmosphere" && next && !atmosphere) {
+        ops.atmosphere().then((a) => setAtmosphere(a)).catch(() => { /* keep off-data */ });
+      }
+      return { ...v, [k]: next };
+    });
+  };
   const select = (e: Entity | null) => { setFlying(false); setPhoto(false); setSelected(e); if (e && narrow) setRailOpen(false); };
+
+  const advice = selected?.kind === "building"
+    ? buildingAdvice(selected)
+    : selected && scene ? scene.advice[selected.id] : undefined;
+  const acts = advice?.actions ?? [];
+  const why = advice?.reasons ?? [];
+
   const recs = useMemo<Rec[]>(() => {
-    if (!selected) return [];
+    if (!selected || !scene) return [];
+    const byId = new Map(scene.entities.map((e) => [e.id, e]));
     const word: Record<string, string> = { qrt: "", food: "Food ", shelter: "Shelter ", grid: "Crew ", alert: "Alert ", air: "Airlift ", army: "Army " };
-    return actions(selected).flatMap((a) => (a.target && a.target.id !== selected.id ? [{ id: a.id, kind: a.kind, at: a.target.at, label: `${word[a.kind] ?? ""}${a.target.id} · ${distKm(selected.at, a.target.at).toFixed(1)} km` }] : []));
-  }, [selected]);
+    return acts.flatMap((a) => {
+      const t = a.targetId ? byId.get(a.targetId) ?? buildingById.get(a.targetId) : undefined;
+      return t && t.id !== selected.id
+        ? [{ id: a.id, kind: a.kind, at: t.at, label: `${word[a.kind] ?? ""}${t.id} · ${distKm(selected.at, t.at).toFixed(1)} km`, target: t.id }]
+        : [];
+    });
+  }, [selected, scene, acts, buildingById]);
 
   const linkedIds = useMemo(() => recs.flatMap((r) => (r.target ? [r.target] : [])), [recs]);
-  const closed = OF("closure").filter((c) => (c.stage ?? 0) <= stage).length;
+  const closed = of("closure").filter((c) => (c.stage ?? 0) <= stage).length;
   const strip: StripItem[] = [
     { key: "closures", label: "closed roads", value: ran ? (revealN >= TOTAL ? closed : Math.min(revealN, closed)) : null },
-    { key: "pockets", label: "cut-off pockets", value: ran && pockets ? OF("pocket").length : null },
-    { key: "landslides", label: "landslide zones", value: ran ? OF("landslide").length : null },
-    { key: "schools", label: "schools at risk", value: ran ? OF("school").filter((s) => s.props.risk !== "ok").length : null },
-    { key: "hospitals", label: "hospitals at risk", value: ran ? OF("hospital").filter((h) => h.props.access !== "ok").length : null },
-    { key: "outages", label: "grid outages", value: ran ? OF("outage").length : null },
+    { key: "pockets", label: "cut-off pockets", value: ran && pockets ? of("pocket").length : null },
+    { key: "landslides", label: "landslide zones", value: ran ? of("landslide").length : null },
+    { key: "schools", label: "schools at risk", value: ran ? of("school").filter((s) => s.props.risk !== "ok").length : null },
+    { key: "hospitals", label: "hospitals at risk", value: ran ? of("hospital").filter((h) => h.props.access !== "ok").length : null },
+    { key: "outages", label: "grid outages", value: ran ? of("outage").length : null },
     ...(bldgLayer ? [{ key: "evacuate", label: "buildings to evacuate", value: ran ? evacuate : null }] : []),
   ];
   const hint = ran && !busy && !selected;
+  const kindLabel = { ...(scene?.kindLabel ?? {}), building: "Building" };
+
+  if (loadErr) return <div className="shell" style={{ padding: 40 }}><p>Could not load scene: {loadErr}</p></div>;
+  if (!scene) return <div className="shell" style={{ padding: 40, color: "#8d9db6" }}>Loading ops console…</div>;
 
   return (
     <div className="shell">
-      <MapStage ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingById={buildingById} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flow?.url ?? null} field={field && terrain.grid ? { grid: terrain.grid, gx: field.gx, gy: field.gy, acc: field.acc } : null} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} />
-      {photo && selected && <PhotorealView token={token} setToken={setToken} ran={ran} selected={selected} depths={depths} linked={linkedIds} onClose={() => setPhoto(false)} />}
+      <MapStage scene={scene} ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingById={buildingById} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} atmosphere={atmosphere} />
+      {photo && selected && <PhotorealView token={token} setToken={setToken} ran={ran} selected={selected} depths={depths} floodPolys={scene.floodPolys} entities={scene.entities} linked={linkedIds} onClose={() => setPhoto(false)} />}
       <StatusStrip items={strip} focus={focus} setFocus={pick} openDetails={() => setDetails(true)} mode={mode} setMode={setMode} />
       <CommandRail open={railOpen} setOpen={setRailOpen} vis={vis} toggle={toggle} stage={stage} setStage={setStage} ran={ran} busy={busy} run={run}
-        rain={rain} setRain={setRain} weather={weather} terrain={terrain} wet={wet} total={FLOOD_POLYS.length} deepest={deepest} flowText={flowText}
+        rain={rain} setRain={setRain} weather={weather} terrain={terrain} wet={wet} total={floodPolyCount} deepest={deepest} flowText={flowText}
         legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
       {hint && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
-      <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} />
-      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} agentLines={[`Weather agent (mock forecast): ${weather.label.toLowerCase()} rain, ${weather.inches} in (${Math.round(weather.mm)} mm) in 24 h, range ${weather.lowIn} to ${weather.highIn} in, peak about ${weather.peakMmH} mm/h.`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${FLOOD_POLYS.length} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
+      <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} reasons={why} actions={acts} kindLabel={kindLabel} />
+      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} note={scene.note} agentLines={[`Weather agent: ${weather.label.toLowerCase()} rain, ${weather.inches} in (${Math.round(weather.mm)} mm) in 24 h, range ${weather.lowIn} to ${weather.highIn} in, peak about ${weather.peakMmH} mm/h.`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${floodPolyCount} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
         bldgLayer
           ? `Shelter agent (REAL buildings, OpenStreetMap 2 Jan 2024): ${bldgLayer.list.length} shelter-relevant footprints. At this forecast ${assessed.filter((b) => b.role === "at-risk-vertical").length} flooded buildings keep floors above the water, ${evacuate} have none and must be evacuated, and ${refuges.length} dry upper-floor buildings in cut-off areas could take about ${refuges.reduce((s, b) => s + (b.capacity ?? 0), 0).toLocaleString("en-US")} people. ${bldgLayer.list.filter((b) => b.f === null).length} have no tagged height and get no judgement.`
           : "Shelter agent: real building footprints are not loaded (run scripts/fetch_buildings.mjs and start the API)."]} />

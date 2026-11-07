@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { actions, KIND_LABEL, reasons, type Action } from "./mock/advice.ts";
-import type { Entity } from "./mock/demo.ts";
+import type { Action, Entity, Reason } from "../../../packages/ports/index.ts";
 import { Glyph } from "./Glyph.tsx";
 import { RING, type BuildingKind } from "./icons.ts";
 
-const BUILDINGS = new Set(["hospital", "school", "shelter", "food", "qrt", "airport", "army"]);
-const ringFor = (e: Entity) => (e.kind === "hospital" || e.kind === "airport" || e.kind === "army" ? (RING as Record<string, string>)[String(e.props.access)] : e.kind === "school" ? (RING as Record<string, string>)[String(e.props.risk)] : RING.base) ?? RING.none;
+const BUILDINGS = new Set(["hospital", "school", "shelter", "food", "qrt", "airport", "helipad", "army"]);
+const ringFor = (e: Entity) => (e.kind === "hospital" || e.kind === "airport" || e.kind === "helipad" || e.kind === "army" ? (RING as Record<string, string>)[String(e.props.access)] : e.kind === "school" ? (RING as Record<string, string>)[String(e.props.risk)] : RING.base) ?? RING.none;
 
 export type Done = Record<string, "assigned" | "issued">;
 const VERB: Record<Action["kind"], string> = { qrt: "Assign QRT", food: "Stage food", shelter: "Open shelter", grid: "Assign crew", alert: "Issue alert", road: "Stage", air: "Reserve", army: "Request" };
 
-export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPhoto }: { onHover: (id: string | null) => void; onFly: (() => void) | null; onPhoto: () => void; e: Entity | null; done: Done; setDone: (f: (d: Done) => Done) => void; onClose: () => void }) {
+export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPhoto, reasons: why, actions: acts, kindLabel }: {
+  onHover: (id: string | null) => void; onFly: (() => void) | null; onPhoto: () => void; e: Entity | null; done: Done;
+  setDone: (f: (d: Done) => Done) => void; onClose: () => void;
+  reasons: Reason[]; actions: Action[]; kindLabel: Record<string, string>;
+}) {
   const [preview, setPreview] = useState<string | null>(null);
-  const acts = e ? actions(e) : [];
-  const why = e ? reasons(e) : [];
   const set = (id: string, v: "assigned" | "issued" | null) => setDone((d) => { const n = { ...d }; if (v) n[id] = v; else delete n[id]; return n; });
   return (
     <aside className={`drawer ${e ? "open" : ""}`} aria-hidden={!e} aria-label="Selected item">
@@ -22,7 +23,7 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
           <header className="d-head">
             {BUILDINGS.has(e.kind) && <span className="d-glyph"><Glyph kind={e.kind as BuildingKind} ring={ringFor(e)} badge={e.props.risk === "risk" || e.props.risk === "high" || e.props.access === "degraded" || e.props.access === "lost"} size={40} /></span>}
             <div style={{ flex: 1 }}>
-              <span className="d-kind">{KIND_LABEL[e.kind]} · {e.id}</span>
+              <span className="d-kind">{kindLabel[e.kind] ?? e.kind}{e.props.source === "openstreetmap" ? " · OSM" : ` · ${e.id}`}</span>
               <h2>{e.name}</h2>
             </div>
             <button className="icon" onClick={onClose} aria-label="Close">×</button>
