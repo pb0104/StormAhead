@@ -72,47 +72,47 @@ svg { display: block; width: 100%; min-width: 1240px; height: auto; }
   <div class="frame" role="img" aria-label="Agent flow diagram: public data feeds five intake agents; their events go to a shared event log with a coordinator and a verification agent; six analysis agents read verified events; four decision agents draft actions; a human approves them in the operations dashboard, and approvals and rejections feed back to verification and memory.">
     <svg id="diagram" viewBox="0 0 1600 850" xmlns="http://www.w3.org/2000/svg"></svg>
   </div>
-  <p class="note">Brainstorm, November 2026 · Replay of Hurricane Helene in western NC · 911 calls and live outage feeds would be simulated</p>
+  <p class="note">Updated November 2026 · Replay of the Sept 2024 Kathmandu valley floods · BUILT, PARTIAL, NEXT and LATER show each box's status · The Hurricane Helene version is in git history</p>
 </div>
 
 <script>
 const COLS = [
   { title: "Public data", sub: "raw feeds, cached for replay", x: 20, w: 180, color: "--src", items: [
-    { name: "Weather & water", how: "NWS alerts, NHC tracks, USGS + FIMAN gauges, radar" },
-    { name: "Imagery", how: "Maxar Open Data, NOAA aerial, Sentinel, traffic cams" },
-    { name: "Roads & terrain", how: "OpenStreetMap, DriveNC, landslide + elevation" },
-    { name: "Power & comms", how: "EAGLE-I outages, FCC cell-site reports, IODA" },
-    { name: "People & places", how: "CDC SVI, Census, OpenFEMA, critical facilities" },
-    { name: "Voices", how: "Bluesky, Reddit, YouTube, 911 + scanner (simulated)" }
+    { name: "Weather & water", how: "BIPAD/DHM hourly rain and river levels, 2021-2026" },
+    { name: "Imagery", how: "UNOSAT flood extent, for checking only. Maxar, Sentinel-1 not connected" },
+    { name: "Roads & terrain", how: "OSM Jan 2024 roads, Copernicus GLO-30 elevation" },
+    { name: "Power & comms", how: "OSM power lines, OpenCelliD towers. Not connected" },
+    { name: "People & places", how: "2021 census, BIPAD wards, OSM hospitals. Shelters not connected" },
+    { name: "Voices", how: "Nepali news, social media, radio. Not connected" }
   ]},
   { title: "Intake agents", sub: "one per data type", x: 250, w: 230, color: "--intake", items: [
-    { name: "Social & Media", how: "Pull posts → LLM reads text and photos → extract what, where, how urgent", tools: "Multimodal LLM · CrisisTransformers" },
-    { name: "Radio & 911", how: "Audio → transcript → classify incident, pull location and needs", tools: "Whisper · LLM" },
-    { name: "Weather & Hydro", how: "Poll forecasts and gauges → flag threshold breaches and storm path by area", tools: "NWS · NHC · FIMAN" },
-    { name: "Imagery", how: "Crop before/after tiles along roads → ask: water, washout, debris, damage?", tools: "Maxar · LLM vision · xView2" },
-    { name: "Infrastructure", how: "Read outage, cell-site, DOT and hospital feeds → status per area", tools: "EAGLE-I · FCC DIRS · DriveNC" }
+    { name: "News & Social", how: "Read dated reports → extract road closures, place, time. Also creates the missing road labels", tools: "NEXT · LLM extraction" },
+    { name: "Radio", how: "Audio → Nepali transcript → incident, location and needs", tools: "LATER · no archive found yet" },
+    { name: "Weather & Hydro", how: "Hourly rain and river levels → official warning and danger crossings by station", tools: "BUILT · detect.ts" },
+    { name: "Imagery", how: "Check a usable radar pass exists → water, damage and debris along roads", tools: "LATER · Prithvi · Sentinel-1" },
+    { name: "Infrastructure", how: "Grid, tower and hospital locations → what sits in exposed areas", tools: "NEXT · locations, not status" }
   ]},
   { title: "Shared picture", sub: "one log every agent uses", x: 530, w: 200, color: "--shared", items: [
-    { name: "Coordinator", how: "Watches the log, decides which agents run next, merges their results", tools: "LangGraph · MCP" },
-    { name: "Shared event log", how: "One format for all: time · place · type · confidence · source · evidence", kind: "log" },
-    { name: "Verification", how: "Checks each claim against physical data, merges duplicates, labels it supported, conflicting or unverified", tools: "photo vs. gauge" }
+    { name: "Coordinator", how: "Fixed stage order. Trains only on earlier years, withholds same-day incidents", tools: "BUILT · rule-based" },
+    { name: "Shared event log", how: "One format for all: time · agent · tool · inputs · summary · evidence", kind: "log" },
+    { name: "Verification", how: "Scores after prediction, against baselines, on held-out years, with fire as a control", tools: "BUILT · risk.ts" }
   ]},
   { title: "Analysis agents", sub: "one per domain", x: 780, w: 240, color: "--analysis", items: [
-    { name: "Roads & Access", how: "Road graph + closures + flood and slide risk → passable roads, reroutes, cut-off towns", tools: "OSMnx · OSRM" },
-    { name: "Power & Utilities", how: "Outages × critical sites → who is on a generator, and for how long", tools: "outage data · facilities" },
-    { name: "Comms & Silence", how: "Expected vs. actual activity per map cell → areas gone quiet where hazard is high", tools: "post baseline · cell sites" },
-    { name: "Hazard Forecast", how: "Gauge trends + rain + terrain → where flooding or slides hit in the next 6–24 h", tools: "gauges · elevation" },
-    { name: "People & Needs", how: "Vulnerability + help requests → needs by area, never by person", tools: "SVI · requests" },
-    { name: "Shelters & Supplies", how: "Capacity, stock and depots → which ones are still reachable", tools: "shelters · depots" }
+    { name: "Roads & Access", how: "Terrain exposure → worst-case screen only. Over-predicts, so it is not a closure forecast", tools: "PARTIAL · needs road labels" },
+    { name: "Power & Utilities", how: "Grid assets × exposed areas → what is at risk. No outage data to confirm it", tools: "LATER · at risk only" },
+    { name: "Comms & Silence", how: "Tower locations × exposed areas → coverage at risk. No live status", tools: "LATER · at risk only" },
+    { name: "Hazard Detection", how: "Rain + terrain → flood and landslide risk per ward per day. Works same day, not a day ahead", tools: "BUILT · HAND · ward model" },
+    { name: "People & Needs", how: "Census spread across wards → population by area, never by person", tools: "PARTIAL · rough estimate" },
+    { name: "Shelters & Supplies", how: "Shelter sites and stock → what is still reachable", tools: "NEXT · needs site data" }
   ]},
   { title: "Decision agents", sub: "draft actions, never send", x: 1070, w: 230, color: "--accent", items: [
-    { name: "Resource Allocation", how: "Ranks combined findings, matches needs to assets, routes them on passable roads", tools: "priority score · routing" },
-    { name: "Alerts & Messaging", how: "Drafts targeted, multilingual public alerts and responder notes", tools: "LLM · area targeting" },
-    { name: "Briefing", how: "Writes situation reports, shift handoffs and leadership briefs", tools: "LLM · event log" },
-    { name: "Knowledge & Memory", how: "Retrieves guidance and past events like Helene, and logs every decision", tools: "RAG · decision log" }
+    { name: "Resource Allocation", how: "Ranks wards by risk and population → QRT, food, shelter, evacuation", tools: "NEXT · needs shelters, stock" },
+    { name: "Alerts & Messaging", how: "One risk score, two tiers: early for authorities, stricter drafts for the public", tools: "BUILT · draft tiers only" },
+    { name: "Briefing", how: "Writes situation reports and shift handoffs from the event log", tools: "LATER · LLM" },
+    { name: "Knowledge & Memory", how: "Retrieves guidance and past events like Sept 2024, and logs every decision", tools: "LATER · RAG · decision log" }
   ]},
   { title: "Human gate", sub: "the only way out", x: 1350, w: 230, color: "--human", items: [
-    { name: "Operations dashboard", how: "Layered map + action queue. Each proposal shows its evidence and confidence. The analyst approves, edits or rejects.", tools: "Approve · Edit · Reject", weight: 2.3 },
+    { name: "Operations dashboard", how: "Layered map + action queue. Each proposal shows its evidence and confidence. The analyst approves, edits or rejects. God's Eye View can replay scenes for demos.", tools: "Approve · Edit · Reject", weight: 2.3 },
     { name: "Dispatch & resources", kind: "out", weight: .75 },
     { name: "Public alerts", kind: "out", weight: .75 },
     { name: "Situation reports", kind: "out", weight: .75 }

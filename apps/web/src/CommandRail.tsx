@@ -5,7 +5,7 @@ import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 
 const INPUTS: { group: string; items: [string, string][] }[] = [
   { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell towers"]] },
-  { group: "Live feeds", items: [["weather", "Weather"], ["atmosphere", "Atmosphere"], ["dams", "River gauges"]] },
+  { group: "Live feeds", items: [["weather", "Weather"], ["atmosphere", "Atmosphere"], ["dams", "River gauges"], ["social", "Social media"]] },
   { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["helipads", "Helipads"], ["army", "Army sites"]] },
 ];
 const OUTPUTS: [string, string][] = [
@@ -27,7 +27,7 @@ export function CommandRail(p: RailProps) {
           <div className="brand"><span className="b1">Cascade</span><span className="b2">IQ</span></div>
           <button className="icon rail-close" onClick={() => p.setOpen(false)} aria-label="Close command rail">×</button>
         </div>
-        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts and gauges are <b>real</b>; towers, outages, posts, radio and food depots are <b>simulated</b>.</p>
+        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges and social posts are <b>real</b>; towers, outages, radio and food depots are <b>simulated</b>.</p>
 
         <section>
           <label className="lbl" htmlFor="scn">Scenario</label>

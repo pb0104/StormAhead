@@ -1,2 +1,7 @@
 pyogrio
 shapely
+numpy
+rasterio
+pandas
+anthropic
+openai

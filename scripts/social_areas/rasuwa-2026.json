@@ -1,0 +1,12 @@
+{
+ "slug": "rasuwa-2026-08",
+ "note": "Bhote Koshi / Rasuwa flood, late August 2026. Bounding box covers Rasuwa and Nuwakot so local names win over same-named places elsewhere.",
+ "country": "NP",
+ "timezone": "Asia/Kathmandu",
+ "bbox": [84.95, 27.75, 85.75, 28.40],
+ "start": "2026-08-24T00:00:00Z",
+ "end": "2026-09-07T00:00:00Z",
+ "place_terms": ["Rasuwa", "Syabrubesi", "Timure", "Rasuwagadhi", "Trishuli", "Nuwakot", "Bhote Koshi", "Dhunche"],
+ "event_terms": ["flood", "flooding", "landslide", "glacial", "GLOF", "outburst", "बाढी", "पहिरो"],
+ "subreddits": ["Nepal"]
+}

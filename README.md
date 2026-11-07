@@ -16,6 +16,7 @@ The app has three modes: **Kathmandu ops console** (authorities cascade demo), *
 | Resources: food, shelter, power | **Not built** (EAGLE-I outage data identified) |
 | Social media, radio, cell towers, dams (Helene) | **Not built** (see [docs/helene-data-audit.md](docs/helene-data-audit.md)) |
 | Kathmandu hindcast engine | Built; **no demonstrated predictive skill** ([docs/hindcast-results.md](docs/hindcast-results.md)) |
+| Forward pipeline: gauges + rain + terrain → ward flood and landslide risk, scored on held-out years ([docs/pipeline.md](docs/pipeline.md)) | **Built** (backend, `/api/pipeline/*`, `npm run eval`). Same-day skill; no reliable next-day lead. `DetectView.tsx` kept but not rendered |
 
 **Important:** NCDOT entered every Helene record ≥ 13 days after it started, so the replay timeline is a *reconstruction*, not what officials saw live. The UI says so.
 
@@ -34,6 +35,7 @@ npm install
 npm start        # builds the web app, serves UI + API on http://127.0.0.1:3001
 npm run dev      # hot reload: API :3001 + Vite :5173 (open http://localhost:5173)
 npm test         # cascade + hindcast + adapter/tile-cache + Helene replay tests
+npm run eval     # score the forward pipeline (writes data/real/kathmandu/pipeline_eval.json)
 npm run typecheck
 ```
 

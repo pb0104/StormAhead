@@ -21,7 +21,8 @@ const SOURCES: [string, string, string][] = [
   ["Atmosphere", "Real", "Open-Meteo cloud cover and MSL pressure (live / cached)"],
   ["Building footprints", "Real", "OSM shelter-relevant footprints for evacuate / shelter-in-place reading"],
   ["Cell towers and outages", "Simulated", "No public feed for tower or grid status"],
-  ["Social media and radio", "Simulated", "Invented posts and call-ins"],
+  ["Social media", "Real", "Reddit (r/Nepal, r/Kathmandu) via Arctic Shift, 25 Sep to 3 Oct 2024, flood-related only. Places matched by name (GeoNames); tags are a keyword baseline on HumAID categories"],
+  ["Radio", "Simulated", "Invented call-ins"],
   ["Food depots", "Simulated", "No public stock feed found"],
 ];
 const ACTIVITY = [

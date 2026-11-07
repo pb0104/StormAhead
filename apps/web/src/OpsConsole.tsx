@@ -10,6 +10,7 @@ import { ops } from "./api.ts";
 import { assess, buildingAdvice, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "./buildings.ts";
 import { mergeBipadIntoScene } from "./mergeBipad.ts";
 import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
+import { AreaFeedPanel, SocialFeed } from "./SocialFeed.tsx";
 import type { AssessmentResult, AtmosphereSnapshot, Entity, SceneSnapshot, TerrainResult, Weather } from "../../../packages/ports/index.ts";
 
 /**
@@ -17,7 +18,7 @@ import type { AssessmentResult, AtmosphereSnapshot, Entity, SceneSnapshot, Terra
  * observed rain overlay the scene on the client. Building footprints from GET /api/buildings.
  */
 const DEFAULT_VIS: Vis = {
-  terrain: true, roads: true, towers: false, weather: true, atmosphere: false, dams: true, buildings: true, schools: true, airports: true, helipads: true, army: true,
+  terrain: true, roads: true, towers: false, weather: true, atmosphere: false, dams: true, social: true, buildings: true, schools: true, airports: true, helipads: true, army: true,
   closures: true, flood: true, runoff: true, landslides: true, qrt: false, food: false, shelter: false, outages: true, alerts: true,
   shelterBuildings: true,
 };
@@ -51,6 +52,7 @@ export function OpsConsole() {
   const [assessBusy, setAssessBusy] = useState(false);
   const [atmosphere, setAtmosphere] = useState<AtmosphereSnapshot | null>(null);
   const [bldgLayer, setBldgLayer] = useState<BuildingLayer | null>(null);
+  const [spot, setSpot] = useState<[number, number] | null>(null);
   const timer = useRef<number | undefined>(undefined);
 
   const of = (k: string) => (scene?.entities ?? []).filter((e) => e.kind === k);
@@ -159,7 +161,7 @@ export function OpsConsole() {
       return { ...v, [k]: next };
     });
   };
-  const select = (e: Entity | null) => { setFlying(false); setPhoto(false); setSelected(e); if (e && narrow) setRailOpen(false); };
+  const select = (e: Entity | null) => { setFlying(false); setPhoto(false); setSelected(e); setSpot(null); if (e && narrow) setRailOpen(false); };
 
   const advice = selected?.kind === "building"
     ? buildingAdvice(selected)
@@ -198,14 +200,15 @@ export function OpsConsole() {
 
   return (
     <div className="shell">
-      <MapStage scene={scene} ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingById={buildingById} onSelect={select} compact={narrow} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} atmosphere={atmosphere} />
+      <MapStage scene={scene} ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={focus} selected={selected} recs={recs} hover={hover} buildings={bldgFc} buildingById={buildingById} onSelect={select} onMapClick={setSpot} pick={spot} compact={narrow} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={rain} view3d={view3d} flying={flying} onFlyEnd={() => setFlying(false)} atmosphere={atmosphere} />
       {photo && selected && <PhotorealView token={token} setToken={setToken} ran={ran} selected={selected} depths={depths} floodPolys={scene.floodPolys} entities={scene.entities} linked={linkedIds} onClose={() => setPhoto(false)} />}
       <StatusStrip items={strip} focus={focus} setFocus={pick} openDetails={() => setDetails(true)} mode={mode} setMode={setMode} />
       <CommandRail open={railOpen} setOpen={setRailOpen} vis={vis} toggle={toggle} stage={stage} setStage={setStage} ran={ran} busy={busy} run={run}
         rain={rain} setRain={setRain} weather={weather} terrain={terrain} wet={wet} total={floodPolyCount} deepest={deepest} flowText={flowText}
         legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
-      {hint && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
-      <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} reasons={why} actions={acts} kindLabel={kindLabel} />
+      {hint && !spot && <div className="hint" role="status">Select a closed road to see where to send response, or click anywhere to see posts from that spot.</div>}
+      <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} reasons={why} actions={acts} kindLabel={kindLabel} feed={selected ? <SocialFeed at={selected.at} compact /> : null} />
+      <AreaFeedPanel at={selected ? null : spot} onClose={() => setSpot(null)} />
       <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} note={scene.note} agentLines={[`Weather agent (real, Open-Meteo ECMWF IFS 9 km): heaviest 24 h ${WEATHER.max24hMm} mm valley average, ending ${whenText(WEATHER.max24hEnd)}; peak ${WEATHER.peakMmH} mm/h at ${whenText(WEATHER.peakAt)}. Depth model is using ${weather.inches} in (${rain === OBSERVED_IN ? "observed" : "what-if"}).`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${floodPolyCount} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
         bldgLayer
           ? `Shelter agent (REAL buildings, OpenStreetMap 2 Jan 2024): ${bldgLayer.list.length} shelter-relevant footprints. At this forecast ${assessed.filter((b) => b.role === "at-risk-vertical").length} flooded buildings keep floors above the water, ${evacuate} have none and must be evacuated, and ${refuges.length} dry upper-floor buildings in cut-off areas could take about ${refuges.reduce((s, b) => s + (b.capacity ?? 0), 0).toLocaleString("en-US")} people. ${bldgLayer.list.filter((b) => b.f === null).length} have no tagged height and get no judgement.`

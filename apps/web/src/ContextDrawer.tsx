@@ -10,10 +10,10 @@ const ringFor = (e: Entity) => (e.kind === "hospital" || e.kind === "airport" ||
 export type Done = Record<string, "assigned" | "issued">;
 const VERB: Record<Action["kind"], string> = { qrt: "Assign QRT", food: "Stage food", shelter: "Open shelter", grid: "Assign crew", alert: "Issue alert", road: "Stage", air: "Reserve", army: "Request" };
 
-export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPhoto, reasons: why, actions: acts, kindLabel }: {
+export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPhoto, reasons: why, actions: acts, kindLabel, feed }: {
   onHover: (id: string | null) => void; onFly: (() => void) | null; onPhoto: () => void; e: Entity | null; done: Done;
   setDone: (f: (d: Done) => Done) => void; onClose: () => void;
-  reasons: Reason[]; actions: Action[]; kindLabel: Record<string, string>;
+  reasons: Reason[]; actions: Action[]; kindLabel: Record<string, string>; feed?: React.ReactNode;
 }) {
   const [preview, setPreview] = useState<string | null>(null);
   const set = (id: string, v: "assigned" | "issued" | null) => setDone((d) => { const n = { ...d }; if (v) n[id] = v; else delete n[id]; return n; });
@@ -64,6 +64,7 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
                 </div>
               </section>
             )}
+            {feed && <section><h3>Posts and photos near here</h3>{feed}</section>}
             <p className="d-foot">Actions are suggestions. Nothing is sent and nobody is dispatched.</p>
           </div>
         </>

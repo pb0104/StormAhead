@@ -14,7 +14,8 @@
     "build": "vite build --config apps/web/vite.config.ts",
     "start": "npm run build && tsx apps/api/main.ts",
     "test": "vitest run",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "eval": "tsx scripts/run_pipeline_eval.ts"
   },
   "dependencies": {
     "@fastify/compress": "^9.3.0",

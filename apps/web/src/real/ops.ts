@@ -25,6 +25,7 @@ export type Provenance = "real" | "modelled" | "simulated";
 export const PROVENANCE = {
   placeModelled: { tag: "real", text: "Real place (BIPAD). Status modelled from the observed flood" },
   record: { tag: "real", text: "Real record (BIPAD)" },
+  post: { tag: "real", text: "Real post (Reddit, via Arctic Shift). Place matched by name" },
   modelled: { tag: "modelled", text: "Modelled from the observed flood (UNOSAT, 30 Sep 2024)" },
   simulated: { tag: "simulated", text: "Simulated for the demo. No public feed" },
 } as const;

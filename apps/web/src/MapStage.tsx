@@ -15,6 +15,10 @@ export type MapProps = {
   ran: boolean; revealN: number; showPockets: boolean; stage: number; vis: Vis; focus: string | null;
   selected: Entity | null; recs: Rec[]; hover: string | null; buildings: unknown; buildingById: Map<string, Entity>; onSelect: (e: Entity | null) => void; compact: boolean; view3d: boolean; flood: unknown; flowUrl: string | null; field: FlowField | null; rainIn: number; flying: boolean; onFlyEnd: () => void;
   atmosphere?: AtmosphereSnapshot | null;
+  /** Called with [lon, lat] when the map is clicked away from any item. */
+  onMapClick?: (at: [number, number]) => void;
+  /** The picked spot, drawn as a ring of the feed radius. */
+  pick?: [number, number] | null;
 };
 
 const WAVE_FRAMES = 8;
@@ -31,7 +35,7 @@ function waveFrame(k: number): { width: number; height: number; data: Uint8Clamp
   return { width: S, height: S, data: g.getImageData(0, 0, S, S).data };
 }
 const RED = "#FF4A3D", AMBER = "#FFB020";
-const HIT = ["bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-helipad", "pts-army", "pts-tower", "pts-dam", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
+const HIT = ["bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-helipad", "pts-army", "pts-tower", "pts-dam", "pts-social", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
 const GROUP: Record<string, string[]> = {
   closures: ["closures-glow", "closures", "closures-minor", "closures-muted"], pockets: ["pockets", "pockets-minor"],
   landslides: ["z-landslide-fill", "z-landslide-line"], hospitals: ["pts-hospital"], schools: ["pts-school"], outages: ["z-outage-fill", "z-outage-line"],
@@ -77,6 +81,7 @@ export function MapStage(p: MapProps) {
         m.addSource(id, { type: "geojson", data });
       const empty = { type: "FeatureCollection", features: [] };
       m.addSource("sel", { type: "geojson", data: empty });
+      m.addSource("pick", { type: "geojson", data: empty });
       m.addSource("rec", { type: "geojson", data: empty });
       m.addSource("affected", { type: "geojson", data: empty });
       m.addSource("bldg", { type: "geojson", data: empty });
@@ -133,6 +138,7 @@ export function MapStage(p: MapProps) {
       const dot = (id: string, kind: string, color: any, r: number, ring?: any) =>
         m.addLayer({ id: `pts-${id}`, type: "circle", source: "points", filter: ["==", ["get", "kind"], kind], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, r, 15, r + 3], "circle-color": color, "circle-stroke-color": ring ?? "#0A1217", "circle-stroke-width": ring ? 2.4 : 1.2, "circle-opacity": 1, "circle-opacity-transition": { duration: 600 } } });
       dot("dam", "dam", "#7CC4FF", 5);
+      dot("social", "social", "#C4B5FD", 4.4, "#FFFFFF"); // real posts: lilac with a white ring, distinct from facilities
       dot("tower", "tower", ["case", ["==", ["get", "status"], "down"], "#FF8E7A", "#59E0D0"], 3.6);
       // Building types get their own icons (hospital cross, school house, shelter tent, food crate, QRT shield).
       const kinds: [BuildingKind, string[]][] = [["hospital", ["none", "ok", "degraded", "lost"]], ["school", ["none", "ok", "risk", "high"]], ["airport", ["none", "ok", "degraded", "lost"]], ["helipad", ["none", "ok", "degraded", "lost"]], ["army", ["none", "ok", "degraded", "lost"]], ["shelter", ["base"]], ["food", ["base"]], ["qrt", ["base"]]];
@@ -195,7 +201,12 @@ export function MapStage(p: MapProps) {
         const layers = HIT.filter((id) => m.getLayer(id) && m.getLayoutProperty(id, "visibility") !== "none");
         return m.queryRenderedFeatures([[pt.x - 7, pt.y - 7], [pt.x + 7, pt.y + 7]], { layers }) as any[];
       };
-      m.on("click", (e: any) => { const f = query(e.point).find((x) => lookup(x.properties?.id)); props.current.onSelect(f ? lookup(f.properties.id)! : null); });
+      m.addLayer({ id: "pick-ring", type: "line", source: "pick", paint: { "line-color": "#FFFFFF", "line-width": 2, "line-dasharray": [2, 2] } });
+      m.on("click", (e: any) => {
+        const f = query(e.point).find((x) => lookup(x.properties?.id));
+        props.current.onSelect(f ? lookup(f.properties.id)! : null);
+        if (!f) props.current.onMapClick?.([e.lngLat.lng, e.lngLat.lat]);
+      });
       m.on("mousemove", (e: any) => {
         const f = query(e.point).find((x) => lookup(x.properties?.id)), t = tip.current;
         m.getCanvas().style.cursor = f ? "pointer" : "";
@@ -238,7 +249,7 @@ export function MapStage(p: MapProps) {
       mm.setPaintProperty("flood-fill", "fill-opacity", water ? 0.5 : 0);
       mm.setPaintProperty("flood-waves", "fill-opacity", water ? 0.9 : 0);
       mm.setPaintProperty("flood-edge", "line-opacity", water ? 0.75 : 0);
-      show("pts-hospital", g("buildings")); show("pts-school", g("schools")); show("pts-airport", g("airports")); show("pts-helipad", g("helipads")); show("pts-army", g("army")); show("pts-tower", g("towers")); show("pts-dam", g("dams"));
+      show("pts-hospital", g("buildings")); show("pts-school", g("schools")); show("pts-airport", g("airports")); show("pts-helipad", g("helipads")); show("pts-army", g("army")); show("pts-tower", g("towers")); show("pts-dam", g("dams")); show("pts-social", g("social"));
       show("pts-shelter", g("shelter")); show("pts-food", g("food")); show("pts-qrt", g("qrt"));
       for (const k of ["landslide", "outage", "alert"]) {
         const on = ran && g(k === "landslide" ? "landslides" : k === "outage" ? "outages" : "alerts");
@@ -295,6 +306,12 @@ export function MapStage(p: MapProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Ring around the picked spot, the same 1.5 km radius the feed uses.
+  useEffect(() => {
+    const src = map.current?.getSource?.("pick") as any; if (!src) return;
+    const at = p.pick;
+    src.setData(at ? { type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: Array.from({ length: 49 }, (_, i) => { const a = (i / 48) * Math.PI * 2; return [at[0] + (Math.cos(a) * 1.5) / 98.6, at[1] + (Math.sin(a) * 1.5) / 110.6]; }) } } : { type: "FeatureCollection", features: [] });
+  }, [p.pick]);
   useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d, p.atmosphere]);
 
   useEffect(() => {

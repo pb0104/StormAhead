@@ -1,0 +1,12 @@
+{
+ "slug": "kathmandu-2024-09",
+ "note": "Kathmandu valley floods, 26-29 Sep 2024. Older than GDELT's ~3-month DOC window, so expect news from Reddit only unless GDELT's raw files are added.",
+ "country": "NP",
+ "timezone": "Asia/Kathmandu",
+ "bbox": [85.284, 27.587, 85.493, 27.788],
+ "start": "2024-09-25T00:00:00Z",
+ "end": "2024-10-03T00:00:00Z",
+ "place_terms": ["Kathmandu", "Lalitpur", "Bhaktapur", "Bagmati", "Kirtipur", "Balkhu", "Nakhu"],
+ "event_terms": ["flood", "flooding", "landslide", "inundat", "बाढी", "पहिरो"],
+ "subreddits": ["Nepal", "Kathmandu"]
+}

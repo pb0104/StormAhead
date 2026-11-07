@@ -25,10 +25,12 @@
 Exploratory (added *after* seeing the above, so not a primary result): at tighter radii the model does **worse** than random — 250 m: 0/19 vs random 8.5; 500 m: 7/19 vs 15.9.
 Closure threshold (10/30/50%) does not change the conclusion. Landslide check: 15/17 outside-flood near flagged items vs random 14.6 (p≈0.55) — also no skill.
 
+**Added later: this test could not have passed.** Random sets averaged 18.7 of 19, so they matched all 19 at least about 70% of the time. Even a perfect model would have scored p ≈ 0.7. The result shows the test was too coarse, not that the model has no skill. Road and bridge loss counts are also empty in BIPAD, and the 19 incidents sit at only 10 distinct coordinates. [pipeline.md](pipeline.md) replaces this scoring.
+
 ## Why (hypotheses, not yet tested)
 1. OSM has 185 `amenity=hospital` features in the valley (many small clinics) → hospital access almost never breaks, so the "unforeseen cascade" the model can see is tiny (1 isolated place).
 2. Stranded-road spurs (428) cluster at a few places; reported incidents are spread widely.
-3. None of the 19 reports fall inside the SPOT-6 extent (they are 200–850 m away) → the optical extent likely under-detects urban flooding, or report coordinates are approximate. Ground truth and hazard input are both imperfect.
+3. None of the 19 reports fall inside the SPOT-6 extent (they are 200–850 m away) → the optical extent likely under-detects urban flooding, the water had receded (18 of 19 reports are dated 27–28 Sep and the image is from 30 Sep), or report coordinates are approximate. Ground truth and hazard input are both imperfect.
 4. 19 incidents is a small sample.
 
 ## Buildings as cascade targets (run 2026-11-07)

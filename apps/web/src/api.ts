@@ -52,3 +52,27 @@ export const TILE = {
   terrarium: (z: number, x: number, y: number) => `/api/tiles/terrarium/${z}/${x}/${y}.png`,
   cesiumProxy: (upstreamUrl: string) => `/api/tiles/cesium?u=${encodeURIComponent(upstreamUrl)}`,
 };
+
+export type AlertLevel = "none" | "authority" | "public-draft";
+export type WardOut = { id: number; name: string; lon: number; lat: number; population: number; floodRisk: number; landslideRisk: number; alert: AlertLevel; roadKmExposed: number; steepRoadKm: number; placesCutOffWorstCase: number };
+export type SeriesHour = { t: string; stage: number | null; rain: number | null };
+export type DetectorRow = { rule: string; events: number; detected: number; missed: number; unobserved: number; falseAlarmsPerSeason: number };
+export type ModelSet = { set: string; pooled: { ap: number | null; auc: number | null; recallTop1pct: number | null; positives: number } };
+export type PipelineMeta = {
+  available: boolean; dates: string[]; wards: number; events: { date: string; incidents: number }[];
+  evaluation: null | { detector: DetectorRow[]; eventCount: number; wardModel: { horizon: string; targets: { target: string; sets: ModelSet[] }[] }[]; spatial: { target: string; sets: { set: string; incidentWeightedAuc: number }[] }[] };
+};
+export type PipelineRun = {
+  runId: string; date: string; handM: number | null; wards: WardOut[]; events: AgentEvent[]; notes: string[];
+  river: { station: string; peak: number | null; warningLevel: number; dangerLevel: number; aboveDanger: boolean } | null;
+  series: { station: string | null; warningLevel: number | null; dangerLevel: number | null; hours: SeriesHour[] };
+  training: { rows: number; floodIncidents: number; landslideIncidents: number };
+  incidents: { id: number; title: string; hazard: string; lon: number; lat: number; deaths: number; families: number }[];
+  roadScreen: null | { basis: string; counts: Record<string, number>; exposedEdges: number[]; cutOffEdges: number[] };
+  verification: { reported: number; inFlaggedWards: number; allIncidents: number };
+};
+export const pipeline = {
+  meta: () => j<PipelineMeta>("/api/pipeline/meta"),
+  geo: () => j<any>("/api/pipeline/geo"),
+  run: (date: string) => j<PipelineRun>("/api/pipeline/run", send("POST", { date })),
+};

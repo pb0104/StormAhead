@@ -2,6 +2,7 @@
  * Evidence and recommended actions for the BIPAD-backed ops console.
  * Real records: BIPAD/DHM. Statuses modelled from the observed flood. Towers/outages/posts/radio/food are simulated.
  */
+import { TAG_LABEL } from "./real/social.ts";
 import type { Action, Entity, Reason } from "../../../packages/ports/index.ts";
 import { OUTLET } from "./real/ops.ts";
 
@@ -83,7 +84,12 @@ function reasons(e: Entity, all: Entity[]): Reason[] {
       { input: "Status", text: e.props.aboveDanger ? `Above danger from ${e.props.firstDanger}.` : "Stayed below its danger level." },
       { input: "Data", text: `Last reading in the window: ${e.props.lastReading}.` },
     ];
-    case "social": return [{ input: "Social media (simulated)", text: `${e.props.text} (${e.props.when})` }];
+    case "social": return e.props.prov === "post"
+      ? [{ input: "Reddit post (real, via Arctic Shift)", text: `${e.props.text} (${e.props.when}, ${e.props.outlet})` },
+         ...(e.props.translation ? [{ input: `English (machine-translated from ${e.props.lang}${e.props.translator ? `, ${e.props.translator}` : ""})`, text: String(e.props.translation) }] : []),
+         { input: "Place (matched by name)", text: `${e.props.places}. Location is where the post names, not where it was sent from.` },
+         { input: "Category (keyword baseline)", text: String(e.props.tags || "").split("; ").filter(Boolean).map((t) => TAG_LABEL[t] ?? t).join(", ") || "No category matched" }]
+      : [{ input: "Social media (simulated)", text: `${e.props.text} (${e.props.when})` }];
     case "radio": return [{ input: "Radio (simulated)", text: `${e.props.text} (${e.props.when})` }];
     case "helipad": return [
       { input: "Helipad (OpenStreetMap)", text: "Mapped helipad; status not in BIPAD." },

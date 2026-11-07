@@ -1,16 +1,17 @@
 /**
  * Prefer BIPAD real/modelled facility layers over OSM/mock scene entities.
- * Keeps closures, pockets, towers, outages, social, radio, food, helipads from the adapter scene.
+ * Keeps closures, pockets, towers, outages, radio, food, helipads from the adapter scene. Social posts are real (Reddit).
  */
 import type { Action, Entity, Feature, FeatureCollection, Kind, Reason, SceneSnapshot } from "../../../packages/ports/index.ts";
 import {
   AIRPORTS, ALERTS, ARMY, GAUGES, HOSPITALS, LANDSLIDES, RAIN_CELLS, RESPONDERS, SCHOOLS, SHELTERS,
 } from "./real/ops.ts";
+import { SOCIAL_ENTITIES } from "./real/social.ts";
 import { bipadAdvice } from "./bipadAdvice.ts";
 
-const REPLACE = new Set<Kind>(["hospital", "school", "landslide", "alert", "dam", "shelter", "qrt", "army", "airport"]);
+const REPLACE = new Set<Kind>(["hospital", "school", "landslide", "alert", "dam", "shelter", "qrt", "army", "airport", "social"]);
 
-const BIPAD: Entity[] = [...HOSPITALS, ...SCHOOLS, ...SHELTERS, ...RESPONDERS, ...ARMY, ...AIRPORTS, ...ALERTS, ...GAUGES, ...LANDSLIDES];
+const BIPAD: Entity[] = [...HOSPITALS, ...SCHOOLS, ...SHELTERS, ...RESPONDERS, ...ARMY, ...AIRPORTS, ...ALERTS, ...GAUGES, ...LANDSLIDES, ...SOCIAL_ENTITIES];
 
 function pointFeat(e: Entity): Feature {
   return {
@@ -37,7 +38,7 @@ function polyFeat(e: Entity): Feature {
 export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   const kept = scene.entities.filter((e) => !REPLACE.has(e.kind)).map((e) => {
     if (e.props.prov) return e;
-    const simulated = e.kind === "tower" || e.kind === "outage" || e.kind === "social" || e.kind === "radio" || e.kind === "food";
+    const simulated = e.kind === "tower" || e.kind === "outage" || e.kind === "radio" || e.kind === "food";
     const modelled = e.kind === "closure" || e.kind === "pocket";
     return { ...e, props: { ...e.props, prov: simulated ? "simulated" : modelled ? "modelled" : (e.props.prov ?? "simulated") } };
   });
@@ -67,7 +68,7 @@ export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   };
   return {
     ...scene,
-    note: "Facilities, alerts and gauges are real (BIPAD/DHM); status is modelled under the observed flood. Towers, outages, posts, radio and food depots are simulated.",
+    note: "Facilities, alerts, gauges and social posts are real (BIPAD/DHM, Reddit); status is modelled under the observed flood. Towers, outages, radio and food depots are simulated.",
     entities,
     kindLabel,
     advice,

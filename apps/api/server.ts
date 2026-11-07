@@ -8,6 +8,7 @@ import { getServices } from "./composition.ts";
 import { HindcastService } from "./hindcast.ts";
 import { HeleneService } from "./helene.ts";
 import compress from "@fastify/compress";
+import { PipelineService } from "./pipeline.ts";
 
 export async function buildServer() {
   const app = Fastify({ logger: false });
@@ -113,6 +114,20 @@ export async function buildServer() {
   app.post("/api/hindcast/run", async (req) => {
     const b = z.object({ closeShare: z.number().optional(), bridgeClosesOnAnyContact: z.boolean().optional(), degradeMinutes: z.number().optional(), degradeRatio: z.number().optional() }).parse(req.body ?? {});
     return H().run(b);
+  });
+
+  // Forward pipeline: gauges + terrain -> ward risk -> roads at risk -> alert drafts. Nothing here uses post-event imagery.
+  let pipe: PipelineService | null = null;
+  const P = () => {
+    if (pipe) return pipe;
+    if (!PipelineService.available()) throw new HttpError(404, "Pipeline inputs not prepared. See docs/pipeline.md.");
+    return (pipe = new PipelineService());
+  };
+  app.get("/api/pipeline/meta", async () => (PipelineService.available() ? P().meta() : { available: false }));
+  app.get("/api/pipeline/geo", async () => P().geo());
+  app.post("/api/pipeline/run", async (req) => {
+    const b = z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) }).parse(req.body ?? {});
+    return P().run(b.date);
   });
 
   const dist = fileURLToPath(new URL("../web/dist", import.meta.url));
