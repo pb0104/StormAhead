@@ -25,6 +25,8 @@ export type Provenance = "real" | "modelled" | "simulated";
 export const PROVENANCE = {
   placeModelled: { tag: "real", text: "Real place (BIPAD). Status modelled from the observed flood" },
   record: { tag: "real", text: "Real record (BIPAD)" },
+  cellModelled: { tag: "modelled", text: "Real OpenCelliD position. Status modelled from flood + night lights" },
+  nightLights: { tag: "real", text: "NASA Black Marble night lights · likely power loss" },
   modelled: { tag: "modelled", text: "Modelled from the observed flood (UNOSAT, 30 Sep 2024)" },
   simulated: { tag: "simulated", text: "Simulated for the demo. No public feed" },
 } as const;

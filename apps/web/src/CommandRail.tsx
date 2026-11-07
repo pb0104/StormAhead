@@ -4,7 +4,7 @@ import type { TerrainResult as Terrain, Weather } from "../../../packages/ports/
 import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 
 const INPUTS: { group: string; items: [string, string][] }[] = [
-  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell towers"]] },
+  { group: "Satellite", items: [["terrain", "Terrain"], ["roads", "Road network"], ["towers", "Cell sites"]] },
   { group: "Live feeds", items: [["weather", "Weather"], ["atmosphere", "Atmosphere"], ["dams", "River gauges"]] },
   { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["helipads", "Helipads"], ["army", "Army sites"]] },
 ];
@@ -27,7 +27,7 @@ export function CommandRail(p: RailProps) {
           <div className="brand"><span className="b1">Cascade</span><span className="b2">IQ</span></div>
           <button className="icon rail-close" onClick={() => p.setOpen(false)} aria-label="Close command rail">×</button>
         </div>
-        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts and gauges are <b>real</b>; towers, outages, posts, radio and food depots are <b>simulated</b>.</p>
+        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges, cell sites and night-light outages are <b>real</b> (status modelled where noted); posts, radio and food depots are <b>simulated</b>.</p>
 
         <section>
           <label className="lbl" htmlFor="scn">Scenario</label>
@@ -80,7 +80,7 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw fill" style={{ background: "#3E8FD3A0", borderColor: "#CDF0FF" }} />Pooled runoff, with flow streaks</li>
             <li><i className="sw line dash" style={{ borderColor: "#FFB020" }} />Cut-off road pocket</li>
             <li><i className="sw fill" style={{ background: "#FF7A1A55", borderColor: "#FF7A1A" }} />Landslide zone</li>
-            <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Grid outage</li>
+            <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Night-lights outage</li>
             <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
             <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
             {p.legendOpen && (
@@ -97,9 +97,8 @@ export function CommandRail(p: RailProps) {
                 <li><Glyph kind="airport" ring="#46D68C" />Airport, access ok · <Glyph kind="airport" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="helipad" ring="#46D68C" />Helipad, access ok · <Glyph kind="helipad" ring="#FFB020" badge />limited</li>
                 <li><Glyph kind="army" ring="#46D68C" />Army base, access ok · <Glyph kind="army" ring="#FFB020" badge />limited</li>
-                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell tower up</li>
-                <li><i className="sw dot sm" style={{ background: "#FF8E7A" }} />Cell tower down</li>
-                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />Dam</li>
+                <li><i className="sw dot sm" style={{ background: "#59E0D0" }} />Cell site (OpenCelliD) · <i className="sw dot sm" style={{ background: "#FFB020" }} />at risk · <i className="sw dot sm" style={{ background: "#FF8E7A" }} />down, modelled</li>
+                <li><i className="sw dot" style={{ background: "#7CC4FF" }} />River gauge</li>
                 <li><Glyph kind="qrt" ring="#0B1318" />QRT · <Glyph kind="shelter" ring="#0B1318" />Shelter · <Glyph kind="food" ring="#0B1318" />Food</li>
                 <li><i className="sw fill" style={{ background: "#2B7BFF47", borderColor: "#6FB0FF" }} />Low ground · <i className="sw fill" style={{ background: "#4DA3FF30", borderColor: "#4DA3FF" }} />Rain</li>
               </>

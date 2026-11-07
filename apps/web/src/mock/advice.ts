@@ -1,5 +1,6 @@
 /** DEMO ONLY: invented evidence and recommended actions. Nothing here is a real assessment or a real dispatch. */
 import { ENTITIES, OF, type Entity } from "./demo.ts";
+import { IODA_REGION, NIGHT, nepalTime, nightCellAt } from "../realdata.ts";
 
 export type Reason = { input: string; text: string };
 export type Action = {
@@ -13,6 +14,8 @@ const km = (a: [number, number], b: [number, number]) => Math.hypot((a[0] - b[0]
 export const nearest = (e: Entity, list: Entity[], n = 1) => [...list].sort((a, b) => km(e.at, a.at) - km(e.at, b.at)).slice(0, n);
 const fmt = (n: number) => n.toLocaleString("en-US");
 const within = (e: Entity, list: Entity[], d: number) => list.filter((x) => km(e.at, x.at) <= d);
+/** Cell sites within d km whose modelled status is down or at risk. */
+const hit = (e: Entity, towers: Entity[], d: number) => within(e, towers, d).filter((t) => t.props.status !== "up").length;
 
 export const KIND_LABEL: Record<string, string> = {
   closure: "Closed road", pocket: "Cut-off pocket", landslide: "Landslide zone", hospital: "Hospital", tower: "Cell tower", outage: "Grid outage",
@@ -35,7 +38,7 @@ export function reasons(e: Entity): Reason[] {
     case "pocket": return [
       { input: "Road network", text: `${e.props.segments} open road segments are cut off from the rest of the network.` },
       { input: "Terrain", text: "Closed crossings on both sides of the pocket." },
-      { input: "Cell towers", text: `${within(e, towers, 2).filter((t) => t.props.status === "down").length} nearby tower(s) down, so reports may be missing.` },
+      { input: "Cell sites", text: `${hit(e, towers, 2)} cell site(s) within 2 km modelled down or at risk from flooding, so reports may be missing.` },
       { input: "Radio", text: "Last call-in from the area 40 minutes ago." },
     ];
     case "landslide": return [
@@ -48,7 +51,7 @@ export function reasons(e: Entity): Reason[] {
     case "hospital": return [
       { input: "Critical buildings", text: e.props.access === "lost" ? "No open route from the valley road network." : e.props.access === "degraded" ? `Ambulance trips take ${e.props.extraMin} min longer.` : "Access normal." },
       { input: "Road network", text: `${within(e, OF("closure"), 2.5).length} closed segment(s) within 2.5 km.` },
-      { input: "Cell towers", text: `${within(e, towers, 1.5).filter((t) => t.props.status === "down").length} tower(s) near the site are down.` },
+      { input: "Cell sites", text: `${hit(e, towers, 1.5)} cell site(s) within 1.5 km modelled down or at risk from flooding.` },
     ];
     case "school": return [
       ...(String(e.props.why).split("|").filter(Boolean).map((t) => { const [input, ...rest] = t.split("::"); return { input: input!, text: rest.join("::") }; })),
@@ -81,14 +84,21 @@ export function reasons(e: Entity): Reason[] {
       { input: "Road network", text: e.props.access === "ok" ? "Routes out of the base are open." : `Closed road ${e.props.closure} is ${e.props.closureM} m away, so vehicles may not get out.` },
       { input: "Role", text: `${e.props.role}.` },
     ];
-    case "tower": return [
-      { input: "Cell towers", text: e.props.status === "down" ? "Offline since 21:40." : "Online, normal load." },
-      { input: "Grid", text: e.props.status === "down" ? "Power lost at the site, backup battery exhausted." : "On grid power." },
-    ];
+    case "tower": {
+      const r = IODA_REGION.series.bgp!, d = e.props.distFloodM as number;
+      return [
+        { input: "Cell site (REAL, OpenCelliD)", text: `${e.props.cells} cell(s) (${e.props.radios}) from ${e.props.operators}. Position estimated from ${fmt(e.props.samples as number)} phone report(s), so it may be off by a few hundred metres.${e.props.preEvent ? "" : ` First seen in OpenCelliD on ${e.props.firstSeen}, after the flood, so it may not have existed then.`}` },
+        { input: "Flood exposure (MODELLED)", text: e.props.status === "down"
+          ? "Inside the observed flood extent (UNOSAT, 30 Sep). Ground-level equipment likely flooded, so modelled as down."
+          : `${fmt(d)} m from the observed flood extent, so modelled as ${e.props.status === "risk" ? "at risk" : "up"}. Real site status is not public.` },
+        { input: "Internet (REAL, IODA)", text: `Across the ${IODA_REGION.label.split(" (")[0]}, networks visible on the internet fell ${r.dropPct}% to their lowest at ${nepalTime(r.floodMinAt)}, Nepal time.` },
+        { input: "Power (REAL, NASA night lights)", text: (() => { const c = nightCellAt(e.at[0], e.at[1]); return !c ? "Not in a lit area, so night lights cannot tell." : c.status === "unseen" ? "Cloud hid this area on every night after the flood." : `Lights here were at ${Math.round((c.ratio ?? 0) * 100)}% of normal after the flood${c.status === "dark" ? ", so the site has likely lost grid power and is on batteries." : "."}`; })() },
+      ];
+    }
     case "outage": return [
-      { input: "Grid", text: `${fmt(e.props.households as number)} households without power.` },
-      { input: "Terrain", text: "Substation in low ground near the river." },
-      { input: "Cell towers", text: `${within(e, towers, 1.8).filter((t) => t.props.status === "down").length} tower(s) in the zone are down.` },
+      { input: "Night lights (REAL, NASA)", text: `${e.props.cells} cell(s) of about 460 m, ${e.props.areaKm2} km², were at a median ${Math.round((e.props.medianRatio as number) * 100)}% of their normal brightness on clear nights from ${NIGHT.windows.flood![0].slice(5)} to ${NIGHT.windows.flood![1].slice(5)}, against the weeks before the rain. Likely lost power.` },
+      { input: "Caveat", text: `28 Sep was fully clouded, so the darkest hours are not seen. Thin cloud can also dim lights. On ordinary nights this rule flags ${(NIGHT.counts.controlFalseDarkRate * 100).toFixed(1)}% of cells.` },
+      { input: "Cell sites", text: `${hit(e, towers, 1.2)} cell site(s) within 1.2 km modelled down or at risk, likely on battery power.` },
     ];
     case "alert": return [
       { input: "Weather", text: "Heavy rain and rising river levels in this zone." },
@@ -114,7 +124,7 @@ export function actions(e: Entity): Action[] {
   };
   const feed = (n: number) => { const t = nearest(e, food)[0]!; a.push({ id: `${e.id}:food`, kind: "food", title: `Stage ${fmt(n)} meal packs from ${t.name.replace("Food depot, ", "")} depot`, detail: `${t.id} holds ${fmt(t.props.packs as number)} packs.`, target: t }); };
   const shelter = () => { const t = [...shelters].filter((s) => (s.props.capacity as number) - (s.props.occupied as number) > 80).sort((x, y) => km(e.at, x.at) - km(e.at, y.at))[0]!; a.push({ id: `${e.id}:shelter`, kind: "shelter", title: `Open ${t.name}`, detail: `${fmt((t.props.capacity as number) - (t.props.occupied as number))} free places, ${km(e.at, t.at).toFixed(1)} km away.`, target: t }); };
-  const grid = () => { const t = nearest(e, outages)[0]!; a.push({ id: `${e.id}:grid`, kind: "grid", title: `Send a grid crew to ${t.name}`, detail: `About ${fmt(t.props.households as number)} households. Prioritise the hospital feeder.`, target: t }); };
+  const grid = () => { const t = nearest(e, outages)[0]!; a.push({ id: `${e.id}:grid`, kind: "grid", title: `Send a grid crew to ${t.name.replace("Dark area near ", "")}`, detail: `${t.props.areaKm2} km² went dark after the flood (NASA night lights). Prioritise the hospital feeder.`, target: t }); };
   const alert = (label?: string) => {
     const z = (label ? alerts.find((x) => x.id === label) : nearest(e, alerts)[0]) ?? alerts[0]!;
     a.push({ id: `${e.id}:alert`, kind: "alert", title: `Public alert for ${z.name}`, detail: `Reaches about ${fmt(z.props.audience as number)} people. Preview before issuing.`, target: z,

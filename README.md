@@ -150,8 +150,11 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | Flood extent | **Real**: UNOSAT SPOT-6, observed 30 Sep 2024 |
 | Flood depth | **Illustrative**: ordering from real elevation tiles (terrain agent), scale assumed |
 | Terrain low-ground patches, rain cells | **Mock** (drawn) |
-| Landslide zones (4), grid outages (3), public-alert zones (2) | **Mock** (drawn) |
-| Cell towers (16, 3 down), dams (2), social posts (8), radio call-ins (6) | **Mock** |
+| Power outages (9 dark areas) | **Real, observed**: NASA Black Marble nightly lights. Cells whose lights fell below half of normal on clear nights 29 Sep to 2 Oct, against 19 Aug to 25 Sep (103 dark cells of 906 seen; 0.3% false-dark rate on ordinary nights). 28 Sep was clouded over. "Likely lost power", not confirmed |
+| Landslide zones (4), public-alert zones (2) | **Mock** (drawn) |
+| Cell sites (328, merged from 902 cells) | **Real positions** from OpenCelliD (crowd-sourced estimates; current database, `firstSeen` marks sites that may postdate the flood). Status is **modelled**: inside the observed flood extent = down; within 200 m of it, or in a night-lights dark cell = at risk |
+| Regional internet connectivity (chart in the drawer for cell sites and pockets) | **Real**: IODA, Bagmati zone. Networks visible fell 24% at 07:45 on 28 Sep, Nepal time. Regional only |
+| Dams (2), social posts (8), radio call-ins (6) | **Mock** |
 | QRT staging (4), food depots (3), shelters (5) | **Mock** |
 | Evidence text, recommended actions, headcounts, stock, households | **Mock** (generated from the fixtures) |
 
@@ -169,6 +172,9 @@ Run 2026-11-06 with default parameters. Full detail in [docs/hindcast-results.md
 | **AWS Terrain Tiles** (Mapzen, terrarium encoding) | 3D terrain, hill-shading, and the terrain agent's elevation reads | Public dataset, attribution shown on the map | Needs internet. 3D only |
 | **Maxar Open Data**, "Nepal Floods Sept 2024" collection | Identified (pre-event 13 Jan 2024, post-event 6 Oct 2024 scenes for the valley). **Not used in the app** | CC BY-NC 4.0 | The 6 Oct scene is heavily clouded over much of the valley. See [docs/real-data-findings.md](docs/real-data-findings.md) |
 | **Google Photorealistic 3D Tiles** via Cesium ion (asset 2275207) | Optional photoreal close-up of a selected item | Cesium ion Community plan is free for personal and non-commercial use, capped at 1,000 root tiles a month. Google attribution is shown. Subject to the Google Maps Platform terms | Needs a Cesium ion token and internet. Check the plan terms before commercial use |
+| **OpenCelliD** per-country download (MCC 429), via `scripts/fetch_opencellid.mjs` (needs `OPENCELLID_KEY` in `.env`) | Cell-site positions (`data/real/kathmandu/cell_sites.json`) | CC BY-SA 4.0, attribute OpenCelliD | Positions are estimates from phone reports. Database is current, not pre-event. Flood-time site status is not public |
+| **NASA Black Marble** VNP46A2 v2 via `scripts/fetch_blackmarble.py` (needs `EARTHDATA_TOKEN`, an Earthdata Login token; downloads from the Earthdata Cloud mirror; ~1.4 GB of tiles cached outside the repo) | Power outages (`data/real/kathmandu/night_lights.json`) | NASA data, free with citation (doi:10.5067/VIIRS/VNP46A2.002) | Monsoon cloud: 28 Sep fully clouded, 26–27 Sep missing. Thin cloud can also dim lights |
+| **IODA** (Georgia Tech) API, via `scripts/fetch_ioda.mjs` (no key) | Regional internet connectivity, 20 Sep to 5 Oct 2024 (`data/real/kathmandu/ioda.json`) | Free for research; credit IODA | Finest unit is the old Bagmati zone, so it shows when, not where |
 | **Google Fonts** (Bricolage Grotesque, IBM Plex Sans/Mono) | UI typography | Open fonts | Loaded from the web. Falls back to system fonts offline |
 | All other console inputs and outputs | Towers, weather, dams, social, radio, shelters, depots, QRT, outages, alerts, landslide zones | **Invented** for the demo | Clearly labelled DEMO DATA |
 

@@ -1,16 +1,46 @@
 /**
  * Prefer BIPAD real/modelled facility layers over OSM/mock scene entities.
- * Keeps closures, pockets, towers, outages, social, radio, food, helipads from the adapter scene.
+ * Also swaps mock towers/outages for Aesha's OpenCelliD + Black Marble layers.
+ * Keeps closures, pockets, social, radio, food, helipads from the adapter scene.
  */
 import type { Action, Entity, Feature, FeatureCollection, Kind, Reason, SceneSnapshot } from "../../../packages/ports/index.ts";
 import {
   AIRPORTS, ALERTS, ARMY, GAUGES, HOSPITALS, LANDSLIDES, RAIN_CELLS, RESPONDERS, SCHOOLS, SHELTERS,
 } from "./real/ops.ts";
+import { CELL_SITES, cellStatus, DARK_AREAS } from "./realdata.ts";
 import { bipadAdvice } from "./bipadAdvice.ts";
 
-const REPLACE = new Set<Kind>(["hospital", "school", "landslide", "alert", "dam", "shelter", "qrt", "army", "airport"]);
+const REPLACE = new Set<Kind>(["hospital", "school", "landslide", "alert", "dam", "shelter", "qrt", "army", "airport", "tower", "outage"]);
 
-const BIPAD: Entity[] = [...HOSPITALS, ...SCHOOLS, ...SHELTERS, ...RESPONDERS, ...ARMY, ...AIRPORTS, ...ALERTS, ...GAUGES, ...LANDSLIDES];
+const CELL_TOWERS: Entity[] = CELL_SITES.map((s) => ({
+  kind: "tower" as const,
+  id: s.id,
+  name: `Cell site ${s.id} · ${s.operators.join(", ")}`,
+  at: [s.lon, s.lat] as [number, number],
+  props: {
+    status: cellStatus(s),
+    cells: s.cells,
+    radios: s.radios.join(", "),
+    operators: s.operators.join(", "),
+    samples: s.samples,
+    firstSeen: s.firstSeen,
+    preEvent: s.preEvent,
+    distFloodM: s.distFloodM,
+    prov: "cellModelled",
+  },
+  geom: { type: "Point" as const, coordinates: [s.lon, s.lat] as [number, number] },
+}));
+
+const NIGHT_OUTAGES: Entity[] = DARK_AREAS.map((a) => ({
+  kind: "outage" as const,
+  id: a.id,
+  name: a.name,
+  at: [a.lon, a.lat] as [number, number],
+  props: { cells: a.cells, areaKm2: a.areaKm2, medianRatio: a.medianRatio, prov: "nightLights" },
+  geom: { type: "Polygon" as const, coordinates: [a.ring] },
+}));
+
+const BIPAD: Entity[] = [...HOSPITALS, ...SCHOOLS, ...SHELTERS, ...RESPONDERS, ...ARMY, ...AIRPORTS, ...ALERTS, ...GAUGES, ...LANDSLIDES, ...CELL_TOWERS, ...NIGHT_OUTAGES];
 
 function pointFeat(e: Entity): Feature {
   return {
@@ -37,7 +67,7 @@ function polyFeat(e: Entity): Feature {
 export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   const kept = scene.entities.filter((e) => !REPLACE.has(e.kind)).map((e) => {
     if (e.props.prov) return e;
-    const simulated = e.kind === "tower" || e.kind === "outage" || e.kind === "social" || e.kind === "radio" || e.kind === "food";
+    const simulated = e.kind === "social" || e.kind === "radio" || e.kind === "food";
     const modelled = e.kind === "closure" || e.kind === "pocket";
     return { ...e, props: { ...e.props, prov: simulated ? "simulated" : modelled ? "modelled" : (e.props.prov ?? "simulated") } };
   });
@@ -52,7 +82,7 @@ export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   for (const e of BIPAD) advice[e.id] = bipadAdvice(e, entities);
   // Refresh advice for kept simulated/modelled entities that reference BIPAD responders/shelters.
   for (const e of kept) {
-    if (e.kind === "closure" || e.kind === "pocket" || e.kind === "tower" || e.kind === "outage" || e.kind === "social" || e.kind === "radio" || e.kind === "food" || e.kind === "helipad") {
+    if (e.kind === "closure" || e.kind === "pocket" || e.kind === "social" || e.kind === "radio" || e.kind === "food" || e.kind === "helipad") {
       advice[e.id] = bipadAdvice(e, entities);
     }
   }
@@ -64,10 +94,12 @@ export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
     qrt: "Responder base",
     army: "Army site",
     airport: "Airport",
+    tower: "Cell site",
+    outage: "Night-lights outage",
   };
   return {
     ...scene,
-    note: "Facilities, alerts and gauges are real (BIPAD/DHM); status is modelled under the observed flood. Towers, outages, posts, radio and food depots are simulated.",
+    note: "Facilities, alerts and gauges are real (BIPAD/DHM); cell sites are real positions with modelled status; outages are NASA night lights. Posts, radio and food depots are simulated.",
     entities,
     kindLabel,
     advice,

@@ -187,7 +187,7 @@ export function OpsConsole() {
     { key: "landslides", label: "landslide zones", value: ran ? of("landslide").length : null },
     { key: "schools", label: "schools at risk", value: ran ? of("school").filter((s) => s.props.risk !== "ok").length : null },
     { key: "hospitals", label: "hospitals at risk", value: ran ? of("hospital").filter((h) => h.props.access === "lost" || h.props.access === "degraded").length : null },
-    { key: "outages", label: "grid outages", value: ran ? of("outage").length : null },
+    { key: "outages", label: "night-lights outages", value: ran ? of("outage").length : null },
     ...(bldgLayer ? [{ key: "evacuate", label: "buildings to evacuate", value: ran ? evacuate : null }] : []),
   ];
   const hint = ran && !busy && !selected;

@@ -133,7 +133,7 @@ export function MapStage(p: MapProps) {
       const dot = (id: string, kind: string, color: any, r: number, ring?: any) =>
         m.addLayer({ id: `pts-${id}`, type: "circle", source: "points", filter: ["==", ["get", "kind"], kind], paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, r, 15, r + 3], "circle-color": color, "circle-stroke-color": ring ?? "#0A1217", "circle-stroke-width": ring ? 2.4 : 1.2, "circle-opacity": 1, "circle-opacity-transition": { duration: 600 } } });
       dot("dam", "dam", "#7CC4FF", 5);
-      dot("tower", "tower", ["case", ["==", ["get", "status"], "down"], "#FF8E7A", "#59E0D0"], 3.6);
+      dot("tower", "tower", ["match", ["get", "status"], "down", "#FF8E7A", "risk", "#FFB020", "#59E0D0"], 3.2);
       // Building types get their own icons (hospital cross, school house, shelter tent, food crate, QRT shield).
       const kinds: [BuildingKind, string[]][] = [["hospital", ["none", "ok", "degraded", "lost"]], ["school", ["none", "ok", "risk", "high"]], ["airport", ["none", "ok", "degraded", "lost"]], ["helipad", ["none", "ok", "degraded", "lost"]], ["army", ["none", "ok", "degraded", "lost"]], ["shelter", ["base"]], ["food", ["base"]], ["qrt", ["base"]]];
       for (const [k, states] of kinds) for (const st of states) {

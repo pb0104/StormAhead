@@ -1,0 +1,422 @@
+<title>Disaster Ops Agent System</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a top-to-bottom flow of agent layers (data → intake → shared picture → analysis → decide → human), with a sticky scenario panel that numbers the agents involved in one worked example. */
+:root {
+  --bg: #EDF0F3;
+  --surface: #FFFFFF;
+  --sunk: #E2E7EC;
+  --ink: #142033;
+  --muted: #536074;
+  --line: #C8D0DA;
+  --accent: #C9430C;      /* incident orange: decisions + highlights */
+  --intake: #0E7377;
+  --shared: #6A4FB0;
+  --analysis: #2D5BA6;
+  --human: #2C7A4C;
+  --gated: #8A6400;
+  --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0E141C; --surface: #161F2B; --sunk: #1D2836; --ink: #E4EAF2; --muted: #98A6B8; --line: #2B384A;
+    --accent: #FF7B3F; --intake: #43B9BD; --shared: #A891F0; --analysis: #7FA7F2; --human: #5CC489; --gated: #E2B94B;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E141C; --surface: #161F2B; --sunk: #1D2836; --ink: #E4EAF2; --muted: #98A6B8; --line: #2B384A;
+  --accent: #FF7B3F; --intake: #43B9BD; --shared: #A891F0; --analysis: #7FA7F2; --human: #5CC489; --gated: #E2B94B;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--body); font-size: 15px; line-height: 1.5;
+}
+.wrap {
+  max-width: 1280px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+h1, h2, h3 { font-family: var(--display); font-weight: 700; letter-spacing: .01em; text-wrap: balance; margin: 0; line-height: 1.05; }
+h1 { font-size: clamp(2.2rem, 5vw, 3.4rem); text-transform: uppercase; }
+h2 { font-size: 1.9rem; text-transform: uppercase; }
+h3 { font-size: 1.2rem; }
+p { margin: 0; }
+.mono { font-family: var(--mono); }
+.eyebrow { font-family: var(--mono); font-size: .74rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* Header */
+header.top { display: grid; gap: 14px; margin-bottom: 28px; }
+.status { display: flex; flex-wrap: wrap; gap: 8px 16px; font-family: var(--mono); font-size: .76rem; color: var(--muted); }
+.status b { color: var(--accent); font-weight: 500; }
+.thesis { font-size: 1.12rem; max-width: 68ch; }
+.thesis strong { font-weight: 600; }
+
+/* Main grid: diagram + scenario panel */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 24px; align-items: start; }
+@media (max-width: 1000px) { .main { grid-template-columns: 1fr; } .panel { position: static !important; order: -1; } }
+
+/* Layers */
+.layer { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 16px; }
+@media (max-width: 720px) { .layer { grid-template-columns: 1fr; gap: 8px; } }
+.layer-label { padding-top: 4px; }
+.layer-label h3 { font-size: 1.25rem; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.layer-label h3::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--c); flex: none; }
+.layer-label p { font-size: .84rem; color: var(--muted); margin-top: 4px; }
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); gap: 10px; }
+
+.card {
+  position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 12px 12px 12px; display: grid; gap: 7px; align-content: start; min-width: 0;
+  transition: border-color .2s, box-shadow .2s;
+}
+.card h4 { margin: 0; font-family: var(--body); font-weight: 600; font-size: .98rem; line-height: 1.25; padding-right: 26px; }
+.card .job { font-size: .84rem; color: var(--muted); }
+.card .tag { font-family: var(--mono); font-size: .66rem; letter-spacing: .08em; text-transform: uppercase; color: var(--c); }
+.card.on { border-color: var(--c); box-shadow: 0 0 0 2px color-mix(in srgb, var(--c) 35%, transparent); }
+.card.on::after {
+  content: attr(data-step); position: absolute; top: 9px; right: 9px; min-width: 22px; height: 22px; padding: 0 5px;
+  border-radius: 11px; background: var(--accent); color: var(--surface);
+  font-family: var(--mono); font-size: .72rem; font-weight: 500; display: grid; place-items: center;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.chip {
+  font-family: var(--mono); font-size: .68rem; line-height: 1.3; padding: 2px 6px; border-radius: 3px;
+  background: var(--sunk); color: var(--ink); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+}
+.chip.model { background: transparent; border: 1px solid var(--line); }
+.chip.gated { background: transparent; border: 1px dashed var(--gated); color: var(--gated); }
+.chip-row-label { font-family: var(--mono); font-size: .62rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+
+/* Source groups */
+.sources { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.src { border: 1px dashed var(--line); border-radius: 6px; padding: 10px; display: grid; gap: 6px; align-content: start; }
+.src b { font-size: .84rem; font-weight: 600; }
+
+/* Shared band */
+.band { background: color-mix(in srgb, var(--shared) 8%, var(--surface)); border: 1px solid color-mix(in srgb, var(--shared) 35%, var(--line)); border-radius: 8px; padding: 12px; display: grid; gap: 10px; }
+.schema { font-family: var(--mono); font-size: .78rem; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.schema span { padding: 2px 7px; border-radius: 3px; background: var(--surface); border: 1px solid var(--line); }
+
+/* Flow connectors */
+.flow { display: grid; grid-template-columns: 170px minmax(0,1fr); gap: 16px; margin: 6px 0; }
+.flow div { display: flex; align-items: center; gap: 10px; color: var(--muted); font-family: var(--mono); font-size: .72rem; }
+.flow div::before { content: "↓"; flex: none; width: 26px; height: 26px; border-radius: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--muted); display: grid; place-items: center; font-size: .9rem; }
+@media (max-width: 720px) { .flow { grid-template-columns: 1fr; } .flow > span { display: none; } }
+
+/* Human gate */
+.gate { background: color-mix(in srgb, var(--human) 9%, var(--surface)); border: 1px solid color-mix(in srgb, var(--human) 40%, var(--line)); border-radius: 8px; padding: 14px; display: grid; gap: 12px; }
+.gate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.gate-item { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+.gate-item b { display: block; font-size: .9rem; font-weight: 600; }
+.gate-item span { font-size: .82rem; color: var(--muted); }
+.mock-q { display: flex; gap: 6px; margin-top: 6px; }
+.mock-q i { font-style: normal; font-family: var(--mono); font-size: .68rem; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--line); }
+.mock-q i.ok { background: var(--human); color: var(--surface); border-color: var(--human); }
+.outputs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .86rem; }
+.outputs .arrow { color: var(--muted); font-family: var(--mono); }
+.outputs .out { font-weight: 600; padding: 4px 10px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); }
+.feedback { font-family: var(--mono); font-size: .74rem; color: var(--human); }
+
+.card.human-card { --c: var(--human); }
+
+/* Scenario panel */
+.panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; gap: 12px; }
+.panel h2 { font-size: 1.45rem; }
+.panel .intro { font-size: .84rem; color: var(--muted); }
+.tabs { display: grid; gap: 6px; }
+.tabs button {
+  font: inherit; font-size: .86rem; text-align: left; cursor: pointer;
+  padding: 8px 10px; border-radius: 5px; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+}
+.tabs button[aria-pressed="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); font-weight: 600; }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.steps li { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: 8px; font-size: .84rem; }
+.steps li .n { width: 22px; height: 22px; border-radius: 11px; background: var(--accent); color: var(--surface); font-family: var(--mono); font-size: .72rem; display: grid; place-items: center; }
+.steps li b { font-weight: 600; }
+.verdict { border-top: 1px solid var(--line); padding-top: 10px; font-size: .86rem; }
+.verdict b { color: var(--accent); }
+
+/* Lower sections */
+section.block { margin-top: 56px; display: grid; gap: 16px; }
+.block > p.lead { color: var(--muted); max-width: 70ch; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.col { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+.col h3 { text-transform: uppercase; }
+.col ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .88rem; }
+.col .sub { font-family: var(--mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-top: 4px; }
+.col .sub.go { color: var(--accent); }
+.phase { font-family: var(--mono); font-size: .72rem; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; font-size: .78rem; color: var(--muted); align-items: center; }
+.legend span { display: inline-flex; gap: 6px; align-items: center; }
+
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); font-size: .8rem; color: var(--muted); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="status"><span><b>●</b> Brainstorm, not final</span><span>Duke AI for Product Management hackathon</span><span>Working name, NC / Helene replay</span></div>
+    <h1>Disaster Ops Agent System</h1>
+    <p class="thesis">An AI operations center for emergency management. <strong>Specialist agents each watch one part of a disaster</strong>: roads, power, weather, people, communications. A shared layer combines what they find into one verified picture, then drafts resource moves, alerts and briefs. <strong>A person approves every action.</strong></p>
+    <div class="legend">
+      <span><span class="chip">data source</span></span>
+      <span><span class="chip model">open model / tool</span></span>
+      <span><span class="chip gated">gated or simulated</span></span>
+      <span><span class="chip" style="background:var(--accent);color:var(--surface)">1</span> step in selected scenario</span>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="diagram">
+
+      <!-- Data sources -->
+      <div class="layer">
+        <div class="layer-label" style="--c: var(--muted)"><h3>Public data</h3><p>Raw feeds, mostly free. Cached Helene snapshots for the demo.</p></div>
+        <div class="sources">
+          <div class="src"><b>Weather &amp; water</b><div class="chips"><span class="chip">NWS alerts API</span><span class="chip">NHC storm tracks</span><span class="chip">USGS gauges</span><span class="chip">NC FIMAN</span><span class="chip">NOAA radar</span><span class="chip gated">Google Flood Hub</span></div></div>
+          <div class="src"><b>Imagery</b><div class="chips"><span class="chip">Maxar Open Data (pre/post, ~0.5 m)</span><span class="chip">NOAA Helene aerial</span><span class="chip">Sentinel-1 radar</span><span class="chip">Sentinel-2</span><span class="chip">Traffic cameras</span></div></div>
+          <div class="src"><b>Roads &amp; terrain</b><div class="chips"><span class="chip">OpenStreetMap</span><span class="chip gated">DriveNC API (key)</span><span class="chip">USGS landslide</span><span class="chip">Elevation</span></div></div>
+          <div class="src"><b>Power &amp; comms</b><div class="chips"><span class="chip gated">EAGLE-I (live gated)</span><span class="chip">EAGLE-I history</span><span class="chip">FCC DIRS cell outages</span><span class="chip">IODA</span></div></div>
+          <div class="src"><b>People &amp; places</b><div class="chips"><span class="chip">CDC SVI</span><span class="chip">Census</span><span class="chip">OpenFEMA</span><span class="chip">HIFLD Next archive</span></div></div>
+          <div class="src"><b>Voices</b><div class="chips"><span class="chip">Bluesky</span><span class="chip">Reddit</span><span class="chip">YouTube</span><span class="chip gated">911 calls (simulate)</span><span class="chip gated">Scanner audio</span></div></div>
+        </div>
+      </div>
+
+      <div class="flow"><span></span><div>ingest &amp; normalize</div></div>
+
+      <!-- Intake -->
+      <div class="layer">
+        <div class="layer-label" style="--c: var(--intake)"><h3>Intake agents</h3><p>One per data type. Turn messy input into structured events.</p></div>
+        <div class="cards" style="--c: var(--intake)">
+          <div class="card" data-id="social"><span class="tag">Intake</span><h4>Social &amp; Media</h4><p class="job">Turns public posts, photos and video into geolocated reports.</p><div class="chips"><span class="chip model">Multimodal LLM</span><span class="chip model">CrisisTransformers</span></div></div>
+          <div class="card" data-id="voice"><span class="tag">Intake</span><h4>Radio &amp; 911</h4><p class="job">Transcribes calls and scanner traffic, then classifies incidents.</p><div class="chips"><span class="chip model">Whisper</span><span class="chip gated">simulated transcripts</span></div></div>
+          <div class="card" data-id="hydro"><span class="tag">Intake</span><h4>Weather &amp; Hydro</h4><p class="job">Tracks forecasts and flags river gauges crossing flood thresholds.</p><div class="chips"><span class="chip">NWS</span><span class="chip">FIMAN</span><span class="chip">NHC</span></div></div>
+          <div class="card" data-id="imagery"><span class="tag">Intake</span><h4>Imagery</h4><p class="job">Compares before/after images along roads and around buildings to find water, washouts, debris and damage.</p><div class="chips"><span class="chip">Maxar Open Data</span><span class="chip model">Multimodal LLM on road crops</span><span class="chip model">Prithvi flood</span><span class="chip model">TerraMind</span><span class="chip model">xView2 damage</span><span class="chip model">GeoChat</span></div></div>
+          <div class="card" data-id="infra"><span class="tag">Intake</span><h4>Infrastructure feeds</h4><p class="job">Reads the status of power, cell service, road closures and hospitals.</p><div class="chips"><span class="chip">FCC DIRS</span><span class="chip">DriveNC</span><span class="chip">EAGLE-I</span></div></div>
+        </div>
+      </div>
+
+      <div class="flow"><span></span><div>events: time · place · type · confidence · source</div></div>
+
+      <!-- Shared picture -->
+      <div class="layer">
+        <div class="layer-label" style="--c: var(--shared)"><h3>Shared picture</h3><p>One event log every agent reads and writes. Nothing moves on unchecked.</p></div>
+        <div class="band">
+          <div class="schema"><span>time</span><span>place / map cell</span><span>type</span><span>confidence</span><span>source</span><span>evidence</span><span>status</span></div>
+          <div class="cards" style="--c: var(--shared)">
+            <div class="card" data-id="coord"><span class="tag">Orchestration</span><h4>Coordinator</h4><p class="job">Routes work between agents and decides what runs next. One graph you can draw on a slide.</p><div class="chips"><span class="chip model">LangGraph</span><span class="chip model">Claude Agent SDK</span><span class="chip model">MCP tools</span></div></div>
+            <div class="card" data-id="verify"><span class="tag">Cross-check</span><h4>Verification (Skeptic)</h4><p class="job">Checks claims against physical data, merges duplicates, labels each item supported, conflicting or unverified.</p><div class="chips"><span class="chip">flood photo vs. gauge</span><span class="chip">repost detection</span></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flow"><span></span><div>verified events by area</div></div>
+
+      <!-- Analysis -->
+      <div class="layer">
+        <div class="layer-label" style="--c: var(--analysis)"><h3>Analysis agents</h3><p>One per domain. Each keeps its slice of the map current.</p></div>
+        <div class="cards" style="--c: var(--analysis)">
+          <div class="card" data-id="roads"><span class="tag">Domain</span><h4>Roads &amp; Access</h4><p class="job">Live passability, predicted closures, alternative routes, towns cut off.</p><div class="chips"><span class="chip model">OSMnx</span><span class="chip model">OSRM / Valhalla</span><span class="chip">landslide + slope</span></div></div>
+          <div class="card" data-id="power"><span class="tag">Domain</span><h4>Power &amp; Utilities</h4><p class="job">Outage extent and duration; critical sites running on generators.</p><div class="chips"><span class="chip">hospitals</span><span class="chip">water plants</span><span class="chip">nursing homes</span></div></div>
+          <div class="card" data-id="silence"><span class="tag">Domain</span><h4>Comms &amp; Silence</h4><p class="job">Finds areas that went quiet even though the hazard there is high.</p><div class="chips"><span class="chip">post-volume baseline</span><span class="chip">cell sites out</span></div></div>
+          <div class="card" data-id="hazard"><span class="tag">Domain</span><h4>Hazard Forecast</h4><p class="job">Where flooding, landslides or fire will hit in the next 6 to 24 hours.</p><div class="chips"><span class="chip">gauge trends</span><span class="chip">rain forecast</span></div></div>
+          <div class="card" data-id="people"><span class="tag">Domain</span><h4>People &amp; Needs</h4><p class="job">Vulnerable groups and help requests, at area level only.</p><div class="chips"><span class="chip">SVI</span><span class="chip">no car</span><span class="chip">elderly</span><span class="chip">language</span></div></div>
+          <div class="card" data-id="shelters"><span class="tag">Domain</span><h4>Shelters &amp; Supplies</h4><p class="job">Shelter space, fuel, water and depots, and whether each is reachable.</p><div class="chips"><span class="chip">capacity</span><span class="chip">depots</span></div></div>
+        </div>
+      </div>
+
+      <div class="flow"><span></span><div>combined findings → proposed actions</div></div>
+
+      <!-- Decide -->
+      <div class="layer">
+        <div class="layer-label" style="--c: var(--accent)"><h3>Decision agents</h3><p>Turn the picture into drafts a person can approve.</p></div>
+        <div class="cards" style="--c: var(--accent)">
+          <div class="card" data-id="alloc"><span class="tag">Decide</span><h4>Resource Allocation</h4><p class="job">Matches needs to assets along routes that are actually passable.</p></div>
+          <div class="card" data-id="alerts"><span class="tag">Decide</span><h4>Alerts &amp; Messaging</h4><p class="job">Drafts targeted, multilingual public alerts and responder notes.</p></div>
+          <div class="card" data-id="brief"><span class="tag">Decide</span><h4>Briefing</h4><p class="job">Situation reports, shift handoffs ("what changed in 6 hours"), leadership briefs.</p></div>
+          <div class="card" data-id="knowledge"><span class="tag">Memory</span><h4>Knowledge &amp; Memory</h4><p class="job">Past events and official guidance, plus an after-action log.</p><div class="chips"><span class="chip model">RAG over guidance</span><span class="chip">Helene history</span></div></div>
+        </div>
+      </div>
+
+      <div class="flow"><span></span><div>nothing sends automatically</div></div>
+
+      <!-- Human -->
+      <div class="layer">
+        <div class="layer-label" style="--c: var(--human)"><h3>Human gate</h3><p>The analyst's dashboard. The only place actions leave the system.</p></div>
+        <div class="gate">
+          <div class="gate-grid">
+            <div class="gate-item card human-card" data-id="human" style="--c: var(--human)"><b>Action queue</b><span>Each proposal shows evidence, confidence and the agents behind it.</span><div class="mock-q"><i class="ok">Approve</i><i>Reject</i><i>Edit</i></div></div>
+            <div class="gate-item"><b>Layered map</b><span>Roads, outages, quiet areas, verified and unverified reports, with a replay slider.</span></div>
+            <div class="gate-item"><b>Ask in plain language</b><span>"What's blocking supply to Swannanoa?" The map moves and answers.</span></div>
+            <div class="gate-item"><b>Feedback</b><span>Rejections and reasons go back to the agents and the memory.</span></div>
+          </div>
+          <div class="outputs"><span class="arrow">approved →</span><span class="out">Dispatch &amp; resource moves</span><span class="out">Public alerts</span><span class="out">Situation reports</span></div>
+          <div class="feedback">↺ rejections feed back into Verification and Knowledge &amp; Memory</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenario panel -->
+    <aside class="panel" aria-labelledby="scn-h">
+      <h2 id="scn-h">Combined findings</h2>
+      <p class="intro">One agent alone is just another dashboard. Pick a scenario to see which agents stack up to produce it. Numbers on the diagram show the order.</p>
+      <div class="tabs" role="group" aria-label="Scenarios">
+        <button type="button" id="scn-nursing" data-scn="nursing" aria-pressed="true">Nursing home at risk</button>
+        <button type="button" id="scn-cutoff" data-scn="cutoff" aria-pressed="false">Mountain town cut off</button>
+        <button type="button" id="scn-prepare" data-scn="prepare" aria-pressed="false">Before landfall: road closures</button>
+      </div>
+      <ol class="steps" id="steps"></ol>
+      <p class="verdict" id="verdict"></p>
+    </aside>
+  </div>
+
+  <!-- Lifecycle -->
+  <section class="block">
+    <h2>Across the disaster timeline</h2>
+    <div class="cols">
+      <div class="col"><span class="phase">Before</span><h3>Prepare</h3><ul><li>Predict roads and critical sites at risk</li><li>Pre-position crews, fuel, water</li><li>Plan evacuation routes and spot bottlenecks</li><li>Send targeted, multilingual warnings</li></ul></div>
+      <div class="col"><span class="phase">During</span><h3>Respond</h3><ul><li>Keep one verified shared picture</li><li>Find cut-off and quiet areas</li><li>Match needs to resources along passable routes</li><li>Shift handoffs and situation reports</li></ul></div>
+      <div class="col"><span class="phase">After</span><h3>Recover</h3><ul><li>Which roads to clear first (people reconnected per mile)</li><li>Power restoration priorities</li><li>Track unmet needs by area</li><li>After-action report into memory</li></ul></div>
+    </div>
+  </section>
+
+  <!-- Inspiration -->
+  <section class="block">
+    <h2>What we borrow, and where we go further</h2>
+    <div class="cols">
+      <div class="col">
+        <span class="phase">MIT · GitHub</span><h3>gods-eye-view</h3>
+        <p style="font-size:.86rem;color:var(--muted)">A browser globe that stacks dozens of public feeds, with a voice agent and MCP server.</p>
+        <span class="sub go">Take</span>
+        <ul><li>One module per feed, catalogued in DATA_SOURCES.md</li><li>Server proxy that hides keys and caches</li><li>Agent tools grouped as Direct, Annotate, Interrogate, Operate</li><li>Replay scenes (it has a Nepal flood replay)</li><li>Shareable view links</li></ul>
+        <span class="sub">Skip</span>
+        <ul><li>3D globe and tokens (MapLibre + deck.gl instead)</li><li>Surveillance-style layers</li></ul>
+      </div>
+      <div class="col">
+        <span class="phase">Texas A&amp;M · arXiv 2510.16034</span><h3>Disaster Copilot</h3>
+        <p style="font-size:.86rem;color:var(--muted)">A vision paper with no code: an orchestrator coordinating specialist sub-agents.</p>
+        <span class="sub go">Ideas we share</span>
+        <ul><li>Coordinator plus specialist agents</li><li>Retrieval over official guidance</li><li>Memory across shifts and staff turnover</li><li>Human feedback loops</li></ul>
+        <span class="sub">Where we go further</span>
+        <ul><li>Detecting areas that went silent</li><li>Verification against physical data</li><li>A working demo, not a diagram</li></ul>
+      </div>
+      <div class="col">
+        <span class="phase">Open models &amp; frameworks</span><h3>Toolkit</h3>
+        <ul><li><b>Imagery data:</b> Maxar Open Data (CC BY-NC 4.0, STAC catalog, Helene pre/post), NOAA aerial, Sentinel</li><li><b>Imagery models:</b> Prithvi flood (Apache-2.0), TerraMind, xView2 damage, GeoChat</li><li><b>Imagery tools:</b> leafmap, TiTiler, rasterio, pystac</li><li><b>Text:</b> CrisisTransformers; a frontier multimodal LLM for most tasks</li><li><b>Audio:</b> Whisper / faster-whisper</li><li><b>Routing:</b> OSMnx, OSRM, Valhalla</li><li><b>Agents:</b> LangGraph, CrewAI, Claude Agent SDK, MCP</li><li><b>Map:</b> MapLibre, deck.gl</li><li><b>Datasets:</b> CrisisMMD, HumAID, xBD, FloodNet, RescueNet</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- PM framing -->
+  <section class="block">
+    <h2>Product framing</h2>
+    <div class="cols">
+      <div class="col"><h3>Users</h3><ul><li>FEMA regional staff</li><li>NC Emergency Management, 24-Hour Watch</li><li>County emergency managers</li></ul></div>
+      <div class="col"><h3>Problem</h3><ul><li>Too much data across separate tools</li><li>Too few analysts</li><li>Slow, unverified situational awareness</li><li>Knowledge lost between shifts</li></ul></div>
+      <div class="col"><h3>Measures</h3><ul><li>Time from first signal to verified decision</li><li>Critical sites flagged before failure</li><li>Resources sent on routes that were passable</li><li>Analyst hours saved</li></ul></div>
+      <div class="col"><h3>Guardrails</h3><ul><li>A person approves every action</li><li>Area level only, no tracking of individuals</li><li>Confidence and evidence on every item</li><li>Simulated data labelled as simulated</li></ul></div>
+    </div>
+  </section>
+
+  <!-- Weekend + open questions -->
+  <section class="block">
+    <h2>Shape for a weekend</h2>
+    <div class="cols">
+      <div class="col"><h3>Approach</h3><ul><li>Show every layer thinly; build two or three agents in depth</li><li>Replay Hurricane Helene in western NC so the demo never depends on live feeds</li><li>One shared event format so agents can be built in parallel</li></ul></div>
+      <div class="col"><h3>Gaps to plan around</h3><ul><li>911 and live power/cell data aren't public: simulate and say so</li><li>Imagery arrives a day or more late and clouds block it: social posts and gauges cover the first hours</li><li>Apply early for DriveNC, Flood Hub keys</li></ul></div>
+      <div class="col"><h3>Still open</h3><ul><li>Which two or three agents go deep?</li><li>Which combined finding is the demo moment?</li><li>Federal, state or county user?</li><li>Product name</li></ul></div>
+    </div>
+  </section>
+
+  <footer>Brainstorm map, November 2026. Data availability and licenses noted from a quick check; confirm terms before building against any feed.</footer>
+</div>
+
+<script>
+const SCENARIOS = {
+  nursing: {
+    steps: [
+      ["infra", "Infrastructure feeds", "report the area's power is out."],
+      ["power", "Power & Utilities", "finds a nursing home on generator power, with fuel for about 18 hours."],
+      ["hydro", "Weather & Hydro", "sees the nearby river gauge rising toward flood stage."],
+      ["hazard", "Hazard Forecast", "expects the low crossing to flood in about 4 hours."],
+      ["roads", "Roads & Access", "finds that crossing is the only road in."],
+      ["silence", "Comms & Silence", "notes the area has gone quiet online."],
+      ["people", "People & Needs", "flags about 60 residents with limited mobility."],
+      ["verify", "Verification", "confirms the outage and gauge readings agree."],
+      ["alloc", "Resource Allocation", "drafts an evacuation plus a fuel delivery, routed before the crossing closes."],
+      ["human", "Analyst", "reviews the evidence and approves."]
+    ],
+    verdict: "No single feed shows this. Stacked together it becomes <b>Priority 1</b> with a 4-hour window."
+  },
+  cutoff: {
+    steps: [
+      ["social", "Social & Media", "picks up posts saying a bridge on the main highway is out."],
+      ["imagery", "Imagery", "compares Maxar before/after images and sees the washout, days later."],
+      ["infra", "Infrastructure feeds", "add the DOT closure and cell sites out from FCC reports."],
+      ["verify", "Verification", "upgrades the bridge report from unverified to supported."],
+      ["roads", "Roads & Access", "finds every route into the town is now blocked."],
+      ["silence", "Comms & Silence", "shows the town went dark after landfall."],
+      ["shelters", "Shelters & Supplies", "finds the nearest depot that can still reach it."],
+      ["alloc", "Resource Allocation", "suggests a helicopter landing zone and supply drop."],
+      ["brief", "Briefing", "writes it up for the next shift."],
+      ["human", "Analyst", "approves the drop."]
+    ],
+    verdict: "Physically cut off <b>and</b> silent means people there can't ask for help. It goes to the top of the list."
+  },
+  prepare: {
+    steps: [
+      ["hydro", "Weather & Hydro", "pulls the storm track and rainfall forecast."],
+      ["hazard", "Hazard Forecast", "maps landslide-prone slopes and flood-prone crossings."],
+      ["knowledge", "Knowledge & Memory", "recalls which roads closed in Helene and at what gauge levels."],
+      ["roads", "Roads & Access", "predicts closures over the next 24 hours and plans alternative routes."],
+      ["people", "People & Needs", "finds areas with many households without cars."],
+      ["alerts", "Alerts & Messaging", "drafts targeted warnings in English and Spanish."],
+      ["alloc", "Resource Allocation", "suggests pre-positioning crews and supplies on the safe side."],
+      ["human", "Analyst", "edits and approves."]
+    ],
+    verdict: "This moves the system from reacting to <b>preparing</b>: crews are in place before the roads close."
+  }
+};
+
+const cards = document.querySelectorAll("[data-id]");
+const stepsEl = document.getElementById("steps");
+const verdictEl = document.getElementById("verdict");
+const buttons = document.querySelectorAll(".tabs button");
+
+function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+function show(key) {
+  const s = SCENARIOS[key];
+  const order = {};
+  s.steps.forEach(([id], i) => { if (!(id in order)) order[id] = []; order[id].push(i + 1); });
+  cards.forEach(c => {
+    const nums = order[c.dataset.id];
+    c.classList.toggle("on", !!nums);
+    if (nums) c.setAttribute("data-step", nums.join("·")); else c.removeAttribute("data-step");
+  });
+  stepsEl.innerHTML = s.steps.map(([, name, text], i) =>
+    `<li><span class="n">${i + 1}</span><span><b>${esc(name)}</b> ${esc(text)}</span></li>`).join("");
+  verdictEl.innerHTML = s.verdict;
+  buttons.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.scn === key)));
+  try { localStorage.setItem("scn", key); } catch (e) {}
+}
+
+buttons.forEach(b => b.addEventListener("click", () => show(b.dataset.scn)));
+let start = "nursing";
+try { const saved = localStorage.getItem("scn"); if (saved && SCENARIOS[saved]) start = saved; } catch (e) {}
+show(start);
+</script>
