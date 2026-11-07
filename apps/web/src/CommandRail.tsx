@@ -8,7 +8,7 @@ const INPUTS: { group: string; items: [string, string][] }[] = [
   { group: "Assets", items: [["buildings", "Hospitals"], ["schools", "Schools"], ["airports", "Airports"], ["army", "Army bases"]] },
 ];
 const OUTPUTS: [string, string][] = [
-  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["landslides", "Landslides"], ["qrt", "QRT staging"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Public alerts"],
+  ["closures", "Road closures"], ["flood", "Flooding"], ["runoff", "Runoff flow"], ["shelterBuildings", "Shelter & evacuate"], ["landslides", "Landslides"], ["qrt", "QRT staging"], ["food", "Food"], ["shelter", "Shelter"], ["outages", "Outages"], ["alerts", "Public alerts"],
 ];
 const STAGES: [number, string][] = [[1, "Now"], [2, "+6 h"], [3, "Peak +12 h"]];
 
@@ -77,9 +77,13 @@ export function CommandRail(p: RailProps) {
             <li><i className="sw fill" style={{ background: "#FF7A1A55", borderColor: "#FF7A1A" }} />Landslide zone</li>
             <li><i className="sw fill" style={{ background: "#FFD23F33", borderColor: "#FFD23F" }} />Grid outage</li>
             <li><Glyph kind="school" ring="#FFB020" badge />School at risk</li>
+            <li><i className="sw fill" style={{ background: "#FF4A3Dcc", borderColor: "#FF4A3D" }} />Building to evacuate <em className="real">real</em></li>
             {p.legendOpen && (
               <>
                 <li><i className="sw fill" style={{ background: "#3DD6E022", borderColor: "#3DD6E0" }} />Public alert zone</li>
+                <li><i className="sw fill" style={{ background: "#FFB020cc", borderColor: "#FFB020" }} />Building, shelter on upper floors <em className="real">real</em></li>
+                <li><i className="sw fill" style={{ background: "#86EFACcc", borderColor: "#86EFAC" }} />Building usable as a refuge <em className="real">real</em></li>
+                <li><i className="sw fill" style={{ background: "#9BA8B0cc", borderColor: "#9BA8B0" }} />Building, height not tagged — no judgement <em className="real">real</em></li>
                 <li><Glyph kind="hospital" ring="#46D68C" />Hospital, access ok</li>
                 <li><Glyph kind="hospital" ring="#FFB020" badge />Hospital, degraded</li>
                 <li><Glyph kind="hospital" ring="#FF4A3D" badge />Hospital, access lost</li>

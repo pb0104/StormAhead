@@ -5,6 +5,7 @@ Real-data availability for the Kathmandu valley was checked on 2026-11-06. Detai
 | Source | Link | Status in this build |
 |---|---|---|
 | OpenStreetMap via Geofabrik (2 Jan 2024 snapshot) | https://download.geofabrik.de/asia/nepal.html | **Used.** Roads and hospitals for the hindcast and the console. ODbL, © OpenStreetMap contributors (https://www.openstreetmap.org/copyright) |
+| OpenStreetMap via the Overpass **attic** API, pinned to 2024-01-02 | https://overpass-api.de/ | **Used.** Pre-event building footprints (7,115 shelter-relevant buildings) for the shelter reading and as cascade targets. Same snapshot date as the Geofabrik road network, so the layer is pre-event too. ODbL, © OpenStreetMap contributors |
 | UNOSAT SPOT-6 flood extent, product 3996 | https://unosat.org/products/3996 | **Used** as the given hazard in the hindcast engine. CC BY-SA. (Product 3993 has no Kathmandu layers) |
 | BIPAD Portal incident API | https://bipadportal.gov.np/ | **Used** for scoring only. Licence not stated on the API: confirm before redistribution |
 | Sentinel-2 cloudless 2020 (EOX) | https://s2maps.eu/ | **Used** as a bundled, dimmed fallback satellite base. CC BY-NC-SA 4.0; contains modified Copernicus Sentinel data |

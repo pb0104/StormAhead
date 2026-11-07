@@ -16,7 +16,7 @@ const within = (e: Entity, list: Entity[], d: number) => list.filter((x) => km(e
 
 export const KIND_LABEL: Record<string, string> = {
   closure: "Closed road", pocket: "Cut-off pocket", landslide: "Landslide zone", hospital: "Hospital", tower: "Cell tower", outage: "Grid outage",
-  alert: "Public alert zone", dam: "Dam gauge", social: "Social media post", radio: "Radio call-in", shelter: "Shelter", food: "Food depot", qrt: "QRT staging", school: "School", airport: "Airport or helipad", army: "Army base",
+  building: "Building", alert: "Public alert zone", dam: "Dam gauge", social: "Social media post", radio: "Radio call-in", shelter: "Shelter", food: "Food depot", qrt: "QRT staging", school: "School", airport: "Airport or helipad", army: "Army base",
 };
 
 export function reasons(e: Entity): Reason[] {
@@ -55,6 +55,23 @@ export function reasons(e: Entity): Reason[] {
       { input: "Critical buildings", text: `About ${fmt(e.props.students as number)} students enrolled.` },
       ...(e.props.risk === "ok" ? [{ input: "Assessment", text: "No cascade risk found nearby in the demo data." }] : []),
     ];
+    case "building": {
+      const floors = e.props.floors === "" ? null : Number(e.props.floors);
+      const depth = Number(e.props.depthM), lost = Number(e.props.floorsLost);
+      return [
+        { input: "Buildings (REAL, OpenStreetMap 2 Jan 2024)", text: floors === null
+          ? `${e.props.type}, ${fmt(e.props.areaM2 as number)} m² footprint. Height is NOT tagged in OpenStreetMap, so no shelter judgement is offered for this building.`
+          : `${e.props.type}, ${floors} storey${floors === 1 ? "" : "s"}, ${fmt(e.props.areaM2 as number)} m² footprint.` },
+        { input: "Flood depth (terrain + weather agents)", text: depth > 0
+          ? `About ${depth.toFixed(1)} m of water here, so the lowest ${lost} floor${lost === 1 ? "" : "s"} ${lost === 1 ? "is" : "are"} unusable.`
+          : "No water on this building in the current forecast." },
+        ...(floors === null ? [] : [{ input: "Assessment", text: e.props.role === "at-risk-evacuate"
+          ? "No floor stays above the water, so people cannot shelter here."
+          : e.props.role === "at-risk-vertical" ? `${e.props.usableFloors} floor(s) stay above the water: about ${fmt(e.props.capacity as number)} places at 3.5 m² per person.`
+          : e.props.role === "refuge" ? `Dry, and inside an area that has lost road access. ${e.props.usableFloors} usable floor(s), about ${fmt(e.props.capacity as number)} places.`
+          : "Dry and still reachable by road." }]),
+      ];
+    }
     case "airport": return [
       { input: "Road network", text: e.props.access === "ok" ? "Access roads open." : `Closed road ${e.props.closure} is ${e.props.closureM} m away, so ${e.props.access === "lost" ? "road access is cut" : "road access is slowed"}.` },
       { input: "Weather", text: "Low cloud and heavy rain forecast for the next 12 hours." },
@@ -126,6 +143,18 @@ export function actions(e: Entity): Action[] {
     case "army":
       a.push({ id: `${e.id}:army`, kind: "army", title: `Request ${e.name.split(",")[1]?.trim() ?? "support"}`, detail: `${e.props.role}.${e.props.access === "ok" ? "" : " Routes out are limited, so pre-position early."}`, target: e });
       break;
+    case "building": {
+      const cap = Number(e.props.capacity) || 0;
+      if (e.props.role === "at-risk-evacuate") { evac(`everyone in ${e.name}`, Math.max(20, Math.round((e.props.areaM2 as number) / 12))); shelter(); alert(); }
+      else if (e.props.role === "at-risk-vertical") {
+        a.push({ id: `${e.id}:road`, kind: "road", title: `Move people to the upper floors of ${e.name}`, detail: `${e.props.usableFloors} floor(s) stay above about ${Number(e.props.depthM).toFixed(1)} m of water: room for about ${fmt(cap)}. Send water and light, not transport.` });
+        armyReq("boats to reach the upper floors", "Ground floor is under water."); feed(cap);
+      } else if (e.props.role === "refuge") {
+        a.push({ id: `${e.id}:shelter`, kind: "shelter", title: `Open ${e.name} as a local refuge`, detail: `Dry, ${e.props.usableFloors} usable floor(s), about ${fmt(cap)} places. The area has lost road access, so shelter people here rather than moving them out.`, target: e });
+        feed(cap);
+      }
+      break;
+    }
     case "tower": grid(); break;
     case "outage": grid(); alert(); break;
     case "alert": alert(e.id); shelter(); break;

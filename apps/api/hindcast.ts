@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
-import { analyzeCascade, DEFAULT_PARAMS, DEFAULT_SCORE, scoreAgainstIncidents, type CascadeParams, type CascadeResult, type Incident, type RealArea, type ScoreResult } from "../../packages/analysis/cascade.ts";
+import { analyzeCascade, DEFAULT_PARAMS, DEFAULT_SCORE, scoreAgainstIncidents, SHELTER, type CascadeParams, type CascadeResult, type Incident, type RealArea, type RealBuilding, type ScoreResult } from "../../packages/analysis/cascade.ts";
 import type { AgentEvent } from "../../packages/shared/events.ts";
 import { HttpError } from "./common.ts";
 
@@ -21,8 +21,18 @@ export function assertNetworkPreEvent(p: Provenance) {
     throw new HttpError(422, `Temporal separation violated: network snapshot ${p.network.snapshot} (${p.network.phase}) is not before the event (${EVENT_START}).`);
 }
 
+/** Buildings are a model input too, so they must predate the event just like the road network. */
+export function assertBuildingsPreEvent(b: { snapshot: string; phase: string }) {
+  if (Date.parse(b.snapshot) >= Date.parse(EVENT_START) || b.phase !== "pre-event")
+    throw new HttpError(422, `Temporal separation violated: building snapshot ${b.snapshot} (${b.phase}) is not before the event (${EVENT_START}).`);
+}
+
 export class HindcastService {
   area: RealArea; floodGeo: unknown; incidents: Incident[]; prov: Provenance; incidentsMeta: Record<string, unknown>;
+  buildingsMeta: Record<string, unknown> | null = null;
+  /** Footprint rings, parallel to area.buildings. Kept out of RealBuilding: the engine reasons about centroids. */
+  private buildingRings: [number, number][][] | null = null;
+  private buildingsGeoCache: unknown = null;
   private roadsGeo: unknown = null;
 
   constructor(dir = KTM_DIR) {
@@ -30,10 +40,22 @@ export class HindcastService {
     assertNetworkPreEvent(this.prov);
     const net = JSON.parse(readFileSync(dir + "network.json", "utf8"));
     const pl = JSON.parse(readFileSync(dir + "places.json", "utf8"));
+    // Buildings are optional: the engine and its existing results work without the file.
+    let buildings: RealBuilding[] | undefined;
+    if (existsSync(dir + "buildings.json")) {
+      const bf = JSON.parse(readFileSync(dir + "buildings.json", "utf8"));
+      assertBuildingsPreEvent(bf);
+      this.buildingsMeta = { source: bf.source, snapshot: bf.snapshot, licence: bf.licence, note: bf.note, counts: bf.counts };
+      this.buildingRings = bf.buildings.map((b: any) => b.ring);
+      buildings = bf.buildings.map((b: any) => ({
+        id: b.id, name: b.name ?? `${b.type} (unnamed)`, type: b.type, lon: b.lon, lat: b.lat,
+        node: b.node, inFlood: b.inFlood, distFloodM: b.distFloodM, floors: b.floors, areaM2: b.areaM2,
+      }));
+    }
     this.area = {
       nodes: net.nodes,
       edges: net.edges.map((e: any[]) => ({ u: e[0], v: e[1], minutes: e[2], lengthM: e[3], cls: e[4], bridge: !!e[5], floodedShare: e[6], name: e[7], osmWayId: e[8], mid: e[9], distFloodM: e[10], via: e[11] })),
-      places: pl.places, hospitals: pl.hospitals,
+      places: pl.places, hospitals: pl.hospitals, buildings,
     };
     this.floodGeo = JSON.parse(readFileSync(dir + "flood_extent.geojson", "utf8"));
     const inc = JSON.parse(readFileSync(dir + "incidents.json", "utf8"));
@@ -43,7 +65,25 @@ export class HindcastService {
   static available(dir = KTM_DIR) { return ["provenance", "network", "places", "flood_extent", "incidents"].every((f) => existsSync(dir + f + (f === "flood_extent" ? ".geojson" : ".json"))); }
 
   meta() {
-    return { available: true, provenance: this.prov, incidents: this.incidentsMeta, evaluationIncidents: this.incidents.length, defaults: { params: DEFAULT_PARAMS, score: DEFAULT_SCORE } };
+    return { available: true, provenance: this.prov, incidents: this.incidentsMeta, buildings: this.buildingsMeta, shelterAssumptions: SHELTER, evaluationIncidents: this.incidents.length, defaults: { params: DEFAULT_PARAMS, score: DEFAULT_SCORE } };
+  }
+
+  /**
+   * Building footprints for the console, as GeoJSON. Cached, and trimmed to what the map needs: the console
+   * derives its own shelter reading from its depth model, so no engine verdict is sent with them.
+   */
+  buildingsGeo() {
+    if (!this.area.buildings?.length) return null;
+    this.buildingsGeoCache ??= {
+      type: "FeatureCollection",
+      meta: this.buildingsMeta,
+      features: this.area.buildings.map((b, i) => ({
+        type: "Feature",
+        properties: { i, id: b.id, name: b.name, t: b.type, f: b.floors, a: b.areaM2, inFlood: b.inFlood ? 1 : 0 },
+        geometry: { type: "Polygon", coordinates: [this.buildingRings![i]] },
+      })),
+    };
+    return this.buildingsGeoCache;
   }
 
   /** Static geometry for the map; cached. Edge index `i` is the key used by results. */
@@ -86,6 +126,15 @@ export class HindcastService {
     emit("Access Agent", "analyzeCascade", { degradeMinutes: p.degradeMinutes, degradeRatio: p.degradeRatio },
       `${k.direct} places directly flooded; CASCADE: ${k.cascadeIsolated} dry places lose all hospital access, ${k.cascadeDegraded} badly degraded; ${k.strandedEdges} dry roads stranded; ${k.hospitalsFlooded} hospital(s) flooded (computed in ${Date.now() - t} ms).`, ["EV-KTM-OSM"]);
 
+    if (this.area.buildings?.length) {
+      emit("Shelter Agent", "assessBuildings", { buildings: k.buildings, m2PerPerson: SHELTER.m2PerPerson, usableFraction: SHELTER.usableFraction },
+        `${k.buildings} shelter-relevant buildings (pre-event OSM footprints): ${k.buildingsFlooded} stand in the flood extent, ` +
+        `${k.buildingsIsolated} dry ones lose all hospital access, ${k.buildingsDegraded} badly degraded. ` +
+        `Shelter reading: ${k.shelterVertical} flooded with floors above the water, ${k.shelterEvacuate} flooded with none (evacuate), ` +
+        `${k.shelterRefuge} dry upper-floor refuges inside cut-off areas (about ${(k.refugeCapacity ?? 0).toLocaleString("en-US")} places at ${SHELTER.m2PerPerson} m²/person). ` +
+        `${k.buildingsUnknownHeight} have no usable building:levels and get NO judgement.`, ["EV-KTM-OSM-BUILDINGS"]);
+    }
+
     const score = scoreAgainstIncidents(this.area, res, this.incidents);
     emit("Verification Agent", "scoreAgainstIncidents", { incidents: this.incidents.length, radiusM: score.options.radiusM },
       `Scored AFTER prediction against ${score.evaluated} BIPAD flood/rain incidents with reported impact: ${score.outsideFlood} outside the flood extent, ${score.outsideCovered} within ${score.options.radiusM} m of a predicted cascade item (random-baseline mean ${score.randomBaseline.meanCovered.toFixed(1)}, p=${score.randomBaseline.p.toFixed(3)}; proximity baseline ${score.proximityBaseline.covered}).`, ["EV-KTM-BIPAD"]);
@@ -103,8 +152,15 @@ export class HindcastService {
     });
     // Secondary, pre-declared out-of-model check: landslides (model has no landslide physics).
     const slide = scoreAgainstIncidents(this.area, res, this.incidents, { ...DEFAULT_SCORE, primaryHazards: ["Landslide"], permutations: 500 });
+    // Buildings as cascade targets. Reported ALONGSIDE the primary headline, never replacing it: the target set
+    // was chosen after the first null result, so these are exploratory, not a pre-registered test.
+    const buildingTargets = this.area.buildings?.length ? {
+      withBuildings: strip(scoreAgainstIncidents(this.area, res, this.incidents, { ...DEFAULT_SCORE, includeBuildings: true })),
+      buildingsOnly: strip(scoreAgainstIncidents(this.area, res, this.incidents, { ...DEFAULT_SCORE, buildingsOnly: true })),
+      note: "EXPLORATORY: target set chosen after seeing the primary null result. Baselines draw the same number of items per class from the same dry pools, so a larger target set cannot flatter the model.",
+    } : null;
     emit("Coordinator", "sensitivityAnalysis", { closeShare: [0.1, 0.3, 0.5] }, `Headline recomputed at three closure thresholds; landslide incidents scored separately as an out-of-model check.`, []);
-    return { runId, params: p, result: compact(res), score, sensitivity: sens, radiusSensitivity, landslideCheck: strip(slide), events };
+    return { runId, params: p, result: compact(res), score, sensitivity: sens, radiusSensitivity, landslideCheck: strip(slide), buildingTargets, events };
   }
 }
 
@@ -112,5 +168,6 @@ const compact = (r: CascadeResult) => ({
   counts: r.counts, closedEdges: r.closedEdges, exposedEdges: r.exposedEdges, strandedEdges: r.strandedEdges,
   placeStatus: r.places.map((p) => p.status), placeT0: r.places.map((p) => p.t0 === null ? null : Math.round(p.t0)), placeT1: r.places.map((p) => p.t1 === null ? null : Math.round(p.t1)),
   hospitals: r.hospitals,
+  buildings: r.buildings.map((b) => ({ i: b.index, s: b.status, role: b.role, f: b.usableFloors, cap: b.capacity })),
 });
-const strip = (s: ScoreResult) => ({ evaluated: s.evaluated, inFlood: s.inFlood, outsideFlood: s.outsideFlood, outsideCovered: s.outsideCovered, randomMean: s.randomBaseline.meanCovered, p: s.randomBaseline.p, proximity: s.proximityBaseline.covered });
+const strip = (s: ScoreResult) => ({ evaluated: s.evaluated, inFlood: s.inFlood, outsideFlood: s.outsideFlood, outsideCovered: s.outsideCovered, randomMean: s.randomBaseline.meanCovered, p: s.randomBaseline.p, proximity: s.proximityBaseline.covered, flagged: s.flagged });

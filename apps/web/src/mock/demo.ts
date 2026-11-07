@@ -16,7 +16,9 @@ type FeatureCollection = { type: "FeatureCollection"; features: Feature[] };
 
 export type Kind =
   | "closure" | "pocket" | "landslide" | "hospital" | "tower" | "outage" | "alert"
-  | "dam" | "social" | "radio" | "shelter" | "food" | "qrt" | "school" | "airport" | "army";
+  | "dam" | "social" | "radio" | "shelter" | "food" | "qrt" | "school" | "airport" | "army"
+  /** REAL OSM building footprint (the only non-mock entity kind in the console). */
+  | "building";
 
 export type Entity = {
   kind: Kind; id: string; name: string; at: [number, number];

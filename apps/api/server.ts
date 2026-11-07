@@ -25,6 +25,13 @@ export function buildServer() {
     return (hind = new HindcastService());
   };
   app.get("/api/hindcast/meta", async () => (HindcastService.available() ? H().meta() : { available: false }));
+  // Real pre-event building footprints for the console's shelter layer. 404 when the layer was never fetched,
+  // so the console simply renders without it.
+  app.get("/api/buildings", async (_req, reply) => {
+    const b = H().buildingsGeo();
+    if (!b) throw new HttpError(404, "Building layer not prepared. Run scripts/fetch_buildings.mjs.");
+    return reply.header("cache-control", "public, max-age=3600").send(b);
+  });
   app.get("/api/hindcast/geo", async () => H().geo());
   app.post("/api/hindcast/run", async (req) => {
     const b = z.object({ closeShare: z.number().optional(), bridgeClosesOnAnyContact: z.boolean().optional(), degradeMinutes: z.number().optional(), degradeRatio: z.number().optional() }).parse(req.body ?? {});
