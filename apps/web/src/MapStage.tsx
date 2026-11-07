@@ -31,7 +31,7 @@ function waveFrame(k: number): { width: number; height: number; data: Uint8Clamp
   return { width: S, height: S, data: g.getImageData(0, 0, S, S).data };
 }
 const RED = "#FF4A3D", AMBER = "#FFB020";
-const HIT = ["bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-helipad", "pts-army", "pts-tower", "pts-dam", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill"];
+const HIT = ["bldg-fill", "bldg-3d", "pts-hospital", "pts-school", "pts-airport", "pts-helipad", "pts-army", "pts-tower", "pts-dam", "pts-shelter", "pts-food", "pts-qrt", "closures", "closures-muted", "pockets", "z-landslide-fill", "z-outage-fill", "z-alert-fill"];
 const GROUP: Record<string, string[]> = {
   closures: ["closures-glow", "closures", "closures-minor", "closures-muted"], pockets: ["pockets", "pockets-minor"],
   landslides: ["z-landslide-fill", "z-landslide-line"], hospitals: ["pts-hospital"], schools: ["pts-school"], outages: ["z-outage-fill", "z-outage-line"],
@@ -68,7 +68,7 @@ export function MapStage(p: MapProps) {
       maxZoom: 18,
     });
     map.current = m;
-    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "DEMO DATA · Base: Esri World Imagery (Maxar), cached · Roads: © OpenStreetMap contributors" }), "bottom-right");
+    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "Real + simulated layers (see Details) · Rain: Open-Meteo (CC BY 4.0) · Facilities, alerts, gauges: BIPAD · Base: Esri World Imagery (Maxar), cached · Roads: © OpenStreetMap contributors" }), "bottom-right");
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     m.on("load", () => {
       const TL = { "line-opacity-transition": { duration: 600 } }, TF = { "fill-opacity-transition": { duration: 600 } };
@@ -106,8 +106,8 @@ export function MapStage(p: MapProps) {
         "line-color": ["match", ["get", "c"], 0, "#E4ECF0", 1, "#D3DEE4", 2, "#A9BAC4", "#8497A2"],
         "line-width": ["interpolate", ["linear"], ["zoom"], 10, ["match", ["get", "c"], 0, 1.3, 1, 1.1, 0.6], 15, ["match", ["get", "c"], 0, 4, 1, 3.4, 2, 2.4, 1.6]],
         "line-opacity": 0.75 } });
-      for (const k of ["landslide", "outage"]) {
-        const col = k === "landslide" ? "#FF7A1A" : "#FFD23F";
+      for (const k of ["landslide", "outage", "alert"]) {
+        const col = k === "landslide" ? "#FF7A1A" : k === "outage" ? "#FFD23F" : "#3DD6E0";
         m.addLayer({ id: `z-${k}-fill`, type: "fill", source: "zones", filter: ["==", ["get", "kind"], k], paint: { "fill-color": col, "fill-opacity": 0, ...TF } });
         m.addLayer({ id: `z-${k}-line`, type: "line", source: "zones", filter: ["==", ["get", "kind"], k], paint: { "line-color": col, "line-width": 2, "line-opacity": 0, "line-dasharray": k === "landslide" ? [1, 0] : [3, 2], ...TL } });
       }
@@ -240,7 +240,10 @@ export function MapStage(p: MapProps) {
       mm.setPaintProperty("flood-edge", "line-opacity", water ? 0.75 : 0);
       show("pts-hospital", g("buildings")); show("pts-school", g("schools")); show("pts-airport", g("airports")); show("pts-helipad", g("helipads")); show("pts-army", g("army")); show("pts-tower", g("towers")); show("pts-dam", g("dams"));
       show("pts-shelter", g("shelter")); show("pts-food", g("food")); show("pts-qrt", g("qrt"));
-      for (const k of ["landslide", "outage"]) { const on = ran && g(k === "landslide" ? "landslides" : "outages"); show(`z-${k}-fill`, on); show(`z-${k}-line`, on); }
+      for (const k of ["landslide", "outage", "alert"]) {
+        const on = ran && g(k === "landslide" ? "landslides" : k === "outage" ? "outages" : "alerts");
+        show(`z-${k}-fill`, on); show(`z-${k}-line`, on);
+      }
       const filt = ["all", ["<=", ["get", "stage"], q.stage], ["<", ["get", "order"], q.revealN]];
       mm.setFilter("closures", filt); mm.setFilter("closures-glow", filt);
       mm.setFilter("closures-muted", ["<=", ["get", "stage"], q.stage]);
@@ -250,6 +253,7 @@ export function MapStage(p: MapProps) {
       set("closures-muted", !ran && g("closures")); set("closures", closuresOn); set("closures-glow", closuresOn); set("closures-minor", closuresOn && done);
       set("pockets", closuresOn && q.showPockets); set("pockets-minor", closuresOn && q.showPockets);
       set("z-landslide-fill", ran && g("landslides")); set("z-landslide-line", ran && g("landslides")); set("z-outage-fill", ran && g("outages")); set("z-outage-line", ran && g("outages"));
+      if (mm.getLayer("z-alert-fill")) { mm.setPaintProperty("z-alert-fill", "fill-opacity", ran && g("alerts") ? 0.22 : 0); mm.setPaintProperty("z-alert-line", "line-opacity", ran && g("alerts") ? 0.9 : 0); }
       mm.setLayoutProperty("pts-hospital", "icon-image", ran ? ["concat", "hospital-", ["get", "access"]] : "hospital-none");
       mm.setLayoutProperty("pts-school", "icon-image", ran ? ["concat", "school-", ["get", "risk"]] : "school-none");
       mm.setLayoutProperty("pts-airport", "icon-image", ran ? ["concat", "airport-", ["get", "access"]] : "airport-none");

@@ -321,3 +321,10 @@ tr.clickable, li.clickable { cursor:pointer; } li.clickable:hover, tr.clickable:
 
 /* floating mode switcher over the ops console */
 .top-modes { position: fixed; top: 10px; right: 12px; z-index: 40; }
+
+/* provenance + timeline (BIPAD layers) */
+.prov { display: inline-block; margin-top: 4px; font: 500 10.5px var(--mono); letter-spacing: .02em; padding: 2px 7px; border-radius: 3px; }
+.prov.real { background: #123A2B; color: #8EE6B8; } .prov.modelled { background: #1F2E38; color: #A9C7DA; } .prov.simulated { background: #3A2C0E; color: #FFD27A; }
+.pill.modelled { background: #1F2E38; color: #A9C7DA; } .pill.simulated { background: #3A2C0E; color: #FFD27A; }
+.timeline { list-style: none; padding: 0; margin: 0; } .timeline li { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--raise); }
+.timeline time { font: 500 11px var(--mono); color: var(--mute); } .timeline small { display: block; color: var(--mute); }

@@ -8,20 +8,21 @@ import { PhotorealView, savedToken } from "./PhotorealView.tsx";
 import { distKm } from "./affected.ts";
 import { ops } from "./api.ts";
 import { assess, buildingAdvice, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "./buildings.ts";
+import { mergeBipadIntoScene } from "./mergeBipad.ts";
+import { OBSERVED_IN, WEATHER, whenText } from "./real/ops.ts";
 import type { AssessmentResult, AtmosphereSnapshot, Entity, SceneSnapshot, TerrainResult, Weather } from "../../../packages/ports/index.ts";
 
 /**
- * Authority ops console. Scene, weather seed, terrain and flow come from the modular API.
- * Hospitals, schools, dams, airports, towers and shelters are merged server-side from OSM.
- * Building footprints for shelter/evacuate come from GET /api/buildings.
+ * Authority ops console. Scene / assessment / tiles from the modular API; BIPAD facilities + Open-Meteo
+ * observed rain overlay the scene on the client. Building footprints from GET /api/buildings.
  */
 const DEFAULT_VIS: Vis = {
   terrain: true, roads: true, towers: false, weather: true, atmosphere: false, dams: true, buildings: true, schools: true, airports: true, helipads: true, army: true,
-  closures: true, flood: true, runoff: true, landslides: true, qrt: false, food: false, shelter: false, outages: true,
+  closures: true, flood: true, runoff: true, landslides: true, qrt: false, food: false, shelter: false, outages: true, alerts: true,
   shelterBuildings: true,
 };
 const TERRAIN_IDLE: TerrainResult = { status: "idle", depth0: [], medianDepth: 0, note: "Terrain agent has not run yet." };
-const WEATHER_IDLE: Weather = { inches: 10, mm: 254, lowIn: 8, highIn: 12, peakMmH: 28, label: "Heavy" };
+const WEATHER_IDLE: Weather = { inches: OBSERVED_IN, mm: OBSERVED_IN * 25.4, lowIn: Math.max(4, OBSERVED_IN - 2), highIn: OBSERVED_IN + 2, peakMmH: WEATHER.peakMmH, label: "Heavy" };
 
 export function OpsConsole() {
   const narrow = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches;
@@ -45,7 +46,7 @@ export function OpsConsole() {
   const view3d = mode === "3d";
   const [hover, setHover] = useState<string | null>(null);
   const [flying, setFlying] = useState(false);
-  const [rain, setRain] = useState(10);
+  const [rain, setRain] = useState(OBSERVED_IN);
   const [assessResult, setAssessResult] = useState<AssessmentResult | null>(null);
   const [assessBusy, setAssessBusy] = useState(false);
   const [atmosphere, setAtmosphere] = useState<AtmosphereSnapshot | null>(null);
@@ -62,15 +63,14 @@ export function OpsConsole() {
     let dead = false;
     (async () => {
       try {
-        const [s, seed, atm] = await Promise.all([
+        const [s, atm] = await Promise.all([
           ops.scene(),
-          ops.weatherSeed().catch(() => null),
           ops.atmosphere().catch(() => null),
         ]);
         if (dead) return;
-        // /api/scene already merges OSM assets (real dam names, hospitals, …).
-        setScene(s);
-        if (seed) setRain(seed.inches);
+        // Adapter scene (OSM + demo closures) then BIPAD real facilities / gauges / alerts / rain grid.
+        setScene(mergeBipadIntoScene(s));
+        setRain(OBSERVED_IN);
         if (atm) setAtmosphere(atm);
       } catch (e) {
         if (!dead) setLoadErr((e as Error).message);
@@ -186,7 +186,7 @@ export function OpsConsole() {
     { key: "pockets", label: "cut-off pockets", value: ran && pockets ? of("pocket").length : null },
     { key: "landslides", label: "landslide zones", value: ran ? of("landslide").length : null },
     { key: "schools", label: "schools at risk", value: ran ? of("school").filter((s) => s.props.risk !== "ok").length : null },
-    { key: "hospitals", label: "hospitals at risk", value: ran ? of("hospital").filter((h) => h.props.access !== "ok").length : null },
+    { key: "hospitals", label: "hospitals at risk", value: ran ? of("hospital").filter((h) => h.props.access === "lost" || h.props.access === "degraded").length : null },
     { key: "outages", label: "grid outages", value: ran ? of("outage").length : null },
     ...(bldgLayer ? [{ key: "evacuate", label: "buildings to evacuate", value: ran ? evacuate : null }] : []),
   ];
@@ -206,7 +206,7 @@ export function OpsConsole() {
         legendOpen={legendOpen} setLegendOpen={setLegendOpen} actionsDone={Object.keys(done).length} openDetails={() => setDetails(true)} />
       {hint && <div className="hint" role="status">Select a closed road to see where to send response.</div>}
       <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={startFly} onPhoto={() => { setFlying(false); setPhoto(true); }} e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setSelected(null); }} reasons={why} actions={acts} kindLabel={kindLabel} />
-      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} note={scene.note} agentLines={[`Weather agent: ${weather.label.toLowerCase()} rain, ${weather.inches} in (${Math.round(weather.mm)} mm) in 24 h, range ${weather.lowIn} to ${weather.highIn} in, peak about ${weather.peakMmH} mm/h.`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${floodPolyCount} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
+      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} note={scene.note} agentLines={[`Weather agent (real, Open-Meteo ECMWF IFS 9 km): heaviest 24 h ${WEATHER.max24hMm} mm valley average, ending ${whenText(WEATHER.max24hEnd)}; peak ${WEATHER.peakMmH} mm/h at ${whenText(WEATHER.peakAt)}. Depth model is using ${weather.inches} in (${rain === OBSERVED_IN ? "observed" : "what-if"}).`, `Terrain agent (real elevation tiles): ${terrain.note}`, `${flowText}`, `Flood depth model (illustrative): ${wet} of ${floodPolyCount} observed patches wet at this point in time, deepest ${deepest.toFixed(1)} m.`,
         bldgLayer
           ? `Shelter agent (REAL buildings, OpenStreetMap 2 Jan 2024): ${bldgLayer.list.length} shelter-relevant footprints. At this forecast ${assessed.filter((b) => b.role === "at-risk-vertical").length} flooded buildings keep floors above the water, ${evacuate} have none and must be evacuated, and ${refuges.length} dry upper-floor buildings in cut-off areas could take about ${refuges.reduce((s, b) => s + (b.capacity ?? 0), 0).toLocaleString("en-US")} people. ${bldgLayer.list.filter((b) => b.f === null).length} have no tagged height and get no judgement.`
           : "Shelter agent: real building footprints are not loaded (run scripts/fetch_buildings.mjs and start the API)."]} />
