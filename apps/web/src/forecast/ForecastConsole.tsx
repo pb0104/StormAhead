@@ -23,7 +23,12 @@ import { RainOverlay } from "./RainOverlay.tsx";
 import { Timeline } from "./Timeline.tsx";
 import { Icon } from "./Icon.tsx";
 import { Eq, RadioPanel, useRadio } from "./RadioPanel.tsx";
+import { TalkToggle, useLiveTalk } from "./ForecastTalk.tsx";
 import { getFactors, getIntent, streamForecast, type AgentResult, type Combined, type Factors, type ForecastEvent, type Intent, type Window } from "./api.ts";
+import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, socialHotspots } from "../voice/insights.ts";
+import { buildSnapshot, resolveEntity, type OpsHandle } from "../voice/opsHandle.ts";
+import { resolveAgentIds } from "../voice/agentNames.ts";
+import { voiceForAgent } from "../../../../packages/voice/agentVoices.ts";
 import "./forecast.css";
 
 type Phase = "idle" | "scoping" | "running" | "done";
@@ -81,6 +86,7 @@ export function ForecastConsole() {
   const [llmOn, setLlmOn] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [boardMin, setBoardMin] = useState(false);
+  const [focusedAgent, setFocusedAgent] = useState<string | null>(null);
   const [reportOpen, setReportOpen] = useState(false);
   const [approved, setApproved] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
@@ -177,7 +183,7 @@ export function ForecastConsole() {
     window.clearInterval(revealTimer.current);
     setOrder([]); setAgentState({}); setResults({}); setFusion([]); setCombined(null); setReport(null); setReportState("idle");
     setRan(false); setRevealN(0); setPockets(false); setAssessRain(null); setAssessResult(null); setSeries(null);
-    setVis(BASE_VIS); setActiveAlert(null); setPlaying(false); setApproved(false); setSelected(null); setReportOpen(false); setBoardMin(false);
+    setVis(BASE_VIS); setActiveAlert(null); setPlaying(false); setApproved(false); setSelected(null); setReportOpen(false); setBoardMin(false); setFocusedAgent(null);
   };
 
   const onEvent = (e: ForecastEvent) => {
@@ -297,6 +303,277 @@ export function ForecastConsole() {
 
   const select = (e: Entity | null) => { setFlying(false); setPhoto(false); setSelected(e); if (e) setActiveAlert(null); };
   const pickAlert = (id: string | null) => { setActiveAlert(id); if (id) setSelected(null); };
+
+  const askRef = useRef(ask);
+  askRef.current = ask;
+  const runRef = useRef(run);
+  runRef.current = run;
+  const phaseRef = useRef(phase);
+  phaseRef.current = phase;
+  const pickedRef = useRef(picked);
+  pickedRef.current = picked;
+  const focusedAgentRef = useRef(focusedAgent);
+  focusedAgentRef.current = focusedAgent;
+  const agentStateRef = useRef(agentState);
+  agentStateRef.current = agentState;
+  const resultsRef = useRef(results);
+  resultsRef.current = results;
+  const agentsMetaRef = useRef(factors?.agents ?? []);
+  agentsMetaRef.current = factors?.agents ?? [];
+  const talkOpenCtxRef = useRef<((t: string, opts?: { voice?: string; persona?: string }) => void) | null>(null);
+
+  const briefingFor = (id: string) => {
+    const meta = agentsMetaRef.current.find((a) => a.id === id);
+    const r = resultsRef.current[id] ?? agentStateRef.current[id]?.result;
+    if (!meta || !r) return null;
+    return {
+      id,
+      name: meta.name,
+      factor: meta.factor,
+      sources: meta.sources,
+      risk: r.risk,
+      headline: r.headline,
+      thinking: r.thinking,
+      watch: r.watch,
+      facts: r.facts,
+      alerts: r.alerts.map((a) => ({ id: a.id, title: a.title, detail: a.detail, severity: a.severity, when: a.when })),
+      by: r.by,
+    };
+  };
+
+  const focusAgentChannel = (id: string) => {
+    const brief = briefingFor(id);
+    if (!brief) return { ok: false as const, error: "agent not finished yet" };
+    setFocusedAgent(id);
+    setBoardMin(false);
+    const { voice, callSign } = voiceForAgent(id);
+    const ctx = [
+      `[OPERATOR SELECTED AGENT CHANNEL]`,
+      `Your name is ${callSign}. You are the specialist "${brief.name}" (${brief.factor}).`,
+      `Answer follow-up questions ONLY from this briefing. Cite numbers from it. Keep answers short and spoken.`,
+      `Risk: ${brief.risk}`,
+      `Headline: ${brief.headline}`,
+      `Watch: ${brief.watch || "(none)"}`,
+      `Reasoning:`,
+      ...brief.thinking.map((t, i) => `${i + 1}. ${t}`),
+      `Facts: ${JSON.stringify(brief.facts)}`,
+      `Alerts: ${brief.alerts.map((a) => a.title).join("; ") || "(none)"}`,
+      `Say your name (${callSign}) in one short sentence, then wait for questions.`,
+    ].join("\n");
+    talkOpenCtxRef.current?.(ctx, { voice, persona: callSign });
+    return { ok: true as const, agent: brief.name, callSign, voice, id };
+  };
+
+  const talkHandle = useMemo<OpsHandle>(() => ({
+    getState: () => buildSnapshot({ stage, rain: assessRain ?? OBSERVED_IN, ran, busy: phase === "running", focus: null, mode, selected, vis, done, scene }),
+    getEntityContext: () => ({
+      selected: selected ? { id: selected.id, name: selected.name, kind: selected.kind } : null,
+      reasons: why.map((r) => ({ input: r.input, text: r.text })),
+      actions: acts.map((a) => ({ id: a.id, kind: a.kind, title: a.title, detail: a.detail })),
+    }),
+    setStage: () => { /* forecast stage follows the timeline */ },
+    setRain: (inches) => setAssessRain(inches),
+    run: () => { void runRef.current(); },
+    toggle: (key) => setVis((v) => ({ ...v, [key]: !v[key] })),
+    pick: () => { /* status strip not in this console */ },
+    selectByQuery: (q) => {
+      const e = resolveEntity(scene, buildingById, q);
+      if (!e) return { ok: false, error: q.name ? `No match for "${q.name}"` : `Unknown id ${q.id ?? ""}` };
+      select(e);
+      return { ok: true, id: e.id };
+    },
+    setMode: (m) => setMode(m),
+    startFly: () => { if (!selected) return; setMode("3d"); window.setTimeout(() => setFlying(true), mode === "3d" ? 50 : 1500); },
+    openPhoto: () => { if (selected) { setFlying(false); setStreet(false); setPhoto(true); } },
+    applyDone: (actionId, modeStamp) => {
+      if (!acts.some((a) => a.id === actionId)) return { ok: false, error: "actionId not on selected entity" };
+      setDone((d) => ({ ...d, [actionId]: modeStamp }));
+      return { ok: true, simulated: true as const };
+    },
+    undoDone: (actionId) => { setDone((d) => { const n = { ...d }; delete n[actionId]; return n; }); return { ok: true }; },
+    setAlertPreview: () => {},
+    ensureLayer: (key) => setVis((v) => (v[key] ? v : { ...v, [key]: true })),
+    setInsight: () => {},
+    flyBounds: () => setFitKey((k) => k + 1),
+    showHighRainfall: (placeName) => {
+      const info = rainfallAlerts(scene);
+      const pickedAlert = pickRainfallAlert(scene, placeName);
+      if (!pickedAlert) return { ok: false, error: "no Heavy Rainfall alerts", count: 0 };
+      setVis((v) => ({ ...v, alerts: true }));
+      setRan(true);
+      select(pickedAlert);
+      setFitKey((k) => k + 1);
+      return { ok: true, count: info.count, selectedId: pickedAlert.id, selectedName: pickedAlert.name };
+    },
+    showAffectedTowers: () => {
+      const t = affectedTowers(scene);
+      setVis((v) => ({ ...v, towers: true }));
+      setRan(true);
+      if (t.entities[0]) select(t.entities[0]);
+      setFitKey((k) => k + 1);
+      return { ok: true, down: t.down, risk: t.risk, total: t.entities.length };
+    },
+    showSocialHotspots: (minPosts) => {
+      const hot = socialHotspots(minPosts && minPosts >= 2 ? minPosts : 2);
+      setVis((v) => ({ ...v, social: true }));
+      setFitKey((k) => k + 1);
+      return { ok: true, placeCount: hot.places.length, postCount: hot.ids.length, places: hot.places.slice(0, 8).map((p) => ({ name: p.name, count: p.count })) };
+    },
+    flyToPlace: (name) => {
+      const place = resolvePlace(scene, name);
+      if (!place.ok) return { ok: false, error: place.error, suggestions: place.suggestions };
+      const e = resolveEntity(scene, buildingById, { name: place.name });
+      if (e) select(e);
+      setFitKey((k) => k + 1);
+      return { ok: true, name: place.name, match: place.match };
+    },
+    clearInsights: () => {
+      setVis(BASE_VIS);
+      setSelected(null);
+      setActiveAlert(null);
+      setFitKey((k) => k + 1);
+      return { ok: true };
+    },
+    askStormAhead: async (question) => {
+      await askRef.current(question);
+      return { ok: true, opened: "factor_picker", question };
+    },
+    deployAgents: () => {
+      if (phaseRef.current === "running") return { ok: false, error: "agents already running" };
+      if (phaseRef.current !== "scoping") return { ok: false, error: "call ask_stormahead first to open the factor picker" };
+      if (!pickedRef.current.length) return { ok: false, error: "no factors selected" };
+      void runRef.current();
+      return { ok: true, deploying: pickedRef.current.length };
+    },
+    excludeAgents: (names) => {
+      if (phaseRef.current !== "scoping") return { ok: false, error: "open the factor picker with ask_stormahead first" };
+      const catalog = factors?.agents ?? [];
+      const { ids, unknown } = resolveAgentIds(names, catalog);
+      if (!ids.length) return { ok: false, error: "no matching agents", unknown, available: catalog.map((a) => a.id) };
+      let next: string[] = [];
+      setPicked((p) => {
+        next = p.filter((id) => !ids.includes(id));
+        pickedRef.current = next;
+        return next;
+      });
+      return { ok: true, removed: ids, unknown, picked: next };
+    },
+    includeAgents: (names) => {
+      if (phaseRef.current !== "scoping") return { ok: false, error: "open the factor picker with ask_stormahead first" };
+      const catalog = factors?.agents ?? [];
+      const { ids, unknown } = resolveAgentIds(names, catalog);
+      if (!ids.length) return { ok: false, error: "no matching agents", unknown, available: catalog.map((a) => a.id) };
+      let next: string[] = [];
+      setPicked((p) => {
+        next = [...new Set([...p, ...ids])];
+        pickedRef.current = next;
+        return next;
+      });
+      return { ok: true, added: ids, unknown, picked: next };
+    },
+    focusForecastAgent: (nameOrId) => {
+      const catalog = agentsMetaRef.current;
+      const { ids, unknown } = resolveAgentIds([nameOrId], catalog);
+      const id = ids[0];
+      if (!id) return { ok: false, error: "agent not found", unknown, available: catalog.map((a) => a.id) };
+      return focusAgentChannel(id);
+    },
+    getFocusedAgentBriefing: () => {
+      const id = focusedAgentRef.current;
+      if (!id) return { ok: false, error: "no agent focused — click a finished agent card first" };
+      const brief = briefingFor(id);
+      if (!brief) return { ok: false, error: "focused agent has no briefing yet" };
+      return { ok: true, ...brief };
+    },
+  }), [stage, assessRain, ran, phase, mode, selected, vis, done, scene, why, acts, buildingById, factors]);
+
+  const talk = useLiveTalk(talkHandle);
+  talkOpenCtxRef.current = talk.openWithContext;
+  useEffect(() => {
+    if (!talk.live) setFocusedAgent(null);
+  }, [talk.live]);
+  const talkSendRef = useRef(talk.send);
+  talkSendRef.current = talk.send;
+  const talkCanRef = useRef(talk.canSend);
+  talkCanRef.current = talk.canSend;
+
+  // Live + Wispr: submit when push-to-talk releases (Fn), not on a typing debounce.
+  useEffect(() => {
+    if (!talk.live) return;
+    const el = inputRef.current;
+    if (!el) return;
+    let last = el.value;
+    let waitInsertUntil = 0;
+    let flushTimer = 0;
+
+    const flush = () => {
+      window.clearTimeout(flushTimer);
+      if (!talkCanRef.current) return;
+      const raw = (inputRef.current?.value ?? "").trim();
+      if (!raw) return;
+      if (talkSendRef.current(raw)) {
+        setInput("");
+        if (inputRef.current) inputRef.current.value = "";
+        last = "";
+        waitInsertUntil = 0;
+      }
+    };
+
+    const syncFromDom = () => {
+      const v = el.value;
+      if (v === last) return;
+      const wasEmpty = !String(last).trim();
+      last = v;
+      setInput(v);
+      // Text arrived right after Fn release / paste → send.
+      if (v.trim() && performance.now() < waitInsertUntil) {
+        flush();
+        return;
+      }
+      // Fn often never reaches the page; Wispr dumps the whole phrase at once.
+      if (wasEmpty && v.trim().length >= 2) {
+        waitInsertUntil = performance.now() + 400;
+        window.clearTimeout(flushTimer);
+        flushTimer = window.setTimeout(flush, 100);
+      }
+    };
+
+    const isPttRelease = (e: KeyboardEvent) =>
+      // Wispr default on Mac is Fn / Globe.
+      e.key === "Fn" || e.code === "Fn" || e.key === "Process";
+
+    const onKeyUp = (e: KeyboardEvent) => {
+      if (!isPttRelease(e)) return;
+      // Wispr inserts the transcript after release — watch briefly, then flush.
+      waitInsertUntil = performance.now() + 900;
+      window.clearTimeout(flushTimer);
+      flushTimer = window.setTimeout(flush, 180);
+      window.setTimeout(flush, 450);
+    };
+
+    const onPaste = () => {
+      waitInsertUntil = performance.now() + 500;
+      requestAnimationFrame(() => {
+        syncFromDom();
+        flush();
+      });
+    };
+
+    window.addEventListener("keyup", onKeyUp, true);
+    el.addEventListener("input", syncFromDom);
+    el.addEventListener("change", syncFromDom);
+    el.addEventListener("paste", onPaste);
+    const poll = window.setInterval(syncFromDom, 80);
+    return () => {
+      window.removeEventListener("keyup", onKeyUp, true);
+      el.removeEventListener("input", syncFromDom);
+      el.removeEventListener("change", syncFromDom);
+      el.removeEventListener("paste", onPaste);
+      window.clearInterval(poll);
+      window.clearTimeout(flushTimer);
+    };
+  }, [talk.live]);
+
   const showBoardFull = (phase === "running" || (phase === "done" && order.length > 0)) && !boardMin;
   const panelPad = narrow ? { left: 20, right: 20, top: 80, bottom: 260 } : { left: showBoardFull ? 470 : 40, right: reportOpen ? 480 : 40, top: 90, bottom: 190 };
   const flash = (t: string) => { setToast(t); window.setTimeout(() => setToast(null), 3200); };
@@ -336,6 +613,7 @@ export function ForecastConsole() {
               <button className="fx-np-x" onClick={radio.stop} aria-label="Stop radio"><Icon name="x" size={13} /></button>
             </span>
           )}
+          <TalkToggle talk={talk} />
           <button className={`fx-tool${radioOpen ? " on" : ""}`} onClick={() => { setRadioOpen((o) => !o); setLayersOpen(false); }} aria-expanded={radioOpen}><Icon name="radio" size={16} /><span>Radio</span></button>
           <button className={`fx-tool${layersOpen ? " on" : ""}`} onClick={() => { setLayersOpen((o) => !o); setRadioOpen(false); }} aria-expanded={layersOpen}><Icon name="layers" size={16} /><span>Layers</span></button>
           <button className={`fx-tool${mode === "3d" ? " on" : ""}`} onClick={() => setMode((m) => (m === "2d" ? "3d" : "2d"))} aria-pressed={mode === "3d"}><Icon name="cube" size={16} /><span>3D</span></button>
@@ -365,7 +643,8 @@ export function ForecastConsole() {
       {/* ---------------- agents + report ---------------- */}
       {showBoard && factors && (
         <AgentBoard agents={agentsMeta} order={order} state={agentState} fusion={fusion} combined={combined} reportState={reportState} reportBy={report?.by}
-          elapsed={elapsed} minimized={boardMin} setMinimized={setBoardMin} onAlert={pickAlert} llmConfigured={llmOn} tallDock={phase === "done" && !!series} />
+          elapsed={elapsed} minimized={boardMin} setMinimized={setBoardMin} onAlert={pickAlert} llmConfigured={llmOn} tallDock={phase === "done" && !!series}
+          focusedId={focusedAgent} onFocusAgent={(id) => { focusAgentChannel(id); }} />
       )}
       {reportOpen && win && (
         <ReportPanel window={win} question={question} agents={agentsMeta} results={results} combined={combined ?? []} report={report} daily={series?.daily ?? null}
@@ -420,16 +699,49 @@ export function ForecastConsole() {
           </div>
         )}
 
-        <form className={`fx-prompt fx-glass${phase === "running" ? " busy" : ""}`} onSubmit={(e) => { e.preventDefault(); ask(input); }}>
+        <form
+          className={`fx-prompt fx-glass${phase === "running" ? " busy" : ""}${talk.live ? " talk" : ""}`}
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (talk.canSend) {
+              if (talk.send(input)) setInput("");
+              return;
+            }
+            ask(input);
+          }}
+        >
           <Icon name="sparkle" size={18} className="fx-prompt-ico" />
-          <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} disabled={phase === "running"}
-            placeholder={phase === "running" ? "Agents are working…" : phase === "done" ? "Ask a follow-up or a new question…" : "Ask StormAhead… e.g. How do the next 15 days look?"}
-            aria-label="Ask StormAhead" onKeyDown={(e) => { if (e.key === "Escape" && phase === "scoping") setPhase(order.length ? "done" : "idle"); }} />
-          {phase === "running"
+          <input
+            ref={inputRef}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            disabled={phase === "running" && !talk.canSend}
+            placeholder={
+              talk.status === "connecting" ? "Connecting spoken assistant…"
+                : talk.canSend
+                  ? (focusedAgent
+                    ? `Ask ${agentsMeta.find((a) => a.id === focusedAgent)?.name ?? "agent"}…`
+                    : "Talk: type or paste from Wispr Flow…")
+                  : phase === "running" ? "Agents are working…"
+                    : phase === "done" ? "Ask a follow-up or a new question…"
+                      : "Ask StormAhead… e.g. How do the next 15 days look?"
+            }
+            aria-label={talk.live ? "Talk to StormAhead" : "Ask StormAhead"}
+            onKeyDown={(e) => { if (e.key === "Escape" && phase === "scoping") setPhase(order.length ? "done" : "idle"); }}
+          />
+          {phase === "running" && !talk.canSend
             ? <button type="button" className="fx-send stop" onClick={stop} aria-label="Stop agents"><i /></button>
-            : <button type="submit" className="fx-send" disabled={!input.trim()} aria-label="Ask"><Icon name="send" size={17} /></button>}
+            : <button type="submit" className="fx-send" disabled={!input.trim() || (talk.live && !talk.canSend)} aria-label={talk.canSend ? "Send talk" : "Ask"}><Icon name="send" size={17} /></button>}
         </form>
-        {phase === "idle" && (
+        {talk.live && talk.log.length > 0 && (
+          <div className="fx-talk-captions fx-glass" aria-live="polite">
+            {talk.log.slice(-3).map((l, i) => (
+              <p key={i} className={l.role === "user" ? "you" : "bot"}><b>{l.role === "user" ? "You" : (talk.persona ?? "ORACLE")}</b> {l.text}</p>
+            ))}
+          </div>
+        )}
+        {talk.error && <p className="fx-err dock">{talk.error}</p>}
+        {phase === "idle" && !talk.live && (
           <div className="fx-suggest">{SUGGESTIONS.map((s) => <button key={s} onClick={() => { setInput(s); ask(s); }}>{s}</button>)}</div>
         )}
         {runErr && <p className="fx-err dock">{runErr}</p>}

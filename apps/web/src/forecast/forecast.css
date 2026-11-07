@@ -214,7 +214,20 @@
 .fx-note { margin: 0 14px 8px; padding: 7px 10px; border-radius: 9px; background: rgba(255, 201, 74, 0.07); border: 1px solid rgba(255, 201, 74, 0.2); color: #E8D9A8; font-size: 11.5px; line-height: 1.5; }
 .fx-note svg { vertical-align: -2px; margin-right: 4px; }
 .fx-agents { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 10px 12px; display: flex; flex-direction: column; gap: 7px; scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.12) transparent; }
-.fx-agent { flex: none; border: 1px solid var(--fx-line); border-radius: 12px; background: rgba(255, 255, 255, 0.025); overflow: hidden; transition: border-color 0.3s, background 0.3s; animation: fx-in 0.3s ease-out; }
+.fx-agent { flex: none; border: 1px solid var(--fx-line); border-radius: 12px; background: rgba(255, 255, 255, 0.025); overflow: hidden; transition: border-color 0.3s, background 0.3s, box-shadow 0.3s; animation: fx-in 0.3s ease-out; }
+.fx-agent.talkable .fx-agent-head:not(:disabled) { cursor: pointer; }
+.fx-agent.talkable .fx-agent-head:not(:disabled):hover { background: rgba(255, 255, 255, 0.04); }
+.fx-agent.focused {
+  border-color: rgba(94, 234, 212, 0.55);
+  background: rgba(94, 234, 212, 0.07);
+  box-shadow: inset 0 0 0 1px rgba(94, 234, 212, 0.2), 0 0 24px rgba(94, 234, 212, 0.08);
+}
+.fx-agent-end { display: inline-flex; align-items: center; gap: 6px; flex: none; }
+.fx-talking {
+  font: 600 9.5px var(--fx-mono); letter-spacing: 0.1em; text-transform: uppercase;
+  color: #042f2e; background: var(--fx-accent); padding: 2px 7px; border-radius: 999px;
+}
+.fx-note.talk-hint { color: var(--fx-accent-2); }
 .fx-agent.is-running { border-color: rgba(125, 211, 252, 0.35); background: rgba(125, 211, 252, 0.04); }
 .fx-agent.is-done.risk-severe { border-left: 2px solid var(--fx-severe); }
 .fx-agent.is-done.risk-high { border-left: 2px solid var(--fx-high); }
@@ -386,6 +399,16 @@
 .fx-pop h4 { margin: 0 0 4px; font-size: 13px; font-weight: 600; line-height: 1.35; }
 .fx-pop p { margin: 0; font-size: 12px; color: #B2C0CF; line-height: 1.5; }
 .fx-pop-when { margin-top: 7px; font: 500 11px "JetBrains Mono", ui-monospace, monospace; color: #CFE3F5; }
+
+/* Gemini Live uses the main Ask bar; captions sit above it */
+.fx-prompt.talk { box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.28), 0 10px 40px rgba(0, 0, 0, 0.45); }
+.fx-talk-captions {
+  width: min(720px, 100%); margin: 0 auto 8px; padding: 8px 12px;
+  font-size: 12.5px; color: var(--fx-mute); max-height: 72px; overflow: auto;
+}
+.fx-talk-captions p { margin: 2px 0; }
+.fx-talk-captions .you b { color: var(--fx-accent); }
+.fx-talk-captions .bot b { color: var(--fx-accent-2); }
 
 /* toast + legacy drawer placement */
 .fx-toast { position: absolute; top: 72px; left: 50%; transform: translateX(-50%); z-index: 14; display: flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 999px; font-size: 12.5px; color: #C7F5D6; animation: fx-up 0.25s ease-out; }

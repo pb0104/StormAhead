@@ -11,9 +11,11 @@ import compress from "@fastify/compress";
 import { PipelineService } from "./pipeline.ts";
 import { radioClick, radioStations } from "./radio.ts";
 import { factorList, parseIntent, runForecast, type ForecastEvent } from "./forecast/service.ts";
+import { registerLiveVoice } from "./voice/liveProxy.ts";
 
 export async function buildServer() {
   const app = Fastify({ logger: false });
+  await registerLiveVoice(app);
 
   app.setErrorHandler((err: any, _req, reply) => {
     if (err instanceof HttpError) return reply.code(err.status).send({ error: err.message });
