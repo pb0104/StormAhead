@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "StormAhead \u2014 which roads can we still use, and where should resources go? (Hurricane Helene replay + Kathmandu case study)",
+  "description": "StormAhead — which roads can we still use, and where should resources go? (Hurricane Helene replay + Kathmandu ops console / hindcast)",
   "engines": {
     "node": ">=22.5"
   },
@@ -21,12 +21,14 @@
     "@fastify/static": "^10.1.10",
     "fastify": "^5.12.8",
     "maplibre-gl": "^6.16.0",
+    "pngjs": "^7.0.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
+    "@types/pngjs": "^6.0.5",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.2.1",

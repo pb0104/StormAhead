@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analyzeCascade, DEFAULT_PARAMS, DEFAULT_SCORE, multiSourceDijkstra, scoreAgainstIncidents, type Incident, type RealArea, type RealEdge } from "../packages/analysis/cascade.ts";
+import { analyzeCascade, DEFAULT_PARAMS, DEFAULT_SCORE, multiSourceDijkstra, scoreAgainstIncidents, SHELTER, type Incident, type RealArea, type RealBuilding, type RealEdge } from "../packages/analysis/cascade.ts";
 
 const E = (u: number, v: number, minutes: number, extra: Partial<RealEdge> = {}): RealEdge => ({
   u, v, minutes, lengthM: minutes * 300, cls: "residential", bridge: false, floodedShare: 0, name: null, osmWayId: u * 100 + v,
@@ -102,5 +102,74 @@ describe("scoring against incident reports", () => {
     const s2 = scoreAgainstIncidents(a, r, list, { ...DEFAULT_SCORE, permutations: 100 });
     expect(s1.randomBaseline).toEqual(s2.randomBaseline);
     expect(scoreAgainstIncidents(a, r, [], DEFAULT_SCORE).outsideRecall).toBeNull();
+  });
+});
+
+// ---- buildings as shelter / evacuation targets ----
+const B = (id: number, node: number, floors: number | null, over: Partial<RealBuilding> = {}): RealBuilding => ({
+  id, name: `B${id}`, type: "school", lon: 85.3 + node * 0.01, lat: 27.7, node, inFlood: false, distFloodM: 3000,
+  floors, areaM2: 1000, ...over,
+});
+
+describe("building shelter assessment", () => {
+  it("a flooded building with upper floors shelters in place; a single-storey one is evacuated", () => {
+    const r = analyzeCascade(area({ buildings: [
+      B(1, 2, 4, { inFlood: true, distFloodM: 0 }),
+      B(2, 2, 1, { inFlood: true, distFloodM: 0 }),
+    ] }));
+    expect(r.buildings[0]!.role).toBe("at-risk-vertical");
+    expect(r.buildings[0]!.usableFloors).toBe(3); // 4 floors less the flooded ground floor
+    expect(r.buildings[1]!.role).toBe("at-risk-evacuate");
+    expect(r.buildings[1]!.usableFloors).toBe(0);
+    expect(r.buildings[1]!.capacity).toBe(0);
+  });
+  it("capacity uses footprint area, the usable fraction and the per-person area", () => {
+    const r = analyzeCascade(area({ buildings: [B(1, 2, 3, { areaM2: 1000 })] }));
+    expect(r.buildings[0]!.usableFloors).toBe(3); // dry: no floor lost
+    expect(r.buildings[0]!.capacity).toBe(Math.floor((1000 * SHELTER.usableFraction * 3) / SHELTER.m2PerPerson));
+  });
+  it("an untagged height yields NO judgement, never a guess", () => {
+    const r = analyzeCascade(area({ buildings: [B(1, 2, null, { inFlood: true, distFloodM: 0 })] }));
+    expect(r.buildings[0]!.role).toBe("unknown-height");
+    expect(r.buildings[0]!.usableFloors).toBeNull();
+    expect(r.buildings[0]!.capacity).toBeNull();
+    expect(r.counts.buildingsUnknownHeight).toBe(1);
+  });
+  it("a dry upper-floor building inside a cut-off area becomes a local refuge", () => {
+    const r = analyzeCascade(area({ buildings: [B(1, 7, 3), B(2, 2, 3)] }));
+    expect(r.buildings[0]!.status).toBe("cascade-isolated"); // node 7 is beyond the flooded bridge
+    expect(r.buildings[0]!.role).toBe("refuge");
+    expect(r.buildings[1]!.role).toBe("none");               // dry and still connected
+    expect(r.counts.shelterRefuge).toBe(1);
+  });
+  it("buildings are optional: results are unchanged when the layer is absent", () => {
+    const without = analyzeCascade(area());
+    expect(without.buildings).toEqual([]);
+    expect(without.counts.buildings).toBe(0);
+    const { buildings: _b, counts: c1, ...rest1 } = without;
+    const { buildings: _b2, counts: c2, ...rest2 } = analyzeCascade(area({ buildings: [B(1, 2, 3)] }));
+    expect(JSON.stringify(rest1)).toEqual(JSON.stringify(rest2)); // places/edges/hospitals untouched
+  });
+});
+
+describe("buildings as scored targets", () => {
+  const inc2 = (id: number, lon: number): Incident => ({
+    id, title: `I${id}`, lon, lat: 27.7, hazard: "Flood", floodRelated: true, hasImpact: true, distFloodM: 800, incidentOn: "2024-09-28", loss: {},
+  });
+  it("the default scoring ignores buildings, so the published headline cannot move", () => {
+    const withB = area({ buildings: [B(1, 7, 3)] });
+    const s = scoreAgainstIncidents(withB, analyzeCascade(withB), [inc2(1, 85.37)], { ...DEFAULT_SCORE, permutations: 100 });
+    expect(s.flagged.buildings).toBe(0);
+  });
+  it("includeBuildings adds them to the flagged set and to the baseline pool", () => {
+    const withB = area({ buildings: [B(1, 7, 3), B(2, 2, 3)] });
+    const s = scoreAgainstIncidents(withB, analyzeCascade(withB), [inc2(1, 85.37)], { ...DEFAULT_SCORE, permutations: 100, includeBuildings: true });
+    expect(s.flagged.buildings).toBe(1);        // only the cut-off one is flagged…
+    expect(s.randomBaseline.meanCovered).toBeGreaterThan(0); // …and the baseline draws 1 from the dry pool too
+  });
+  it("buildingsOnly drops roads and places from the target set", () => {
+    const withB = area({ buildings: [B(1, 7, 3)] });
+    const s = scoreAgainstIncidents(withB, analyzeCascade(withB), [inc2(1, 85.37)], { ...DEFAULT_SCORE, permutations: 100, buildingsOnly: true });
+    expect(s.flagged).toEqual({ places: 0, edges: 0, buildings: 1 });
   });
 });

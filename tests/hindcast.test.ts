@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { buildServer } from "../apps/api/server.ts";
 import { HttpError } from "../apps/api/common.ts";
-import { assertNetworkPreEvent, HindcastService } from "../apps/api/hindcast.ts";
+import { assertBuildingsPreEvent, assertNetworkPreEvent, HindcastService } from "../apps/api/hindcast.ts";
 
 const have = HindcastService.available();
 const d = describe.skipIf(!have);
@@ -13,6 +13,11 @@ describe("temporal guard for the real network", () => {
     expect(() => assertNetworkPreEvent(prov("2026-11-06"))).toThrow(HttpError);
     expect(() => assertNetworkPreEvent(prov("2024-09-27"))).toThrow(/Temporal separation/);
     expect(() => assertNetworkPreEvent(prov("2024-01-02", "post-event"))).toThrow();
+  });
+  it("holds the building layer to the same pre-event rule", () => {
+    expect(() => assertBuildingsPreEvent({ snapshot: "2024-01-02", phase: "pre-event" })).not.toThrow();
+    expect(() => assertBuildingsPreEvent({ snapshot: "2024-10-01", phase: "pre-event" })).toThrow(/Temporal separation/);
+    expect(() => assertBuildingsPreEvent({ snapshot: "2024-01-02", phase: "post-event" })).toThrow(HttpError);
   });
 });
 
@@ -69,5 +74,33 @@ d("Kathmandu hindcast on the real dataset", () => {
     expect(run.score.options.primaryHazards).toContain("Flood");
     expect(run.radiusSensitivity).toHaveLength(3);
     expect((await app.inject({ method: "POST", url: "/api/hindcast/run", payload: { closeShare: 5 } })).statusCode).toBe(400);
+  });
+});
+
+d("buildings as shelter targets on the real dataset", () => {
+  const h = new HindcastService();
+  const has = !!h.area.buildings?.length;
+  it.skipIf(!has)("loads pre-event footprints and never guesses an untagged height", () => {
+    const bs = h.area.buildings!;
+    expect(h.buildingsMeta!.snapshot).toBe("2024-01-02");
+    expect(bs.every((b) => b.lon > 85.2 && b.lon < 85.5 && b.lat > 27.5 && b.lat < 27.8)).toBe(true);
+    expect(bs.every((b) => b.floors === null || (b.floors >= 1 && b.floors <= 60))).toBe(true);
+    const r = h.run().result;
+    const unknown = r.buildings.filter((b) => b.role === "unknown-height");
+    expect(unknown.length).toBeGreaterThan(0);
+    expect(unknown.every((b) => b.f === null && b.cap === null)).toBe(true);
+  });
+  it.skipIf(!has)("only flooded buildings are told to shelter or evacuate", () => {
+    const bs = h.area.buildings!, r = h.run().result;
+    for (const b of r.buildings) {
+      if (b.role === "at-risk-vertical" || b.role === "at-risk-evacuate") expect(bs[b.i]!.inFlood).toBe(true);
+      if (b.role === "refuge") expect(bs[b.i]!.inFlood).toBe(false);
+    }
+  });
+  it.skipIf(!has)("reports building-target scoring alongside the primary headline, not instead of it", () => {
+    const run = h.run();
+    expect(run.score.flagged.buildings).toBe(0);              // primary target set unchanged
+    expect(run.buildingTargets!.buildingsOnly.flagged.edges).toBe(0);
+    expect(run.buildingTargets!.withBuildings.flagged.buildings).toBeGreaterThan(0);
   });
 });
