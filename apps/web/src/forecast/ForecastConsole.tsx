@@ -1093,7 +1093,7 @@ export function ForecastConsole() {
         onPhoto={() => { setFlying(false); setStreet(false); setPhoto(true); }} onStreet={() => { if (selected) { setFlying(false); setPhoto(false); setStreetPt({ id: selected.id, name: selected.name, at: selected.at }); } }}
         e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setStreet(false); setSelected(null); }}
         reasons={why} actions={acts} kindLabel={{ ...scene.kindLabel, building: "Building" }} feed={selected ? <SocialFeed onStreet={(t) => { setFlying(false); setPhoto(false); setStreetPt(t); }} at={selected.at} compact /> : null} />
-      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} note={scene.note}
+      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} note={scene.note} legacyActivity={false}
         agentLines={order.length ? order.map((id) => `${agentsMeta.find((a) => a.id === id)?.name ?? id}: ${results[id]?.headline ?? "not finished"} (${results[id]?.by === "stackai" ? "LLM via StackAI" : "rules"})`) : ["No forecast run yet. Ask a question to deploy the agents."]} />
     </div>
   );

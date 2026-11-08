@@ -59,7 +59,9 @@ function reading(a: AgentScore, truthWards: number, wards: number): string {
   return `${where} This beats same-size random sets (p = ${p.toFixed(3)}), the only row that does — but on ${c.tp} hits, and it does not hold when the road network is rebuilt one day before the event (p becomes 0.052). Treat it as noise.`;
 }
 
-export function DetailsDialog({ open, onClose, done, agentLines, note, scorecard }: { open: boolean; onClose: () => void; done: Done; agentLines: string[]; note?: string; scorecard: Scorecard | null }) {
+/** `legacyActivity` adds the old ops console's fixed agent lines. The forecast console turns it off so the Activity tab
+ * lists only the agents it actually runs. */
+export function DetailsDialog({ open, onClose, done, agentLines, note, scorecard, legacyActivity = true }: { open: boolean; onClose: () => void; done: Done; agentLines: string[]; note?: string; scorecard: Scorecard | null; legacyActivity?: boolean }) {
   type Tab = "sources" | "timeline" | "assumptions" | "activity" | "evaluation";
   const [tab, setTab] = useState<Tab>(scorecard ? "evaluation" : "sources");
   if (!open) return null;
@@ -98,7 +100,7 @@ export function DetailsDialog({ open, onClose, done, agentLines, note, scorecard
         )}
         {tab === "activity" && (
           <>
-            <ol className="plain">{[...agentLines, ...ACTIVITY].map((a) => <li key={a}>{a}</li>)}</ol>
+            <ol className="plain">{[...agentLines, ...(legacyActivity ? ACTIVITY : [])].map((a) => <li key={a}>{a}</li>)}</ol>
             <h3>Simulated actions this session</h3>
             {Object.keys(done).length ? <ul className="plain">{Object.entries(done).map(([k, v]) => <li key={k}><code>{k}</code>: {v === "issued" ? "alert issued (simulated)" : "assigned (simulated)"}</li>)}</ul> : <p className="muted">None yet. Select a closure and assign a response.</p>}
           </>
