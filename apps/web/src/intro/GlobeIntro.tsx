@@ -59,6 +59,7 @@ function Intro({ onDone }: { onDone: () => void }) {
   const starEl = useRef<HTMLCanvasElement>(null);
   const hud = useRef({ date: null as HTMLElement | null, time: null as HTMLElement | null, lat: null as HTMLElement | null, lon: null as HTMLElement | null, bar: null as HTMLElement | null });
   const [phase, setPhase] = useState<Phase>("spin");
+  const [noGl, setNoGl] = useState(false);
   const skip = useRef<() => void>(() => {});
   const root = useRef<HTMLDivElement>(null);
 
@@ -100,16 +101,14 @@ function Intro({ onDone }: { onDone: () => void }) {
           ],
         } as maplibregl.StyleSpecification,
       });
-    } catch { /* WebGL unavailable: skip straight to console */
-      finish(); return;
-    }
-    m.on("error", () => { /* tile errors are expected offline; graticule fallback stays */ });
+    } catch { m = null; setNoGl(true); } // WebGL unavailable (e.g. hardware acceleration off): HUD-only version, still plays
+    m?.on("error", () => { /* tile errors are expected offline; graticule fallback stays */ });
     const mm = m;
 
     // Target-lock marker, shown while flying in
     const lockEl = document.createElement("div");
     lockEl.innerHTML = `<div class="gi-lock"><i></i><span>LOCK · 27.70°N 85.30°E · KATHMANDU</span></div>`; // inner node: MapLibre owns the marker element's opacity on a globe
-    new maplibregl.Marker({ element: lockEl, anchor: "center" }).setLngLat(TARGET).addTo(mm);
+    if (mm) new maplibregl.Marker({ element: lockEl, anchor: "center" }).setLngLat(TARGET).addTo(mm);
 
     function setHud(lon: number, lat: number, clock: number, pct: number) {
       const h = hud.current, c = fmtClock(clock);
@@ -137,11 +136,11 @@ function Intro({ onDone }: { onDone: () => void }) {
     const tick = (now: number) => {
       if (dead || finished) return;
       const t = now - t0;
-      const lat0 = mm.getCenter().lat;
+      const lat0 = mm ? mm.getCenter().lat : START_LAT;
       if (t < SPIN_FORWARD_MS) {
         const dt = (now - lastT) / 1000;
         lon -= SPIN_FORWARD_DEG_PER_S * dt;   // Earth turns eastward: surface drifts left→right, view centre moves west
-        mm.jumpTo({ center: [lon, START_LAT], zoom: START_ZOOM });
+        mm?.jumpTo({ center: [lon, START_LAT], zoom: START_ZOOM });
         setHud(lon, lat0, NOW, 0);
       } else if (t < SPIN_FORWARD_MS + REWIND_MS) {
         if (phaseRef.cur !== "rewind") { phaseRef.cur = "rewind"; setPhase("rewind"); phaseRef.lon = lon; }
@@ -152,18 +151,20 @@ function Intro({ onDone }: { onDone: () => void }) {
         const curLon = phaseRef.lon + e * (rewindLonSpan + delta);
         const curLat = START_LAT + (TARGET[1] - START_LAT) * e;
         const zoom = START_ZOOM + (REWIND_END_ZOOM - START_ZOOM) * e;
-        mm.jumpTo({ center: [((curLon + 540) % 360) - 180, curLat], zoom });
+        mm?.jumpTo({ center: [((curLon + 540) % 360) - 180, curLat], zoom });
         const clock = NOW + (CLOCK_END - NOW) * Math.pow(e, 1.15);
         setHud(curLon, curLat, clock, e);
       } else {
         if (!flyStarted) {
           flyStarted = true; setPhase("fly");
           lockEl.firstElementChild?.classList.add("on");
-          mm.flyTo({ center: LANDING.center, zoom: LANDING.zoom, pitch: 0, bearing: 0, duration: FLY_MS, curve: 1.5, essential: true });
-          mm.once("moveend", () => { cancelAnimationFrame(raf); finish(); });
-          timers.push(window.setTimeout(finish, FLY_MS + 1500)); // safety net
+          if (mm) {
+            mm.flyTo({ center: LANDING.center, zoom: LANDING.zoom, pitch: 0, bearing: 0, duration: FLY_MS, curve: 1.5, essential: true });
+            mm.once("moveend", () => { cancelAnimationFrame(raf); finish(); });
+          }
+          timers.push(window.setTimeout(finish, FLY_MS + (mm ? 1500 : 0))); // safety net / no-WebGL path
         }
-        const c = mm.getCenter();
+        const c = mm ? mm.getCenter() : { lng: TARGET[0], lat: TARGET[1] };
         setHud(c.lng, c.lat, CLOCK_END, 1);
       }
       lastT = now;
@@ -172,7 +173,7 @@ function Intro({ onDone }: { onDone: () => void }) {
     const phaseRef = { cur: "spin" as Phase, lon: lon };
     raf = requestAnimationFrame(tick);
 
-    return () => { dead = true; cancelAnimationFrame(raf); timers.forEach(clearTimeout); try { mm.remove(); } catch { /* ignore */ } };
+    return () => { dead = true; cancelAnimationFrame(raf); timers.forEach(clearTimeout); try { mm?.remove(); } catch { /* ignore */ } };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -187,6 +188,7 @@ function Intro({ onDone }: { onDone: () => void }) {
     <div ref={root} className={`gi gi-${phase}`} onClick={() => skip.current()} role="presentation">
       <canvas ref={starEl} className="gi-stars" aria-hidden="true" />
       <div ref={mapEl} className="gi-map" aria-hidden="true" />
+      {noGl && <div className="gi-orb" aria-hidden="true" />}
       <div className="gi-scan" aria-hidden="true" />
       <div className="gi-vig" aria-hidden="true" />
       <div className="gi-hud" aria-hidden="true">

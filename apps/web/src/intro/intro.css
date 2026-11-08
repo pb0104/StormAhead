@@ -36,5 +36,6 @@
 .gi-replay:hover { opacity: 1; }
 @keyframes gi-blink { 50% { opacity: .15; } }
 @keyframes gi-pulse { from { transform: scale(.7); opacity: 1; } to { transform: scale(1.9); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .gi { display: none; } }
 @media (max-width: 640px) { .gi-date { font-size: 22px; } .gi-tr { top: 90px; left: 32px; right: auto; text-align: left; } .gi-skip kbd { display: none; } }
+.gi-orb { position: absolute; left: 50%; top: 50%; width: min(52vh, 70vw); aspect-ratio: 1; transform: translate(-50%,-50%); border-radius: 50%; background: repeating-linear-gradient(90deg, rgba(95,227,255,.22) 0 1px, transparent 1px 28px), repeating-linear-gradient(0deg, rgba(95,227,255,.18) 0 1px, transparent 1px 28px), radial-gradient(circle at 35% 30%, #1e5f8a, #08202f 70%); box-shadow: 0 0 60px rgba(80,190,255,.35), inset -30px -20px 60px rgba(0,0,0,.6); animation: gi-orb 1.6s linear infinite reverse; background-size: 28px 28px, 28px 28px, 100% 100%; }
+@keyframes gi-orb { to { background-position: 28px 0, 0 0, 0 0; } }
