@@ -17,6 +17,7 @@ import { factorList, parseIntent, runForecast, type ForecastEvent } from "./fore
 import { registerLiveVoice } from "./voice/liveProxy.ts";
 import { detourAround } from "./routes/detour.ts";
 import { HAZARDS, reliefNear, type Hazard } from "./forecast/relief.ts";
+import type { ResourcePlan } from "./forecast/agents.ts";
 
 export async function buildServer() {
   const app = Fastify({ logger: false });
@@ -205,13 +206,21 @@ export async function buildServer() {
   });
 
   // Relief needs by hazard: the last Resource allocation plan joined with power / cell / rain / landslide locations.
-  app.get("/api/relief/near", async (req) => {
-    const b = z.object({ hazards: z.string().default("power,cell,rain,landslide"), q: z.string().trim().max(120).optional(), radiusKm: z.coerce.number().min(0.2).max(10).optional() }).parse(req.query);
+  app.post("/api/relief/near", async (req) => {
+    const b = z.object({
+      hazards: z.string().default("power,cell,rain,landslide"), q: z.string().trim().max(120).optional(), radiusKm: z.coerce.number().min(0.2).max(10).optional(),
+      plan: z.object({
+        window: z.string().max(120), start: z.number().int().optional(), end: z.number().int().optional(),
+        daysCovered: z.number().nullable().optional(), askBy: z.string().max(60).nullable().optional(),
+        areas: z.array(z.object({ id: z.string(), place: z.string(), lon: z.number(), lat: z.number(), people: z.number() }).passthrough()).max(500),
+      }).optional(),
+    }).parse(req.body ?? {});
     const hz = b.hazards.split(",").map((h) => h.trim().toLowerCase()).filter((h): h is Hazard => (HAZARDS as string[]).includes(h));
     if (!hz.length) throw new HttpError(400, `hazards must be some of ${HAZARDS.join(", ")}`);
     let place: [number, number] | null = null, placeName: string | null = null;
     if (b.q) { const r = searchPlaces(b.q); if (!r.match) return { ok: false, error: `No place called "${b.q}"`, suggestions: r.suggestions.map((s) => s.name) }; place = [r.match.lon, r.match.lat]; placeName = r.match.name; }
-    return reliefNear(hz, { place, placeName, radiusKm: b.radiusKm });
+    const plan = b.plan ? { rainShareOf2024: 0, needShare: 0, ...b.plan, daysCovered: b.plan.daysCovered ?? null, askBy: b.plan.askBy ?? null } as unknown as ResourcePlan : null;
+    return reliefNear(hz, { place, placeName, radiusKm: b.radiusKm, plan });
   });
 
   // Analyst action updates: a typed sentence → structured actions (LLM) → confirmed → saved to the location's history.

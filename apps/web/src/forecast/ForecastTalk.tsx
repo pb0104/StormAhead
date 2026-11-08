@@ -60,6 +60,8 @@ function proxyHandle(ref: { current: OpsHandle }): OpsHandle {
     getRoadClosures: (q, n) => ref.current.getRoadClosures(q, n),
     showAlternativeRoutes: (q) => ref.current.showAlternativeRoutes(q),
     clearRoutes: () => ref.current.clearRoutes(),
+    closeReplay: () => ref.current.closeReplay(),
+    openReplay: () => ref.current.openReplay(),
     getReliefNeeds: (q) => ref.current.getReliefNeeds(q),
     openAllocation: (a) => ref.current.openAllocation(a),
     openStreetView: (q) => ref.current.openStreetView(q),

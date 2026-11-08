@@ -59,6 +59,10 @@ export type OpsHandle = {
   /** "If this bridge goes down": detours around a bridge/road, drawn on the map. No name/id = the selected item or open alert. */
   showAlternativeRoutes: (q: { id?: string; name?: string; avoidFlood?: boolean }) => Promise<{ ok: boolean; [k: string]: unknown }>;
   clearRoutes: () => { ok: boolean };
+  /** Close the forecast replay: the timeline goes away and the map holds the peak water moment. */
+  closeReplay: () => { ok: boolean; [k: string]: unknown };
+  /** Reopen the replay timeline (resumes at the water peak). */
+  openReplay: () => { ok: boolean; [k: string]: unknown };
   /** Relief needs (people, cost, QRT / helicopter) in areas hit by power, cell, rain or landslide hazards; labels them on the map. */
   getReliefNeeds: (q: { hazards?: string[]; near?: string }) => Promise<{ ok: boolean; [k: string]: unknown }>;
   /** Open the Allocation section, optionally on one area (place name). */

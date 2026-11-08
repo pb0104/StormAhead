@@ -103,6 +103,10 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
       });
     case "clear_routes":
       return handle.clearRoutes();
+    case "close_replay":
+      return handle.closeReplay();
+    case "open_replay":
+      return handle.openReplay();
     case "get_relief_needs":
       return handle.getReliefNeeds({
         hazards: Array.isArray(args.hazards) ? args.hazards.map(String) : undefined,

@@ -270,6 +270,17 @@ export const OPS_LIVE_TOOLS = [
     parameters: { type: "object", properties: { area: { type: "string" } }, additionalProperties: false },
   },
   {
+    name: "close_replay",
+    description:
+      "Close the forecast replay (the timeline player under the map). The timeline goes away and the map holds the PEAK WATER moment: water and rivers at their peak, all road closures and alerts shown, no rain animation. Use for 'close the replay', 'stop the replay', 'hide the timeline', 'show me the peak', 'show the worst moment'. Needs a finished forecast run; otherwise returns ok=false.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "open_replay",
+    description: "Bring the replay timeline back (it resumes at the hour the water peaks). Use for 'replay it', 'show the timeline', 'play the replay again'.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
     name: "clear_routes",
     description: "Remove the detour routes drawn by show_alternative_routes from the map.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
@@ -306,6 +317,7 @@ NAVIGATION: For "take me to X", "go to X", "zoom to X", "fly to X" — call fly_
 Map layers / rainfall / towers / social: use the map tools. Never invent a forecast — use ask_stormahead / deploy_agents.
 SOCIAL POSTS: For 'what are people saying', 'any posts near X', 'urgent needs', photos — call search_social_posts and answer only from the returned text, flagging that posts are unverified; to show one call open_social_post. You cannot post, reply or verify. If asked to draft a reply, write the text in your answer for the operator to review; nothing is ever sent.
 RADIO: You CAN control the console's Radio tab. Never say you lack access to external media or broadcasts: you have tools for it. For 'tune into BBC Nepali / local radio / news', call list_radio_stations (query: the name or 'news') then tune_radio, and stop_radio to stop. The audio plays in the operator's browser; the only thing you cannot do is hear it or summarize what is said, so say that in one short sentence and invite them to tell you what they hear. Examples: 'play BBC Nepali' -> tune_radio({name:"BBC Nepali"}); 'any Nepali news radio?' -> list_radio_stations({query:"nepali", newsOnly:true}); 'turn it off' -> stop_radio. If tune_radio returns suggestions or alsoMatched, mention the options instead of refusing.
+REPLAY: 'close the replay' / 'show the peak water' call close_replay (the map then holds the peak water moment); 'replay it' / 'bring back the timeline' call open_replay. Say in one sentence what the map now shows.
 RELIEF & RESOURCES: For who needs help, relief, budget, supplies, vehicles, QRT teams or 'how long does the fund last', especially tied to outages, cell loss, heavy rain or landslides, call get_relief_needs with the matching hazards (power, cell, rain, landslide; several for combined questions) and answer with people, budget, how they are reached (road QRT or helicopter) and the fund's days left, naming the top one or two areas. Then offer open_allocation (pass the area to open on it). Numbers are estimates: say 'about'. If the Relief budget agent has not run, offer include_agents ['resources'] and deploy.
 DETOURS: For 'alternative routes if this bridge goes down', 'how do we get across if X closes' or 'show me another way around', call show_alternative_routes with the bridge name or id (no arguments = the selected item or open alert), then say the best route's extra minutes and main roads in one sentence; clear_routes removes them. If it says the far side is cut off, say so plainly.
 ROADS & STREET VIEW: For closed roads, cut-off areas, or hospital access call get_road_closures (pass a place/hospital as query) and answer only from its data; to show one, select_entity with its id. For 'show me street view of X' or 'what does it look like there' call open_street_view (close_street_view to leave). If it reports Street View is not configured, say so in one sentence.

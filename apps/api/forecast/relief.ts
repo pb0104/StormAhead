@@ -3,7 +3,7 @@
  * need?" — joins the last Resource allocation plan (per-area people, cost, QRT or helicopter) with hazard locations.
  * The geography is done here, not by the LLM. Areas match a hazard when they lie within its radius.
  */
-import { lastResourcePlan, load, rainStats, type AreaAllocation, type Ctx } from "./agents.ts";
+import { lastResourcePlan, load, rainStats, type AreaAllocation, type Ctx, type ResourcePlan } from "./agents.ts";
 
 type Pt = [number, number];
 export type Hazard = "power" | "cell" | "rain" | "landslide";
@@ -48,12 +48,25 @@ function hazardSpots(h: Hazard, plan: { start?: number; end?: number }): { spots
 
 const npr = (n: number) => `NPR ${n >= 1e7 ? `${(n / 1e7).toFixed(2)} crore` : n >= 1e5 ? `${(n / 1e5).toFixed(1)} lakh` : Math.round(n).toLocaleString("en-US")}`;
 
-export function reliefNear(hazards: Hazard[], opts: { place?: Pt | null; placeName?: string | null; radiusKm?: number } = {}) {
-  const plan = lastResourcePlan();
-  if (!plan || !plan.areas.length) {
-    return { ok: false as const, error: plan ? "The last relief plan allocated nothing (rain too light for displacement)." : "The Relief budget agent has not run yet. Deploy it (agent id 'resources') with the others, then ask again." };
+/**
+ * `given` is the plan the browser is showing (sent with the request), so a server reload cannot lose it; the
+ * server's own last plan is the fallback.
+ */
+export function reliefNear(hazards: Hazard[], opts: { place?: Pt | null; placeName?: string | null; radiusKm?: number; plan?: ResourcePlan | null } = {}) {
+  const plan = opts.plan ?? lastResourcePlan();
+  if (!plan) {
+    return { ok: false as const, error: "The Relief budget agent has not run yet. Offer to include it (agent id 'resources') and deploy, then ask again." };
   }
   const per = hazards.map((h) => ({ h, ...hazardSpots(h, plan) }));
+  if (!plan.areas.length) {
+    // Standby window: no relief is allocated, but the operator still asked where the hazards are.
+    return {
+      ok: true as const, window: plan.window, hazards, standby: true,
+      answer: "No relief is allocated in this window: the rain is too light to expect people to be displaced. Stock stays on standby. For a relief plan, ask about a longer window (e.g. the next 7 or 15 days) with the Relief budget agent.",
+      hazardsFound: Object.fromEntries(per.map((p) => [p.h, { count: p.spots.length, examples: p.spots.slice(0, 4).map((s) => s.label), source: p.source }])),
+      totals: { areas: 0, people: 0, allocated: "NPR 0 (standby)" }, areas: [],
+    };
+  }
   const rows = plan.areas.map((a: AreaAllocation) => {
     const hits = per.flatMap(({ h, spots }) => {
       let best: Spot | null = null, bd = Infinity;
@@ -78,6 +91,12 @@ export function reliefNear(hazards: Hazard[], opts: { place?: Pt | null; placeNa
       foodKgPerDay: sum((a) => a.foodKgPerDay), waterLPerDay: sum((a) => a.waterLPerDay), shelterKits: sum((a) => a.shelterKits),
     },
     fund: { daysCovered: plan.daysCovered, requestNationalAidBy: plan.askBy },
+    vehiclesNeeded: (() => {
+      const by = new Map<string, number>();
+      for (const r of matched) for (const v of r.a.vehicles ?? []) by.set(v.label, (by.get(v.label) ?? 0) + v.count);
+      return [...by].map(([label, count]) => `${count} × ${label}`);
+    })(),
+    vehicleAvailability: "The plan sizes vehicles to the need; how many are actually available is not tracked (vehicle and QRT rates are mocked). Say what is needed, not that there are enough.",
     areas: matched.slice(0, 12).map(({ a, hits }) => ({
       id: a.id, place: a.place, lon: a.lon, lat: a.lat, people: a.people, households: a.households,
       reach: a.by === "helicopter" ? "helicopter (cut off by road)" : "road", from: a.from, qrtTeams: a.qrtTeams,

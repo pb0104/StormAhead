@@ -112,6 +112,8 @@ export function ForecastConsole() {
   const [series, setSeries] = useState<{ hourly: number[]; daily: { day: string; mm: number }[]; peak: number; max24: number } | null>(null);
   const [cursor, setCursor] = useState(0);
   const [playing, setPlaying] = useState(false);
+  // Replay open = the map follows the timeline hour by hour. Closed = the map holds the peak water moment.
+  const [replay, setReplay] = useState(true);
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const [fitKey, setFitKey] = useState(0);
   const [goto, setGoto] = useState<{ lon: number; lat: number; zoom?: number; key: number } | null>(null);
@@ -297,7 +299,7 @@ export function ForecastConsole() {
     window.clearInterval(revealTimer.current);
     setOrder([]); setAgentState({}); setResults({}); setFusion([]); setCombined(null); setReport(null); setReportState("idle");
     setRan(false); setRevealN(0); setPockets(false); setAssessRain(null); setAssessResult(null); setSeries(null);
-    setVis(BASE_VIS); setActiveAlert(null); setPlaying(false); setApproved(false); setSelected(null); setReportOpen(false); setBoardMin(false);
+    setVis(BASE_VIS); setActiveAlert(null); setPlaying(false); setReplay(true); setApproved(false); setSelected(null); setReportOpen(false); setBoardMin(false);
   };
 
   const onEvent = (e: ForecastEvent) => {
@@ -334,7 +336,7 @@ export function ForecastConsole() {
       case "report": setReport({ markdown: e.markdown, by: e.by, error: e.error }); setReportState("done"); actionsApi.view().then(setActionsView).catch(() => {}); break;
       case "done":
         setPhase("done"); setElapsed(e.ms); setFitKey((k) => k + 1);
-        window.setTimeout(() => { setBoardMin(true); setCursor(0); setPlaying(true); }, 900);
+        window.setTimeout(() => { setBoardMin(true); setReplay(true); setCursor(0); setPlaying(true); }, 900);
         break;
       case "error": setRunErr(e.message); break;
     }
@@ -358,7 +360,7 @@ export function ForecastConsole() {
   const startIdx = win?.startIdx ?? 0;
   const pins = useMemo<MapAlertPin[]>(() => {
     const name = new Map((factors?.agents ?? []).map((a) => [a.id, a.factor]));
-    const showAt = (at: number | null) => phase !== "done" || at === null || at - startIdx <= cursor;
+    const showAt = (at: number | null) => phase !== "done" || !replay || at === null || at - startIdx <= cursor;
     const single = Object.values(results).flatMap((r) => r.alerts).map((a) => ({
       id: a.id, lon: a.lon, lat: a.lat, severity: a.severity, title: a.title, detail: a.detail, when: a.when, source: `${name.get(a.agent) ?? a.agent} agent`, visible: showAt(a.at),
     }));
@@ -366,7 +368,7 @@ export function ForecastConsole() {
       id: c.id, lon: c.lon, lat: c.lat, severity: c.severity, title: c.title, detail: `${coverageText(liveCov[c.id] ?? c.coverage)} ${c.why.join(" · ")}`.trim(), when: c.when, source: "Coordinator · combined finding", priority: c.priority, visible: showAt(c.at),
     }));
     return [...single, ...comb];
-  }, [results, combined, cursor, phase, startIdx, factors, liveCov]);
+  }, [results, combined, cursor, phase, startIdx, factors, liveCov, replay]);
   const actionPins = useMemo(() => (actionsView?.locations ?? []).map((l) => ({ id: l.key, lon: l.lon, lat: l.lat, name: l.name, label: locationLabel(l), active: locFocus === l.key })), [actionsView, locFocus]);
 
   const stationPins = useMemo(() => (radioOpen || radio.current
@@ -385,6 +387,7 @@ export function ForecastConsole() {
       if (w?.status === "done" && series) return Math.min(1, 0.25 + series.max24 / 200);
       return 0;
     }
+    if (phase === "done" && series && !replay) return 0; // held peak-water view: no rain animation
     if (phase === "done" && series) {
       const max = Math.max(0.1, ...series.hourly), v = series.hourly[Math.min(cursor, series.hourly.length - 1)] ?? 0;
       return v <= 0.05 ? 0 : Math.min(1, 0.12 + Math.pow(v / max, 0.6) * 0.88);
@@ -403,7 +406,7 @@ export function ForecastConsole() {
   }, [series]);
   const gauge = results["rivers"]?.map as { station: string; stageM: (number | null)[]; level: (number | null)[]; dangerLevel: number; warningLevel: number } | undefined;
   const atHour = <T,>(a: T[] | undefined | null) => (a && a.length ? a[Math.max(0, Math.min(a.length - 1, cursor))] : undefined);
-  const playback = phase === "done" && !!win;
+  const playback = phase === "done" && !!win && replay;
   const waterLevel = playback && reservoir ? atHour(reservoir) ?? 1 : ran ? 1 : 0;
   // Rivers follow the real gauge where it has readings, and the rain model where it doesn't (null = no reading).
   const riverLevel = playback ? atHour(gauge?.level) ?? waterLevel : results["rivers"] ? 1 : waterLevel;
@@ -413,6 +416,14 @@ export function ForecastConsole() {
     reservoir ? `water ${Math.round(waterLevel * 100)}% of peak` : null,
     gauge && stageNow !== null && stageNow !== undefined ? `${gauge.station.replace(/ River at /, " at ")} ${stageNow.toFixed(1)} m${stageNow >= gauge.dangerLevel ? " · above danger" : stageNow >= gauge.warningLevel ? " · above warning" : ""}` : null,
   ].filter(Boolean).join(" · ") : "";
+
+  const replayRef = useRef(replay); replayRef.current = replay;
+  const closeReplay = () => { setPlaying(false); setReplay(false); };
+  const openReplay = () => {
+    // Resume where the water peaks, not from the start.
+    const pk = reservoir ? Math.max(0, reservoir.indexOf(Math.max(...reservoir))) : 0;
+    setCursor(pk); setReplay(true);
+  };
 
   const depths = assessResult?.depths ?? [];
   const floodFc = assessResult?.floodFc ?? { type: "FeatureCollection" as const, features: [] };
@@ -535,6 +546,7 @@ export function ForecastConsole() {
           ? { id: selectedRef.current.id, name: selectedRef.current.name, kind: selectedRef.current.kind }
           : null,
         activeAlertId: activeAlertRef.current,
+        replayOpen: replayRef.current,
         radio: { panelOpen: radioOpenRef.current, nowPlaying: radioRef.current.current?.name ?? null, state: radioRef.current.state, note: "listen-only: you cannot hear it" },
         streetView: { open: streetRef.current, available: !!streetKey },
         socialPosts: { layerOn: !!visRef.current.social, ...socialOverview(), hint: "call search_social_posts to read posts" },
@@ -692,12 +704,26 @@ export function ForecastConsole() {
       };
     },
     clearRoutes: () => { setDetour(null); return { ok: true }; },
+    closeReplay: () => {
+      if (phaseRef.current !== "done" || !winRef.current) return { ok: false, error: "There is no finished forecast replay to close. Deploy the agents first." };
+      closeReplay();
+      return { ok: true, showing: "the peak water moment: water and rivers at peak, all road closures and alerts, no rain animation", reopen: "open_replay or the Replay button" };
+    },
+    openReplay: () => {
+      if (phaseRef.current !== "done" || !winRef.current) return { ok: false, error: "There is no finished forecast to replay. Deploy the agents first." };
+      openReplay();
+      return { ok: true, showing: "the replay timeline, resumed at the water peak; press play to run it" };
+    },
     getReliefNeeds: async (q) => {
-      const qs = new URLSearchParams({ hazards: (q.hazards?.length ? q.hazards : ["power", "cell", "rain", "landslide"]).join(",") });
-      if (q.near) qs.set("q", q.near);
+      // Send the plan this screen is showing, so a server reload since the run cannot lose it.
+      const res = resultsRef.current["resources"];
+      const m = res?.map as { areas?: unknown[]; totals?: { days?: number | null; askBy?: string | null; window?: string } } | undefined;
+      const w = winRef.current;
+      const plan = res && m ? { window: m.totals?.window ?? w?.label ?? "", start: w?.startIdx, end: w ? w.startIdx + w.hours : undefined, daysCovered: m.totals?.days ?? null, askBy: m.totals?.askBy ?? null, areas: m.areas ?? [] } : undefined;
+      const body = { hazards: (q.hazards?.length ? q.hazards : ["power", "cell", "rain", "landslide"]).join(","), ...(q.near ? { q: q.near } : {}), ...(plan ? { plan } : {}) };
       type Res = { ok: boolean; error?: string; areas?: { id: string; place: string; lon: number; lat: number; people: number; allocated: string; reach: string; hazards: { hazard: string }[] }[]; [k: string]: unknown };
       let r: Res;
-      try { r = await fetch(`/api/relief/near?${qs}`).then((x) => x.json()) as Res; }
+      try { r = await fetch("/api/relief/near", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }).then((x) => x.json()) as Res; }
       catch (e) { return { ok: false, error: `Relief service unreachable: ${(e as Error).message}` }; }
       if (!r.ok) return r as { ok: false; error?: string };
       const areas = r.areas ?? [];
@@ -1080,8 +1106,14 @@ export function ForecastConsole() {
 
       {/* ---------------- bottom: timeline + prompt ---------------- */}
       <div className={`fx-dock${phase === "idle" ? " idle" : ""}${(reportOpen || actionsOpen || radioOpen) && !narrow ? " with-report" : ""}`}>
-        {phase === "done" && series && win && (
-          <Timeline startIso={win.start} hours={win.hours} hourly={series.hourly} ticks={ticks} cursor={cursor} setCursor={setCursor} playing={playing} setPlaying={setPlaying} peak={series.peak} readout={readout} level={reservoir} />
+        {phase === "done" && series && win && replay && (
+          <Timeline startIso={win.start} hours={win.hours} hourly={series.hourly} ticks={ticks} cursor={cursor} setCursor={setCursor} playing={playing} setPlaying={setPlaying} peak={series.peak} readout={readout} level={reservoir} onClose={closeReplay} />
+        )}
+        {phase === "done" && series && win && !replay && (
+          <div className="fx-peakbar fx-glass" role="status">
+            <i /><span>Map shows the peak water moment</span>
+            <button type="button" onClick={openReplay}><Icon name="play" size={12} /> Replay the window</button>
+          </div>
         )}
 
         {phase === "scoping" && intent && factors && (

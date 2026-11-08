@@ -58,6 +58,8 @@ export function VoiceDock({ handle }: { handle: OpsHandle }) {
     getRoadClosures: (q, n) => handleRef.current.getRoadClosures(q, n),
     showAlternativeRoutes: (q) => handleRef.current.showAlternativeRoutes(q),
     clearRoutes: () => handleRef.current.clearRoutes(),
+    closeReplay: () => handleRef.current.closeReplay(),
+    openReplay: () => handleRef.current.openReplay(),
     getReliefNeeds: (q) => handleRef.current.getReliefNeeds(q),
     openAllocation: (a) => handleRef.current.openAllocation(a),
     openStreetView: (q) => handleRef.current.openStreetView(q),

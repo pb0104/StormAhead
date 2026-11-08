@@ -15,6 +15,8 @@ export type TimelineProps = {
   readout?: string;
   /** 0..1 water level per hour, drawn as a filled curve behind the rain bars. */
   level?: number[] | null;
+  /** Close the replay: the timeline goes away and the map holds the peak water moment. */
+  onClose?: () => void;
 };
 
 export function Timeline(p: TimelineProps) {
@@ -53,6 +55,11 @@ export function Timeline(p: TimelineProps) {
           <line x1={p.cursor * bw} x2={p.cursor * bw} y1={0} y2={H} className="head" />
         </svg>
       </div>
+      {p.onClose && (
+        <button type="button" className="fx-tl-close" onClick={p.onClose} aria-label="Close replay" title="Close replay and show the peak water moment">
+          <Icon name="x" size={15} />
+        </button>
+      )}
     </div>
   );
 }
