@@ -883,8 +883,8 @@ export function ForecastConsole() {
           <span className="fx-clock" title="Replay of the September 2024 floods. The scenario clock is fixed before the event."><i className="fx-live" /> Replay · {factors?.nowLabel ?? "Thu 26 Sep, 06:00"} 2024 NPT</span>
         </div>
         <div className="fx-tools fx-glass">
-          <span className={`fx-llm ${factors?.llm.configured ? "on" : "off"}`} title={factors?.llm.configured ? "LLM reasoning via StackAI" : `StackAI not configured: missing ${factors?.llm.missing.join(", ")}`}>
-            <i /> {factors?.llm.configured ? "StackAI" : "LLM offline"}
+          <span className={`fx-llm ${factors?.llm.configured ? "on" : "off"}`} role="img" aria-label={factors?.llm.configured ? "LLM online" : "LLM offline"} title={factors?.llm.configured ? "LLM reasoning via StackAI" : `StackAI not configured: missing ${factors?.llm.missing.join(", ")}`}>
+            <i />
           </span>
           {radio.current && !radioOpen && (
             <span className={`fx-np-pill ${radio.state}`}>
