@@ -202,27 +202,37 @@ export function ForecastConsole() {
     if (!list?.length) return;
     try { setLiveCov(await actionsApi.coverage(list.map((c) => ({ id: c.id, lon: c.lon, lat: c.lat })))); } catch { /* keep last */ }
   };
-  const logUpdate = async (text: string) => {
+  const logUpdate = async (text: string): Promise<Proposal | null> => {
     setRunErr(null); setParsing(true); setProposal(null); setPicking(null);
-    try { setProposal(await actionsApi.parse(text)); setInput(""); }
-    catch (e) { setRunErr(`Couldn't read that update: ${(e as Error).message}`); }
+    try { const p = await actionsApi.parse(text); setProposal(p); setInput(""); return p; }
+    catch (e) { setRunErr(`Couldn't read that update: ${(e as Error).message}`); return null; }
     finally { setParsing(false); }
   };
-  const confirmUpdate = async () => {
-    if (!proposal || saving) return;
+  /** Save a confirmed proposal (the Confirm button and ORACLE both come through here). */
+  const saveProposal = async (p: Proposal) => {
     setSaving(true);
     try {
-      const r = await actionsApi.save(proposal);
+      const r = await actionsApi.save(p);
       setActionsView({ items: r.items, locations: r.locations, next: r.next });
       setProposal(null); setPicking(null); setFollowup(r.followup);
       const at = r.saved.find((a) => a.place)?.place;
       if (at) { setFlyTo({ lon: at.lon, lat: at.lat, key: Date.now() }); setLocFocus(r.locations.find((l) => Math.hypot((l.lon - at.lon) * 98.6, (l.lat - at.lat) * 110.6) < 0.3)?.key ?? null); }
-      refreshCoverage(combined);
-    } catch (e) { setRunErr(`Couldn't save: ${(e as Error).message}`); }
+      refreshCoverage(combinedRef.current);
+      return { ok: true as const, saved: r.saved.map((a) => ({ id: a.id, summary: a.summary, place: a.place?.name ?? null })), followup: r.followup.text };
+    } catch (e) { setRunErr(`Couldn't save: ${(e as Error).message}`); return { ok: false as const, error: (e as Error).message }; }
     finally { setSaving(false); }
   };
+  const confirmUpdate = async () => { if (proposal && !saving) await saveProposal(proposal); };
   const undoAction = async (id: string) => {
-    try { setActionsView(await actionsApi.remove(id)); refreshCoverage(combined); } catch (e) { setRunErr((e as Error).message); }
+    try { setActionsView(await actionsApi.remove(id)); refreshCoverage(combinedRef.current); return true; } catch (e) { setRunErr((e as Error).message); return false; }
+  };
+  const editAction = async (id: string, changes: Parameters<typeof actionsApi.edit>[1]) => {
+    const r = await actionsApi.edit(id, changes);
+    setActionsView({ items: r.items, locations: r.locations, next: r.next });
+    refreshCoverage(combinedRef.current);
+    const at = r.item.place;
+    if (at) setFlyTo({ lon: at.lon, lat: at.lat, key: Date.now() });
+    return r.item;
   };
   const onMapPick = (at: [number, number]) => {
     if (!picking || !proposal) return;
@@ -263,6 +273,9 @@ export function ForecastConsole() {
     const upd = (id: string, f: (s: AgentState) => AgentState) => setAgentState((m) => (m[id] ? { ...m, [id]: f(m[id]!) } : m));
     switch (e.type) {
       case "run":
+        // A new run starts a clean action log (the server has already switched); clear what the screen shows.
+        setProposal(null); setPicking(null); setFollowup(null); setLocFocus(null); setLiveCov({});
+        actionsApi.view().then(setActionsView).catch(() => {});
         setWin(e.window); setOrder(e.agents); setLlmOn(e.llm.configured); setCursor(e.window.hours);
         setAgentState(Object.fromEntries(e.agents.map((id) => [id, { status: "queued", steps: [] } as AgentState])));
         break;
@@ -435,6 +448,10 @@ export function ForecastConsole() {
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
   const sceneRef = useRef(scene);
+  const proposalRef = useRef(proposal); proposalRef.current = proposal;
+  const actionsViewRef = useRef(actionsView); actionsViewRef.current = actionsView;
+  const actionFns = useRef({ logUpdate, saveProposal, undoAction, editAction });
+  actionFns.current = { logUpdate, saveProposal, undoAction, editAction };
   sceneRef.current = scene;
   const buildOracleContext = () => {
     const meta = agentsMetaRef.current;
@@ -490,6 +507,13 @@ export function ForecastConsole() {
       fusionSteps: fusionRef.current,
       combined: combinedRef.current,
       placesNearby: uniquePlaces,
+      actionsOnGround: {
+        note: "Actions analysts logged in THIS run (a new run starts a clean log). Use list_actions for ids before editing or removing.",
+        count: actionsViewRef.current?.items.length ?? 0,
+        locations: (actionsViewRef.current?.locations ?? []).map((l) => ({ name: l.name, resources: l.resources, evacuated: l.evacuated, shelteredHere: l.received, lines: l.lines.map((x) => x.summary) })),
+        next: actionsViewRef.current?.next.text ?? null,
+        pendingConfirmation: proposalRef.current ? proposalRef.current.line : null,
+      },
       report: reportRef.current
         ? { by: reportRef.current.by, markdown: reportRef.current.markdown.slice(0, 4000), error: reportRef.current.error }
         : null,
@@ -551,9 +575,24 @@ export function ForecastConsole() {
       setFitKey((k) => k + 1);
       return { ok: true, placeCount: hot.places.length, postCount: hot.ids.length, places: hot.places.slice(0, 8).map((p) => ({ name: p.name, count: p.count })) };
     },
-    flyToPlace: (name) => {
+    flyToPlace: async (name) => {
       const place = resolvePlace(scene, name);
-      if (!place.ok) return { ok: false, error: place.error, suggestions: place.suggestions };
+      if (!place.ok) {
+        // Not a social-post place or a scene facility: search the full place index on the server (OSM places such as
+        // Tigani, wards, open spaces, hospitals, schools, named buildings). Alert titles use these names.
+        try {
+          const r = await fetch(`/api/places/search?q=${encodeURIComponent(name)}`).then((x) => x.json()) as { match: { name: string; lon: number; lat: number; kind: string } | null; suggestions: { name: string }[] };
+          if (r.match) {
+            setSelected(null); setActiveAlert(null);
+            setGoto((g) => ({ lon: r.match!.lon, lat: r.match!.lat, zoom: 14.6, key: (g?.key ?? 0) + 1 }));
+            return { ok: true, name: r.match.name, match: r.match.kind, lon: r.match.lon, lat: r.match.lat, selectedId: null };
+          }
+          const suggestions = [...new Set([...place.suggestions, ...r.suggestions.map((x) => x.name)])].slice(0, 6);
+          return { ok: false, error: suggestions.length ? "not found; did you mean one of these?" : "place not found", suggestions };
+        } catch {
+          return { ok: false, error: place.error, suggestions: place.suggestions };
+        }
+      }
       const e = resolveEntity(scene, buildingById, { name: place.name })
         ?? resolveEntity(scene, buildingById, { name })
         ?? (scene?.entities ?? []).find((x) => x.name.toLowerCase() === place.name.toLowerCase())
@@ -609,6 +648,42 @@ export function ForecastConsole() {
       return { ok: true, added: ids, unknown, picked: next };
     },
     getOracleContext: () => buildOracleContext(),
+    listActions: () => {
+      const v = actionsViewRef.current;
+      return {
+        ok: true,
+        count: v?.items.length ?? 0,
+        actions: (v?.items ?? []).map((a) => ({ id: a.id, time: a.loggedAt.slice(11, 16), kind: a.kind, summary: a.summary, resource: a.resource, people: a.people, place: a.place?.name ?? a.placeText, destination: a.dest?.name ?? a.destText })),
+        next: v?.next.text ?? null,
+        pendingConfirmation: proposalRef.current?.line ?? null,
+      };
+    },
+    logAction: async (text) => {
+      setPromptMode("update");
+      const p = await actionFns.current.logUpdate(text);
+      if (!p) return { ok: false, error: "Couldn't read that update" };
+      if (!p.actions.length) return { ok: false, error: p.warnings[0] ?? "No action found in that sentence" };
+      return { ok: true, pending: true, line: p.line, warnings: p.warnings, note: "Shown on screen for confirmation. Read the line back; call confirm_action_update only after the operator agrees." };
+    },
+    confirmActionUpdate: async () => {
+      const p = proposalRef.current;
+      if (!p) return { ok: false, error: "Nothing waiting for confirmation" };
+      return actionFns.current.saveProposal(p);
+    },
+    cancelActionUpdate: () => {
+      if (!proposalRef.current) return { ok: false, error: "Nothing waiting for confirmation" };
+      setProposal(null); setPicking(null);
+      return { ok: true };
+    },
+    editAction: async (id, changes) => {
+      try { const item = await actionFns.current.editAction(id, changes); return { ok: true, id: item.id, summary: item.summary, place: item.place?.name ?? null }; }
+      catch (e) { return { ok: false, error: (e as Error).message }; }
+    },
+    removeAction: async (id) => {
+      const a = actionsViewRef.current?.items.find((x) => x.id === id);
+      if (!a) return { ok: false, error: "No action with that id in this run" };
+      return (await actionFns.current.undoAction(id)) ? { ok: true, removed: a.summary } : { ok: false, error: "Couldn't remove it" };
+    },
   }), [stage, assessRain, ran, phase, mode, selected, vis, done, scene, why, acts, buildingById, factors, boardMin, reportOpen]);
 
   const talk = useLiveTalk(talkHandle);

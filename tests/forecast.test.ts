@@ -95,3 +95,20 @@ describe("Google base imagery proxy", () => {
     expect(googleStatus().usedToday).toBe(0);
   });
 });
+
+import { searchPlaces } from "../apps/api/actions/actions.ts";
+describe("place search for navigation", () => {
+  it("finds localities named in alerts, and suggests the right one for a misheard name", () => {
+    expect(searchPlaces("tigani").match?.name).toBe("Tigani");
+    const misheard = searchPlaces("Tigany");
+    expect(misheard.match).toBeNull();
+    expect(misheard.suggestions[0]?.name).toBe("Tigani");
+    expect(searchPlaces("Zzyzx").suggestions).toEqual([]);
+  });
+});
+describe("place search tolerates the spoken command", () => {
+  it("strips 'fly me to'", () => {
+    expect(searchPlaces("Fly me to Tigani").match?.name).toBe("Tigani");
+    expect(searchPlaces("take me to the Khoria area").match?.name).toBe("Khoria");
+  });
+});

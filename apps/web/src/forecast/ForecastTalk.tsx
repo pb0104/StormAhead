@@ -56,6 +56,12 @@ function proxyHandle(ref: { current: OpsHandle }): OpsHandle {
     excludeAgents: (n) => ref.current.excludeAgents(n),
     includeAgents: (n) => ref.current.includeAgents(n),
     getOracleContext: () => ref.current.getOracleContext(),
+    listActions: () => ref.current.listActions(),
+    logAction: (t) => ref.current.logAction(t),
+    confirmActionUpdate: () => ref.current.confirmActionUpdate(),
+    cancelActionUpdate: () => ref.current.cancelActionUpdate(),
+    editAction: (id, c) => ref.current.editAction(id, c),
+    removeAction: (id) => ref.current.removeAction(id),
   };
 }
 

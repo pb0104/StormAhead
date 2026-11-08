@@ -119,7 +119,7 @@ export const OPS_LIVE_TOOLS = [
   {
     name: "fly_to_place",
     description:
-      "Fly/zoom the map to a named place. Use for 'take me to…', 'go to…', 'zoom to…', 'show me…' a location (district, town, facility, alert place). Pass the place name they said.",
+      "Fly/zoom the map to a named place. Use for 'take me to…', 'go to…', 'zoom to…', 'show me…' a location: neighbourhoods and localities (e.g. Tigani, Khoria), wards (Lalitpur-12), open spaces, hospitals, schools, facilities and any place named in an alert. Pass the place name they said; if it returns suggestions, offer the closest one.",
     parameters: {
       type: "object",
       properties: { name: { type: "string" } },
@@ -140,6 +140,64 @@ export const OPS_LIVE_TOOLS = [
     },
   },
   {
+    name: "list_actions",
+    description: "List the actions analysts have logged on the ground in THIS forecast run (id, time, what, where, how many people), plus the next recommendation. Call before editing or removing, or when asked what has been done.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "log_action",
+    description: "Log something the operator says was DONE on the ground (e.g. 'Sent QRT-2 to Balkhu, 40 people moved to Kalimati open space'). Parses it and shows a one-line confirmation on screen; it is NOT saved yet. Read the returned line back to the operator.",
+    parameters: {
+      type: "object",
+      properties: { text: { type: "string", description: "What was done, in the operator's words" } },
+      required: ["text"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "confirm_action_update",
+    description: "Save the action update waiting on screen. Call ONLY after the operator agrees to the line you read back; set confirmed=true.",
+    parameters: {
+      type: "object",
+      properties: { confirmed: { type: "boolean", description: "true only after the operator agreed" } },
+      required: ["confirmed"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "cancel_action_update",
+    description: "Discard the action update waiting on screen without saving.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
+    name: "edit_action",
+    description: "Correct a logged action (get its id from list_actions). Change only the fields the operator corrects. A new place name must exist on the map; if it isn't found, tell the operator.",
+    parameters: {
+      type: "object",
+      properties: {
+        id: { type: "string", description: "Action id from list_actions" },
+        kind: { type: "string", enum: ["dispatch", "evacuate", "supply", "shelter", "rescue", "alert", "road", "other"] },
+        resource: { type: "string", description: "Team, vehicle or supply, e.g. QRT-5, 2 boats" },
+        people: { type: "number", description: "Number of people" },
+        place: { type: "string", description: "Where the help went, or where people were moved from" },
+        destination: { type: "string", description: "Where people or goods were moved to" },
+        summary: { type: "string", description: "Optional one-line summary; otherwise rebuilt from the fields" },
+      },
+      required: ["id"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "remove_action",
+    description: "Remove a logged action (id from list_actions). Say which action you will remove and call with confirmed=true only after the operator agrees.",
+    parameters: {
+      type: "object",
+      properties: { id: { type: "string" }, confirmed: { type: "boolean" } },
+      required: ["id", "confirmed"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "clear_map_insights",
     description: "Clear map insight filters / reset overlay focus.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
@@ -154,4 +212,5 @@ DEFAULT: For new forecasts / outlooks / "what happens next" — call ask_stormah
 SUMMARIZE / UI: For "what's on screen", "summarize the agents", "brief me", "what did weather find", the situation report, layers, selection, or any UI question — call get_oracle_context first, then give a short spoken summary from that data. Cite specialists by name when useful; you remain ORACLE.
 NAVIGATION: For "take me to X", "go to X", "zoom to X", "fly to X" — call fly_to_place with X. If they name a specific site/hospital/tower, you may select_entity too. If fly_to_place returns suggestions, offer one and retry.
 Map layers / rainfall / towers / social: use the map tools. Never invent a forecast — use ask_stormahead / deploy_agents.
+ACTIONS ON THE GROUND: When the operator reports something done ("we sent…", "log that…", "40 people moved…") call log_action with their words, read the returned line back, and call confirm_action_update with confirmed=true only after they agree (cancel_action_update if not). To change or delete one, call list_actions for the id, then edit_action (only the corrected fields) or remove_action (confirm first). An action never closes a place; after saving, mention the next recommendation if it suggests more help. Each new forecast run starts a clean action log.
 Speak one or two short sentences after tools. Be concise.`;

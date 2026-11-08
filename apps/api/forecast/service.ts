@@ -8,7 +8,7 @@ import { randomUUID } from "node:crypto";
 import type { Services } from "../../../packages/app/index.ts";
 import { AGENTS, AGENT_BY_ID, inValley, idxOf, isoLocal, nearestPlace, NOW_LOCAL, resourcePack, SEASON_HOURS, when, type Ctx, type Findings, type MapAlert, type Risk, type Severity } from "./agents.ts";
 import { complete, llmStatus, parseJsonLoose } from "./stackai.ts";
-import { actionsForPrompt, coverageAt, setLastRun, type Coverage, type Target } from "../actions/actions.ts";
+import { actionsForPrompt, coverageAt, setLastRun, startRun, type Coverage, type Target } from "../actions/actions.ts";
 
 export type ForecastEvent =
   | { type: "run"; runId: string; question: string; window: Window; agents: string[]; llm: ReturnType<typeof llmStatus> }
@@ -208,7 +208,10 @@ export async function runForecast(services: Services, body: { question: string; 
   const w = windowOf(start, hours);
   const ids = (body.factors?.length ? body.factors : intent.suggested).filter((id) => AGENT_BY_ID.has(id));
   const llm = llmStatus();
-  emit({ type: "run", runId: randomUUID(), question: body.question, window: w, agents: ids, llm });
+  // Each forecast run starts with a clean action log (earlier runs' actions stay on file but aren't shown or counted).
+  const runId = randomUUID();
+  startRun(runId, body.question, w.label);
+  emit({ type: "run", runId, question: body.question, window: w, agents: ids, llm });
 
   const ctx: Ctx = { question: body.question, start, end: start + hours, hours, services, memo: new Map() };
   const results = new Map<string, AgentResult>();
@@ -271,7 +274,7 @@ export async function runForecast(services: Services, body: { question: string; 
     ...all.filter((a) => a.severity === "severe" || a.severity === "high").sort((a, b) => SEV[a.severity] - SEV[b.severity])
       .map((a) => ({ id: a.id, title: a.title, place: nearestPlace([a.lon, a.lat]), lon: a.lon, lat: a.lat, priority: a.severity === "severe" ? "Severe alert" : "High alert", agents: 1, severity: a.severity })),
   ];
-  setLastRun({ at: new Date().toISOString(), question: body.question, window: w.label, targets });
+  setLastRun({ runId, at: new Date().toISOString(), question: body.question, window: w.label, targets });
   emit({ type: "fusion_step", text: combined.length ? `Found ${combined.length} places where agents agree; ${combined.filter((c) => c.priority === "P1").length} are Priority 1.` : "No place is flagged by more than one agent." });
   emit({ type: "fusion", findings: combined });
 

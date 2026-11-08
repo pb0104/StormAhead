@@ -26,6 +26,8 @@ export const actionsApi = {
   parse: (text: string) => j<Proposal>("/api/actions/parse", { method: "POST", body: JSON.stringify({ text }) }),
   save: (p: Proposal) => j<ActionsView & { saved: ActionItem[]; followup: NextRec; coverage: Coverage | null }>("/api/actions", { method: "POST", body: JSON.stringify({ text: p.text, by: p.by, actions: p.actions }) }),
   remove: (id: string) => j<ActionsView>(`/api/actions/${id}`, { method: "DELETE" }),
+  edit: (id: string, changes: Partial<{ kind: ActionDraft["kind"]; resource: string | null; people: number | null; placeText: string | null; destText: string | null; summary: string }>) =>
+    j<ActionsView & { item: ActionItem }>(`/api/actions/${id}`, { method: "PATCH", body: JSON.stringify(changes) }),
   coverage: (points: { id: string; lon: number; lat: number }[]) => j<Record<string, Coverage>>("/api/actions/coverage", { method: "POST", body: JSON.stringify({ points }) }),
 };
 

@@ -21,15 +21,17 @@ export type ActionDraft = {
   kind: ActionKind; resource: string | null; people: number | null; summary: string;
   placeText: string | null; destText: string | null; place: Resolved | null; dest: Resolved | null;
 };
-export type ActionItem = ActionDraft & { id: string; loggedAt: string; text: string; by: "stackai" | "rules" };
+/** runId: the forecast run the action belongs to. A new run starts a fresh log; older runs stay on file for audit. */
+export type ActionItem = ActionDraft & { id: string; loggedAt: string; text: string; by: "stackai" | "rules"; runId?: string; editedAt?: string };
 export type Proposal = { text: string; actions: ActionDraft[]; line: string; warnings: string[]; by: "stackai" | "rules"; llmError?: string };
 export type Coverage = { status: "none" | "partial" | "covered"; resources: string[]; evacuated: number; actions: number; need: NeedEstimate; remaining: number | null; last: string | null };
 export type Target = { id: string; title: string; place: string; lon: number; lat: number; priority: string; agents: number; severity: string };
-export type LastRun = { at: string; question: string; window: string; targets: Target[] };
+export type LastRun = { runId?: string; at: string; question: string; window: string; targets: Target[] };
 export type NextRec = { kind: "more" | "next" | "idle"; text: string; target: { name: string; lon: number; lat: number } | null; prefill: string | null; basis: string | null };
 
 // ---------------------------------------------------------------- storage (data/runtime, gitignored)
-const RUNTIME = fileURLToPath(new URL("../../../data/runtime/", import.meta.url));
+// STORMAHEAD_RUNTIME_DIR lets a test copy keep its log apart from the real one.
+const RUNTIME = process.env.STORMAHEAD_RUNTIME_DIR ? `${process.env.STORMAHEAD_RUNTIME_DIR.replace(/\/$/, "")}/` : fileURLToPath(new URL("../../../data/runtime/", import.meta.url));
 const ACTIONS_FILE = `${RUNTIME}actions.json`, RUN_FILE = `${RUNTIME}last_run.json`;
 function readJson<T>(file: string, fallback: T): T {
   try { return JSON.parse(readFileSync(file, "utf8")) as T; } catch { return fallback; }
@@ -41,25 +43,62 @@ function writeJson(file: string, data: unknown) {
   renameSync(tmp, file); // atomic replace, so a crash never leaves half a log
 }
 let items: ActionItem[] | null = null;
-const all = () => (items ??= readJson<{ items: ActionItem[] }>(ACTIONS_FILE, { items: [] }).items);
+/** Every action ever logged (all runs). */
+const store = () => (items ??= readJson<{ items: ActionItem[] }>(ACTIONS_FILE, { items: [] }).items);
+const persist = () => writeJson(ACTIONS_FILE, { items: store() });
+let lastRun: LastRun | null | undefined;
+export const getLastRun = () => (lastRun === undefined ? (lastRun = readJson<LastRun | null>(RUN_FILE, null)) : lastRun);
+export function setLastRun(r: LastRun) { lastRun = { ...r, runId: r.runId ?? getLastRun()?.runId }; writeJson(RUN_FILE, lastRun); }
+/** Actions logged before any forecast run share this bucket until the first run starts. */
+const currentRunId = () => getLastRun()?.runId ?? "pre-run";
+/** A new forecast run starts a clean action log: earlier runs' actions are kept on file but no longer shown or counted. */
+export function startRun(runId: string, question: string, window: string) {
+  lastRun = { runId, at: new Date().toISOString(), question, window, targets: [] };
+  writeJson(RUN_FILE, lastRun);
+}
+/** Actions in the current run: the only ones the map, coverage, recommendations and report see. */
+const all = () => store().filter((a) => (a.runId ?? "legacy") === currentRunId());
 export const listActions = () => [...all()].sort((a, b) => b.loggedAt.localeCompare(a.loggedAt));
 export function saveActions(text: string, drafts: ActionDraft[], by: "stackai" | "rules"): ActionItem[] {
-  const now = new Date().toISOString();
-  const saved = drafts.map((d) => ({ ...d, id: randomUUID(), loggedAt: now, text, by }));
-  all().push(...saved);
-  writeJson(ACTIONS_FILE, { items: all() });
+  const now = new Date().toISOString(), runId = currentRunId();
+  const saved = drafts.map((d) => ({ ...d, id: randomUUID(), loggedAt: now, text, by, runId }));
+  store().push(...saved);
+  persist();
   return saved;
 }
 export function deleteAction(id: string): boolean {
-  const i = all().findIndex((a) => a.id === id);
+  const i = store().findIndex((a) => a.id === id && (a.runId ?? "legacy") === currentRunId());
   if (i < 0) return false;
-  all().splice(i, 1);
-  writeJson(ACTIONS_FILE, { items: all() });
+  store().splice(i, 1);
+  persist();
   return true;
 }
-let lastRun: LastRun | null | undefined;
-export const getLastRun = () => (lastRun === undefined ? (lastRun = readJson<LastRun | null>(RUN_FILE, null)) : lastRun);
-export function setLastRun(r: LastRun) { lastRun = r; writeJson(RUN_FILE, r); }
+export type ActionEdit = Partial<{ kind: ActionKind; resource: string | null; people: number | null; placeText: string | null; destText: string | null; summary: string }>;
+/** Edit an action in the current run. Place names are re-matched against the gazetteer; an unknown name is refused. */
+export function updateAction(id: string, edit: ActionEdit): { ok: true; item: ActionItem } | { ok: false; error: string } {
+  const a = store().find((x) => x.id === id && (x.runId ?? "legacy") === currentRunId());
+  if (!a) return { ok: false, error: "No such action in this run" };
+  const next: ActionItem = { ...a };
+  if (edit.kind !== undefined) next.kind = edit.kind;
+  if (edit.resource !== undefined) next.resource = edit.resource?.trim() || null;
+  if (edit.people !== undefined) next.people = edit.people;
+  if (edit.placeText !== undefined) {
+    const t = edit.placeText?.trim() || null, r = resolvePlace(t);
+    if (t && !r) return { ok: false, error: `Couldn't find “${t}” on the map` };
+    next.placeText = t; next.place = r;
+  }
+  if (edit.destText !== undefined) {
+    const t = edit.destText?.trim() || null, r = resolvePlace(t);
+    if (t && !r) return { ok: false, error: `Couldn't find “${t}” on the map` };
+    next.destText = t; next.dest = r;
+  }
+  // Keep the summary in step with the facts unless the caller wrote one.
+  next.summary = edit.summary?.trim() || lineOf(next);
+  next.editedAt = new Date().toISOString();
+  Object.assign(a, next);
+  persist();
+  return { ok: true, item: a };
+}
 
 // ---------------------------------------------------------------- gazetteer (real names only)
 type Entry = Resolved & { norm: string; tokens: string[]; rank: number };
@@ -104,6 +143,41 @@ export function resolvePlace(text: string | null): Resolved | null {
     if (s > bestScore) { best = e; bestScore = s; }
   }
   return best && bestScore >= 55 ? { name: best.name, lon: best.lon, lat: best.lat, kind: best.kind } : null;
+}
+
+/** Edit distance, capped (for misheard or misspelled names such as "Tigany" → "Tigani"). */
+function editDistance(a: string, b: string, cap = 3): number {
+  if (Math.abs(a.length - b.length) > cap) return cap + 1;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j]! + 1, cur[j - 1]! + 1, prev[j - 1]! + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length]!;
+}
+/** Find a place for navigation: the confident match (same rules as action updates) plus close suggestions. */
+export function searchPlaces(raw: string, limit = 6): { match: Resolved | null; suggestions: Resolved[] } {
+  // Tolerate the whole spoken command ("fly me to Tigani", "take me to the Khoria area").
+  const text = raw.replace(/^\s*(please\s+)?(fly|take|go|zoom|navigate|show|bring|move)(\s+(me|us))?(\s+(over|in))?(\s+(to|into|on|at))?\s+/i, "").replace(/\s+(please|area|region)\s*$/i, "").trim() || raw;
+  const match = resolvePlace(text);
+  const q = norm(text), qt = q.split(" ").filter((t) => !STOP.has(t) && t.length > 1);
+  if (!qt.length) return { match, suggestions: [] };
+  const scored: { e: Entry; s: number }[] = [];
+  for (const e of gazetteer()) {
+    if (e.kind === "building" && !match) continue; // buildings only as exact hits, or suggestions get noisy
+    let s = 0;
+    for (const t of qt) {
+      const best = Math.min(9, ...e.tokens.filter((et) => et.length >= 3).map((et) => (et === t ? 0 : (et.startsWith(t) && t.length >= 3) || (t.startsWith(et) && et.length >= 4) ? 1 : t.length >= 4 ? editDistance(t, et) : 9)));
+      s += best;
+    }
+    if (s <= qt.length * 2) scored.push({ e, s: s - e.rank * 0.1 });
+  }
+  const seen = new Set<string>();
+  const suggestions = scored.sort((a, b) => a.s - b.s || a.e.name.length - b.e.name.length)
+    .filter(({ e }) => !seen.has(e.norm) && seen.add(e.norm))
+    .slice(0, limit).map(({ e }) => ({ name: e.name, lon: e.lon, lat: e.lat, kind: e.kind }));
+  return { match, suggestions };
 }
 
 // ---------------------------------------------------------------- parsing

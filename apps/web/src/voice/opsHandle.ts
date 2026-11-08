@@ -48,7 +48,7 @@ export type OpsHandle = {
   showHighRainfall: (placeName?: string) => { ok: boolean; [k: string]: unknown };
   showAffectedTowers: () => { ok: boolean; [k: string]: unknown };
   showSocialHotspots: (minPosts?: number) => { ok: boolean; [k: string]: unknown };
-  flyToPlace: (name: string) => { ok: boolean; [k: string]: unknown };
+  flyToPlace: (name: string) => { ok: boolean; [k: string]: unknown } | Promise<{ ok: boolean; [k: string]: unknown }>;
   clearInsights: () => { ok: boolean };
   /** Same as the Ask StormAhead bar → intent + factor picker. */
   askStormAhead: (question: string) => Promise<{ ok: boolean; [k: string]: unknown }>;
@@ -60,7 +60,20 @@ export type OpsHandle = {
   includeAgents: (names: string[]) => { ok: boolean; [k: string]: unknown };
   /** Full intel for ORACLE: agents + fusion + report + UI snapshot. */
   getOracleContext: () => { ok: boolean; [k: string]: unknown };
+  /** Actions on the ground (current run only). */
+  listActions: () => { ok: boolean; [k: string]: unknown };
+  /** Parse a spoken/typed update and show it for confirmation (does NOT save). */
+  logAction: (text: string) => Promise<{ ok: boolean; [k: string]: unknown }>;
+  /** Save the update waiting for confirmation. Only after the operator agrees. */
+  confirmActionUpdate: () => Promise<{ ok: boolean; [k: string]: unknown }>;
+  cancelActionUpdate: () => { ok: boolean; [k: string]: unknown };
+  editAction: (id: string, changes: ActionChanges) => Promise<{ ok: boolean; [k: string]: unknown }>;
+  removeAction: (id: string) => Promise<{ ok: boolean; [k: string]: unknown }>;
 };
+export type ActionChanges = Partial<{
+  kind: "dispatch" | "evacuate" | "supply" | "shelter" | "rescue" | "alert" | "road" | "other";
+  resource: string | null; people: number | null; placeText: string | null; destText: string | null; summary: string;
+}>;
 
 export function buildSnapshot(p: {
   stage: number; rain: number; ran: boolean; busy: boolean; focus: string | null;
