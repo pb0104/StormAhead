@@ -72,6 +72,7 @@ function proxyHandle(ref: { current: OpsHandle }): OpsHandle {
     excludeAgents: (n) => ref.current.excludeAgents(n),
     includeAgents: (n) => ref.current.includeAgents(n),
     getOracleContext: () => ref.current.getOracleContext(),
+    getEvaluation: () => ref.current.getEvaluation(),
     listActions: () => ref.current.listActions(),
     logAction: (t) => ref.current.logAction(t),
     confirmActionUpdate: () => ref.current.confirmActionUpdate(),

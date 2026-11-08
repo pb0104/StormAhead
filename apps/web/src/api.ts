@@ -41,6 +41,24 @@ export const fetchScorecard = async (): Promise<Scorecard | null> => {
   try { const r = await fetch("/api/scorecard"); return r.ok ? ((await r.json()) as Scorecard) : null; } catch { return null; }
 };
 
+export type EvalMetric = { id: string; label: string; value: string; detail: string };
+export type EvalPillar = {
+  id: string; name: string; question: string; score: number;
+  judges: { judge: string; score: number; note: string }[];
+  rationale: string;
+};
+export type EvalReport = {
+  title: string; headline: string; method: string; groundTruth: string[];
+  metrics: EvalMetric[]; pillars: EvalPillar[]; talkingPoints: string[];
+  scorecardSummary: {
+    wards: number; truthWards: number; evaluatedIncidents: number;
+    combinedRecall: number | null; combinedPrecision: number | null; networkSnapshot: string;
+  };
+};
+export const fetchEvaluation = async (): Promise<EvalReport | null> => {
+  try { const r = await fetch("/api/evaluation"); return r.ok ? ((await r.json()) as EvalReport) : null; } catch { return null; }
+};
+
 export type Verification = { wards: any; incidents: any; summary: { wards: number; truthWards: number; evaluatedIncidents: number }; note: string };
 /** The scorecard as geography. null when the ward dataset is absent, so the console omits the layer. */
 export const fetchVerification = async (): Promise<Verification | null> => {

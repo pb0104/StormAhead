@@ -139,6 +139,13 @@ export async function buildServer() {
     if (!s) throw new HttpError(404, "Ward layer not prepared. Run scripts/fetch_wards.mjs.");
     return s;
   });
+  // Demo evaluation pack: real GT metrics + five-pillar LLM-council scores for Details + ORACLE.
+  app.get("/api/evaluation", async () => {
+    const { buildEvalReport } = await import("./eval/report.ts");
+    const e = buildEvalReport(H());
+    if (!e) throw new HttpError(404, "Ward layer not prepared. Run scripts/fetch_wards.mjs.");
+    return e;
+  });
   // The scorecard as geography: wards coloured by hit / false alarm / miss, plus the incident points.
   app.get("/api/verification", async (_req, reply) => {
     const v = H().verificationGeo();
