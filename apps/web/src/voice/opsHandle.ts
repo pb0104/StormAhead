@@ -52,6 +52,9 @@ export type OpsHandle = {
   /** Road closures at the current timeline stage, from scene data. */
   searchSocialPosts: (o: { query?: string; tag?: string; near?: string; photoOnly?: boolean; limit?: number }) => { ok: boolean; [k: string]: unknown };
   openSocialPost: (id: string) => { ok: boolean; [k: string]: unknown };
+  listRadioStations: (o: { query?: string; localOnly?: boolean; newsOnly?: boolean; limit?: number }) => Promise<{ ok: boolean; [k: string]: unknown }>;
+  tuneRadio: (q: { id?: string; name?: string }) => Promise<{ ok: boolean; [k: string]: unknown }>;
+  stopRadio: (closePanel?: boolean) => { ok: boolean; [k: string]: unknown };
   getRoadClosures: (query?: string, limit?: number) => { ok: boolean; [k: string]: unknown };
   openStreetView: (q: { id?: string; name?: string }) => { ok: boolean; [k: string]: unknown };
   closeStreetView: () => { ok: boolean; [k: string]: unknown };

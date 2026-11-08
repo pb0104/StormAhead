@@ -30,6 +30,9 @@ function stub(over: Partial<OpsHandle> = {}): OpsHandle {
     flyToPlace: vi.fn(() => ({ ok: true })),
     searchSocialPosts: vi.fn(() => ({ ok: true, posts: [] })),
     openSocialPost: vi.fn(() => ({ ok: true })),
+    listRadioStations: vi.fn(async () => ({ ok: true, stations: [] })),
+    tuneRadio: vi.fn(async () => ({ ok: true })),
+    stopRadio: vi.fn(() => ({ ok: true })),
     getRoadClosures: vi.fn(() => ({ ok: true, closures: [] })),
     openStreetView: vi.fn(() => ({ ok: true })),
     closeStreetView: vi.fn(() => ({ ok: true })),
@@ -132,5 +135,15 @@ describe("ORACLE action tools", () => {
     expect((await runOpsTool(h, "open_social_post", {})).ok).toBe(false);
     await runOpsTool(h, "open_social_post", { id: "SP-2" });
     expect(h.openSocialPost).toHaveBeenCalledWith("SP-2");
+  });
+
+  it("radio tools route to the handle", async () => {
+    const h = stub();
+    await runOpsTool(h, "list_radio_stations", { query: "news", localOnly: true });
+    expect(h.listRadioStations).toHaveBeenCalledWith({ query: "news", localOnly: true, newsOnly: false, limit: undefined });
+    await runOpsTool(h, "tune_radio", { name: "Radio Nepal" });
+    expect(h.tuneRadio).toHaveBeenCalledWith({ id: undefined, name: "Radio Nepal" });
+    await runOpsTool(h, "stop_radio", { closePanel: true });
+    expect(h.stopRadio).toHaveBeenCalledWith(true);
   });
 });

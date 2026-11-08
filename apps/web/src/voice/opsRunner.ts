@@ -85,6 +85,15 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
       if (!id) return { ok: false, error: "id required (from search_social_posts)" };
       return handle.openSocialPost(id);
     }
+    case "list_radio_stations":
+      return handle.listRadioStations({
+        query: args.query != null ? String(args.query) : undefined, localOnly: args.localOnly === true, newsOnly: args.newsOnly === true,
+        limit: args.limit != null ? Number(args.limit) || undefined : undefined,
+      });
+    case "tune_radio":
+      return handle.tuneRadio({ id: args.id != null ? String(args.id) : undefined, name: args.name != null ? String(args.name) : undefined });
+    case "stop_radio":
+      return handle.stopRadio(args.closePanel === true);
     case "get_road_closures":
       return handle.getRoadClosures(args.query != null ? String(args.query) : undefined, args.limit != null ? Math.max(1, Math.min(30, Number(args.limit) || 12)) : undefined);
     case "open_street_view":

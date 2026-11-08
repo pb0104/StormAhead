@@ -213,6 +213,25 @@ export const OPS_LIVE_TOOLS = [
     parameters: { type: "object", properties: { id: { type: "string" } }, required: ["id"], additionalProperties: false },
   },
   {
+    name: "list_radio_stations",
+    description: "List live LOCAL radio broadcasts available to tune into (Radio Browser directory; valley and news stations first). Optional query (name, language, tag such as news), localOnly, newsOnly. You cannot hear or transcribe broadcasts: this only lets the operator listen.",
+    parameters: {
+      type: "object",
+      properties: { query: { type: "string" }, localOnly: { type: "boolean" }, newsOnly: { type: "boolean" }, limit: { type: "number" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "tune_radio",
+    description: "Tune the operator's browser to a live radio station by id or name (from list_radio_stations) and open the radio panel. With no arguments, tunes the best local news station. Listen-only: nothing is recorded or transcribed, and you cannot hear it.",
+    parameters: { type: "object", properties: { id: { type: "string" }, name: { type: "string" } }, additionalProperties: false },
+  },
+  {
+    name: "stop_radio",
+    description: "Stop the radio and optionally close the radio panel.",
+    parameters: { type: "object", properties: { closePanel: { type: "boolean" } }, additionalProperties: false },
+  },
+  {
     name: "get_road_closures",
     description:
       "Road-closure intel from the app's computed data at the CURRENT timeline time: which roads are closed now (names, class, bridge, length, coordinates), cut-off areas, and hospital access (ok/degraded/lost + extra minutes). Pass an optional query (a place or hospital name) to sort closures by distance from it and limit hospital access, e.g. 'what is cut off near Patan' or 'can ambulances reach Bir Hospital'. Never invent roads or coordinates; use only what this returns.",
@@ -253,6 +272,7 @@ SUMMARIZE / UI: For "what's on screen", "summarize the agents", "brief me", "wha
 NAVIGATION: For "take me to X", "go to X", "zoom to X", "fly to X" — call fly_to_place with X. If they name a specific site/hospital/tower, you may select_entity too. If fly_to_place returns suggestions, offer one and retry.
 Map layers / rainfall / towers / social: use the map tools. Never invent a forecast — use ask_stormahead / deploy_agents.
 SOCIAL POSTS: For 'what are people saying', 'any posts near X', 'urgent needs', photos — call search_social_posts and answer only from the returned text, flagging that posts are unverified; to show one call open_social_post. You cannot post, reply or verify. If asked to draft a reply, write the text in your answer for the operator to review; nothing is ever sent.
+RADIO: To 'tune into local radio / news', call list_radio_stations then tune_radio (stop_radio to stop). Say plainly that you cannot hear the broadcast; the operator listens and can tell you what they hear.
 ROADS & STREET VIEW: For closed roads, cut-off areas, or hospital access call get_road_closures (pass a place/hospital as query) and answer only from its data; to show one, select_entity with its id. For 'show me street view of X' or 'what does it look like there' call open_street_view (close_street_view to leave). If it reports Street View is not configured, say so in one sentence.
 ACTIONS ON THE GROUND: When the operator reports something done ("we sent…", "log that…", "40 people moved…") call log_action with their words, read the returned line back, and call confirm_action_update with confirmed=true only after they agree (cancel_action_update if not). To change or delete one, call list_actions for the id, then edit_action (only the corrected fields) or remove_action (confirm first). An action never closes a place; after saving, mention the next recommendation if it suggests more help. Each new forecast run starts a clean action log.
 Speak one or two short sentences after tools. Be concise.`;

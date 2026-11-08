@@ -241,3 +241,14 @@ export function socialOverview() {
   for (const p of POSTS) for (const t of p.tags.split("; ").filter(Boolean)) tags[TAG_LABEL[t] ?? t] = (tags[TAG_LABEL[t] ?? t] ?? 0) + 1;
   return { total: POSTS.length, onMap: POSTS.filter((p) => (p.precision === "place" || p.precision === "town") && p.lon != null).length, withPhotos: POSTS.filter((p) => p.image).length, tags };
 }
+
+export type RadioStationLite = { id: string; name: string; tags: string[]; language: string; state: string; distKm: number | null; inValley: boolean; news: boolean; local: boolean; bitrate: number };
+/** Live-broadcast directory search (Radio Browser). Local/valley and news stations first, then nearest. */
+export function findRadioStations<T extends RadioStationLite>(stations: T[], o: { query?: string; localOnly?: boolean; newsOnly?: boolean; limit?: number } = {}) {
+  const words = (o.query ?? "").toLowerCase().split(/\s+/).filter(Boolean);
+  let pool = stations.filter((st) => (!o.localOnly || st.inValley || st.local) && (!o.newsOnly || st.news));
+  if (words.length) pool = pool.filter((st) => { const h = `${st.name} ${st.tags.join(" ")} ${st.language}`.toLowerCase(); return words.every((w) => h.includes(w)); });
+  pool = [...pool].sort((a, b) => Number(b.inValley) - Number(a.inValley) || Number(b.news) - Number(a.news) || (a.distKm ?? 1e9) - (b.distKm ?? 1e9));
+  const limit = Math.max(1, Math.min(15, o.limit ?? 8));
+  return { total: pool.length, stations: pool.slice(0, limit).map((st) => ({ id: st.id, name: st.name, language: st.language, tags: st.tags.slice(0, 4), news: st.news, local: st.inValley || st.local, distKm: st.distKm, bitrate: st.bitrate })) };
+}

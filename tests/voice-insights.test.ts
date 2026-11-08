@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, searchSocialPosts, socialOverview, socialHotspots } from "../apps/web/src/voice/insights.ts";
+import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, findRadioStations, roadClosureReport, searchSocialPosts, socialOverview, socialHotspots } from "../apps/web/src/voice/insights.ts";
 import { mergeBipadIntoScene } from "../apps/web/src/mergeBipad.ts";
 import type { SceneSnapshot } from "../packages/ports/index.ts";
 
@@ -87,6 +87,14 @@ describe("voice insights", () => {
     const hit = hotspotPlace();
     const near = searchSocialPosts(emptyScene(), { near: hit });
     expect(near.ok && near.posts.every((p) => p.onMap && p.lon != null)).toBe(true);
+  });
+
+  it("ranks valley and news radio stations first and filters by text", () => {
+    const st = (id: string, name: string, o: object = {}) => ({ id, name, tags: [], language: "nepali", state: "", distKm: 50, inValley: false, news: false, local: false, bitrate: 64, ...o });
+    const r = findRadioStations([st("a", "Far Pop"), st("b", "Kathmandu News", { inValley: true, news: true, distKm: 3 }), st("c", "Valley Music", { inValley: true })]);
+    expect(r.stations.map((x) => x.id)).toEqual(["b", "c", "a"]);
+    expect(findRadioStations([st("a", "Far Pop")], { localOnly: true }).total).toBe(0);
+    expect(findRadioStations([st("b", "Kathmandu News")], { query: "kath news" }).total).toBe(1);
   });
 });
 

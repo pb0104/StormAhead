@@ -27,6 +27,8 @@ import { TalkToggle, useLiveTalk } from "./ForecastTalk.tsx";
 import { ActionsPanel, FollowUp, UpdateConfirm } from "./ActionLog.tsx";
 import { actionsApi, locationLabel, looksLikeUpdate, type ActionsView, type Coverage, type NextRec, type Proposal } from "./actionsApi.ts";
 import { getFactors, getIntent, streamForecast, type AgentResult, type Combined, type Factors, type ForecastEvent, type Intent, type Window } from "./api.ts";
+import { findRadioStations } from "../voice/insights.ts";
+import type { Station } from "./RadioPanel.tsx";
 import { POSTS } from "../real/social.ts";
 import { STREET_VIEW_KEY_HINT, affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, searchSocialPosts, socialHotspots, socialOverview, postView } from "../voice/insights.ts";
 import { buildSnapshot, resolveEntity, type OpsHandle } from "../voice/opsHandle.ts";
@@ -455,6 +457,8 @@ export function ForecastConsole() {
   selectedRef.current = selected;
   const sceneRef = useRef(scene);
   const pinsRef = useRef<MapAlertPin[]>([]); pinsRef.current = pins;
+  const radioRef = useRef(radio); radioRef.current = radio;
+  const radioOpenRef = useRef(radioOpen); radioOpenRef.current = radioOpen;
   const streetRef = useRef(street); streetRef.current = street;
   const stageRef = useRef(stage); stageRef.current = stage;
   const proposalRef = useRef(proposal); proposalRef.current = proposal;
@@ -508,6 +512,7 @@ export function ForecastConsole() {
           ? { id: selectedRef.current.id, name: selectedRef.current.name, kind: selectedRef.current.kind }
           : null,
         activeAlertId: activeAlertRef.current,
+        radio: { panelOpen: radioOpenRef.current, nowPlaying: radioRef.current.current?.name ?? null, state: radioRef.current.state, note: "listen-only: you cannot hear it" },
         streetView: { open: streetRef.current, available: !!streetKey },
         socialPosts: { layerOn: !!visRef.current.social, ...socialOverview(), hint: "call search_social_posts to read posts" },
         roadClosures: { stage: stageRef.current, closedNow: roadClosureReport(sceneRef.current, stageRef.current, undefined, 0).closedCount, hint: "call get_road_closures for names" },
@@ -530,6 +535,13 @@ export function ForecastConsole() {
         ? { by: reportRef.current.by, markdown: reportRef.current.markdown.slice(0, 4000), error: reportRef.current.error }
         : null,
     };
+  };
+
+  const loadStations = async (): Promise<Station[] | null> => {
+    const cur = radioRef.current;
+    if (cur.dir) return cur.dir.stations;
+    void cur.load();
+    try { const r = await fetch("/api/radio/stations"); return r.ok ? ((await r.json()) as { stations: Station[] }).stations : null; } catch { return null; }
   };
 
   const talkHandle = useMemo<OpsHandle>(() => ({
@@ -670,6 +682,24 @@ export function ForecastConsole() {
       select(e);
       return { ok: true, opened: id, post: postView(post) };
     },
+    listRadioStations: async (o) => {
+      const stations = await loadStations();
+      if (!stations) return { ok: false, error: "Radio directory unavailable right now" };
+      return { ok: true, ...findRadioStations(stations, o), nowPlaying: radioRef.current.current?.name ?? null, note: "Live broadcasts, listen-only. You cannot hear them." };
+    },
+    tuneRadio: async (q) => {
+      const stations = await loadStations();
+      if (!stations) return { ok: false, error: "Radio directory unavailable right now" };
+      const needle = (q.name ?? "").trim().toLowerCase();
+      const st = q.id ? stations.find((x) => x.id === q.id)
+        : needle ? (stations.find((x) => x.name.toLowerCase() === needle) ?? stations.find((x) => x.name.toLowerCase().includes(needle)))
+        : stations.find((x) => x.id === findRadioStations(stations, { newsOnly: true, limit: 1 }).stations[0]?.id) ?? stations[0];
+      if (!st) return { ok: false, error: q.id || q.name ? `No station matches "${q.name ?? q.id}"` : "No stations available" };
+      setRadioOpen(true); setLayersOpen(false); setActionsOpen(false);
+      void radioRef.current.play(st);
+      return { ok: true, tuned: st.name, language: st.language, local: st.inValley || st.local, note: "Streaming to the operator's speakers. Listen-only: nothing is recorded or transcribed and you cannot hear it. Browsers may block audio until the page has been clicked." };
+    },
+    stopRadio: (closePanel) => { radioRef.current.stop(); if (closePanel) setRadioOpen(false); return { ok: true }; },
     getRoadClosures: (query, limit) => roadClosureReport(scene, stage, query, limit ?? 12),
     openStreetView: (q) => {
       const open = (t: StreetTarget) => {
