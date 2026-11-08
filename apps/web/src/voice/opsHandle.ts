@@ -80,6 +80,8 @@ export type OpsHandle = {
   includeAgents: (names: string[]) => { ok: boolean; [k: string]: unknown };
   /** Full intel for ORACLE: agents + fusion + report + UI snapshot. */
   getOracleContext: () => { ok: boolean; [k: string]: unknown };
+  /** Evaluation pack: five pillars + ground-truth metrics (demo defense). */
+  getEvaluation: () => { ok: boolean; [k: string]: unknown };
   /** Actions on the ground (current run only). */
   listActions: () => { ok: boolean; [k: string]: unknown };
   /** Parse a spoken/typed update and show it for confirmation (does NOT save). */

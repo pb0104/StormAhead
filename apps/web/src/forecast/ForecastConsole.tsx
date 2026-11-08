@@ -12,7 +12,7 @@ import { PhotorealView, savedToken } from "../PhotorealView.tsx";
 import { StreetView, type StreetTarget } from "../StreetView.tsx";
 import { SocialFeed } from "../SocialFeed.tsx";
 import { distKm } from "../affected.ts";
-import { fetchScorecard, ops, type Scorecard } from "../api.ts";
+import { fetchEvaluation, fetchScorecard, ops, type EvalReport, type Scorecard } from "../api.ts";
 import { assess, buildingAdvice, fetchBuildings, ROLE_COLOR, toEntity, type BuildingLayer } from "../buildings.ts";
 import { mergeBipadIntoScene } from "../mergeBipad.ts";
 import { OBSERVED_IN } from "../real/ops.ts";
@@ -64,6 +64,9 @@ export function ForecastConsole() {
   const [atmosphere, setAtmosphere] = useState<AtmosphereSnapshot | null>(null);
   const [bldgLayer, setBldgLayer] = useState<BuildingLayer | null>(null);
   const [scorecard, setScorecard] = useState<Scorecard | null>(null);
+  const [evaluation, setEvaluation] = useState<EvalReport | null>(null);
+  const evaluationRef = useRef<EvalReport | null>(null);
+  evaluationRef.current = evaluation;
   useEffect(() => {
     let dead = false;
     Promise.all([ops.scene(), ops.atmosphere().catch(() => null)])
@@ -72,6 +75,7 @@ export function ForecastConsole() {
     getFactors().then((f) => { if (!dead) setFactors(f); }).catch(() => { /* the dock shows the error on run */ });
     fetchBuildings().then((b) => { if (!dead) setBldgLayer(b); });
     fetchScorecard().then((s) => { if (!dead) setScorecard(s); });
+    fetchEvaluation().then((e) => { if (!dead) setEvaluation(e); });
     return () => { dead = true; };
   }, []);
 
@@ -569,6 +573,16 @@ export function ForecastConsole() {
       report: reportRef.current
         ? { by: reportRef.current.by, markdown: reportRef.current.markdown.slice(0, 4000), error: reportRef.current.error }
         : null,
+      evaluation: evaluationRef.current
+        ? {
+            headline: evaluationRef.current.headline,
+            method: evaluationRef.current.method,
+            pillars: evaluationRef.current.pillars.map((p) => ({ name: p.name, score: p.score, question: p.question, rationale: p.rationale })),
+            metrics: evaluationRef.current.metrics,
+            talkingPoints: evaluationRef.current.talkingPoints,
+            groundTruth: evaluationRef.current.groundTruth,
+          }
+        : null,
     };
   };
 
@@ -789,6 +803,23 @@ export function ForecastConsole() {
       return { ok: true, added: ids, unknown, picked: next };
     },
     getOracleContext: () => buildOracleContext(),
+    getEvaluation: () => {
+      const e = evaluationRef.current;
+      if (!e) return { ok: false, error: "Evaluation pack not loaded yet. Open Details → Evaluation once the scorecard is ready." };
+      return {
+        ok: true as const,
+        headline: e.headline,
+        method: e.method,
+        groundTruth: e.groundTruth,
+        pillars: e.pillars.map((p) => ({
+          name: p.name, score: p.score, question: p.question, rationale: p.rationale,
+          judges: p.judges.map((j) => ({ judge: j.judge, score: j.score })),
+        })),
+        metrics: e.metrics,
+        talkingPoints: e.talkingPoints,
+        scorecardSummary: e.scorecardSummary,
+      };
+    },
     searchSocialPosts: (o) => searchSocialPosts(scene, o),
     openSocialPost: (id) => {
       const post = POSTS.find((p) => p.id === id);
@@ -1240,8 +1271,8 @@ export function ForecastConsole() {
         onPhoto={() => { setFlying(false); setStreet(false); setPhoto(true); }} onStreet={() => { if (selected) { setFlying(false); setPhoto(false); setStreetPt({ id: selected.id, name: selected.name, at: selected.at }); } }}
         e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setStreet(false); setSelected(null); }}
         reasons={why} actions={acts} kindLabel={{ ...scene.kindLabel, building: "Building" }} feed={selected ? <SocialFeed onStreet={(t) => { setFlying(false); setPhoto(false); setStreetPt(t); }} at={selected.at} compact /> : null} />
-      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} note={scene.note} legacyActivity={false}
-        agentLines={order.length ? order.map((id) => `${agentsMeta.find((a) => a.id === id)?.name ?? id}: ${results[id]?.headline ?? "not finished"} (${results[id]?.by === "stackai" ? "LLM" : "rules"})`) : ["No forecast run yet. Ask a question to deploy the agents."]} />
+      <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} evaluation={evaluation} legacyActivity={false}
+        agentLines={order.length ? order.map((id) => `${agentsMeta.find((a) => a.id === id)?.name ?? id}: ${results[id]?.headline ?? "not finished"}`) : ["No forecast run yet. Ask a question to deploy the agents."]} />
     </div>
   );
 }

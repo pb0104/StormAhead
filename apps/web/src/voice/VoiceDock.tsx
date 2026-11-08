@@ -70,6 +70,7 @@ export function VoiceDock({ handle }: { handle: OpsHandle }) {
       excludeAgents: (n) => handleRef.current.excludeAgents(n),
       includeAgents: (n) => handleRef.current.includeAgents(n),
       getOracleContext: () => handleRef.current.getOracleContext(),
+      getEvaluation: () => handleRef.current.getEvaluation(),
       listActions: () => handleRef.current.listActions(),
       logAction: (t) => handleRef.current.logAction(t),
       confirmActionUpdate: () => handleRef.current.confirmActionUpdate(),

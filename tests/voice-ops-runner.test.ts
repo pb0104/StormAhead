@@ -48,6 +48,7 @@ function stub(over: Partial<OpsHandle> = {}): OpsHandle {
     excludeAgents: vi.fn(() => ({ ok: true, removed: [], picked: [] })),
     includeAgents: vi.fn(() => ({ ok: true, added: [], picked: [] })),
     getOracleContext: vi.fn(() => ({ ok: true, agents: [] })),
+    getEvaluation: vi.fn(() => ({ ok: true, pillars: [], metrics: [] })),
     listActions: vi.fn(() => ({ ok: true, actions: [] })),
     logAction: vi.fn(async () => ({ ok: true, pending: true })),
     confirmActionUpdate: vi.fn(async () => ({ ok: true })),

@@ -139,6 +139,8 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
     }
     case "get_oracle_context":
       return handle.getOracleContext();
+    case "get_evaluation":
+      return handle.getEvaluation();
     // Actions on the ground (current run). Saving and removing need the operator's agreement: confirmed must be true.
     case "list_actions":
       return handle.listActions();
