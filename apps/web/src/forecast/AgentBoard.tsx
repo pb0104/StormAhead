@@ -69,6 +69,34 @@ function AgentCard({
               {r.by === "stackai" ? "Reasoning · LLM via StackAI" : "Summary · rules (LLM offline)"}
             </div>
             <ul>{r.thinking.map((t, i) => <li key={i}>{t}</li>)}</ul>
+            {r.figures && r.figures.length > 0 && (
+              <dl className="fx-figures">
+                {r.figures.map((f) => <div key={f.label}><dt>{f.label}</dt><dd>{f.value}{f.note && <small>{f.note}</small>}</dd></div>)}
+              </dl>
+            )}
+            {Array.isArray(r.map?.["fleet"]) && (r.map!["fleet"] as unknown[]).length > 0 && (
+              <table className="fx-spend fx-fleet">
+                <caption>Vehicles needed each day · {String(r.map!["fleetPerDayLabel"] ?? "")} in hire</caption>
+                <thead><tr><th>Vehicle</th><th>No.</th><th>Each / day</th><th>Total</th></tr></thead>
+                <tbody>
+                  {(r.map!["fleet"] as { type: string; label: string; count: number; perDayEachLabel: string; perDayLabel: string }[]).map((f) => (
+                    <tr key={f.type}><td>{f.label}</td><td>{f.count}</td><td>{f.perDayEachLabel}</td><td>{f.perDayLabel}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {Array.isArray(r.map?.["areas"]) && (r.map!["areas"] as unknown[]).length > 0 && (() => {
+              const areas = r.map!["areas"] as { place: string; people: number; perDayLabel: string; by: string }[];
+              return (
+                <table className="fx-spend">
+                  <caption>Daily spend by area</caption>
+                  <tbody>
+                    {areas.slice(0, 8).map((a) => <tr key={a.place}><td>{a.place}{a.by === "helicopter" && <span className="fx-spend-tag">heli</span>}</td><td>~{a.people.toLocaleString("en-US")} people</td><td>{a.perDayLabel}</td></tr>)}
+                  </tbody>
+                  {areas.length > 8 && <tfoot><tr><td colSpan={3}>+ {areas.length - 8} more areas. Click any area on the map for its census and costs.</td></tr></tfoot>}
+                </table>
+              );
+            })()}
             <p className="fx-agent-headline strong">{r.headline}</p>
             {r.watch && <p className="fx-watch"><Icon name="clock" size={13} /> {r.watch}</p>}
             {r.alerts.length > 0 && (

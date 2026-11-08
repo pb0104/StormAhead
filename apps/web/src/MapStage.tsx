@@ -52,6 +52,8 @@ export type MapProps = {
   waterLevel?: number;
   /** 0..1: how swollen the rivers are (from the real Bagmati gauge when the river agent ran). */
   riverLevel?: number;
+  /** Ward outline for the area card (polygon rings), or null. */
+  area?: [number, number][][] | null;
   /** Crosshair cursor while the analyst picks a location on the map. */
   picking?: boolean;
   /** Padding to keep pins clear of floating panels when fitting. */
@@ -152,6 +154,7 @@ export function MapStage(p: MapProps) {
       const empty = { type: "FeatureCollection", features: [] };
       m.addSource("sel", { type: "geojson", data: empty });
       m.addSource("pick", { type: "geojson", data: empty });
+      m.addSource("area", { type: "geojson", data: empty });
       m.addSource("rec", { type: "geojson", data: empty });
       m.addSource("affected", { type: "geojson", data: empty });
       m.addSource("bldg", { type: "geojson", data: empty });
@@ -358,6 +361,8 @@ export function MapStage(p: MapProps) {
         return m.queryRenderedFeatures([[pt.x - 7, pt.y - 7], [pt.x + 7, pt.y + 7]], { layers }) as any[];
       };
       m.addLayer({ id: "pick-ring", type: "line", source: "pick", paint: { "line-color": "#FFFFFF", "line-width": 2, "line-dasharray": [2, 2] } });
+      m.addLayer({ id: "area-fill", type: "fill", source: "area", paint: { "fill-color": "#5EEAD4", "fill-opacity": 0.12 } });
+      m.addLayer({ id: "area-line", type: "line", source: "area", paint: { "line-color": "#5EEAD4", "line-width": 2.2 } });
       m.on("click", (e: any) => {
         // While the analyst is placing an action, every map click is a location, never a selection.
         if (props.current.picking) { props.current.onMapClick?.([e.lngLat.lng, e.lngLat.lat]); return; }
@@ -533,6 +538,11 @@ export function MapStage(p: MapProps) {
     const at = p.pick;
     src.setData(at ? { type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: Array.from({ length: 49 }, (_, i) => { const a = (i / 48) * Math.PI * 2; return [at[0] + (Math.cos(a) * 1.5) / 98.6, at[1] + (Math.sin(a) * 1.5) / 110.6]; }) } } : { type: "FeatureCollection", features: [] });
   }, [p.pick]);
+  // Outline of the ward shown in the area card.
+  useEffect(() => {
+    const src = map.current?.getSource?.("area") as any; if (!src) return;
+    src.setData(p.area?.length ? { type: "Feature", properties: {}, geometry: { type: "Polygon", coordinates: p.area } } : { type: "FeatureCollection", features: [] });
+  }, [p.area]);
   useEffect(() => { (map.current as any)?.__apply?.(); }, [p.ran, p.revealN, p.showPockets, p.stage, p.vis, p.focus, p.selected, p.recs, p.hover, p.flood, p.flowUrl, p.buildings, p.view3d, p.atmosphere, p.verify, p.swipe]);
 
   useEffect(() => {

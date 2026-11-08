@@ -79,3 +79,36 @@ export function needNear(lon: number, lat: number, radiusKm = 0.75): NeedEstimat
     basis: `Estimate: people living on ground the 2024 flood covered within ${radiusKm} km (UNOSAT extent × ${densityNote}). Upper bound.`,
   };
 }
+
+export type ExposedArea = { lon: number; lat: number; people: number; floodedKm2: number };
+
+/**
+ * The same flooded cells grouped into ~binKm squares: where the people on flooded ground live, area by area. Each area's point is
+ * the population-weighted centre of its cells. Same upper-bound caveat as needNear. Largest first.
+ */
+export function exposedAreas(binKm = 1.5): { areas: ExposedArea[]; basis: string } {
+  cells ??= build();
+  const bins = new Map<string, { p: number; x: number; y: number; n: number }>();
+  for (const c of cells) {
+    const k = `${Math.floor((c.lon * 98.6) / binKm)}:${Math.floor((c.lat * 110.6) / binKm)}`;
+    const p = c.density * CELL_KM2, b = bins.get(k) ?? { p: 0, x: 0, y: 0, n: 0 };
+    b.p += p; b.x += c.lon * p; b.y += c.lat * p; b.n++;
+    bins.set(k, b);
+  }
+  const areas = [...bins.values()].filter((b) => b.p > 0)
+    .map((b) => ({ lon: b.x / b.p, lat: b.y / b.p, people: Math.round(b.p / 10) * 10, floodedKm2: Math.round(b.n * CELL_KM2 * 100) / 100 }))
+    .sort((a, b) => b.people - a.people);
+  return { areas, basis: `UNOSAT 2024 flood extent × ${densityNote}. Upper bound.` };
+}
+
+/** People living on flooded ground inside a polygon (even-odd over all rings, so holes and multi-part wards work). Upper bound. */
+export function exposedIn(rings: Ring[]): { people: number; floodedKm2: number } {
+  cells ??= build();
+  const bb = rings.reduce<BBox>((b, r) => { const x = bboxOf(r); return [Math.min(b[0], x[0]), Math.min(b[1], x[1]), Math.max(b[2], x[2]), Math.max(b[3], x[3])]; }, [Infinity, Infinity, -Infinity, -Infinity]);
+  let people = 0, n = 0;
+  for (const c of cells) {
+    if (c.lon < bb[0] || c.lon > bb[2] || c.lat < bb[1] || c.lat > bb[3]) continue;
+    if (rings.reduce((inside, r) => (inRing(c.lon, c.lat, r) ? !inside : inside), false)) { people += c.density * CELL_KM2; n++; }
+  }
+  return { people: Math.round(people / 10) * 10, floodedKm2: Math.round(n * CELL_KM2 * 100) / 100 };
+}

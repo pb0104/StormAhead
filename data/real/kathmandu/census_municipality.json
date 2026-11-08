@@ -1,0 +1,227 @@
+{
+ "source": "BIPAD Portal /api/v1/demographic/ (National Population and Housing Census 2021, local level) and /api/v1/ward/ (ward counts)",
+ "retrievedAt": "2026-11-08T01:33:29.311Z",
+ "note": "Municipality-level only: BIPAD has no ward-level census. Any ward population shown in the console is an estimate (municipality ÷ its wards).",
+ "municipalities": [
+  {
+   "municipality": 27006,
+   "name": "Kathmandu",
+   "wards": 32,
+   "population": 862400,
+   "households": 238966,
+   "male": 438256,
+   "female": 424144,
+   "under5": 42541,
+   "over65": 57101
+  },
+  {
+   "municipality": 25004,
+   "name": "Lalitpur",
+   "wards": 29,
+   "population": 294098,
+   "households": 77159,
+   "male": 146730,
+   "female": 147368,
+   "under5": 14864,
+   "over65": 22200
+  },
+  {
+   "municipality": 27001,
+   "name": "Budhanilkantha",
+   "wards": 13,
+   "population": 177557,
+   "households": 46930,
+   "male": 87337,
+   "female": 90220,
+   "under5": 10883,
+   "over65": 9857
+  },
+  {
+   "municipality": 27010,
+   "name": "Tarakeshwor",
+   "wards": 11,
+   "population": 151479,
+   "households": 41362,
+   "male": 75281,
+   "female": 76198,
+   "under5": 10103,
+   "over65": 6167
+  },
+  {
+   "municipality": 27004,
+   "name": "Gokarneshwor",
+   "wards": 9,
+   "population": 149366,
+   "households": 39771,
+   "male": 73235,
+   "female": 76131,
+   "under5": 10222,
+   "over65": 6615
+  },
+  {
+   "municipality": 26004,
+   "name": "Suryabinayak",
+   "wards": 10,
+   "population": 140085,
+   "households": 35865,
+   "male": 69915,
+   "female": 70170,
+   "under5": 9504,
+   "over65": 7893
+  },
+  {
+   "municipality": 27011,
+   "name": "Tokha",
+   "wards": 11,
+   "population": 133755,
+   "households": 37025,
+   "male": 66532,
+   "female": 67223,
+   "under5": 8129,
+   "over65": 6336
+  },
+  {
+   "municipality": 27005,
+   "name": "Kageshwori Manahora",
+   "wards": 9,
+   "population": 130433,
+   "households": 33764,
+   "male": 65031,
+   "female": 65402,
+   "under5": 9153,
+   "over65": 6728
+  },
+  {
+   "municipality": 25005,
+   "name": "Mahalaxmi",
+   "wards": 10,
+   "population": 123116,
+   "households": 32106,
+   "male": 62399,
+   "female": 60717,
+   "under5": 7617,
+   "over65": 6788
+  },
+  {
+   "municipality": 26003,
+   "name": "Madhyapur Thimi",
+   "wards": 9,
+   "population": 119756,
+   "households": 31966,
+   "male": 60746,
+   "female": 59010,
+   "under5": 7471,
+   "over65": 6784
+  },
+  {
+   "municipality": 27008,
+   "name": "Nagarjun",
+   "wards": 10,
+   "population": 115437,
+   "households": 31301,
+   "male": 57596,
+   "female": 57841,
+   "under5": 7228,
+   "over65": 6208
+  },
+  {
+   "municipality": 25002,
+   "name": "Godawari",
+   "wards": 14,
+   "population": 97633,
+   "households": 24045,
+   "male": 48140,
+   "female": 49493,
+   "under5": 5861,
+   "over65": 6339
+  },
+  {
+   "municipality": 26002,
+   "name": "Changunarayan",
+   "wards": 9,
+   "population": 88083,
+   "households": 21588,
+   "male": 43674,
+   "female": 44409,
+   "under5": 6072,
+   "over65": 5219
+  },
+  {
+   "municipality": 27007,
+   "name": "Kirtipur",
+   "wards": 10,
+   "population": 81578,
+   "households": 24150,
+   "male": 43247,
+   "female": 38331,
+   "under5": 4437,
+   "over65": 4753
+  },
+  {
+   "municipality": 26001,
+   "name": "Bhaktapur",
+   "wards": 10,
+   "population": 79136,
+   "households": 18987,
+   "male": 39755,
+   "female": 39381,
+   "under5": 4948,
+   "over65": 5479
+  },
+  {
+   "municipality": 24001,
+   "name": "Banepa",
+   "wards": 14,
+   "population": 67690,
+   "households": 16698,
+   "male": 33172,
+   "female": 34518,
+   "under5": 4545,
+   "over65": 4204
+  },
+  {
+   "municipality": 24010,
+   "name": "Panauti",
+   "wards": 12,
+   "population": 51504,
+   "households": 12806,
+   "male": 25015,
+   "female": 26489,
+   "under5": 3368,
+   "over65": 3961
+  },
+  {
+   "municipality": 23009,
+   "name": "Melamchi",
+   "wards": 14,
+   "population": 41063,
+   "households": 11180,
+   "male": 19963,
+   "female": 21100,
+   "under5": 2970,
+   "over65": 3702
+  },
+  {
+   "municipality": 27009,
+   "name": "Shankharapur",
+   "wards": 9,
+   "population": 29318,
+   "households": 7140,
+   "male": 14433,
+   "female": 14885,
+   "under5": 1872,
+   "over65": 2140
+  },
+  {
+   "municipality": 27003,
+   "name": "Dakshinkali",
+   "wards": 9,
+   "population": 26372,
+   "households": 6489,
+   "male": 12955,
+   "female": 13417,
+   "under5": 1599,
+   "over65": 1888
+  }
+ ]
+}

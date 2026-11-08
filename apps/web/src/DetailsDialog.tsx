@@ -26,6 +26,8 @@ const SOURCES: [string, string, string][] = [
   ["Atmosphere", "Real", "Open-Meteo cloud cover and MSL pressure (live / cached)"],
   ["Building footprints", "Real", "OSM shelter-relevant footprints for evacuate / shelter-in-place reading"],
   ["Social media", "Real", "Reddit (r/Nepal, r/Kathmandu) via Arctic Shift, 25 Sep to 3 Oct 2024, flood-related only. Places matched by name (GeoNames); tags are a keyword baseline on HumAID categories; non-English posts machine-translated, original kept"],
+  ["Census population (area card)", "Real", "National Population and Housing Census 2021 via BIPAD, per municipality: population, households, under-5s, 65+. No ward-level census is published there, so a ward figure is an estimate (municipality ÷ its wards)"],
+  ["Relief budget and vehicles (resource allocation agent)", "Mixed", "Real: Nepal Minimum Expenditure Basket (NPR 15,000 per household a month), 3-day emergency phase (IFRC 2024: Kathmandu water receded after three days), household size, flood extent, census, responder bases. Anchored: shelter kit ≈ NPR 11,500 and 34% needing relief (IFRC 2024 response), 30-day support period, NPR 6.75 crore fund (NDRRMA's first 2026 Bhotekoshi release), helicopter US$2,000/h. Mocked: vehicle day rates and QRT crew cost. Full list with links in the Allocation section"],
   ["Radio", "Simulated", "Invented call-ins"],
   ["Food depots", "Simulated", "No public stock feed found"],
 ];

@@ -23,6 +23,8 @@ import { RainOverlay } from "./RainOverlay.tsx";
 import { Timeline } from "./Timeline.tsx";
 import { Icon } from "./Icon.tsx";
 import { Eq, RadioPanel, useRadio } from "./RadioPanel.tsx";
+import { AreaPanel, fetchArea, type AreaInfo } from "./AreaPanel.tsx";
+import { AllocationView } from "./AllocationView.tsx";
 import { TalkToggle, useLiveTalk } from "./ForecastTalk.tsx";
 import { ActionsPanel, FollowUp, UpdateConfirm } from "./ActionLog.tsx";
 import { actionsApi, locationLabel, looksLikeUpdate, type ActionsView, type Coverage, type NextRec, type Proposal } from "./actionsApi.ts";
@@ -115,6 +117,16 @@ export function ForecastConsole() {
   const [goto, setGoto] = useState<{ lon: number; lat: number; zoom?: number; key: number } | null>(null);
   const [layersOpen, setLayersOpen] = useState(false);
   const [radioOpen, setRadioOpen] = useState(false);
+  // Resource allocation: its own full section, opened only from the top-bar Allocation button.
+  const [allocOpen, setAllocOpen] = useState(false);
+  // Area card: click an empty spot on the map for its ward, census and relief needs.
+  const [area, setArea] = useState<{ at: [number, number]; info: AreaInfo | null; loading: boolean; error: string | null } | null>(null);
+  const openArea = (at: [number, number]) => {
+    setArea({ at, info: null, loading: true, error: null });
+    fetchArea(at)
+      .then((info) => setArea((cur) => (cur && cur.at === at ? { ...cur, info, loading: false } : cur)))
+      .catch((e: Error) => setArea((cur) => (cur && cur.at === at ? { ...cur, loading: false, error: e.message } : cur)));
+  };
   const radio = useRadio();
   // Analyst action updates.
   const [promptMode, setPromptMode] = useState<"ask" | "update">("ask");
@@ -861,7 +873,7 @@ export function ForecastConsole() {
         view3d={mode === "3d"} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={assessRain ?? OBSERVED_IN} flying={flying} onFlyEnd={() => setFlying(false)}
         atmosphere={atmosphere} padLeft={24} alerts={pins} activeAlert={activeAlert} onAlert={pickAlert} onStreet={(t) => { setFlying(false); setPhoto(false); setStreetPt(t); }} fitAlertsKey={fitKey} goto={goto} panelPad={panelPad} stations={stationPins} onStation={toggleStation}
         actionPins={actionPins} onActionPin={(key) => { setLocFocus(key); setActionsOpen(true); setRadioOpen(false); setLayersOpen(false); }}
-        flyTo={flyTo} onMapClick={picking ? onMapPick : undefined} picking={!!picking}
+        flyTo={flyTo} onMapClick={picking ? onMapPick : openArea} picking={!!picking} area={area?.info?.found ? area.info.ward.rings : null}
         waterLevel={waterLevel} riverLevel={riverLevel}
         base={base === "google" && gAvail?.available ? "google" : "esri"} onView={base === "google" && gAvail?.available ? onView : undefined} />
       {base === "google" && gAvail?.available && (
@@ -897,6 +909,8 @@ export function ForecastConsole() {
           <button className={`fx-tool${radioOpen ? " on" : ""}`} onClick={() => { setRadioOpen((o) => !o); setLayersOpen(false); setActionsOpen(false); }} aria-expanded={radioOpen}><Icon name="radio" size={16} /><span>Radio</span></button>
           <button className={`fx-tool${layersOpen ? " on" : ""}`} onClick={() => { setLayersOpen((o) => !o); setRadioOpen(false); setActionsOpen(false); }} aria-expanded={layersOpen}><Icon name="layers" size={16} /><span>Layers</span></button>
           <button className={`fx-tool${mode === "3d" ? " on" : ""}`} onClick={() => setMode((m) => (m === "2d" ? "3d" : "2d"))} aria-pressed={mode === "3d"}><Icon name="cube" size={16} /><span>3D</span></button>
+          <button className={`fx-tool${allocOpen ? " on" : ""}`} disabled={!results["resources"]} title={results["resources"] ? "Relief budget, supplies and vehicles by area" : "Run the Relief budget agent to see allocations"}
+            onClick={() => setAllocOpen((o) => !o)} aria-expanded={allocOpen}><Icon name="resources" size={16} /><span>Allocation</span></button>
           <button className="fx-tool" onClick={() => setDetails(true)}><Icon name="info" size={16} /><span>Sources</span></button>
           {phase === "done" && !reportOpen && <button className="fx-tool accent" onClick={() => setReportOpen(true)}><Icon name="doc" size={16} /><span>Report</span></button>}
         </div>
@@ -927,6 +941,11 @@ export function ForecastConsole() {
       )}
 
       {radioOpen && <RadioPanel radio={radio} onClose={() => setRadioOpen(false)} />}
+      {allocOpen && results["resources"] && (
+        <AllocationView r={results["resources"]} onClose={() => setAllocOpen(false)}
+          onShow={(a) => { setAllocOpen(false); if (a.pin) pickAlert(a.pin); else setFlyTo({ lon: a.lon, lat: a.lat, key: Date.now() }); }} />
+      )}
+      {area && <AreaPanel area={area.info} loading={area.loading} error={area.error} onClose={() => setArea(null)} />}
       {actionsOpen && (
         <ActionsPanel view={actionsView} focus={locFocus} onClose={() => setActionsOpen(false)} onUndo={undoAction}
           onFocus={(key, lon, lat) => { setLocFocus(key); setFlyTo({ lon, lat, key: Date.now() }); }}

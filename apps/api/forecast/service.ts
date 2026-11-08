@@ -30,7 +30,8 @@ export type Combined = { coverage?: Coverage; id: string; priority: "P1" | "P2";
 const SUGGEST: { re: RegExp; ids: string[] }[] = [
   { re: /rain|weather|storm|monsoon/i, ids: ["weather", "terrain"] },
   { re: /river|gauge|bagmati|water level/i, ids: ["rivers", "weather"] },
-  { re: /flood/i, ids: ["weather", "rivers", "terrain", "satellite"] },
+  { re: /flood/i, ids: ["weather", "rivers", "terrain", "satellite", "resources"] },
+  { re: /resource|budget|cost|money|fund|relief|aid|supplies|allocat|qrt|fema|ndrrma/i, ids: ["resources", "weather"] },
   { re: /road|access|route|cut.?off|bridge/i, ids: ["roads", "terrain"] },
   { re: /cell|phone|network|internet|comms|connect/i, ids: ["cellular", "power"] },
   { re: /power|electric|outage|grid/i, ids: ["power"] },
@@ -124,7 +125,7 @@ Bullets grouped by: people & facilities, roads & access, power & communications,
 ## How to prepare
 Numbered actions with a deadline relative to the peak (e.g. "by T-24 h"), most urgent first.
 ## Resource allocation
-A markdown table with columns: Resource | Send to | Why | When. Use only the resources listed. Route around the cut-off pockets and closed bridges. Take the logged actions into account: an action never closes a place. Where help is on site but people likely remain, say what is there and recommend more for that place. Put areas with NO ACTION YET first. Do not repeat what has already been done.
+If the Resource allocation agent ran, start with one line "**Budget allocated:** <its budgetAllocated>" and one line "**Days until more (national / FEMA-level) aid is needed:** <its daysUntilMoreAidNeeded>" (add "request by <its requestNationalAidBy>" only when it gives a time), copying its figures exactly and noting the costs are mocked. Then a markdown table with columns: Resource | Send to | Why | When. Use only the resources listed. Route around the cut-off pockets and closed bridges. Take the logged actions into account: an action never closes a place. Where help is on site but people likely remain, say what is there and recommend more for that place. Put areas with NO ACTION YET first. Do not repeat what has already been done.
 ## Public messaging (draft, needs approval)
 One short alert in English and the same in Nepali.
 ## Confidence and gaps
@@ -156,7 +157,7 @@ ${results.map(([id, r]) => `- **${AGENT_BY_ID.get(id)!.factor}:** ${r.headline}`
 ${combined.slice(0, 5).map((c, i) => `${i + 1}. **${c.priority} · ${c.place}** — ${c.why.join(" + ")}. ${c.coverage?.status === "none" || !c.coverage ? `No action logged yet: stage a response before ${c.when ?? "the peak"}.` : c.coverage.status === "partial" ? `${c.coverage.resources.join(", ") || "Help"} already on site, but about ${c.coverage.remaining} people may remain (estimate): send more.` : `Help already logged (${c.coverage.resources.join(", ") || "team"}); keep watching.`}`).join("\n") || "1. Keep monitoring; no combined finding."}
 
 ## Resource allocation
-| Resource | Send to | Why | When |
+${budgetLines(results)}| Resource | Send to | Why | When |
 |---|---|---|---|
 ${combined.slice(0, 4).map((c) => `| Nearest responder base | ${c.place} | ${c.agents.length} agents flag it | Before ${c.when ?? "peak"} |`).join("\n") || "| — | — | — | — |"}
 
@@ -169,6 +170,11 @@ Needs an LLM to draft. Configure StackAI to generate bilingual alerts.
 - Written by rules because the LLM was unavailable. Numbers come straight from the agents.
 - Replay: window values are what was observed in 2024, used as a perfect-forecast stand-in.
 - Depot stock is simulated; facility statuses are modelled from the observed flood.`;
+}
+
+function budgetLines(results: [string, AgentResult][]): string {
+  const r = results.find(([id]) => id === "resources")?.[1];
+  return r?.figures?.length ? `${r.figures.map((f) => `**${f.label}:** ${f.value}${f.note ? ` (${f.note})` : ""}`).join("  \n")}  \n_Costs are mocked for the demo._\n\n` : "";
 }
 
 // ---------------------------------------------------------------- fusion
@@ -260,7 +266,8 @@ export async function runForecast(services: Services, body: { question: string; 
 
   // Fusion: the combined finding no single feed shows.
   const names = new Map(ids.map((id) => [id, AGENT_BY_ID.get(id)!.factor]));
-  const all = ids.flatMap((id) => results.get(id)?.alerts ?? []);
+  // Budget pins say where help goes, not that something is wrong there, so they don't count towards agents agreeing.
+  const all = ids.filter((id) => id !== "resources").flatMap((id) => results.get(id)?.alerts ?? []);
   emit({ type: "fusion_step", text: `Coordinator: merging ${all.length} alerts from ${ids.length} agents.` });
   await sleep(500);
   const RANK = { none: 0, partial: 1, covered: 2 } as const;

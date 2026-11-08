@@ -1,3 +1,4 @@
+import { areaAt } from "./forecast/area.ts";
 import Fastify from "fastify";
 import fastifyStatic from "@fastify/static";
 import { existsSync } from "node:fs";
@@ -227,6 +228,10 @@ export async function buildServer() {
 
   // Forecast console: question → factors → parallel agents (streamed as server-sent events) → fusion → LLM report.
   app.get("/api/forecast/factors", async () => factorList());
+  app.get("/api/forecast/area", async (req) => {
+    const q = z.object({ lon: z.coerce.number().min(-180).max(180), lat: z.coerce.number().min(-90).max(90) }).parse(req.query ?? {});
+    return areaAt(S(), q.lon, q.lat);
+  });
   app.post("/api/forecast/intent", async (req) => {
     const b = z.object({ question: z.string().min(1).max(500) }).parse(req.body ?? {});
     return parseIntent(b.question);

@@ -81,6 +81,8 @@ export type Findings = {
   headline: string; risk: Risk; facts: Record<string, string | number>; alerts: MapAlert[]; caveats: string[];
   /** Extra payload for the map, per agent. */
   map?: Record<string, unknown>;
+  /** Headline numbers shown as-is on the agent card (never rewritten by the LLM). */
+  figures?: { label: string; value: string; note?: string | undefined }[];
 };
 export type StepKind = "read" | "calc" | "found";
 export type Ctx = { question: string; start: number; end: number; hours: number; services: Services; memo: Map<string, unknown> };
@@ -485,7 +487,271 @@ const landslides: AgentDef = {
   },
 };
 
-export const AGENTS: AgentDef[] = [weather, rivers, terrain, satellite, roads, cellular, power, social, facilities, landslides];
+// ---------------------------------------------------------------- resource allocation (budget)
+/**
+ * COST MODEL. Each number says whether it is REAL (published figure), ANCHORED (derived from a published figure) or MOCKED
+ * (placeholder). ASSUMPTIONS below carries the same list, with sources, to the UI. Change a value here and every figure follows.
+ *
+ * Shape of the response: shelter kits on day 1; during the emergency phase (water up) basic needs plus vehicles and QRT crews;
+ * after it, basic needs only (cash at the Minimum Expenditure Basket rate, the way the Red Cross ran the 2024 response).
+ */
+export const RELIEF = {
+  nprPerUsd: 134, // approximate, Sep 2024
+  /** REAL: 2021 census average household size, 4.37. */
+  householdSize: 4.4,
+  /** ANCHORED: in the Sep 2024 response 1,800 of 5,300 affected households (34%) had fully destroyed homes (IFRC MDRNP018). */
+  needShare: 0.34,
+  /** REAL: Nepal's Minimum Expenditure Basket, NPR 15,000 per household for one month (Cash Working Group; paid by NRCS/IFRC, Oct 2024). */
+  mebNprPerHouseholdMonth: 15000,
+  /** ANCHORED: IFRC 2024 shelter budget CHF 147,853 ÷ 1,800 households ≈ CHF 82 (2 tarpaulins, 2 blankets, 2 mattresses) at NPR 140/CHF. */
+  householdKit: 11500,
+  /** Supplies moved per person per day in the emergency phase: a WFP-style dry ration (~0.49 kg) plus water treatment and hygiene items (assumed ~0.2 kg). */
+  kgPerPersonDay: 0.7,
+  /** REAL: IFRC reports Kathmandu inundation receded after three days. Vehicles and QRT crews are costed for this phase only. */
+  emergencyDays: 3,
+  /** ANCHORED: the MEB is a one-month basket, and Nepal's 2017 flood allowance (NPR 70 per person per day) also ran for a month. */
+  horizonDays: 30,
+  /** ANCHORED: NDRRMA's first Disaster Management Fund release for the Aug 2026 Bhotekoshi flood, NPR 6.75 crore to 15 local units. */
+  fundNpr: 67_500_000,
+  /** Road distance = straight line × this (assumed). */
+  roadDetour: 1.4,
+  /** MOCKED: Quick Response Team crew (wages, food, kit), one team per this many people, per day. Vehicles are costed separately. */
+  qrtPeople: 2000, qrtNprPerDay: 25000,
+  /** REAL: government hill-route freight rate, NPR per tonne-km (Kathmandu Post, Apr 2026). Cross-check on truck hire only. */
+  hillFreightNprPerTonneKm: 17.97,
+  /** Areas with fewer people than this are left to ward offices rather than given their own package and team. */
+  minPeople: 50,
+};
+/** Basic needs per person per day at the MEB rate: 15,000 ÷ 4.4 people ÷ 30 days ≈ NPR 114. */
+export const basicPerPersonDay = () => RELIEF.mebNprPerHouseholdMonth / RELIEF.householdSize / 30;
+
+/**
+ * VEHICLES. Day rates are MOCKED (round placeholders, driver and fuel included). The helicopter rate is ANCHORED on published
+ * Nepal figures: US$1,500/h government rescue rate (Republica, 2018) and ~US$2,000–3,000/h AS350/H125 charter quotes.
+ */
+export const VEHICLES = {
+  truck: { label: "Medium truck (8 t)", tonnes: 8, nprPerDay: 18000, shiftH: 8, kmh: 15, loadH: 1.5 },
+  pickup: { label: "Pickup (1 t), last mile in narrow lanes", tonnes: 1, nprPerDay: 8000, perPeople: 600 },
+  boat: { label: "Inflatable rescue boat with outboard", nprPerDay: 6000, perPeople: 800 },
+  crew: { label: "QRT crew carrier (jeep or van)", nprPerDay: 10000 },
+  heli: { label: "Helicopter (AS350/H125 class, ~1 t load)", usdPerHour: 2000, tonnesPerSortie: 1, hoursPerSortie: 1, maxHoursPerDay: 6 },
+};
+export type Vehicle = { type: keyof typeof VEHICLES; label: string; count: number; perDayEach: number; perDay: number; note: string };
+
+export type Assumption = { item: string; value: string; status: "real" | "anchored" | "standard" | "estimate" | "mocked"; source: string; url?: string };
+/** Where every number in the allocation comes from. Shown in the Allocation section. */
+export const ASSUMPTIONS: Assumption[] = [
+  { item: "Basic needs per household", value: "NPR 15,000 a month (≈ NPR 114 per person per day)", status: "real", source: "Nepal Minimum Expenditure Basket (Cash Working Group), paid per household by the Nepal Red Cross / IFRC in the Sep 2024 flood response", url: "https://go-api.ifrc.org/api/DownloadFile/88981/MDRNP018dfr" },
+  { item: "Shelter kit per household", value: "≈ NPR 11,500 (2 tarpaulins, 2 blankets, 2 mattresses)", status: "anchored", source: "IFRC 2024 shelter budget CHF 147,853 ÷ 1,800 households; kit contents from the same report", url: "https://go-api.ifrc.org/api/DownloadFile/88981/MDRNP018dfr" },
+  { item: "Share of exposed people needing relief", value: "34%", status: "anchored", source: "IFRC 2024: 1,800 of 5,300 affected households had fully destroyed homes", url: "https://go-api.ifrc.org/api/DownloadFile/88981/MDRNP018dfr" },
+  { item: "Emergency phase (vehicles + QRT)", value: "3 days", status: "real", source: "IFRC 2024: inundation in Kathmandu receded after three days", url: "https://go-api.ifrc.org/api/DownloadFile/88981/MDRNP018dfr" },
+  { item: "Support period", value: "30 days", status: "anchored", source: "The MEB is a one-month basket; Nepal's 2017 flood allowance (NPR 70 per person per day) also ran for a month", url: "https://thehimalayantimes.com/nepal/flood-victims-get-rs-70-daily-month/" },
+  { item: "Emergency fund before national aid", value: "NPR 6.75 crore", status: "anchored", source: "NDRRMA's first Disaster Management Fund release for the Aug 2026 Bhotekoshi flood (15 local units)", url: "https://kathmandupost.com/national/2026/08/30/government-releases-rs675-million-to-15-local-units-hit-by-bhotekoshi-flood" },
+  { item: "Household size", value: "4.4 people", status: "real", source: "Nepal census 2021 (4.37)" },
+  { item: "Water and food quantities", value: "15 L water, 2,100 kcal per person per day", status: "standard", source: "Sphere humanitarian minimum standards" },
+  { item: "Helicopter", value: "US$2,000 per flying hour", status: "anchored", source: "Nepal rescue rate US$1,500/h (2018); AS350/H125 charters US$2,000–3,000/h", url: "https://myrepublica.nagariknetwork.com/news/no-more-discounts-on-chartered-rescue-flights-for-nepali-citizens" },
+  { item: "Truck freight cross-check", value: "NPR 17.97 per tonne-km", status: "real", source: "Government hill-route freight rate, Apr 2026", url: "https://kathmandupost.com/national/2026/04/08/government-approves-public-transport-fare-adjustment" },
+  { item: "People on flooded ground", value: "census density × flooded area", status: "estimate", source: "UNOSAT flood extent (30 Sep 2024) × 2021 census density by municipality. Upper bound" },
+  { item: "Vehicle day rates and numbers", value: "pickup NPR 8,000, truck 18,000, boat 6,000, crew carrier 10,000; 1 pickup per 600 people, 1 boat per 800", status: "mocked", source: "Placeholder; no published per-day hire rate found" },
+  { item: "QRT crew cost", value: "NPR 25,000 per team per day, 1 team per 2,000 people", status: "mocked", source: "Placeholder" },
+];
+
+export const npr = (n: number) => (n >= 1e7 ? `NPR ${(n / 1e7).toFixed(n >= 1e8 ? 1 : 2)} crore` : n >= 1e5 ? `NPR ${(n / 1e5).toFixed(1)} lakh` : `NPR ${Math.round(n).toLocaleString("en-US")}`);
+const usd = (n: number) => { const d = n / RELIEF.nprPerUsd; return d >= 1e6 ? `US$${(d / 1e6).toFixed(2)}M` : d >= 1000 ? `US$${Math.round(d / 1000)}k` : `US$${Math.round(d)}`; };
+export const money = (n: number) => `${npr(n)} (~${usd(n)})`;
+
+export type AreaCost = {
+  people: number; households: number; tonnesPerDay: number;
+  /** Per day, NPR. `perDay` is the emergency phase (basic needs + vehicles + QRT); `perDayAfter` is basic needs only. */
+  basic: number; transport: number; qrt: number; perDay: number; perDayAfter: number;
+  /** Once, NPR: shelter kits. */
+  kits: number;
+  qrtTeams: number; cutOff: boolean; base: { name: string; type: string }; roadKm: number; airKm: number;
+  /** Vehicles needed each day of the emergency phase, with their hire cost. `transport` is their sum. */
+  vehicles: Vehicle[];
+};
+/** Cost of the first `d` days for one area or the whole valley: kits, then the emergency phase, then basic needs. */
+export const costThrough = (d: number, kits: number, perDay: number, perDayAfter: number) =>
+  kits + Math.min(d, RELIEF.emergencyDays) * perDay + Math.max(0, Math.min(d, RELIEF.horizonDays) - RELIEF.emergencyDays) * perDayAfter;
+/** How many whole days `fund` pays for. */
+export function daysFundedBy(fund: number, kits: number, perDay: number, perDayAfter: number): number {
+  const E = RELIEF.emergencyDays, H = RELIEF.horizonDays;
+  let rem = fund - kits;
+  if (rem < 0 || perDay <= 0) return 0;
+  if (rem < E * perDay) return Math.floor(rem / perDay);
+  rem -= E * perDay;
+  return Math.min(H, E + (perDayAfter > 0 ? Math.floor(rem / perDayAfter) : H));
+}
+
+/**
+ * What it costs to support `people` at one spot: basic needs at the MEB rate, getting supplies there (pickups and trucks from the
+ * nearest reachable responder base, or helicopter from Tribhuvan airport when the spot is in a cut-off pocket), boats and QRT crews.
+ * Used by the resource agent and by the area card, so both always agree.
+ */
+export function costArea(people: number, at: Pt, pockets: { at: Pt }[]): AreaCost {
+  const R = RELIEF, O = ops(), bases = O.responders.filter((b) => b.access !== "lost");
+  const airport: Pt = O.airports[0]?.at ?? [85.359, 27.698];
+  const base = bases.reduce((b, x) => (km(x.at, at) < km(b.at, at) ? x : b), bases[0]!);
+  const roadKm = km(base.at, at) * R.roadDetour, cutOff = pockets.some((p) => km(p.at, at) < 0.8);
+  const tonnesPerDay = (people * R.kgPerPersonDay) / 1000;
+  const households = Math.ceil(people / R.householdSize);
+  const basic = people * basicPerPersonDay();
+  const qrtTeams = people <= 0 ? 0 : Math.max(1, Math.ceil(people / R.qrtPeople)), qrt = qrtTeams * R.qrtNprPerDay;
+  const V = VEHICLES, vehicles: Vehicle[] = [];
+  const add = (type: Vehicle["type"], count: number, perDayEach: number, note: string) => { if (count > 0) vehicles.push({ type, label: V[type].label, count, perDayEach: Math.round(perDayEach), perDay: Math.round(count * perDayEach), note }); };
+  if (people > 0) {
+    if (cutOff) {
+      // Cut off by road: everything flies in from Tribhuvan airport.
+      const sorties = Math.ceil(tonnesPerDay / V.heli.tonnesPerSortie), hours = sorties * V.heli.hoursPerSortie;
+      const n = Math.ceil(hours / V.heli.maxHoursPerDay);
+      add("heli", n, (hours / n) * V.heli.usdPerHour * R.nprPerUsd, `${sorties} sortie${sorties === 1 ? "" : "s"} a day from Tribhuvan airport (${Math.round(km(airport, at) * 10) / 10} km), US$${V.heli.usdPerHour.toLocaleString("en-US")}/h`);
+    } else {
+      // Round trips that fit in a shift at flood-traffic speed. Pickups (1 per 600 people) carry what they can; trucks take the rest.
+      const trips = Math.max(1, Math.floor(V.truck.shiftH / ((2 * roadKm) / V.truck.kmh + V.truck.loadH)));
+      const pickups = Math.ceil(people / V.pickup.perPeople), rest = Math.max(0, tonnesPerDay - pickups * V.pickup.tonnes * trips);
+      const trip = `${trips} round trip${trips === 1 ? "" : "s"} each from ${base.name} (~${Math.round(roadKm * 10) / 10} km)`;
+      add("pickup", pickups, V.pickup.nprPerDay, `1 per ${V.pickup.perPeople} people; ${trip}`);
+      if (rest > 0) {
+        const freight = rest * roadKm * R.hillFreightNprPerTonneKm;
+        add("truck", Math.ceil(rest / (V.truck.tonnes * trips)), V.truck.nprPerDay, `${Math.round(rest * 10) / 10} t a day the pickups can't carry; ${trip}. Government freight rate alone would be ${money(freight)}`);
+      }
+    }
+    add("boat", Math.ceil(people / V.boat.perPeople), V.boat.nprPerDay, `1 per ${V.boat.perPeople} people on flooded ground`);
+    add("crew", qrtTeams, V.crew.nprPerDay, "1 per QRT team");
+  }
+  const transport = vehicles.reduce((t, v) => t + v.perDay, 0);
+  return {
+    people, households, tonnesPerDay, basic, transport, qrt, perDay: basic + transport + qrt, perDayAfter: basic,
+    kits: households * R.householdKit, qrtTeams, cutOff, base: { name: base.name, type: base.type }, roadKm, airKm: km(airport, at), vehicles,
+  };
+}
+
+/** One affected area's allocation, as the UI shows it. */
+export type AreaAllocation = {
+  id: string; place: string; lon: number; lat: number; people: number; households: number; by: "road" | "helicopter"; from: string;
+  /** Supplies per day of the emergency phase, and once. */
+  foodKgPerDay: number; waterLPerDay: number; shelterKits: number; qrtTeams: number;
+  vehicles: { type: string; label: string; count: number; perDayEachLabel: string; perDayLabel: string; note: string }[];
+  perDay: number; perDayLabel: string; perDayAfterLabel: string; kitsLabel: string;
+  /** Paid by the emergency fund (kits + the days it lasts) and the full need over the support period. */
+  allocated: number; allocatedLabel: string; fullNeed: number; fullNeedLabel: string; daysFunded: number;
+  /** Map pin id when this area has a pin. */
+  pin: string | null;
+};
+/** What the last resource-agent run assumed, so a clicked area is costed on the same basis. Null until it has run. */
+export type ResourcePlan = { window: string; rainShareOf2024: number; needShare: number; daysCovered: number | null; askBy: string | null; areas: AreaAllocation[] };
+let lastPlan: ResourcePlan | null = null;
+export const lastResourcePlan = () => lastPlan;
+
+const resources: AgentDef = {
+  id: "resources", name: "Resource allocation agent", factor: "Relief budget", sources: "Census 2021 × UNOSAT extent · Nepal MEB · IFRC 2024 response · BIPAD responder bases",
+  blurb: "Budget for relief packages, vehicles and QRT crews, by area, and how long the emergency fund lasts.",
+  async run(ctx, step): Promise<Findings> {
+    const R = RELIEF, rs = rainStats(ctx), risk = band(rs.ratio), E = R.emergencyDays, H = R.horizonDays;
+    const { exposedAreas } = await import("../actions/need.ts");
+    const { areas: all, basis } = exposedAreas(1.5);
+    const totalExposed = sum(all.map((a) => a.people));
+    await step("read", `Population on ground the 2024 flood covered: about ${totalExposed.toLocaleString("en-US")} people in ${all.length} areas (${basis})`);
+    const scale = Math.min(1, rs.ratio / 0.8);
+    lastPlan = { window: `${when(ctx.start)} → ${when(ctx.end)}`, rainShareOf2024: rs.ratio, needShare: R.needShare * scale, daysCovered: null, askBy: null, areas: [] };
+    await step("calc", `In 2024, 34% of affected households lost their homes (IFRC). This window's rain is ${Math.round(rs.ratio * 100)}% of 2024, so ${Math.round(R.needShare * scale * 100)}% of exposed people are planned for.`);
+    // One area per named place: neighbouring bins that share a nearest place are merged (people-weighted centre).
+    const byPlace = new Map<string, { people: number; x: number; y: number }>();
+    for (const a of all) {
+      const k = nearestPlace([a.lon, a.lat]), g = byPlace.get(k) ?? { people: 0, x: 0, y: 0 };
+      g.people += a.people; g.x += a.lon * a.people; g.y += a.lat * a.people; byPlace.set(k, g);
+    }
+    const grouped = [...byPlace.entries()].map(([place, g]) => ({ place, lon: g.x / g.people, lat: g.y / g.people, people: g.people, need: Math.round((g.people * R.needShare * scale) / 10) * 10 }))
+      .sort((a, b) => b.need - a.need);
+    const areas = grouped.filter((a) => a.need >= R.minPeople), small = grouped.filter((a) => a.need > 0 && a.need < R.minPeople);
+    await step("calc", `Grouped into ${grouped.length} named places; ${areas.length} have ${R.minPeople}+ people to plan for${small.length ? `, ${small.length} smaller ones (${sum(small.map((a) => a.need))} people) go to ward offices` : ""}.`);
+    if (!areas.length || risk === "low") {
+      await step("found", "Rain is too light to expect displacement. No package allocated; stock stays on standby.");
+      return {
+        headline: "Standby: no relief allocation needed for this window.", risk: "low", alerts: [],
+        caveats: ["Vehicle and QRT rates are mocked; basic needs, shelter kits and the fund are anchored on published figures."],
+        facts: { budgetAllocated: "NPR 0 (standby)", peoplePlannedFor: 0, daysUntilMoreAidNeeded: "not needed" },
+        figures: [{ label: "Budget allocated", value: "NPR 0 · standby" }, { label: "Days until more (national / FEMA-level) aid is needed", value: "Not expected" }],
+      };
+    }
+    await step("calc", `Basic needs at Nepal's Minimum Expenditure Basket: NPR ${R.mebNprPerHouseholdMonth.toLocaleString("en-US")} per household a month ≈ NPR ${Math.round(basicPerPersonDay())} per person a day; shelter kit ≈ NPR ${R.householdKit.toLocaleString("en-US")} per household (IFRC 2024).`);
+    const scene = await ctx.services.scene.load();
+    const pockets = scene.entities.filter((e) => e.kind === "pocket");
+    const plans = areas.map((a) => {
+      const at: Pt = [a.lon, a.lat], c = costArea(a.need, at, pockets);
+      return { a, at, place: a.place, ...c };
+    });
+    for (const p of plans.slice(0, 4)) {
+      await step("calc", `${p.place}: ~${p.a.need.toLocaleString("en-US")} people. ${p.cutOff ? `Cut off by road: helicopter from Tribhuvan airport (${r1(p.airKm)} km)` : `${p.qrtTeams} QRT from ${p.base.name} (${p.base.type}, ~${r1(p.roadKm)} km by road)`}; ${money(p.perDay)} a day while the water is up.`);
+    }
+    const oneOff = sum(plans.map((p) => p.kits)), perDay = sum(plans.map((p) => p.perDay)), perDayAfter = sum(plans.map((p) => p.perDayAfter));
+    // Whole fleet, by vehicle type.
+    const fleetMap = new Map<string, { type: string; label: string; count: number; perDay: number }>();
+    for (const v of plans.flatMap((p) => p.vehicles)) {
+      const f = fleetMap.get(v.type) ?? { type: v.type, label: v.label, count: 0, perDay: 0 };
+      f.count += v.count; f.perDay += v.perDay; fleetMap.set(v.type, f);
+    }
+    const fleet = [...fleetMap.values()].map((f) => ({ ...f, perDayEach: Math.round(f.perDay / f.count), perDayEachLabel: money(f.perDay / f.count), perDayLabel: money(f.perDay) }));
+    const fleetDay = sum(fleet.map((f) => f.perDay));
+    await step("calc", `Fleet for the ${E}-day emergency phase: ${fleet.map((f) => `${f.count} × ${f.label.split(" (")[0]!.split(",")[0]!.toLowerCase()}`).join(", ")}; ${money(fleetDay)} a day in vehicle hire.`);
+    const fullNeed = costThrough(H, oneOff, perDay, perDayAfter);
+    const days = daysFundedBy(R.fundNpr, oneOff, perDay, perDayAfter);
+    const allocated = Math.min(R.fundNpr, fullNeed), short = Math.max(0, fullNeed - R.fundNpr);
+    await step("calc", `Total: ${money(oneOff)} in shelter kits, ${money(perDay)} a day for ${E} days, then ${money(perDayAfter)} a day to day ${H}: ${money(fullNeed)} in all.`);
+    const people = sum(plans.map((p) => p.a.need));
+    const escalate = days < H;
+    // When to ask: the day the money runs out, counted from when people start needing help (the rain peak).
+    const askBy = rs.max24End + days * 24;
+    const daysFunded = Math.min(days, H), PINS = 12;
+    const allocations: AreaAllocation[] = plans.map((p, i) => {
+      const full = costThrough(H, p.kits, p.perDay, p.perDayAfter), got = costThrough(daysFunded, p.kits, p.perDay, p.perDayAfter);
+      return {
+        id: `area-${i}`, place: p.place, lon: p.a.lon, lat: p.a.lat, people: p.a.need, households: p.households, by: p.cutOff ? "helicopter" : "road",
+        from: p.cutOff ? "Tribhuvan International Airport, by helicopter" : `${p.base.name} (${p.base.type}, ~${r1(p.roadKm)} km by road)`,
+        foodKgPerDay: Math.round(p.a.need * 0.49), waterLPerDay: p.a.need * 15, shelterKits: p.households, qrtTeams: p.qrtTeams,
+        vehicles: p.vehicles.map((v) => ({ type: v.type, label: v.label, count: v.count, perDayEachLabel: money(v.perDayEach), perDayLabel: money(v.perDay), note: v.note })),
+        perDay: Math.round(p.perDay), perDayLabel: money(p.perDay), perDayAfterLabel: money(p.perDayAfter), kitsLabel: money(p.kits),
+        allocated: Math.round(got), allocatedLabel: money(got), fullNeed: Math.round(full), fullNeedLabel: money(full), daysFunded, pin: i < PINS ? `resources-${i}` : null,
+      };
+    });
+    lastPlan = { ...lastPlan!, daysCovered: escalate ? days : null, askBy: escalate ? when(askBy) : null, areas: allocations };
+    await step("found", escalate
+      ? `The ${money(R.fundNpr)} emergency fund covers ${days} day${days === 1 ? "" : "s"}. Request national (NDRRMA) or international aid before ${when(askBy)}; shortfall ${money(short)}.`
+      : `The ${money(R.fundNpr)} emergency fund covers the full ${H}-day period; no national request needed.`);
+    const alerts: MapAlert[] = allocations.slice(0, PINS).map((x, i) => ({
+      id: `resources-${i}`, agent: "resources", lon: x.lon, lat: x.lat, severity: x.by === "helicopter" ? "high" : "moderate",
+      title: `${x.place}: ${x.allocatedLabel} for ~${x.people.toLocaleString("en-US")} people`,
+      detail: `${x.perDayLabel} a day while the water is up, then ${x.perDayAfterLabel}. Covers shelter kits plus ${daysFunded} days. ${x.by === "helicopter" ? "Cut off by road: helicopter drop." : `${x.qrtTeams} QRT team${x.qrtTeams > 1 ? "s" : ""} from ${plans[i]!.base.name}.`}`,
+      at: rs.max24End - 12, when: when(rs.max24End - 12),
+    }));
+    return {
+      headline: `${money(allocated)} allocated for ~${people.toLocaleString("en-US")} people in ${plans.length} areas; ${escalate ? `more aid needed in ${days} days` : "covers the full period"}.`,
+      risk: escalate && days <= 3 ? "high" : escalate ? "moderate" : "low", alerts,
+      caveats: ["Basic needs, shelter kits, the share in need, phase lengths and the fund are anchored on published figures; vehicle and QRT rates are mocked.", "People counts are upper-bound estimates from census density on the 2024 flood extent; area level only."],
+      facts: {
+        budgetAllocated: money(allocated), peoplePlannedFor: people, areas: plans.length, shelterKits: money(oneOff), costPerDayEmergency: money(perDay), costPerDayAfter: money(perDayAfter),
+        fullNeed30Days: money(fullNeed), emergencyFund: money(R.fundNpr), daysUntilMoreAidNeeded: escalate ? days : `not within ${H} days`,
+        requestNationalAidBy: escalate ? when(askBy) : "not needed", vehicleHirePerDay: money(fleetDay),
+        fleet: fleet.map((f) => `${f.count} ${f.label} at ${f.perDayEachLabel}/day each`).join("; "), shortfall: money(short), qrtTeams: sum(plans.map((p) => p.qrtTeams)), helicopterAreas: plans.filter((p) => p.cutOff).length,
+      },
+      figures: [
+        { label: "Budget allocated", value: money(allocated), note: `for ~${people.toLocaleString("en-US")} people in ${plans.length} areas` },
+        { label: "Days until more (national / FEMA-level) aid is needed", value: escalate ? `${days} day${days === 1 ? "" : "s"}` : `None within ${H} days`, note: escalate ? `request by ${when(askBy)} · shortfall ${money(short)}` : undefined },
+        { label: `Spend per day, first ${E} days`, value: money(perDay), note: `then ${money(perDayAfter)} a day for basic needs` },
+      ],
+      map: {
+        fleet, fleetPerDayLabel: money(fleetDay), areas: allocations, assumptions: ASSUMPTIONS,
+        totals: {
+          allocatedLabel: money(allocated), fullNeedLabel: money(fullNeed), perDayLabel: money(perDay), perDayAfterLabel: money(perDayAfter), kitsLabel: money(oneOff),
+          fundLabel: money(R.fundNpr), shortfallLabel: money(short), days: escalate ? days : null, askBy: escalate ? when(askBy) : null,
+          horizonDays: H, emergencyDays: E, people, households: sum(plans.map((p) => p.households)), qrtTeams: sum(plans.map((p) => p.qrtTeams)), window: lastPlan.window,
+        },
+      },
+    };
+  },
+};
+
+export const AGENTS: AgentDef[] = [weather, rivers, terrain, satellite, roads, cellular, power, social, facilities, landslides, resources];
 export const AGENT_BY_ID = new Map(AGENTS.map((a) => [a.id, a]));
 
 /** Resources the report can allocate. Responder bases, army, airports and open spaces are real places; depot stock is simulated. */

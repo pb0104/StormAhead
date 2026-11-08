@@ -10,6 +10,8 @@ export type MapAlert = { id: string; agent: string; lon: number; lat: number; se
 export type AgentResult = {
   headline: string; risk: Risk; facts: Record<string, string | number>; alerts: MapAlert[]; caveats: string[]; map?: Record<string, unknown>;
   thinking: string[]; watch: string; by: "stackai" | "rules"; llmError?: string;
+  /** Headline numbers to show as-is (e.g. the resource agent's budget). */
+  figures?: { label: string; value: string; note?: string }[];
 };
 export type Combined = { coverage?: import("./actionsApi.ts").Coverage; id: string; priority: "P1" | "P2"; lon: number; lat: number; place: string; agents: string[]; title: string; why: string[]; at: number | null; when: string | null; severity: Severity };
 export type ForecastEvent =

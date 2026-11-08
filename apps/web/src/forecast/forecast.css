@@ -491,3 +491,144 @@
 .fx-pop-sv { margin-top: 9px; background: rgba(125, 211, 252, 0.12); color: #BFE6FB; border: 1px solid rgba(125, 211, 252, 0.35); border-radius: 7px; padding: 4px 10px; font: 500 11.5px "Inter", system-ui, sans-serif; cursor: pointer; }
 .fx-pop-sv:hover { background: rgba(125, 211, 252, 0.22); }
 .fx .photo { z-index: 20; } /* Street View / photoreal cover the whole console, including the dock and report */
+
+/* Resource allocation agent: headline money figures on its card and in the sitrep header. */
+.fx-figures { margin: 8px 0 2px; display: grid; gap: 6px; }
+.fx-figures > div { display: grid; gap: 1px; padding: 7px 9px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07); }
+.fx-figures dt { font-size: 10.5px; letter-spacing: 0.02em; color: var(--fx-mute); }
+.fx-figures dd { margin: 0; font-size: 13.5px; font-weight: 600; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-figures small { display: block; font-size: 11px; font-weight: 400; color: var(--fx-mute); }
+.fx-budget { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.fx-budget > div { display: grid; gap: 2px; padding: 8px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+.fx-budget span { font-size: 10.5px; color: var(--fx-mute); }
+.fx-budget b { font-size: 14px; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-budget small { font-size: 11px; color: var(--fx-mute); }
+@media (max-width: 520px) { .fx-budget { grid-template-columns: 1fr; } }
+
+/* Daily spend per area on the resource agent card. */
+.fx-spend { width: 100%; margin: 8px 0 2px; border-collapse: collapse; font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.fx-spend caption { text-align: left; font-size: 10.5px; color: var(--fx-mute); padding-bottom: 4px; }
+.fx-spend td { padding: 4px 0; border-top: 1px solid var(--fx-line); color: #C3CFDC; }
+.fx-spend td:nth-child(2) { color: var(--fx-mute); padding: 4px 8px; white-space: nowrap; }
+.fx-spend td:last-child { text-align: right; color: var(--fx-text); white-space: nowrap; }
+.fx-spend tfoot td { color: var(--fx-mute); font-size: 11px; }
+.fx-spend-tag { margin-left: 6px; padding: 0 5px; border-radius: 4px; font-size: 10px; color: var(--fx-high); border: 1px solid currentColor; }
+
+/* Area card. */
+.fx-area { position: absolute; top: 72px; right: 14px; z-index: 11; width: 380px; max-width: calc(100vw - 32px); max-height: calc(100vh - 110px); display: flex; flex-direction: column; overflow: hidden; animation: fx-in 0.18s ease-out; }
+.fx-area-head { display: flex; justify-content: space-between; gap: 10px; padding: 14px 12px 8px 16px; }
+.fx-area-head h3 { margin: 4px 0 2px; font-size: 16px; font-weight: 600; letter-spacing: -0.01em; color: var(--fx-text); }
+.fx-area-kicker { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; color: var(--fx-accent); }
+.fx-area-body { overflow-y: auto; padding: 0 16px 14px; display: grid; gap: 14px; font-size: 12.5px; color: #C3CFDC; line-height: 1.45; }
+.fx-area-body section { display: grid; gap: 6px; }
+.fx-area-body h4 { margin: 0; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fx-mute); }
+.fx-area-body p { margin: 0; }
+.fx-area-body b { color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-area-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0; }
+.fx-area-grid > div { padding: 7px 9px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.07); }
+.fx-area-grid dt { font-size: 10.5px; color: var(--fx-mute); }
+.fx-area-grid dd { margin: 0; font-size: 14px; font-weight: 600; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-area-est span, .fx-area-src, .fx-area-note, .fx-muted { color: var(--fx-mute); font-size: 11.5px; }
+.fx-area-note { padding-top: 8px; border-top: 1px solid var(--fx-line); }
+.fx-area-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.fx-area-table caption { text-align: left; font-size: 10.5px; color: var(--fx-mute); padding-bottom: 4px; }
+.fx-area-table td { padding: 4px 0; border-top: 1px solid var(--fx-line); }
+.fx-area-table td:last-child { text-align: right; color: var(--fx-text); white-space: nowrap; padding-left: 10px; }
+.fx-area-table tr.total td { font-weight: 600; color: var(--fx-text); }
+@media (max-width: 520px) { .fx-area { left: 16px; right: 16px; width: auto; } .fx-area-grid { grid-template-columns: 1fr; } }
+
+/* Vehicle tables (agent card and area card). */
+.fx-fleet th { text-align: left; font-size: 10.5px; font-weight: 500; color: var(--fx-mute); padding: 2px 0 4px; }
+.fx-fleet th:not(:first-child), .fx-fleet td:not(:first-child) { text-align: right; padding-left: 8px; white-space: nowrap; }
+.fx-fleet td:first-child small { display: block; font-size: 10.5px; color: var(--fx-mute); }
+.fx-spend.fx-fleet td:nth-child(2) { padding: 4px 0 4px 8px; color: var(--fx-text); }
+
+/* Budget tiles are a button that opens the Allocation tab. */
+button.fx-budget { width: 100%; font: inherit; color: inherit; text-align: left; cursor: pointer; background: none; border: 0; padding: 0; }
+button.fx-budget > div { transition: border-color 0.15s; }
+button.fx-budget:hover > div { border-color: rgba(94, 234, 212, 0.45); }
+.fx-budget-more { grid-column: 1 / -1; font-size: 11.5px; color: var(--fx-accent); }
+
+/* Allocation tab. */
+.fx-alloc { display: grid; gap: 12px; font-size: 12.5px; color: #C3CFDC; }
+.fx-alloc h4 { margin: 4px 0 0; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fx-mute); }
+.fx-alloc-sum { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.fx-alloc-sum > div { display: grid; gap: 2px; padding: 9px 10px; border-radius: 10px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+.fx-alloc-sum > div.warn { border-color: rgba(255, 138, 61, 0.45); }
+.fx-alloc-sum span { font-size: 10.5px; color: var(--fx-mute); }
+.fx-alloc-sum b { display: grid; font-size: 14px; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-alloc-sum small { font-size: 11px; color: var(--fx-mute); }
+.fx-npr { display: block; }
+.fx-usd { display: block; font-size: 0.86em; font-weight: 500; color: var(--fx-mute); }
+.fx-alloc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.fx-alloc-list > li { border-radius: 10px; border: 1px solid var(--fx-line); background: rgba(255, 255, 255, 0.025); }
+.fx-alloc-list > li.open { border-color: rgba(94, 234, 212, 0.35); }
+.fx-alloc-row { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 9px 11px; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.fx-alloc-place { display: grid; gap: 1px; min-width: 0; }
+.fx-alloc-place b { color: var(--fx-text); font-weight: 600; }
+.fx-alloc-place small { font-size: 11px; color: var(--fx-mute); }
+.fx-alloc-amt { text-align: right; font-weight: 600; color: var(--fx-text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fx-alloc-detail { display: grid; gap: 10px; padding: 0 11px 11px; }
+.fx-alloc-detail dl { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 0; }
+.fx-alloc-detail dl > div { padding: 7px 9px; border-radius: 8px; background: rgba(255, 255, 255, 0.04); }
+.fx-alloc-detail dt { font-size: 10.5px; color: var(--fx-mute); }
+.fx-alloc-detail dd { margin: 0; font-weight: 600; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-area-table .fx-npr, .fx-area-table .fx-usd { white-space: nowrap; }
+@media (max-width: 520px) { .fx-alloc-sum, .fx-alloc-detail dl { grid-template-columns: 1fr; } }
+
+/* Area card: keep everything inside the card; vehicles as a list, money stacked NPR over USD. */
+.fx-area-body { overflow-x: hidden; }
+.fx-area-table td:last-child { text-align: right; }
+.fx-area-sub { margin: 4px 0 0; font-size: 10.5px; font-weight: 500; color: var(--fx-mute); }
+.fx-veh { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.fx-veh li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--fx-line); }
+.fx-veh-main { min-width: 0; }
+.fx-veh-main b { color: var(--fx-text); }
+.fx-veh-main small, .fx-veh-cost small { display: block; font-size: 10.5px; color: var(--fx-mute); }
+.fx-veh-cost { text-align: right; white-space: nowrap; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+
+/* Allocation section: a full page over the map, opened from the top bar. */
+.fx-allocview { position: absolute; top: 64px; left: 14px; right: 14px; bottom: 14px; z-index: 12; display: flex; flex-direction: column; overflow: hidden; animation: fx-in 0.18s ease-out; }
+.fx-av-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; padding: 18px 24px 12px; border-bottom: 1px solid var(--fx-line); }
+.fx-av-head h2 { margin: 6px 0 4px; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; color: var(--fx-text); }
+.fx-av-close { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--fx-line-2); background: rgba(255, 255, 255, 0.04); color: var(--fx-text); font: 500 13px var(--fx-sans); cursor: pointer; }
+.fx-av-close:hover { border-color: rgba(94, 234, 212, 0.5); }
+.fx-av-scroll { overflow-y: auto; padding: 18px 24px 24px; display: grid; gap: 22px; align-content: start; }
+.fx-av-sum { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.fx-av-sum > div, .fx-av-tiles > div { display: grid; gap: 3px; align-content: start; padding: 12px 14px; border-radius: 12px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); }
+.fx-av-sum > div.warn { border-color: rgba(255, 138, 61, 0.5); }
+.fx-av-sum > div > span, .fx-av-tiles > div > span { font-size: 11px; color: var(--fx-mute); }
+.fx-av-sum b { display: grid; font-size: 19px; font-weight: 600; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-av-sum small { font-size: 11.5px; color: var(--fx-mute); line-height: 1.4; }
+.fx-av-main { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.fx-allocview h3 { margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fx-mute); }
+.fx-allocview h4 { margin: 14px 0 6px; font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--fx-mute); }
+.fx-av-table { width: 100%; border-collapse: collapse; font-size: 13px; color: #C3CFDC; font-variant-numeric: tabular-nums; }
+.fx-av-table th { text-align: left; font-size: 11px; font-weight: 500; color: var(--fx-mute); padding: 6px 10px; border-bottom: 1px solid var(--fx-line-2); }
+.fx-av-table td { padding: 9px 10px; border-bottom: 1px solid var(--fx-line); vertical-align: top; }
+.fx-av-table td small { display: block; font-size: 11px; color: var(--fx-mute); }
+.fx-av-table td b { color: var(--fx-text); font-weight: 600; }
+.fx-av-list tbody tr { cursor: pointer; }
+.fx-av-list tbody tr:hover td { background: rgba(255, 255, 255, 0.03); }
+.fx-av-list tbody tr.sel td { background: rgba(94, 234, 212, 0.09); }
+.fx-av-list tbody tr.sel td:first-child { box-shadow: inset 3px 0 0 var(--fx-accent); }
+.fx-av-list tbody tr:focus-visible { outline: 2px solid var(--fx-accent); outline-offset: -2px; }
+.fx-av-table.compact td { padding: 7px 10px; }
+.fx-av-detail { position: sticky; top: 0; padding: 16px; border-radius: 14px; border: 1px solid rgba(94, 234, 212, 0.25); background: rgba(255, 255, 255, 0.03); font-size: 12.5px; color: #C3CFDC; }
+.fx-av-detail-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+.fx-av-detail-head h3 { margin: 0 0 2px; font-size: 18px; text-transform: none; letter-spacing: -0.01em; color: var(--fx-text); }
+.fx-av-show { display: inline-flex; align-items: center; gap: 6px; flex: none; padding: 7px 11px; border-radius: 9px; border: 0; background: linear-gradient(135deg, var(--fx-accent-2), var(--fx-accent)); color: #04120F; font: 600 12px var(--fx-sans); cursor: pointer; }
+.fx-av-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.fx-av-tiles b { display: grid; font-size: 15px; color: var(--fx-text); font-variant-numeric: tabular-nums; }
+.fx-av-detail .fx-area-table td small { display: block; color: var(--fx-mute); font-size: 11px; }
+.fx-av-src td:last-child a { color: var(--fx-accent-2); text-decoration: none; }
+.fx-av-src td:last-child a:hover { text-decoration: underline; }
+.fx-st { display: inline-block; padding: 1px 7px; border-radius: 999px; font-size: 11px; font-weight: 600; border: 1px solid currentColor; white-space: nowrap; }
+.fx-st.st-real { color: var(--fx-low); }
+.fx-st.st-anchored { color: var(--fx-accent-2); }
+.fx-st.st-standard { color: var(--fx-info); }
+.fx-st.st-estimate { color: var(--fx-moderate); }
+.fx-st.st-mocked { color: var(--fx-high); }
+.fx-tool:disabled { opacity: 0.4; cursor: not-allowed; }
+@media (max-width: 1100px) { .fx-av-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fx-av-main { grid-template-columns: 1fr; } .fx-av-detail { position: static; } }
+@media (max-width: 560px) { .fx-allocview { left: 0; right: 0; bottom: 0; border-radius: 0; } .fx-av-head, .fx-av-scroll { padding-left: 16px; padding-right: 16px; } .fx-av-sum { grid-template-columns: 1fr; } }

@@ -17,7 +17,7 @@ describe("forecast intent", () => {
   });
   it("suggests matching agents, or all of them for a general question", () => {
     expect(parseIntent("Which hospitals lose access?").suggested).toEqual(expect.arrayContaining(["facilities", "roads"]));
-    expect(parseIntent("How do the next 15 days look?").suggested.length).toBe(10);
+    expect(parseIntent("How do the next 15 days look?").suggested.length).toBe(11);
   });
 });
 
