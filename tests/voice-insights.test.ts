@@ -119,7 +119,7 @@ describe("tools sent to the live session", () => {
   it("declares every ORACLE capability and mentions it in the instructions", async () => {
     const { OPS_LIVE_TOOLS, OPS_INSTRUCTIONS } = await import("../packages/voice/index.ts");
     const names = OPS_LIVE_TOOLS.map((t) => t.name);
-    for (const n of ["list_radio_stations", "tune_radio", "stop_radio", "get_road_closures", "open_street_view", "close_street_view", "search_social_posts", "open_social_post"]) {
+    for (const n of ["list_radio_stations", "tune_radio", "stop_radio", "get_road_closures", "open_street_view", "close_street_view", "search_social_posts", "open_social_post", "show_alternative_routes", "clear_routes", "get_relief_needs", "open_allocation"]) {
       expect(names).toContain(n);
       expect(OPS_INSTRUCTIONS).toContain(n);
     }

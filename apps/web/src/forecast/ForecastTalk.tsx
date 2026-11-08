@@ -23,6 +23,8 @@ export type LiveTalk = {
   canSend: boolean;
   toggle: () => void;
   send: (text: string) => boolean;
+  /** Send to ORACLE, reconnecting first if the session is off or dropped. */
+  sendOrConnect: (text: string) => void;
   /** Push quiet context once Live is ready (assessment / UI briefing). */
   openWithContext: (text: string) => void;
 };
@@ -56,6 +58,10 @@ function proxyHandle(ref: { current: OpsHandle }): OpsHandle {
     tuneRadio: (q) => ref.current.tuneRadio(q),
     stopRadio: (c) => ref.current.stopRadio(c),
     getRoadClosures: (q, n) => ref.current.getRoadClosures(q, n),
+    showAlternativeRoutes: (q) => ref.current.showAlternativeRoutes(q),
+    clearRoutes: () => ref.current.clearRoutes(),
+    getReliefNeeds: (q) => ref.current.getReliefNeeds(q),
+    openAllocation: (a) => ref.current.openAllocation(a),
     openStreetView: (q) => ref.current.openStreetView(q),
     closeStreetView: () => ref.current.closeStreetView(),
     clearInsights: () => ref.current.clearInsights(),
@@ -78,13 +84,25 @@ export function useLiveTalk(handle: OpsHandle): LiveTalk {
   const [error, setError] = useState<string | null>(null);
   const [log, setLog] = useState<{ role: "assistant" | "user"; text: string }[]>([]);
   const session = useRef<ReturnType<typeof createLiveSession> | null>(null);
+  const botOpen = useRef(false);
   const handleRef = useRef(handle);
   handleRef.current = handle;
 
   useEffect(() => {
     session.current = createLiveSession(proxyHandle(handleRef), {
       onStatus: (s) => setStatus(s),
-      onCaption: (t, role) => setLog((L) => [...L.slice(-30), { role, text: t }]),
+      // Live sends a reply as many small transcript pieces: join them into one message per turn.
+      onCaption: (t, role) => setLog((L) => {
+        const last = L[L.length - 1];
+        if (role === "assistant" && last?.role === "assistant" && botOpen.current) {
+          const sep = /\s$/.test(last.text) || /^[\s.,!?;:'’)]/.test(t) ? "" : " ";
+          return [...L.slice(0, -1), { role, text: last.text + sep + t }];
+        }
+        if (role === "assistant") botOpen.current = true;
+        else botOpen.current = false;
+        return [...L.slice(-199), { role, text: t.trim() }];
+      }),
+      onTurnEnd: () => { botOpen.current = false; },
       onError: (m) => setError(m),
     });
     return () => session.current?.stop();
@@ -106,14 +124,26 @@ export function useLiveTalk(handle: OpsHandle): LiveTalk {
   };
 
   const pendingContext = useRef<string | null>(null);
+  const pendingText = useRef<string | null>(null);
 
   useEffect(() => {
     if (status !== "ready") return;
     const ctx = pendingContext.current;
-    if (!ctx) return;
-    pendingContext.current = null;
-    session.current?.sendContext(ctx);
+    if (ctx) { pendingContext.current = null; session.current?.sendContext(ctx); }
+    const txt = pendingText.current;
+    if (txt) { pendingText.current = null; session.current?.sendText(txt); }
   }, [status]);
+
+  /** Send a user message to ORACLE, connecting first (and sending once READY) if the session is off or dropped. */
+  const sendOrConnect = (text: string) => {
+    const t = text.trim();
+    if (!t) return;
+    if (send(t)) return;
+    setError(null);
+    pendingText.current = t;
+    const st = statusRef.current;
+    if (st === "idle" || st === "error") session.current?.connect();
+  };
 
   const openWithContext = (text: string) => {
     const t = text.trim();
@@ -134,7 +164,7 @@ export function useLiveTalk(handle: OpsHandle): LiveTalk {
     else session.current?.connect();
   };
 
-  return { status, error, log, live, canSend, toggle, send, openWithContext };
+  return { status, error, log, live, canSend, toggle, send, sendOrConnect, openWithContext };
 }
 
 export function TalkToggle({ talk }: { talk: LiveTalk }) {

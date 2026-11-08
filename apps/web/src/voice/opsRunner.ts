@@ -96,6 +96,20 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
       return handle.stopRadio(args.closePanel === true);
     case "get_road_closures":
       return handle.getRoadClosures(args.query != null ? String(args.query) : undefined, args.limit != null ? Math.max(1, Math.min(30, Number(args.limit) || 12)) : undefined);
+    case "show_alternative_routes":
+      return handle.showAlternativeRoutes({
+        id: args.id != null ? String(args.id) : undefined, name: args.name != null ? String(args.name) : undefined,
+        avoidFlood: args.avoid_flood === false || args.avoidFlood === false ? false : true,
+      });
+    case "clear_routes":
+      return handle.clearRoutes();
+    case "get_relief_needs":
+      return handle.getReliefNeeds({
+        hazards: Array.isArray(args.hazards) ? args.hazards.map(String) : undefined,
+        near: args.near != null ? String(args.near) : undefined,
+      });
+    case "open_allocation":
+      return handle.openAllocation(args.area != null ? String(args.area) : undefined);
     case "open_street_view":
       return handle.openStreetView({ id: args.id != null ? String(args.id) : undefined, name: args.name != null ? String(args.name) : undefined });
     case "close_street_view":

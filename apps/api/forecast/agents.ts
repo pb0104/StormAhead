@@ -69,6 +69,17 @@ export function nearestPlace(at: Pt): string {
   return best.name.charAt(0).toUpperCase() + best.name.slice(1);
 }
 
+/** A landmark's own name (e.g. "Shankhamul Bridge") when one lies within maxKm, else null. */
+export function landmarkAt(at: Pt, maxKm = 0.2): string | null {
+  let best: string | null = null, bd = maxKm;
+  for (const l of load<{ landmarks: { name: string; lon: number; lat: number }[] }>("real/kathmandu/landmarks.json").landmarks) {
+    const d = km(at, [l.lon, l.lat]); if (d <= bd) { bd = d; best = l.name; }
+  }
+  return best;
+}
+/** "Shankhamul Bridge (near Wyona Nani)" when the bridge has a name, else "bridge near Wyona Nani". */
+const bridgeLabel = (at: Pt) => { const n = landmarkAt(at); return n ? `${n} (near ${nearestPlace(at)})` : `bridge near ${nearestPlace(at)}`; };
+
 // ---------------------------------------------------------------- types
 export type Severity = "severe" | "high" | "moderate" | "info";
 export type Risk = "low" | "moderate" | "high" | "severe";
@@ -276,9 +287,19 @@ const terrain: AgentDef = {
     }));
     const risk: Risk = a.deepest >= 1.5 ? "severe" : a.deepest >= 0.8 ? "high" : a.wet ? "moderate" : "low";
     return {
-      headline: a.wet ? `${a.wet} flood patches wet, deepest ~${r1(a.deepest)} m; runoff pools in ${a.flow ? r1(a.flow.pooledKm2) : 0} km².` : "Not enough rain to put water in the flood patches.",
+      headline: a.wet ? `${a.wet} flood patches wet, deepest ~${r1(a.deepest)} m; runoff pools in ${a.flow ? r1(a.flow.pooledKm2) : 0} km².`
+        : `Not enough rain to refill the 2024 flood patches; runoff only collects in ${a.flow ? r1(a.flow.pooledKm2) : 0} km² of low ground (local ponding).`,
       risk, alerts, caveats: ["Depth model is illustrative: depth scales with rain relative to a 10 in reference.", "It can show less water than the observed extent, never more area."],
-      facts: { rainUsedIn: rainIn, wetPatches: a.wet, deepestM: r1(a.deepest), pooledKm2: a.flow ? r1(a.flow.pooledKm2) : 0 },
+      // Two different models, so name them apart: a.wet/deepest = the observed 2024 flood patches refilled by this
+      // rain; pooledKm2 = low ground where the runoff model collects water anywhere. 0 wet patches + some pooling
+      // is consistent (local ponding, no river-style flooding), not a contradiction.
+      facts: {
+        rainUsedIn: rainIn,
+        observed2024PatchesRefilled: a.wet, deepestInThosePatchesM: r1(a.deepest),
+        runoffPondingKm2: a.flow ? r1(a.flow.pooledKm2) : 0,
+        topPondingPlaces: picked.map((f) => `${nearestPlace(f.c)} (~${r1(f.d)} m)`).join("; ") || "none",
+        reading: a.wet ? "Rain refills observed flood patches." : "Rain is too light to refill the 2024 flood patches; expect only local ponding in low ground. These two numbers do not conflict.",
+      },
       map: { rainIn },
     };
   },
@@ -333,12 +354,20 @@ const roads: AgentDef = {
     const eta = rs.max24End - 6, sev = sevOf(risk);
     const alerts: MapAlert[] = risk === "low" ? [] : [
       ...pockets.slice(0, 4).map((p, i) => ({ id: `roads-p${i}`, agent: "roads", lon: p.at[0], lat: p.at[1], severity: sev, title: `Cut-off pocket near ${nearestPlace(p.at)}`, detail: `${p.props.segments ?? "Several"} road segments lose their link to the main network.`, at: eta, when: when(eta) })),
-      ...bridges.slice(0, 3).map((b, i) => ({ id: `roads-b${i}`, agent: "roads", lon: b.at[0], lat: b.at[1], severity: sev, title: `Bridge likely closed near ${nearestPlace(b.at)}`, detail: "Bridge touches the flood extent.", at: eta, when: when(eta) })),
+      ...bridges.slice(0, 3).map((b, i) => ({ id: `roads-b${i}`, agent: "roads", lon: b.at[0], lat: b.at[1], severity: sev, title: landmarkAt(b.at) ? `${landmarkAt(b.at)} likely closed` : `Bridge likely closed near ${nearestPlace(b.at)}`, detail: "Bridge touches the flood extent.", at: eta, when: when(eta) })),
     ];
     return {
       headline: risk === "low" ? "Network stays open; no cut-offs expected." : `${closures.length} key closures and ${pockets.length} cut-off pockets if 2024 water returns.`,
       risk, alerts, caveats: [MODELLED, "Closure and pocket set is the engine's snapshot; stages are illustrative."],
-      facts: { closedSegments: O.closedSegments, keyClosures: closures.length, bridgesClosed: bridges.length, cutOffPockets: pockets.length, hospitalsAccessLost: hLost.length, hospitalsDegraded: hDeg.length },
+      facts: {
+        closedSegments: O.closedSegments, keyClosures: closures.length, bridgesClosed: bridges.length, cutOffPockets: pockets.length, hospitalsAccessLost: hLost.length, hospitalsDegraded: hDeg.length,
+        // Named so the briefing can say WHERE, not just how many. Ordered longest flooded stretch first.
+        keyClosureSites: closures.map((c) => `${c.props.bridge === true ? bridgeLabel(c.at) : `${String(c.props.cls ?? "road")} near ${nearestPlace(c.at)}`} (${r1(Number(c.props.lengthM ?? 0) / 1000)} km flooded, ${c.at[1].toFixed(4)}, ${c.at[0].toFixed(4)})`).join("; ") || "none",
+        bridgeSites: bridges.map((b) => `${bridgeLabel(b.at)} (${b.at[1].toFixed(4)}, ${b.at[0].toFixed(4)})`).join("; ") || "none",
+        cutOffPocketSites: pockets.map((p) => `near ${nearestPlace(p.at)} (${p.props.segments ?? "?"} segments, ${p.at[1].toFixed(4)}, ${p.at[0].toFixed(4)})`).join("; ") || "none",
+        hospitalsAccessLostNames: hLost.map((h) => h.name).join("; ") || "none",
+        basis: "Closures come from the observed 30 Sep 2024 flood extent: where the network breaks if 2024 water returns, not a prediction for this window.",
+      },
     };
   },
 };
@@ -440,7 +469,7 @@ const facilities: AgentDef = {
     const h = at(O.hospitals), s = at(O.schools), r = at(O.responders), os = O.openSpaces.filter((o) => o.access === "ok");
     await step("calc", `Hospitals: ${h.lost.length} lose access, ${h.deg.length} degraded. Schools: ${s.lost.length} lost, ${s.deg.length} degraded.`);
     await step("calc", `Responder bases cut off: ${r.lost.length}. Usable open spaces for shelter: ${os.length}.`);
-    const g = load<{ careHomes: unknown[] }>("real/kathmandu/google_places.json");
+    const g = load<{ careHomes: { name: string; at: Pt }[] }>("real/kathmandu/google_places.json");
     await step("read", `Google Places: ${g.careHomes.length} care homes (mobility-limited residents) to check.`);
     await step("found", risk === "low" ? "No facility is expected to lose access at this rain." : `${h.lost.length + h.deg.length} hospitals and ${s.lost.length + s.deg.length} schools need a plan before ${when(rs.max24End)}.`);
     const eta = rs.max24End - 6;
@@ -451,7 +480,13 @@ const facilities: AgentDef = {
     return {
       headline: risk === "low" ? "All facilities stay reachable." : `${h.lost.length + h.deg.length} hospitals and ${s.lost.length + s.deg.length} schools at risk; ${os.length} open spaces usable for shelter.`,
       risk: risk === "low" ? "low" : h.lost.length ? risk : "moderate", alerts, caveats: [MODELLED],
-      facts: { hospitals: O.hospitals.length, hospitalsLost: h.lost.length, hospitalsDegraded: h.deg.length, schoolsLost: s.lost.length, schoolsDegraded: s.deg.length, responderBasesCutOff: r.lost.length, usableOpenSpaces: os.length, careHomes: g.careHomes.length },
+      facts: { hospitals: O.hospitals.length, hospitalsLost: h.lost.length, hospitalsDegraded: h.deg.length, schoolsLost: s.lost.length, schoolsDegraded: s.deg.length, responderBasesCutOff: r.lost.length, usableOpenSpaces: os.length, careHomes: g.careHomes.length,
+        hospitalsLostNames: h.lost.map((x) => x.name).join("; ") || "none",
+        hospitalsDegradedNames: h.deg.map((x) => x.name).join("; ") || "none",
+        schoolsAtRiskNames: [...s.lost, ...s.deg].map((x) => `${x.name} (${x.access})`).join("; ") || "none",
+        responderBasesCutOffNames: r.lost.map((x) => x.name).join("; ") || "none",
+        careHomeNames: g.careHomes.map((c) => `${c.name} (near ${nearestPlace(c.at)})`).join("; ") || "none",
+      },
     };
   },
 };
@@ -639,7 +674,7 @@ export type AreaAllocation = {
   pin: string | null;
 };
 /** What the last resource-agent run assumed, so a clicked area is costed on the same basis. Null until it has run. */
-export type ResourcePlan = { window: string; rainShareOf2024: number; needShare: number; daysCovered: number | null; askBy: string | null; areas: AreaAllocation[] };
+export type ResourcePlan = { window: string; start?: number; end?: number; rainShareOf2024: number; needShare: number; daysCovered: number | null; askBy: string | null; areas: AreaAllocation[] };
 let lastPlan: ResourcePlan | null = null;
 export const lastResourcePlan = () => lastPlan;
 
@@ -653,7 +688,7 @@ const resources: AgentDef = {
     const totalExposed = sum(all.map((a) => a.people));
     await step("read", `Population on ground the 2024 flood covered: about ${totalExposed.toLocaleString("en-US")} people in ${all.length} areas (${basis})`);
     const scale = Math.min(1, rs.ratio / 0.8);
-    lastPlan = { window: `${when(ctx.start)} → ${when(ctx.end)}`, rainShareOf2024: rs.ratio, needShare: R.needShare * scale, daysCovered: null, askBy: null, areas: [] };
+    lastPlan = { window: `${when(ctx.start)} → ${when(ctx.end)}`, start: ctx.start, end: ctx.end, rainShareOf2024: rs.ratio, needShare: R.needShare * scale, daysCovered: null, askBy: null, areas: [] };
     await step("calc", `In 2024, 34% of affected households lost their homes (IFRC). This window's rain is ${Math.round(rs.ratio * 100)}% of 2024, so ${Math.round(R.needShare * scale * 100)}% of exposed people are planned for.`);
     // One area per named place: neighbouring bins that share a nearest place are merged (people-weighted centre).
     const byPlace = new Map<string, { people: number; x: number; y: number }>();

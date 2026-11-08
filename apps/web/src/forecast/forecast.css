@@ -460,9 +460,10 @@
 .fx-prompt.talk { box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.28), 0 10px 40px rgba(0, 0, 0, 0.45); }
 .fx-talk-captions {
   width: min(720px, 100%); margin: 0 auto 8px; padding: 8px 12px;
-  font-size: 12.5px; color: var(--fx-mute); max-height: 72px; overflow: auto;
+  font-size: 12.5px; color: var(--fx-mute); max-height: min(220px, 30vh); overflow-y: auto;
+  overscroll-behavior: contain; line-height: 1.45;
 }
-.fx-talk-captions p { margin: 2px 0; }
+.fx-talk-captions p { margin: 4px 0; }
 .fx-talk-captions .you b { color: var(--fx-accent); }
 .fx-talk-captions .bot b { color: var(--fx-accent-2); }
 
@@ -632,3 +633,19 @@ button.fx-budget:hover > div { border-color: rgba(94, 234, 212, 0.45); }
 .fx-tool:disabled { opacity: 0.4; cursor: not-allowed; }
 @media (max-width: 1100px) { .fx-av-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fx-av-main { grid-template-columns: 1fr; } .fx-av-detail { position: static; } }
 @media (max-width: 560px) { .fx-allocview { left: 0; right: 0; bottom: 0; border-radius: 0; } .fx-av-head, .fx-av-scroll { padding-left: 16px; padding-right: 16px; } .fx-av-sum { grid-template-columns: 1fr; } }
+
+/* Detours around a downed bridge (ORACLE show_alternative_routes) */
+.fx-route-tag {
+  padding: 3px 8px; border-radius: 999px; font: 600 11.5px/1.3 Inter, system-ui, sans-serif; white-space: nowrap;
+  background: rgba(6, 18, 24, 0.9); border: 1px solid currentColor; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45); pointer-events: none;
+}
+.fx-route-tag.rank-1 { color: #3BF0A6; }
+.fx-route-tag.rank-2 { color: #F5D547; }
+.fx-route-tag.down { color: #FF6B60; }
+
+/* Labelled answer points (ORACLE get_relief_needs) */
+.fx-mark { display: flex; align-items: center; gap: 6px; pointer-events: none; }
+.fx-mark i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.12), 0 2px 8px rgba(0, 0, 0, 0.5); }
+.fx-mark.hot i { background: #FF5A4E; }
+.fx-mark.warn i { background: #FFB547; }
+.fx-mark span { padding: 3px 8px; border-radius: 7px; font: 600 11.5px/1.3 Inter, system-ui, sans-serif; white-space: nowrap; color: #F2F6FA; background: rgba(6, 18, 24, 0.9); border: 1px solid rgba(255, 255, 255, 0.14); }

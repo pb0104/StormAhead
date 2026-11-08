@@ -1,0 +1,17 @@
+{
+  "note": "Common English names for landmarks whose OpenStreetMap name is missing or only in Devanagari, so ORACLE and alert titles can use the name people say. Coordinates are the midpoint of the OSM bridge way named in 'osm'.",
+  "landmarks": [
+    {
+      "name": "Shankhamul Bridge",
+      "aliases": ["Shankhamul Pul", "Sankhamul Bridge", "Sankhamul Pul", "Shankamul Bridge", "संखामुल पुल"],
+      "kind": "bridge", "lon": 85.33044, "lat": 27.68039,
+      "osm": "way 112785201 (name 'संखामुल पुल', tertiary, over the Bagmati)"
+    },
+    {
+      "name": "Balkhu Bridge",
+      "aliases": ["Balkhu Pul", "Balkhu Ring Road bridge", "Balkhu Ringroad bridge"],
+      "kind": "bridge", "lon": 85.29948, "lat": 27.68451,
+      "osm": "way 670112954 / 185470054 (Kathmandu Ring Road over the Bagmati at the Balkhu Khola confluence; unnamed in OSM)"
+    }
+  ]
+}

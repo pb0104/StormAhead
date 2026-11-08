@@ -242,6 +242,39 @@ export const OPS_LIVE_TOOLS = [
     },
   },
   {
+    name: "show_alternative_routes",
+    description:
+      "'If this bridge goes down, what are the alternatives?' Removes a bridge (or road) from the real OSM road network, also avoids every road the flood closes, and draws up to two detours between the bridge's two ends on the map (the bridge in red, routes in green). Returns each route's minutes, extra minutes versus the bridge, km and the main roads it uses. Pass the bridge or place name (e.g. 'Shankhamul Bridge', 'Balkhu Bridge') or an alert/entity id; with no arguments it uses the selected item or open alert. Set avoid_flood=false only if the operator asks to ignore flooding. Never invent roads; describe only what this returns.",
+    parameters: {
+      type: "object",
+      properties: { name: { type: "string" }, id: { type: "string" }, avoid_flood: { type: "boolean" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "get_relief_needs",
+    description:
+      "Relief needs where hazards hit: joins the Resource allocation agent's plan (people to plan for, budget, cost per day, QRT teams or helicopter, vehicles, from which base) with real hazard locations: power = areas that went dark (NASA night lights), cell = cell sites down or at risk, rain = the wettest gauges in the window, landslide = past landslide sites. Pass one hazard for one question, or several to get the areas hit by at least two of them (most hazards first). Optional near = a place name to limit to within 3 km. Returns totals (areas, people, budget, QRT, helicopter areas, food, water, shelter kits), how many days the emergency fund lasts and when to request national aid, and the top areas with their hazards. Labels those areas on the map. If the Relief budget agent has not run it says so: offer to deploy it.",
+    parameters: {
+      type: "object",
+      properties: {
+        hazards: { type: "array", items: { type: "string", enum: ["power", "cell", "rain", "landslide"] } },
+        near: { type: "string" },
+      },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "open_allocation",
+    description: "Open the Allocation section (relief budget, every affected area, fleet and sources for every number). Pass area = a place name from get_relief_needs to open on that area.",
+    parameters: { type: "object", properties: { area: { type: "string" } }, additionalProperties: false },
+  },
+  {
+    name: "clear_routes",
+    description: "Remove the detour routes drawn by show_alternative_routes from the map.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
     name: "open_street_view",
     description:
       "Open Street View (street-level imagery) at any located element: a named site, hospital, shelter, road closure, cut-off pocket, social post (id SP-n), forecast alert or combined finding (id or title from get_oracle_context). Coordinates come from the app's data, never from you. With no arguments it uses the selected entity. If Google has no coverage the overlay says so and shows the nearest panorama distance when there is one. If Street View is not configured it returns ok=false with the reason: tell the operator plainly.",
@@ -273,6 +306,8 @@ NAVIGATION: For "take me to X", "go to X", "zoom to X", "fly to X" — call fly_
 Map layers / rainfall / towers / social: use the map tools. Never invent a forecast — use ask_stormahead / deploy_agents.
 SOCIAL POSTS: For 'what are people saying', 'any posts near X', 'urgent needs', photos — call search_social_posts and answer only from the returned text, flagging that posts are unverified; to show one call open_social_post. You cannot post, reply or verify. If asked to draft a reply, write the text in your answer for the operator to review; nothing is ever sent.
 RADIO: You CAN control the console's Radio tab. Never say you lack access to external media or broadcasts: you have tools for it. For 'tune into BBC Nepali / local radio / news', call list_radio_stations (query: the name or 'news') then tune_radio, and stop_radio to stop. The audio plays in the operator's browser; the only thing you cannot do is hear it or summarize what is said, so say that in one short sentence and invite them to tell you what they hear. Examples: 'play BBC Nepali' -> tune_radio({name:"BBC Nepali"}); 'any Nepali news radio?' -> list_radio_stations({query:"nepali", newsOnly:true}); 'turn it off' -> stop_radio. If tune_radio returns suggestions or alsoMatched, mention the options instead of refusing.
+RELIEF & RESOURCES: For who needs help, relief, budget, supplies, vehicles, QRT teams or 'how long does the fund last', especially tied to outages, cell loss, heavy rain or landslides, call get_relief_needs with the matching hazards (power, cell, rain, landslide; several for combined questions) and answer with people, budget, how they are reached (road QRT or helicopter) and the fund's days left, naming the top one or two areas. Then offer open_allocation (pass the area to open on it). Numbers are estimates: say 'about'. If the Relief budget agent has not run, offer include_agents ['resources'] and deploy.
+DETOURS: For 'alternative routes if this bridge goes down', 'how do we get across if X closes' or 'show me another way around', call show_alternative_routes with the bridge name or id (no arguments = the selected item or open alert), then say the best route's extra minutes and main roads in one sentence; clear_routes removes them. If it says the far side is cut off, say so plainly.
 ROADS & STREET VIEW: For closed roads, cut-off areas, or hospital access call get_road_closures (pass a place/hospital as query) and answer only from its data; to show one, select_entity with its id. For 'show me street view of X' or 'what does it look like there' call open_street_view (close_street_view to leave). If it reports Street View is not configured, say so in one sentence.
 ACTIONS ON THE GROUND: When the operator reports something done ("we sent…", "log that…", "40 people moved…") call log_action with their words, read the returned line back, and call confirm_action_update with confirmed=true only after they agree (cancel_action_update if not). To change or delete one, call list_actions for the id, then edit_action (only the corrected fields) or remove_action (confirm first). An action never closes a place; after saving, mention the next recommendation if it suggests more help. Each new forecast run starts a clean action log.
 Speak one or two short sentences after tools. Be concise.`;

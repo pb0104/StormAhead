@@ -55,7 +55,14 @@ export type OpsHandle = {
   listRadioStations: (o: { query?: string; localOnly?: boolean; newsOnly?: boolean; limit?: number }) => Promise<{ ok: boolean; [k: string]: unknown }>;
   tuneRadio: (q: { id?: string; name?: string }) => Promise<{ ok: boolean; [k: string]: unknown }>;
   stopRadio: (closePanel?: boolean) => { ok: boolean; [k: string]: unknown };
-  getRoadClosures: (query?: string, limit?: number) => { ok: boolean; [k: string]: unknown };
+  getRoadClosures: (query?: string, limit?: number) => { ok: boolean; [k: string]: unknown } | Promise<{ ok: boolean; [k: string]: unknown }>;
+  /** "If this bridge goes down": detours around a bridge/road, drawn on the map. No name/id = the selected item or open alert. */
+  showAlternativeRoutes: (q: { id?: string; name?: string; avoidFlood?: boolean }) => Promise<{ ok: boolean; [k: string]: unknown }>;
+  clearRoutes: () => { ok: boolean };
+  /** Relief needs (people, cost, QRT / helicopter) in areas hit by power, cell, rain or landslide hazards; labels them on the map. */
+  getReliefNeeds: (q: { hazards?: string[]; near?: string }) => Promise<{ ok: boolean; [k: string]: unknown }>;
+  /** Open the Allocation section, optionally on one area (place name). */
+  openAllocation: (area?: string) => { ok: boolean; [k: string]: unknown };
   openStreetView: (q: { id?: string; name?: string }) => { ok: boolean; [k: string]: unknown };
   closeStreetView: () => { ok: boolean; [k: string]: unknown };
   clearInsights: () => { ok: boolean };

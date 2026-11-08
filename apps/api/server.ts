@@ -15,6 +15,8 @@ import { googleAttribution, googleStatus, googleTile, TileError } from "./google
 import { coverageAt, deleteAction, listActions, locations, nextRecommendation, parseUpdate, saveActions, searchPlaces, updateAction } from "./actions/actions.ts";
 import { factorList, parseIntent, runForecast, type ForecastEvent } from "./forecast/service.ts";
 import { registerLiveVoice } from "./voice/liveProxy.ts";
+import { detourAround } from "./routes/detour.ts";
+import { HAZARDS, reliefNear, type Hazard } from "./forecast/relief.ts";
 
 export async function buildServer() {
   const app = Fastify({ logger: false });
@@ -183,6 +185,33 @@ export async function buildServer() {
   app.get("/api/places/search", async (req) => {
     const q = z.object({ q: z.string().trim().min(1).max(80) }).parse(req.query);
     return searchPlaces(q.q);
+  });
+
+  // "If this bridge goes down, show the alternatives": detours on the OSM road network, avoiding flood-closed roads.
+  app.get("/api/routes/detour", async (req) => {
+    const b = z.object({
+      q: z.string().trim().max(120).optional(), lon: z.coerce.number().min(85.2).max(85.6).optional(), lat: z.coerce.number().min(27.5).max(27.9).optional(),
+      avoidFlood: z.enum(["true", "false"]).optional(),
+    }).parse(req.query);
+    let at: [number, number] | null = b.lon != null && b.lat != null ? [b.lon, b.lat] : null;
+    let place: string | null = null;
+    if (!at && b.q) {
+      const r = searchPlaces(b.q);
+      if (!r.match) return { ok: false, error: `No place called "${b.q}"`, suggestions: r.suggestions.map((s) => s.name) };
+      at = [r.match.lon, r.match.lat]; place = r.match.name;
+    }
+    if (!at) throw new HttpError(400, "Pass q (a bridge or place name) or lon and lat.");
+    return { ...detourAround(at, { avoidFlood: b.avoidFlood !== "false" }), query: place };
+  });
+
+  // Relief needs by hazard: the last Resource allocation plan joined with power / cell / rain / landslide locations.
+  app.get("/api/relief/near", async (req) => {
+    const b = z.object({ hazards: z.string().default("power,cell,rain,landslide"), q: z.string().trim().max(120).optional(), radiusKm: z.coerce.number().min(0.2).max(10).optional() }).parse(req.query);
+    const hz = b.hazards.split(",").map((h) => h.trim().toLowerCase()).filter((h): h is Hazard => (HAZARDS as string[]).includes(h));
+    if (!hz.length) throw new HttpError(400, `hazards must be some of ${HAZARDS.join(", ")}`);
+    let place: [number, number] | null = null, placeName: string | null = null;
+    if (b.q) { const r = searchPlaces(b.q); if (!r.match) return { ok: false, error: `No place called "${b.q}"`, suggestions: r.suggestions.map((s) => s.name) }; place = [r.match.lon, r.match.lat]; placeName = r.match.name; }
+    return reliefNear(hz, { place, placeName, radiusKm: b.radiusKm });
   });
 
   // Analyst action updates: a typed sentence → structured actions (LLM) → confirmed → saved to the location's history.

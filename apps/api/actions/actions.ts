@@ -123,6 +123,22 @@ function gazetteer(): Entry[] {
   for (const s of ops.schools) add(s.name, s.at[0], s.at[1], "school", 2);
   for (const c of load<{ careHomes: P[] }>("real/kathmandu/google_places.json").careHomes) add(c.name, c.at[0], c.at[1], "care home", 2);
   for (const b of load<{ buildings: { name: string | null; lon: number; lat: number }[] }>("real/kathmandu/buildings.json").buildings) add(b.name, b.lon, b.lat, "building", 0);
+  // Landmarks people say by an English name OSM lacks ("Shankhamul Bridge", "Balkhu Bridge").
+  for (const l of load<{ landmarks: { name: string; aliases: string[]; kind: string; lon: number; lat: number }[] }>("real/kathmandu/landmarks.json").landmarks) {
+    for (const n of [l.name, ...l.aliases]) add(n, l.lon, l.lat, l.kind, 5);
+  }
+  // Named roads and bridges from the pre-event OSM network: one entry per name, at the middle of its longest piece.
+  const net = load<{ edgeFields: string[]; edges: unknown[][] }>("real/kathmandu/network.json");
+  const fi = (k: string) => net.edgeFields.indexOf(k);
+  const [iName, iMid, iLen, iBridge] = [fi("name"), fi("mid"), fi("lengthM"), fi("bridge")];
+  const roads = new Map<string, { lon: number; lat: number; len: number; bridge: boolean }>();
+  for (const e of net.edges) {
+    const name = e[iName] as string | null, mid = e[iMid] as [number, number] | null, len = Number(e[iLen] ?? 0);
+    if (!name || !mid) continue;
+    const prev = roads.get(name);
+    if (!prev || len > prev.len) roads.set(name, { lon: mid[0], lat: mid[1], len, bridge: !!e[iBridge] || /\b(bridge|pul)\b/i.test(name) });
+  }
+  for (const [name, r] of roads) add(name, r.lon, r.lat, r.bridge ? "bridge" : "road", r.bridge ? 3 : 1);
   return (gaz = out);
 }
 /** Match a place as written to a real gazetteer entry. Null when nothing is a confident match. */
@@ -159,7 +175,14 @@ function editDistance(a: string, b: string, cap = 3): number {
 /** Find a place for navigation: the confident match (same rules as action updates) plus close suggestions. */
 export function searchPlaces(raw: string, limit = 6): { match: Resolved | null; suggestions: Resolved[] } {
   // Tolerate the whole spoken command ("fly me to Tigani", "take me to the Khoria area").
-  const text = raw.replace(/^\s*(please\s+)?(fly|take|go|zoom|navigate|show|bring|move)(\s+(me|us))?(\s+(over|in))?(\s+(to|into|on|at))?\s+/i, "").replace(/\s+(please|area|region)\s*$/i, "").trim() || raw;
+  let text = raw.replace(/["“”'‘’]/g, " ")
+    .replace(/^\s*(please\s+)?(fly|take|go|zoom|navigate|show|bring|move)(\s+(me|us))?(\s+(over|in))?(\s+(to|into|on|at))?\s+/i, "").replace(/\s+(please|area|region)\s*$/i, "").trim() || raw;
+  // Alert and report titles name the place after "near" or "·" ("Bridge likely closed near Wyona Nani",
+  // "Hospital access lost · Korea Nepal Friendship Hospital"): search for the place, not the whole title.
+  const near = text.match(/\bnear\s+(.+)$/i)?.[1] ?? text.match(/·\s*([^·]+)$/)?.[1];
+  if (near && near.trim()) text = near.replace(/\s*\(.*$/, "").trim();
+  // ...or before a status ("Shankhamul Bridge likely closed").
+  text = text.replace(/\s+(is\s+)?(likely\s+|probably\s+)?(closed|cut[\s-]?off|flooded|blocked|at risk)\b.*$/i, "").trim() || text;
   const match = resolvePlace(text);
   const q = norm(text), qt = q.split(" ").filter((t) => !STOP.has(t) && t.length > 1);
   if (!qt.length) return { match, suggestions: [] };
@@ -174,9 +197,10 @@ export function searchPlaces(raw: string, limit = 6): { match: Resolved | null; 
     if (s <= qt.length * 2) scored.push({ e, s: s - e.rank * 0.1 });
   }
   const seen = new Set<string>();
-  const suggestions = scored.sort((a, b) => a.s - b.s || a.e.name.length - b.e.name.length)
-    .filter(({ e }) => !seen.has(e.norm) && seen.add(e.norm))
-    .slice(0, limit).map(({ e }) => ({ name: e.name, lon: e.lon, lat: e.lat, kind: e.kind }));
+  const ranked = scored.sort((a, b) => a.s - b.s || a.e.name.length - b.e.name.length)
+    .filter(({ e }) => !seen.has(e.norm) && seen.add(e.norm));
+  const suggestions = ranked.slice(0, limit).map(({ e }) => ({ name: e.name, lon: e.lon, lat: e.lat, kind: e.kind }));
+  // A misheard name ("Weona Nani") is never auto-accepted: it comes back as suggestions so ORACLE asks "did you mean".
   return { match, suggestions };
 }
 

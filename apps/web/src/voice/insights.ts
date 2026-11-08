@@ -158,7 +158,7 @@ export { KEY_HINT as STREET_VIEW_KEY_HINT };
  * A closure is "closed now" when its stage <= the current stage (same rule the map filter uses). Optional `query` is a place
  * or hospital name: closures are then sorted by distance to it and hospital access is limited to matches.
  */
-export function roadClosureReport(scene: SceneSnapshot | null, stage: number, query?: string, limit = 12) {
+export function roadClosureReport(scene: SceneSnapshot | null, stage: number, query?: string, limit = 12, place?: { name: string; at: LonLat }) {
   const ents = scene?.entities ?? [];
   const closures = ents.filter((e) => e.kind === "closure");
   const closedNow = closures.filter((e) => (e.stage ?? 0) <= stage);
@@ -166,7 +166,8 @@ export function roadClosureReport(scene: SceneSnapshot | null, stage: number, qu
   let origin: LonLat | null = null;
   let originName: string | null = null;
   let hospitals = ents.filter((e) => e.kind === "hospital");
-  if (q) {
+  if (place) { origin = place.at; originName = place.name; }
+  else if (q) {
     const ql = q.toLowerCase();
     const hit = hospitals.filter((h) => h.name.toLowerCase().includes(ql));
     if (hit.length) { hospitals = hit; origin = hit[0]!.at; originName = hit[0]!.name; }

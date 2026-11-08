@@ -121,7 +121,7 @@ Two or three sentences: how bad, when, where.
 ## Timeline
 A bulleted list of what happens when, using the times given.
 ## What is likely to be affected
-Bullets grouped by: people & facilities, roads & access, power & communications, hazards (flood, landslide). Name places from the findings.
+Bullets grouped by: people & facilities, roads & access, power & communications, hazards (flood, landslide). Name places from the findings: the facts include named lists (keyClosureSites, bridgeSites, cutOffPocketSites, careHomeNames, hospitalsLostNames, schoolsAtRiskNames, topPondingPlaces); use those names, never only counts. Power & communications comes from the Power grid agent (night-light dark areas) and the Cell network agent (sites near water, IODA internet drop); summarise both. Hazards includes the Landslide agent.
 ## How to prepare
 Numbered actions with a deadline relative to the peak (e.g. "by T-24 h"), most urgent first.
 ## Resource allocation

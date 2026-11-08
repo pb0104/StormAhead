@@ -8,6 +8,8 @@ export type LiveEvents = {
   onStatus: (s: LiveStatus, detail?: string) => void;
   onCaption: (text: string, role: "assistant" | "user") => void;
   onError: (msg: string) => void;
+  /** ORACLE finished speaking one reply (captions after this start a new message). */
+  onTurnEnd?: () => void;
 };
 
 function wsUrl(): string {
@@ -52,7 +54,14 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
     for (const call of calls) {
       const name = call.name ?? "";
       const args = (call.args ?? call.arguments ?? {}) as Record<string, unknown>;
-      const result = await runOpsTool(handle, name, args);
+      // Always answer every call: if one throws and no tool_response is sent, the model waits for it
+      // forever and silently ignores every follow-up question.
+      let result: Record<string, unknown>;
+      try {
+        result = await runOpsTool(handle, name, args);
+      } catch (e) {
+        result = { ok: false, error: `Tool ${name} failed: ${(e as Error)?.message ?? String(e)}` };
+      }
       functionResponses.push({ id: call.id, name, response: result });
     }
     ws?.send(JSON.stringify({ tool_response: { function_responses: functionResponses } }));
@@ -107,7 +116,7 @@ export function createLiveSession(handle: OpsHandle, events: LiveEvents) {
         }
       }
     }
-    if (sc?.turnComplete || sc?.turn_complete) setStatus("ready");
+    if (sc?.turnComplete || sc?.turn_complete) { events.onTurnEnd?.(); setStatus("ready"); }
   }
 
   function connect() {

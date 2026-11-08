@@ -58,6 +58,15 @@ export type MapProps = {
   picking?: boolean;
   /** Padding to keep pins clear of floating panels when fitting. */
   panelPad?: { left: number; right: number; top: number; bottom: number };
+  /** Labelled points from a tool answer (e.g. relief areas hit by hazards); the camera fits them. */
+  marks?: { key: number; points: { lon: number; lat: number; label: string; tone?: "hot" | "warn" }[] } | null;
+  /** Detours around a downed bridge: the crossing in red, routes in green (rank 1 solid, rank 2 dashed). */
+  routes?: DetourOverlay | null;
+};
+export type DetourOverlay = {
+  key: number;
+  crossing: { name: string; coords: [number, number][][] };
+  routes: { rank: number; label: string; coords: [number, number][] }[];
 };
 export type MapAlertPin = {
   id: string; lon: number; lat: number; severity: "severe" | "high" | "moderate" | "info"; title: string; detail: string;
@@ -107,6 +116,7 @@ export function MapStage(p: MapProps) {
   /** Water levels as currently drawn (eased toward the props). */
   const lvl = useRef({ water: 0, river: 0, raf: 0, dash: 0 });
   const actPins = useRef(new Map<string, { mk: any; el: HTMLDivElement }>());
+  const routeTags = useRef<any[]>([]), markTags = useRef<any[]>([]);
   const pins = useRef(new Map<string, { mk: any; el: HTMLDivElement }>()), popup = useRef<any>(null);
   const map = useRef<any>(null), ready = useRef(false), props = useRef(p), markers = useRef<any[]>([]), raf = useRef(0), bar = useRef<HTMLElement | null>(null), floodRef = useRef<unknown>(null), verifyRef = useRef<unknown>(null), postCv = useRef<HTMLCanvasElement | null>(null), postImg = useRef<HTMLImageElement | null>(null), bldgRef = useRef<unknown>(null), flowCv = useRef<HTMLCanvasElement | null>(null), runoffUrl = useRef<string | null>(null);
   props.current = p;
@@ -839,6 +849,67 @@ export function MapStage(p: MapProps) {
     const go = () => m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: props.current.panelPad ?? 60, maxZoom: 13.2, duration: 1400 });
     if (ready.current) go(); else m.once("load", go);
   }, [p.fitAlertsKey]);
+
+  // Detours ("if this bridge goes down"): draw the routes over everything else and fit the camera to them.
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    const draw = () => {
+      for (const t of routeTags.current) t.remove();
+      routeTags.current = [];
+      const r = props.current.routes;
+      const empty = { type: "FeatureCollection", features: [] };
+      const routeFc = r ? { type: "FeatureCollection", features: [...r.routes].sort((a, b) => b.rank - a.rank).map((x) => ({ type: "Feature", properties: { rank: x.rank }, geometry: { type: "LineString", coordinates: x.coords } })) } : empty;
+      const crossFc = r ? { type: "FeatureCollection", features: r.crossing.coords.map((c) => ({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: c } })) } : empty;
+      if (!m.getSource("detour")) {
+        m.addSource("detour", { type: "geojson", data: routeFc });
+        m.addSource("detour-x", { type: "geojson", data: crossFc });
+        m.addLayer({ id: "detour-casing", type: "line", source: "detour", layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": "#04221c", "line-width": ["interpolate", ["linear"], ["zoom"], 11, 6, 16, 12], "line-opacity": 0.85 } });
+        const w = ["interpolate", ["linear"], ["zoom"], 11, 3.5, 16, 7];
+        m.addLayer({ id: "detour-line-2", type: "line", source: "detour", filter: ["==", ["get", "rank"], 2], layout: { "line-join": "round" }, paint: { "line-color": "#F5D547", "line-width": w, "line-dasharray": [2, 1.2] } });
+        m.addLayer({ id: "detour-line", type: "line", source: "detour", filter: ["==", ["get", "rank"], 1], layout: { "line-join": "round", "line-cap": "round" }, paint: { "line-color": "#3BF0A6", "line-width": w } });
+        m.addLayer({ id: "detour-x-glow", type: "line", source: "detour-x", layout: { "line-cap": "round" }, paint: { "line-color": "#FF3B30", "line-width": ["interpolate", ["linear"], ["zoom"], 11, 10, 16, 20], "line-opacity": 0.35, "line-blur": 3 } });
+        m.addLayer({ id: "detour-x", type: "line", source: "detour-x", layout: { "line-cap": "round" }, paint: { "line-color": "#FF3B30", "line-width": ["interpolate", ["linear"], ["zoom"], 11, 4, 16, 8] } });
+      } else {
+        m.getSource("detour").setData(routeFc);
+        m.getSource("detour-x").setData(crossFc);
+        for (const id of ["detour-casing", "detour-line-2", "detour-line", "detour-x-glow", "detour-x"]) if (m.getLayer(id)) m.moveLayer(id); // keep on top
+      }
+      if (!r) return;
+      // Labels: one tag per route at its middle, and one on the downed crossing.
+      const tag = (at: [number, number], html: string, cls: string) => {
+        const el = document.createElement("div"); el.className = `fx-route-tag ${cls}`; el.innerHTML = html;
+        routeTags.current.push(new maplibregl.Marker({ element: el, anchor: "bottom" }).setLngLat(at).addTo(m));
+      };
+      for (const x of r.routes) { const c = x.coords[Math.floor(x.coords.length / 2)]; if (c) tag(c, esc(x.label), `rank-${x.rank}`); }
+      const x0 = r.crossing.coords[0]?.[Math.floor((r.crossing.coords[0]?.length ?? 1) / 2)];
+      if (x0) tag(x0, `✕ ${esc(r.crossing.name)} down`, "down");
+      const all = [...r.routes.flatMap((x) => x.coords), ...r.crossing.coords.flat()];
+      const xs = all.map((c) => c[0]), ys = all.map((c) => c[1]);
+      if (xs.length) m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: props.current.panelPad ?? 80, maxZoom: 15.5, duration: 1200 });
+    };
+    if (ready.current) draw(); else m.once("load", draw);
+  }, [p.routes?.key, p.routes === null]);
+  useEffect(() => () => { for (const t of routeTags.current) t.remove(); }, []);
+
+  // Labelled answer points (relief areas by hazard).
+  useEffect(() => {
+    const m = map.current; if (!m) return;
+    for (const t of markTags.current) t.remove();
+    markTags.current = [];
+    const pts = p.marks?.points ?? [];
+    if (!pts.length) return;
+    const draw = () => {
+      for (const x of pts) {
+        const el = document.createElement("div"); el.className = `fx-mark ${x.tone ?? "warn"}`;
+        el.innerHTML = `<i></i><span>${esc(x.label)}</span>`;
+        markTags.current.push(new maplibregl.Marker({ element: el, anchor: "left", offset: [-6, 0] }).setLngLat([x.lon, x.lat]).addTo(m));
+      }
+      const xs = pts.map((x) => x.lon), ys = pts.map((x) => x.lat);
+      m.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: props.current.panelPad ?? 80, maxZoom: 14.5, duration: 1200 });
+    };
+    if (ready.current) draw(); else m.once("load", draw);
+  }, [p.marks?.key, p.marks === null]);
+  useEffect(() => () => { for (const t of markTags.current) t.remove(); }, []);
 
   // ORACLE / tool: fly to an arbitrary place.
   useEffect(() => {

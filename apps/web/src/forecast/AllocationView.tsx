@@ -36,9 +36,9 @@ export function allocationOf(r: AgentResult | undefined) {
 
 const STATUS: Record<Assumption["status"], string> = { real: "Real", anchored: "Anchored", standard: "Standard", estimate: "Estimate", mocked: "Mocked" };
 
-export function AllocationView({ r, onClose, onShow }: { r: AgentResult; onClose: () => void; onShow: (a: AreaAllocation) => void }) {
+export function AllocationView({ r, onClose, onShow, initialId }: { r: AgentResult; onClose: () => void; onShow: (a: AreaAllocation) => void; initialId?: string | null }) {
   const a = allocationOf(r);
-  const [selId, setSelId] = useState<string | null>(a?.areas[0]?.id ?? null);
+  const [selId, setSelId] = useState<string | null>((initialId && a?.areas.some((x) => x.id === initialId) ? initialId : null) ?? a?.areas[0]?.id ?? null);
   if (!a) {
     return (
       <section className="fx-allocview fx-glass" aria-label="Resource allocation">

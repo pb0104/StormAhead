@@ -5,7 +5,7 @@
  * alert pins. Nothing is sent: every output is a draft for a person to approve.
  */
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapStage, type MapAlertPin, type Rec, type Vis } from "../MapStage.tsx";
+import { MapStage, type DetourOverlay, type MapAlertPin, type Rec, type Vis } from "../MapStage.tsx";
 import { ContextDrawer, type Done } from "../ContextDrawer.tsx";
 import { DetailsDialog } from "../DetailsDialog.tsx";
 import { PhotorealView, savedToken } from "../PhotorealView.tsx";
@@ -115,6 +115,9 @@ export function ForecastConsole() {
   const [activeAlert, setActiveAlert] = useState<string | null>(null);
   const [fitKey, setFitKey] = useState(0);
   const [goto, setGoto] = useState<{ lon: number; lat: number; zoom?: number; key: number } | null>(null);
+  const [detour, setDetour] = useState<DetourOverlay | null>(null);
+  const [marks, setMarks] = useState<{ key: number; points: { lon: number; lat: number; label: string; tone?: "hot" | "warn" }[] } | null>(null);
+  const [allocArea, setAllocArea] = useState<string | null>(null);
   const [layersOpen, setLayersOpen] = useState(false);
   const [radioOpen, setRadioOpen] = useState(false);
   // Resource allocation: its own full section, opened only from the top-bar Allocation button.
@@ -271,9 +274,17 @@ export function ForecastConsole() {
   };
 
   // ---------------------------------------------------------------- run lifecycle
+  const talkAskRef = useRef<(t: string) => void>(() => {});
   const ask = async (q: string) => {
     const text = q.trim(); if (!text) return;
     if (promptMode === "update" || looksLikeUpdate(text)) { if (promptMode !== "update") setPromptMode("update"); return logUpdate(text); }
+    // Map / navigation requests ("take me to a spot hit by landslides") and follow-ups after a run are for ORACLE,
+    // not a new forecast: only a forecast-shaped question opens the deploy window again.
+    const forecastQ = /\b(next|coming)\s+(\d+\s*)?(h|hrs?|hours?|days?|weeks?)\b|\b\d+\s*(h|hours?|days?)\b|\bforecast|\boutlook|\bwhat (happens|will happen)|\bhow (do|does|will) .*\b(look|go)\b|\bre-?run|\bdeploy/i.test(text);
+    const navQ = /\b(take|bring|fly|zoom|go|navigate|move)\b.*\b(me|us|to|into|in)\b|\bshow me\b|\bwhere (is|are)\b|\bstreet view\b|\bopen\b.*\b(map|layer|post|report)\b/i.test(text);
+    // After a run, relief / cost / supply questions are about that run, even with a time span ("cost over the next week").
+    const reliefQ = /\b(relief|cost|budget|fund|money|spend|supplies|food|water|shelter kits?|vehicles?|helicopter|qrt|teams?|how many people|who needs|need help|reach them)\b/i.test(text);
+    if (navQ || (order.length > 0 && (!forecastQ || reliefQ))) { talkAskRef.current(text); setInput(""); if (phase === "scoping") setPhase(order.length ? "done" : "idle"); return; }
     if (phase === "running") return;
     setRunErr(null); setQuestion(text);
     try {
@@ -639,7 +650,75 @@ export function ForecastConsole() {
       setGoto((g) => ({ lon: place.at[0], lat: place.at[1], zoom: 13.8, key: (g?.key ?? 0) + 1 }));
       return { ok: true, name: place.name, match: place.match, lon: place.at[0], lat: place.at[1], selectedId: e?.id ?? null };
     },
+    showAlternativeRoutes: async (q) => {
+      // Which crossing: an id (entity or alert pin), a name (alert title, map entity, or any place/bridge on the
+      // server), or with neither the selected item / open alert.
+      let at: [number, number] | null = null, label: string | null = null;
+      const pinsNow = pinsRef.current;
+      if (q.id) {
+        const e = resolveEntity(scene, buildingById, { id: q.id }); const pin = pinsNow.find((a) => a.id === q.id);
+        if (e) { at = e.at; label = e.name; } else if (pin) { at = [pin.lon, pin.lat]; label = pin.title; }
+      }
+      if (!at && q.name) {
+        const needle = q.name.toLowerCase();
+        const pin = pinsNow.find((a) => a.title.toLowerCase().includes(needle));
+        if (pin) { at = [pin.lon, pin.lat]; label = pin.title; }
+      }
+      if (!at && !q.name) {
+        const pin = pinsNow.find((a) => a.id === activeAlertRef.current);
+        if (selected) { at = selected.at; label = selected.name; } else if (pin) { at = [pin.lon, pin.lat]; label = pin.title; }
+      }
+      if (!at && !q.name) return { ok: false, error: "Which bridge? Nothing is selected: pass a bridge or place name." };
+      const qs = new URLSearchParams(at ? { lon: String(at[0]), lat: String(at[1]) } : { q: q.name! });
+      if (q.avoidFlood === false) qs.set("avoidFlood", "false");
+      type Res = { ok: boolean; error?: string; suggestions?: string[]; note?: string; normalMinutes?: number; avoidedSegments?: number;
+        crossing?: { name: string; kind: string; coords: [number, number][][]; closedByFlood: boolean; lengthM: number };
+        routes?: { rank: number; minutes: number; extraMinutes: number; km: number; via: string[]; coords: [number, number][] }[] };
+      let r: Res;
+      try { r = await fetch(`/api/routes/detour?${qs}`).then((x) => x.json()) as Res; }
+      catch (e) { return { ok: false, error: `Route service unreachable: ${(e as Error).message}` }; }
+      if (!r.ok || !r.crossing || !r.routes) return { ok: false, error: r.error ?? "no route", suggestions: r.suggestions };
+      setStreet(false); setPhoto(false);
+      setDetour({
+        key: Date.now(),
+        crossing: { name: r.crossing.name, coords: r.crossing.coords },
+        routes: r.routes.map((x) => ({ rank: x.rank, coords: x.coords, label: `${x.rank === 1 ? "Best detour" : "Option 2"} · +${Math.round(x.extraMinutes)} min · ${x.km} km` })),
+      });
+      return {
+        ok: true, crossing: r.crossing.name, asked: label ?? q.name ?? null, crossingClosedByFloodRule: r.crossing.closedByFlood,
+        normalMinutesAcross: r.normalMinutes, floodClosedSegmentsAvoided: r.avoidedSegments,
+        routes: r.routes.map((x) => ({ rank: x.rank, minutes: x.minutes, extraMinutes: x.extraMinutes, km: x.km, mainRoads: x.via })),
+        shown: "Bridge in red; best detour solid green; option 2 dashed yellow.", note: r.note,
+      };
+    },
+    clearRoutes: () => { setDetour(null); return { ok: true }; },
+    getReliefNeeds: async (q) => {
+      const qs = new URLSearchParams({ hazards: (q.hazards?.length ? q.hazards : ["power", "cell", "rain", "landslide"]).join(",") });
+      if (q.near) qs.set("q", q.near);
+      type Res = { ok: boolean; error?: string; areas?: { id: string; place: string; lon: number; lat: number; people: number; allocated: string; reach: string; hazards: { hazard: string }[] }[]; [k: string]: unknown };
+      let r: Res;
+      try { r = await fetch(`/api/relief/near?${qs}`).then((x) => x.json()) as Res; }
+      catch (e) { return { ok: false, error: `Relief service unreachable: ${(e as Error).message}` }; }
+      if (!r.ok) return r as { ok: false; error?: string };
+      const areas = r.areas ?? [];
+      setDetour(null); setStreet(false); setPhoto(false); setActiveAlert(null);
+      setMarks(areas.length ? {
+        key: Date.now(),
+        points: areas.slice(0, 8).map((a) => ({ lon: a.lon, lat: a.lat, tone: a.hazards.length >= 2 || a.reach.startsWith("helicopter") ? "hot" as const : "warn" as const,
+          label: `${a.place} · ~${a.people.toLocaleString("en-US")} people · ${a.allocated.replace(/\s*\(.*\)$/, "")}${a.reach.startsWith("helicopter") ? " · helicopter" : ""}` })),
+      } : null);
+      return { ...r, shown: areas.length ? "Top areas are labelled on the map (red = several hazards or helicopter only)." : "No relief area matches." };
+    },
+    openAllocation: (areaName) => {
+      const res = resultsRef.current["resources"];
+      if (!res) return { ok: false, error: "The Relief budget agent has not run. Offer to include 'resources' and deploy." };
+      const list = ((res.map as { areas?: { id: string; place: string }[] } | undefined)?.areas) ?? [];
+      const hit = areaName ? list.find((a) => a.place.toLowerCase() === areaName.toLowerCase()) ?? list.find((a) => a.place.toLowerCase().includes(areaName.toLowerCase())) : undefined;
+      setAllocArea(hit?.id ?? null); setAllocOpen(true); setReportOpen(false);
+      return { ok: true, opened: hit?.place ?? "all areas", ...(areaName && !hit ? { note: `No area named "${areaName}"; opened the full list.` } : {}) };
+    },
     clearInsights: () => {
+      setDetour(null); setMarks(null);
       setVis(BASE_VIS);
       setSelected(null);
       setActiveAlert(null);
@@ -712,7 +791,17 @@ export function ForecastConsole() {
       return { ok: true, tuned: st.name, alsoMatched: hit?.alternatives ?? [], language: st.language, local: st.inValley || st.local, note: "Streaming to the operator's speakers. Listen-only: nothing is recorded or transcribed and you cannot hear it. Browsers may block audio until the page has been clicked." };
     },
     stopRadio: (closePanel) => { radioRef.current.stop(); if (closePanel) setRadioOpen(false); return { ok: true }; },
-    getRoadClosures: (query, limit) => roadClosureReport(scene, stage, query, limit ?? 12),
+    getRoadClosures: async (query, limit) => {
+      const local = roadClosureReport(scene, stage, query, limit ?? 12);
+      if (local.ok || !query) return local;
+      // Not a hospital or map place: use the full place index on the server (OSM places such as Wyona Nani,
+      // wards, schools), which also strips alert-title wording and tolerates dictation misspellings.
+      try {
+        const r = await fetch(`/api/places/search?q=${encodeURIComponent(query)}`).then((x) => x.json()) as { match: { name: string; lon: number; lat: number } | null; suggestions: { name: string }[] };
+        if (r.match) return roadClosureReport(scene, stage, query, limit ?? 12, { name: r.match.name, at: [r.match.lon, r.match.lat] });
+        return { ...local, suggestions: [...new Set([...(local.suggestions ?? []), ...r.suggestions.map((x) => x.name)])].slice(0, 6) };
+      } catch { return local; }
+    },
     openStreetView: (q) => {
       const open = (t: StreetTarget) => {
         if (!streetKey) return { ok: false, selected: t.name, streetViewConfigured: false, error: STREET_VIEW_KEY_HINT };
@@ -773,6 +862,14 @@ export function ForecastConsole() {
   }), [stage, assessRain, ran, phase, mode, selected, vis, done, scene, why, acts, buildingById, factors, boardMin, reportOpen]);
 
   const talk = useLiveTalk(talkHandle);
+  talkAskRef.current = talk.sendOrConnect;
+  // Conversation panel: keep the newest line in view unless the person has scrolled up to read.
+  const captionsRef = useRef<HTMLDivElement>(null);
+  const stickRef = useRef(true);
+  useEffect(() => {
+    const el = captionsRef.current;
+    if (el && stickRef.current) el.scrollTop = el.scrollHeight;
+  }, [talk.log]);
   const talkSendRef = useRef(talk.send);
   talkSendRef.current = talk.send;
   const talkCanRef = useRef(talk.canSend);
@@ -801,7 +898,7 @@ export function ForecastConsole() {
     };
 
     const syncFromDom = () => {
-      const v = el.value;
+      const v = (inputRef.current ?? el).value; // current box, in case React replaced the element
       if (v === last) return;
       const wasEmpty = !String(last).trim();
       last = v;
@@ -832,24 +929,41 @@ export function ForecastConsole() {
       window.setTimeout(flush, 450);
     };
 
-    const onPaste = () => {
+    // Wispr dictates by pasting (Cmd+V) into whatever has focus. Seen in a debug log: the follow-up paste
+    // reached the ORACLE box with the text on the clipboard, but Chrome never inserted it (no input
+    // event), so the follow-up was lost. Also, turning ORACLE on leaves focus on the toggle button.
+    // So for any paste aimed at the ORACLE box or at a non-text element, insert the text ourselves.
+    const isEditable = (t: EventTarget | null) =>
+      t instanceof HTMLElement && (t.isContentEditable || (t instanceof HTMLInputElement && !["button", "checkbox", "radio", "submit", "range"].includes(t.type)) || t instanceof HTMLTextAreaElement);
+    const onDocPaste = (e: ClipboardEvent) => {
+      const box = inputRef.current;
+      if (!box) return;
+      if (e.target !== box && isEditable(e.target)) return; // a different text field: leave it alone
+      const text = e.clipboardData?.getData("text/plain") ?? "";
+      if (!text.trim()) return;
+      e.preventDefault();
+      if (document.activeElement !== box) box.focus();
+      const start = e.target === box ? box.selectionStart ?? box.value.length : box.value.length;
+      const end = e.target === box ? box.selectionEnd ?? box.value.length : box.value.length;
+      box.value = box.value.slice(0, start) + text + box.value.slice(end);
+      box.setSelectionRange(start + text.length, start + text.length);
       waitInsertUntil = performance.now() + 500;
-      requestAnimationFrame(() => {
-        syncFromDom();
-        flush();
-      });
+      syncFromDom();
+      flush();
     };
+    // Put the cursor in the box as soon as ORACLE turns on, so the first dictation lands there.
+    if (!isEditable(document.activeElement)) el.focus();
 
     window.addEventListener("keyup", onKeyUp, true);
+    document.addEventListener("paste", onDocPaste, true);
     el.addEventListener("input", syncFromDom);
     el.addEventListener("change", syncFromDom);
-    el.addEventListener("paste", onPaste);
     const poll = window.setInterval(syncFromDom, 80);
     return () => {
       window.removeEventListener("keyup", onKeyUp, true);
+      document.removeEventListener("paste", onDocPaste, true);
       el.removeEventListener("input", syncFromDom);
       el.removeEventListener("change", syncFromDom);
-      el.removeEventListener("paste", onPaste);
       window.clearInterval(poll);
       window.clearTimeout(flushTimer);
     };
@@ -873,7 +987,7 @@ export function ForecastConsole() {
         view3d={mode === "3d"} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={assessRain ?? OBSERVED_IN} flying={flying} onFlyEnd={() => setFlying(false)}
         atmosphere={atmosphere} padLeft={24} alerts={pins} activeAlert={activeAlert} onAlert={pickAlert} onStreet={(t) => { setFlying(false); setPhoto(false); setStreetPt(t); }} fitAlertsKey={fitKey} goto={goto} panelPad={panelPad} stations={stationPins} onStation={toggleStation}
         actionPins={actionPins} onActionPin={(key) => { setLocFocus(key); setActionsOpen(true); setRadioOpen(false); setLayersOpen(false); }}
-        flyTo={flyTo} onMapClick={picking ? onMapPick : openArea} picking={!!picking} area={area?.info?.found ? area.info.ward.rings : null}
+        flyTo={flyTo} onMapClick={picking ? onMapPick : openArea} picking={!!picking} area={area?.info?.found ? area.info.ward.rings : null} routes={detour} marks={marks}
         waterLevel={waterLevel} riverLevel={riverLevel}
         base={base === "google" && gAvail?.available ? "google" : "esri"} onView={base === "google" && gAvail?.available ? onView : undefined} />
       {base === "google" && gAvail?.available && (
@@ -942,7 +1056,7 @@ export function ForecastConsole() {
 
       {radioOpen && <RadioPanel radio={radio} onClose={() => setRadioOpen(false)} />}
       {allocOpen && results["resources"] && (
-        <AllocationView r={results["resources"]} onClose={() => setAllocOpen(false)}
+        <AllocationView key={allocArea ?? "all"} initialId={allocArea} r={results["resources"]} onClose={() => { setAllocOpen(false); setAllocArea(null); }}
           onShow={(a) => { setAllocOpen(false); if (a.pin) pickAlert(a.pin); else setFlyTo({ lon: a.lon, lat: a.lat, key: Date.now() }); }} />
       )}
       {area && <AreaPanel area={area.info} loading={area.loading} error={area.error} onClose={() => setArea(null)} />}
@@ -1071,9 +1185,10 @@ export function ForecastConsole() {
               </button>
             )}
         </form>
-        {talk.live && talk.log.length > 0 && (
-          <div className="fx-talk-captions fx-glass" aria-live="polite">
-            {talk.log.slice(-3).map((l, i) => (
+        {talk.log.length > 0 && (
+          <div className="fx-talk-captions fx-glass" aria-live="polite" ref={captionsRef}
+            onScroll={(e) => { const el = e.currentTarget; stickRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 24; }}>
+            {talk.log.map((l, i) => (
               <p key={i} className={l.role === "user" ? "you" : "bot"}><b>{l.role === "user" ? "You" : "ORACLE"}</b> {l.text}</p>
             ))}
           </div>
