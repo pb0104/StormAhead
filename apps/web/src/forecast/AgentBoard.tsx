@@ -66,7 +66,7 @@ function AgentCard({
           <div className="fx-think">
             <div className="fx-think-h">
               <Icon name="sparkle" size={13} />
-              {r.by === "stackai" ? "Reasoning · LLM via StackAI" : "Summary · rules (LLM offline)"}
+              {r.by === "stackai" ? "Reasoning · LLM" : "Summary · rules (LLM offline)"}
             </div>
             <ul>{r.thinking.map((t, i) => <li key={i}>{t}</li>)}</ul>
             {r.figures && r.figures.length > 0 && (
@@ -143,7 +143,7 @@ export function AgentBoard(p: BoardProps) {
         </div>
       </header>
       <div className="fx-progress" role="progressbar" aria-valuemin={0} aria-valuemax={p.order.length} aria-valuenow={done}><i style={{ width: `${(done / Math.max(1, p.order.length)) * 100}%` }} /></div>
-      {!p.llmConfigured && <p className="fx-note"><Icon name="info" size={13} />StackAI isn't configured, so agents summarise with rules. Add STACKAI_ORG_ID and STACKAI_FLOW_ID to .env for LLM reasoning.</p>}
+      {!p.llmConfigured && <p className="fx-note"><Icon name="info" size={13} />The LLM isn't connected, so agents summarise with rules.</p>}
       <div className="fx-agents">
         {p.order.map((id) => {
           const meta = byId.get(id); const s = p.state[id];
@@ -173,7 +173,7 @@ export function AgentBoard(p: BoardProps) {
           <article className={`fx-agent fx-sys ${p.reportState === "done" ? "is-done" : "is-running"}`}>
             <div className="fx-agent-head static">
               <span className="fx-agent-ico sys"><Icon name="doc" size={17} /></span>
-              <span className="fx-agent-id"><span className="fx-agent-name">Briefing agent</span><span className="fx-agent-src">{p.llmConfigured ? "Writes the situation report with the LLM (StackAI)" : "Writes the situation report (rules, LLM offline)"}</span></span>
+              <span className="fx-agent-id"><span className="fx-agent-name">Briefing agent</span><span className="fx-agent-src">{p.llmConfigured ? "Writes the situation report with the LLM" : "Writes the situation report (rules, LLM offline)"}</span></span>
               {p.reportState === "writing" ? <span className="fx-state run"><i className="fx-spin" />Writing</span> : <span className="fx-state">{p.reportBy === "stackai" ? "LLM" : "Rules"}</span>}
             </div>
           </article>

@@ -164,7 +164,7 @@ ${combined.slice(0, 4).map((c) => `| Nearest responder base | ${c.place} | ${c.a
 Available: ${Object.entries(res.responderBases).map(([k, v]) => `${v} ${k}`).join(", ")}; ${res.usableOpenSpaces} usable open spaces; depots (simulated): ${res.foodDepotsSimulated.join("; ")}.
 
 ## Public messaging (draft, needs approval)
-Needs an LLM to draft. Configure StackAI to generate bilingual alerts.
+Needs the LLM to draft bilingual alerts.
 
 ## Confidence and gaps
 - Written by rules because the LLM was unavailable. Numbers come straight from the agents.
@@ -291,6 +291,6 @@ export async function runForecast(services: Services, body: { question: string; 
   if (llm.configured) {
     try { md = await complete(reportPrompt(body.question, w, ordered, combined, actionsForPrompt(targets))); } catch (e) { err = (e as Error).message; }
   }
-  emit({ type: "report", markdown: md ?? ruleReport(body.question, w, ordered, combined), by: md ? "stackai" : "rules", ...(err ? { error: err } : !llm.configured ? { error: `StackAI not configured (missing ${llm.missing.join(", ")})` } : {}) });
+  emit({ type: "report", markdown: md ?? ruleReport(body.question, w, ordered, combined), by: md ? "stackai" : "rules", ...(err ? { error: err } : !llm.configured ? { error: "LLM not connected" } : {}) });
   emit({ type: "done", ms: Date.now() - t0 });
 }

@@ -70,7 +70,7 @@ export function ReportPanel(p: ReportProps) {
       <div className="fx-report-body">
         {tab === "brief" && (p.report ? (
           <>
-            <div className={`fx-by ${p.report.by}`}><Icon name="sparkle" size={13} /> {p.report.by === "stackai" ? "Written by the LLM (StackAI) from the agents' numbers" : "Written by rules: LLM unavailable"}{p.report.error ? ` · ${p.report.error}` : ""}</div>
+            <div className={`fx-by ${p.report.by}`}><Icon name="sparkle" size={13} /> {p.report.by === "stackai" ? "Written by the LLM from the agents' numbers" : "Written by rules: LLM unavailable"}{p.report.error ? ` · ${p.report.error}` : ""}</div>
             <Markdown text={p.report.markdown} />
           </>
         ) : (

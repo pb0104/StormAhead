@@ -67,12 +67,12 @@ export async function complete(prompt: string, env: NodeJS.ProcessEnv = process.
         body: JSON.stringify({ "user_id": "stormahead-ops", [inKey]: prompt }),
       });
       const body = await r.json().catch(() => null);
-      if (!r.ok) throw new StackAiError(`StackAI HTTP ${r.status}${body && (body as any).detail ? `: ${JSON.stringify((body as any).detail).slice(0, 200)}` : ""}`);
+      if (!r.ok) throw new StackAiError(`LLM HTTP ${r.status}${body && (body as any).detail ? `: ${JSON.stringify((body as any).detail).slice(0, 200)}` : ""}`);
       const text = extract(body, outKey);
-      if (!text) throw new StackAiError(`StackAI returned no text output (looked for "${outKey}")`);
+      if (!text) throw new StackAiError(`LLM returned no text output (looked for "${outKey}")`);
       return text.trim();
     } catch (e) {
-      if ((e as Error).name === "AbortError") throw new StackAiError(`StackAI timed out after ${TIMEOUT_MS / 1000}s`);
+      if ((e as Error).name === "AbortError") throw new StackAiError(`LLM timed out after ${TIMEOUT_MS / 1000}s`);
       throw e;
     } finally {
       clearTimeout(t);

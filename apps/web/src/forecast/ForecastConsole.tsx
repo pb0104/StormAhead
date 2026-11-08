@@ -1035,7 +1035,7 @@ export function ForecastConsole() {
           <span className="fx-clock" title="Replay of the September 2024 floods. The scenario clock is fixed before the event."><i className="fx-live" /> Replay · {factors?.nowLabel ?? "Thu 26 Sep, 06:00"} 2024 NPT</span>
         </div>
         <div className="fx-tools fx-glass">
-          <span className={`fx-llm ${factors?.llm.configured ? "on" : "off"}`} role="img" aria-label={factors?.llm.configured ? "StackAI connected" : "StackAI not configured"} title={factors?.llm.configured ? "LLM reasoning via StackAI" : `StackAI not configured: missing ${factors?.llm.missing.join(", ")}`}>
+          <span className={`fx-llm ${factors?.llm.configured ? "on" : "off"}`} role="img" aria-label={factors?.llm.configured ? "LLM connected" : "LLM not connected"} title={factors?.llm.configured ? "LLM reasoning on" : "LLM not connected: agents summarise with rules"}>
             <i />
           </span>
           {radio.current && !radioOpen && (
@@ -1144,7 +1144,7 @@ export function ForecastConsole() {
             </div>
             <div className="fx-scope-foot">
               <button className="fx-link" onClick={() => setPicked(picked.length === factors.agents.length ? [] : factors.agents.map((a) => a.id))}>{picked.length === factors.agents.length ? "Clear all" : "Select all"}</button>
-              <span className="fx-sub">{factors.llm.configured ? "Each agent reasons with the LLM via StackAI." : "LLM offline: agents will summarise with rules."}</span>
+              <span className="fx-sub">{factors.llm.configured ? "Each agent reasons with the LLM." : "LLM offline: agents will summarise with rules."}</span>
               <button className="fx-btn primary big" disabled={!picked.length} onClick={run}><Icon name="sparkle" size={15} /> Deploy {picked.length} agent{picked.length === 1 ? "" : "s"}</button>
             </div>
           </div>
@@ -1241,7 +1241,7 @@ export function ForecastConsole() {
         e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setStreet(false); setSelected(null); }}
         reasons={why} actions={acts} kindLabel={{ ...scene.kindLabel, building: "Building" }} feed={selected ? <SocialFeed onStreet={(t) => { setFlying(false); setPhoto(false); setStreetPt(t); }} at={selected.at} compact /> : null} />
       <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} note={scene.note} legacyActivity={false}
-        agentLines={order.length ? order.map((id) => `${agentsMeta.find((a) => a.id === id)?.name ?? id}: ${results[id]?.headline ?? "not finished"} (${results[id]?.by === "stackai" ? "LLM via StackAI" : "rules"})`) : ["No forecast run yet. Ask a question to deploy the agents."]} />
+        agentLines={order.length ? order.map((id) => `${agentsMeta.find((a) => a.id === id)?.name ?? id}: ${results[id]?.headline ?? "not finished"} (${results[id]?.by === "stackai" ? "LLM" : "rules"})`) : ["No forecast run yet. Ask a question to deploy the agents."]} />
     </div>
   );
 }
