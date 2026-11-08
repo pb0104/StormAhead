@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, socialHotspots } from "../apps/web/src/voice/insights.ts";
+import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, searchSocialPosts, socialOverview, socialHotspots } from "../apps/web/src/voice/insights.ts";
 import { mergeBipadIntoScene } from "../apps/web/src/mergeBipad.ts";
 import type { SceneSnapshot } from "../packages/ports/index.ts";
 
@@ -76,4 +76,18 @@ describe("voice insights", () => {
     expect(high.ok && high.cutOffAreas[0]!.id).toBe("P1");
     expect(roadClosureReport(scene, 3, "Nowhereville").ok).toBe(false);
   });
+
+  it("searches real posts by tag, text and place, from data only", () => {
+    const all = searchSocialPosts(emptyScene(), { limit: 15 });
+    expect(all.ok && all.total).toBe(socialOverview().total);
+    expect(all.ok && all.posts.length).toBeLessThanOrEqual(15);
+    const urgent = searchSocialPosts(emptyScene(), { tag: "urgent", limit: 5 });
+    expect(urgent.ok && urgent.posts.every((p) => p.tags.includes("Urgent need"))).toBe(true);
+    expect(searchSocialPosts(emptyScene(), { tag: "zzz-nope" }).ok).toBe(false);
+    const hit = hotspotPlace();
+    const near = searchSocialPosts(emptyScene(), { near: hit });
+    expect(near.ok && near.posts.every((p) => p.onMap && p.lon != null)).toBe(true);
+  });
 });
+
+function hotspotPlace() { return socialHotspots(1).places[0]!.name; }

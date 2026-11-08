@@ -50,6 +50,8 @@ export type OpsHandle = {
   showSocialHotspots: (minPosts?: number) => { ok: boolean; [k: string]: unknown };
   flyToPlace: (name: string) => { ok: boolean; [k: string]: unknown } | Promise<{ ok: boolean; [k: string]: unknown }>;
   /** Road closures at the current timeline stage, from scene data. */
+  searchSocialPosts: (o: { query?: string; tag?: string; near?: string; photoOnly?: boolean; limit?: number }) => { ok: boolean; [k: string]: unknown };
+  openSocialPost: (id: string) => { ok: boolean; [k: string]: unknown };
   getRoadClosures: (query?: string, limit?: number) => { ok: boolean; [k: string]: unknown };
   openStreetView: (q: { id?: string; name?: string }) => { ok: boolean; [k: string]: unknown };
   closeStreetView: () => { ok: boolean; [k: string]: unknown };

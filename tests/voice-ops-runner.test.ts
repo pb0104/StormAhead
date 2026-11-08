@@ -28,6 +28,8 @@ function stub(over: Partial<OpsHandle> = {}): OpsHandle {
     showAffectedTowers: vi.fn(() => ({ ok: true })),
     showSocialHotspots: vi.fn(() => ({ ok: true })),
     flyToPlace: vi.fn(() => ({ ok: true })),
+    searchSocialPosts: vi.fn(() => ({ ok: true, posts: [] })),
+    openSocialPost: vi.fn(() => ({ ok: true })),
     getRoadClosures: vi.fn(() => ({ ok: true, closures: [] })),
     openStreetView: vi.fn(() => ({ ok: true })),
     closeStreetView: vi.fn(() => ({ ok: true })),
@@ -121,5 +123,14 @@ describe("ORACLE action tools", () => {
     expect(h.openStreetView).toHaveBeenCalledWith({ id: undefined, name: "Patan Hospital" });
     await runOpsTool(h, "close_street_view", {});
     expect(h.closeStreetView).toHaveBeenCalled();
+  });
+
+  it("search_social_posts passes filters; open_social_post requires an id", async () => {
+    const h = stub();
+    await runOpsTool(h, "search_social_posts", { tag: "urgent need", near: "Balkhu", photoOnly: true, limit: 3 });
+    expect(h.searchSocialPosts).toHaveBeenCalledWith({ query: undefined, tag: "urgent need", near: "Balkhu", photoOnly: true, limit: 3 });
+    expect((await runOpsTool(h, "open_social_post", {})).ok).toBe(false);
+    await runOpsTool(h, "open_social_post", { id: "SP-2" });
+    expect(h.openSocialPost).toHaveBeenCalledWith("SP-2");
   });
 });

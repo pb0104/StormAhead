@@ -198,6 +198,21 @@ export const OPS_LIVE_TOOLS = [
     },
   },
   {
+    name: "search_social_posts",
+    description:
+      "Search the real social-media posts (Reddit, replayed from the Sep 2024 floods; many translated from Nepali), newest first. Filters: query (words in the text or place), tag (e.g. 'urgent need', 'evacuation', 'damage', 'missing', 'injured', 'rescue', 'warning'), near (a place or facility name: posts within ~1.5 km), photoOnly. Returns id, time, outlet, place, tags, text (English), photo flag, link and whether it is on the map. Posts are unverified: say so when relevant. Read-only; you cannot post or reply.",
+    parameters: {
+      type: "object",
+      properties: { query: { type: "string" }, tag: { type: "string" }, near: { type: "string" }, photoOnly: { type: "boolean" }, limit: { type: "number" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "open_social_post",
+    description: "Show a social post on the map and in the side panel (turns the social layer on, flies there, selects it). Use an id from search_social_posts with onMap=true. Posts with no precise place cannot be shown on the map: read the text instead.",
+    parameters: { type: "object", properties: { id: { type: "string" } }, required: ["id"], additionalProperties: false },
+  },
+  {
     name: "get_road_closures",
     description:
       "Road-closure intel from the app's computed data at the CURRENT timeline time: which roads are closed now (names, class, bridge, length, coordinates), cut-off areas, and hospital access (ok/degraded/lost + extra minutes). Pass an optional query (a place or hospital name) to sort closures by distance from it and limit hospital access, e.g. 'what is cut off near Patan' or 'can ambulances reach Bir Hospital'. Never invent roads or coordinates; use only what this returns.",
@@ -237,6 +252,7 @@ DEFAULT: For new forecasts / outlooks / "what happens next" — call ask_stormah
 SUMMARIZE / UI: For "what's on screen", "summarize the agents", "brief me", "what did weather find", the situation report, layers, selection, or any UI question — call get_oracle_context first, then give a short spoken summary from that data. Cite specialists by name when useful; you remain ORACLE.
 NAVIGATION: For "take me to X", "go to X", "zoom to X", "fly to X" — call fly_to_place with X. If they name a specific site/hospital/tower, you may select_entity too. If fly_to_place returns suggestions, offer one and retry.
 Map layers / rainfall / towers / social: use the map tools. Never invent a forecast — use ask_stormahead / deploy_agents.
+SOCIAL POSTS: For 'what are people saying', 'any posts near X', 'urgent needs', photos — call search_social_posts and answer only from the returned text, flagging that posts are unverified; to show one call open_social_post. You cannot post, reply or verify. If asked to draft a reply, write the text in your answer for the operator to review; nothing is ever sent.
 ROADS & STREET VIEW: For closed roads, cut-off areas, or hospital access call get_road_closures (pass a place/hospital as query) and answer only from its data; to show one, select_entity with its id. For 'show me street view of X' or 'what does it look like there' call open_street_view (close_street_view to leave). If it reports Street View is not configured, say so in one sentence.
 ACTIONS ON THE GROUND: When the operator reports something done ("we sent…", "log that…", "40 people moved…") call log_action with their words, read the returned line back, and call confirm_action_update with confirmed=true only after they agree (cancel_action_update if not). To change or delete one, call list_actions for the id, then edit_action (only the corrected fields) or remove_action (confirm first). An action never closes a place; after saving, mention the next recommendation if it suggests more help. Each new forecast run starts a clean action log.
 Speak one or two short sentences after tools. Be concise.`;

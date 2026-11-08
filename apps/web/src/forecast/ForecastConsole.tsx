@@ -27,7 +27,8 @@ import { TalkToggle, useLiveTalk } from "./ForecastTalk.tsx";
 import { ActionsPanel, FollowUp, UpdateConfirm } from "./ActionLog.tsx";
 import { actionsApi, locationLabel, looksLikeUpdate, type ActionsView, type Coverage, type NextRec, type Proposal } from "./actionsApi.ts";
 import { getFactors, getIntent, streamForecast, type AgentResult, type Combined, type Factors, type ForecastEvent, type Intent, type Window } from "./api.ts";
-import { STREET_VIEW_KEY_HINT, affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, socialHotspots } from "../voice/insights.ts";
+import { POSTS } from "../real/social.ts";
+import { STREET_VIEW_KEY_HINT, affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, searchSocialPosts, socialHotspots, socialOverview, postView } from "../voice/insights.ts";
 import { buildSnapshot, resolveEntity, type OpsHandle } from "../voice/opsHandle.ts";
 import { resolveAgentIds } from "../voice/agentNames.ts";
 import "./forecast.css";
@@ -503,6 +504,7 @@ export function ForecastConsole() {
           : null,
         activeAlertId: activeAlertRef.current,
         streetView: { open: streetRef.current, available: !!streetKey },
+        socialPosts: { layerOn: !!visRef.current.social, ...socialOverview(), hint: "call search_social_posts to read posts" },
         roadClosures: { stage: stageRef.current, closedNow: roadClosureReport(sceneRef.current, stageRef.current, undefined, 0).closedCount, hint: "call get_road_closures for names" },
         boardMinimized: boardMin,
         reportOpen,
@@ -653,6 +655,16 @@ export function ForecastConsole() {
       return { ok: true, added: ids, unknown, picked: next };
     },
     getOracleContext: () => buildOracleContext(),
+    searchSocialPosts: (o) => searchSocialPosts(scene, o),
+    openSocialPost: (id) => {
+      const post = POSTS.find((p) => p.id === id);
+      if (!post) return { ok: false, error: `No post with id ${id}` };
+      const e = resolveEntity(scene, buildingById, { id });
+      if (!e) return { ok: false, post: postView(post), error: "This post names no precise place, so it is not on the map. Read its text instead." };
+      setVis((v) => ({ ...v, social: true }));
+      select(e);
+      return { ok: true, opened: id, post: postView(post) };
+    },
     getRoadClosures: (query, limit) => roadClosureReport(scene, stage, query, limit ?? 12),
     openStreetView: (q) => {
       const e = q.id || q.name ? resolveEntity(scene, buildingById, q) : selected;

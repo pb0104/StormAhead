@@ -74,6 +74,17 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
       return handle.showSocialHotspots(args.minPosts != null ? Number(args.minPosts) : undefined);
     case "fly_to_place":
       return handle.flyToPlace(String(args.name ?? ""));
+    case "search_social_posts":
+      return handle.searchSocialPosts({
+        query: args.query != null ? String(args.query) : undefined, tag: args.tag != null ? String(args.tag) : undefined,
+        near: args.near != null ? String(args.near) : undefined, photoOnly: args.photoOnly === true,
+        limit: args.limit != null ? Number(args.limit) || undefined : undefined,
+      });
+    case "open_social_post": {
+      const id = String(args.id ?? "").trim();
+      if (!id) return { ok: false, error: "id required (from search_social_posts)" };
+      return handle.openSocialPost(id);
+    }
     case "get_road_closures":
       return handle.getRoadClosures(args.query != null ? String(args.query) : undefined, args.limit != null ? Math.max(1, Math.min(30, Number(args.limit) || 12)) : undefined);
     case "open_street_view":

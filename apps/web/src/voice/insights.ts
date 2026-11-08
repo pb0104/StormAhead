@@ -1,5 +1,5 @@
 import type { Entity, SceneSnapshot } from "../../../../packages/ports/index.ts";
-import { POSTS } from "../real/social.ts";
+import { POSTS, TAG_LABEL, whenLocal, type Post } from "../real/social.ts";
 
 export type LonLat = [number, number];
 export type Bounds = [LonLat, LonLat];
@@ -196,4 +196,48 @@ export function roadClosureReport(scene: SceneSnapshot | null, stage: number, qu
     hospitalAccess: hospitals.map((h) => ({ id: h.id, name: h.name, access: h.props.access ?? "unknown", extraDelayMin: h.props.extraMin ?? 0, lon: h.at[0], lat: h.at[1] })),
     howToShow: "To fly the map to a closure or hospital call select_entity with its id; for a street-level look call open_street_view with that name.",
   };
+}
+
+const clip = (t: string, n = 320) => (t.length > n ? t.slice(0, n - 1) + "…" : t);
+export const postView = (p: Post) => ({
+  id: p.id, when: whenLocal(p), outlet: p.outlet, place: p.places || p.district || null,
+  tags: p.tags.split("; ").filter(Boolean).map((t) => TAG_LABEL[t] ?? t),
+  text: clip(p.translation || p.excerpt), originalLang: p.translation ? p.lang ?? null : null, hasPhoto: !!p.image, url: p.url,
+  onMap: (p.precision === "place" || p.precision === "town") && p.lon != null && p.lat != null,
+  lon: p.lon, lat: p.lat,
+});
+
+/**
+ * Search the real replayed social posts (newest first). Filters: free-text `query`, `tag` (label or key, fuzzy),
+ * `near` (a place/entity name, posts within `radiusKm`), `photoOnly`. Everything returned is from data.
+ */
+export function searchSocialPosts(scene: SceneSnapshot | null, o: { query?: string; tag?: string; near?: string; photoOnly?: boolean; limit?: number; radiusKm?: number } = {}) {
+  let pool = POSTS;
+  let nearOf: string | null = null;
+  if (o.near?.trim()) {
+    const r = resolvePlace(scene, o.near);
+    if (!r.ok) return { ok: false as const, error: `no place matching "${o.near}"`, suggestions: r.suggestions };
+    nearOf = r.name;
+    const radius = o.radiusKm ?? 1.5;
+    pool = pool.filter((p) => p.lon != null && p.lat != null && (p.precision === "place" || p.precision === "town") && kmBetween(r.at, [p.lon, p.lat]) <= radius);
+  }
+  if (o.tag?.trim()) {
+    const t = o.tag.trim().toLowerCase();
+    const keys = Object.entries(TAG_LABEL).filter(([k, l]) => k.includes(t.replace(/\s+/g, "_")) || l.toLowerCase().includes(t)).map(([k]) => k);
+    if (!keys.length) return { ok: false as const, error: `unknown tag "${o.tag}"`, tags: Object.values(TAG_LABEL) };
+    pool = pool.filter((p) => keys.some((k) => p.tags.includes(k)));
+  }
+  if (o.query?.trim()) {
+    const words = o.query.toLowerCase().split(/\s+/).filter(Boolean);
+    pool = pool.filter((p) => { const h = `${p.excerpt} ${p.translation ?? ""} ${p.places} ${p.district}`.toLowerCase(); return words.every((w) => h.includes(w)); });
+  }
+  if (o.photoOnly) pool = pool.filter((p) => !!p.image);
+  const limit = Math.max(1, Math.min(15, o.limit ?? 6));
+  return { ok: true as const, nearOf, total: pool.length, shown: Math.min(limit, pool.length), posts: pool.slice(0, limit).map(postView), note: "Real Reddit posts replayed from 25 Sep to 3 Oct 2024; tags are keyword-based, unverified. Use open_social_post with an id (onMap=true) to show it." };
+}
+
+export function socialOverview() {
+  const tags: Record<string, number> = {};
+  for (const p of POSTS) for (const t of p.tags.split("; ").filter(Boolean)) tags[TAG_LABEL[t] ?? t] = (tags[TAG_LABEL[t] ?? t] ?? 0) + 1;
+  return { total: POSTS.length, onMap: POSTS.filter((p) => (p.precision === "place" || p.precision === "town") && p.lon != null).length, withPhotos: POSTS.filter((p) => p.image).length, tags };
 }

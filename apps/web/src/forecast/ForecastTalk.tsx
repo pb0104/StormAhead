@@ -50,6 +50,8 @@ function proxyHandle(ref: { current: OpsHandle }): OpsHandle {
     showAffectedTowers: () => ref.current.showAffectedTowers(),
     showSocialHotspots: (n) => ref.current.showSocialHotspots(n),
     flyToPlace: (n) => ref.current.flyToPlace(n),
+    searchSocialPosts: (o) => ref.current.searchSocialPosts(o),
+    openSocialPost: (id) => ref.current.openSocialPost(id),
     getRoadClosures: (q, n) => ref.current.getRoadClosures(q, n),
     openStreetView: (q) => ref.current.openStreetView(q),
     closeStreetView: () => ref.current.closeStreetView(),
