@@ -46,7 +46,7 @@ describe("console shelter reading (depth-driven)", () => {
 });
 
 describe("depth lookup against the observed flood extent", () => {
-  // Two unit squares, so the expected answer is unambiguous. Explicit polygons rather than the demo fixture:
+  // Two unit squares, so the expected answer is unambiguous. Explicit polygons rather than the shared scene flood:
   // the function takes them as an argument, so the test need not depend on whatever the console happens to ship.
   const sq = (x: number, y: number): FloodPoly => ({ r: 0, ring: [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1], [x, y]] });
   const polys = [sq(0, 0), sq(10, 10)];

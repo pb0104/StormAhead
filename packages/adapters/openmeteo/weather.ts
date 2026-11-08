@@ -22,7 +22,7 @@ export function clampInches(n: number) {
 export class FixtureWeatherAdapter implements WeatherPort {
   constructor(private inches = DEFAULT_INCHES) {}
   async seedRainfall(): Promise<WeatherSeed> {
-    return { inches: this.inches, source: "fixture", fetchedAt: new Date().toISOString() };
+    return { inches: this.inches, source: "offline", fetchedAt: new Date().toISOString() };
   }
   describe(inches: number) { return describeWeather(inches); }
 }

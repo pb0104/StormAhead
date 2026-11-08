@@ -56,7 +56,7 @@ describe("atmosphereGrid", () => {
 describe("FixtureAtmosphereAdapter", () => {
   it("returns clouds and isobars", async () => {
     const snap = await new FixtureAtmosphereAdapter().load();
-    expect(snap.source).toBe("fixture");
+    expect(snap.source).toBe("offline");
     expect(snap.clouds.features.length).toBeGreaterThan(0);
     expect(snap.isobars.features.length).toBeGreaterThan(0);
     expect(snap.extensions).toEqual({});

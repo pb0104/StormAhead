@@ -256,8 +256,8 @@ code { font: 12px var(--mono); }
 
 /* provenance + timeline (BIPAD layers) */
 .prov { display: inline-block; margin-top: 4px; font: 500 10.5px var(--mono); letter-spacing: .02em; padding: 2px 7px; border-radius: 3px; }
-.prov.real { background: #123A2B; color: #8EE6B8; } .prov.modelled { background: #1F2E38; color: #A9C7DA; } .prov.planning, .prov.simulated { background: #3A2C0E; color: #FFD27A; }
-.pill.modelled { background: #1F2E38; color: #A9C7DA; } .pill.planning { background: #3A2C0E; color: #FFD27A; }
+.prov.real { background: #123A2B; color: #8EE6B8; } .prov.modelled { background: #1F2E38; color: #A9C7DA; }
+.pill.modelled { background: #1F2E38; color: #A9C7DA; }
 .timeline { list-style: none; padding: 0; margin: 0; } .timeline li { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--raise); }
 .timeline time { font: 500 11px var(--mono); color: var(--mute); } .timeline small { display: block; color: var(--mute); }
 

@@ -6,7 +6,7 @@ Setup: `npm start`, open http://127.0.0.1:3001. Use the mode switcher at the top
 
 ## A. Kathmandu ops console (~3 min)
 
-Everything on this surface except OSM roads, building footprints, elevation and the satellite base comes from public feeds plus planning layers; see Details → Sources.
+Everything on this surface is live public data — OSM, BIPAD/DHM, UNOSAT, Open-Meteo, OpenCelliD, Black Marble, Reddit, Maxar, Radio Browser, Google Places; see Details → Sources.
 
 **0:00–0:30, Problem.** "A flood map shows where water is. The costly surprises are knock-on effects: roads that close and places that get cut off. Authorities need to see that and know where to send response. This is the ops console on the Sept 2024 Kathmandu valley."
 

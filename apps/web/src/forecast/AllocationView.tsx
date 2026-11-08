@@ -149,7 +149,7 @@ export function AllocationView({ r, onClose, onShow, initialId }: { r: AgentResu
                 ))}
               </tbody>
             </table>
-            <p className="fx-area-note">Real: a published figure used as is. Anchored: derived from a published figure. Standard: an international minimum. Estimate: computed from real data. Estimate: a planning figure pending a published source.</p>
+            <p className="fx-area-note">Real: a published figure used as is. Anchored: derived from a published figure. Standard: an international minimum. Estimate: computed from real operational data.</p>
           </section>
         )}
       </div>

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { confusion, DEFAULT_WARD_SCORE, scoreByWard, wardIndex, type Ward } from "../packages/analysis/wards.ts";
 import { analyzeCascade, type Incident, type RealArea, type RealEdge } from "../packages/analysis/cascade.ts";
 
-/** A square ward of side ~0.01 deg, placed on the same synthetic chain the cascade tests use. */
+/** A square ward of side ~0.01 deg, placed on the same road chain the cascade tests use. */
 const W = (id: number, lon: number, lat = 27.7): Ward => ({
   id, name: `W${id}`, ward: String(id), municipality: "Test",
   areaM2: 1e6, at: [lon, lat],
@@ -41,7 +41,7 @@ describe("ward lookup", () => {
   });
 });
 
-// Reuse the cascade tests' synthetic area: chain 0-1-2-3-4-5, flooded bridge 5-6, right chain 6-7-8.
+// Reuse the cascade tests' area: chain 0-1-2-3-4-5, flooded bridge 5-6, right chain 6-7-8.
 const E = (u: number, v: number, minutes: number, extra: Partial<RealEdge> = {}): RealEdge => ({
   u, v, minutes, lengthM: minutes * 300, cls: "residential", bridge: false, floodedShare: 0, name: null, osmWayId: u * 100 + v,
   mid: [85.3 + (u + v) * 0.005, 27.7], distFloodM: 5000, via: null, ...extra,

@@ -27,7 +27,7 @@ Event window used: Helene landfall/flooding ≈ 2024-09-25 → 2024-09-29; after
 | Cell towers / outages | FCC DIRS: **not found** via ArcGIS search; OpenCellID needs a key. Unverified. |
 
 ## Social media and radio
-**Not probed**, deliberately: platform terms and API access change (X is effectively closed; Reddit/Bluesky have terms and rate limits), and radio/scanner archives (e.g. Broadcastify) have licensing limits. Realistic options: a small hand-labelled feed clearly marked as a planning layer, or an open public archive if one is found.
+**Not probed**, deliberately: platform terms and API access change (X is effectively closed; Reddit/Bluesky have terms and rate limits), and radio/scanner archives (e.g. Broadcastify) have licensing limits. Realistic options: a small hand-labelled open archive, or the EOC's own radio feeds.
 
 ## Terrain / rainfall / susceptibility — **not audited yet**
 DEM (USGS 3DEP or Copernicus), rainfall (MRMS/Stage IV), pre-event landslide susceptibility (NCGS maps) are the obvious predictors for closures and still need checking.

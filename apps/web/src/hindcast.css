@@ -85,7 +85,7 @@ ul.plain { padding-left:17px; margin:5px 0; } ul.plain li { margin:3px 0; } deta
 .fbox { border:1.5px solid; border-radius:10px; padding:5px 8px; margin:5px 0; background:rgba(2,6,23,.4); } .fbox small { display:block; color:var(--mute); font-size:10.5px; } .fbox.todo { border-style:dashed; opacity:.45; } .fbox.hot { background:rgba(56,189,248,.12); box-shadow:0 0 16px rgba(56,189,248,.35); animation:pulseBox 2.4s ease-in-out infinite; }
 @keyframes pulseBox { 50% { box-shadow:0 0 6px rgba(56,189,248,.15); } }
 
-/* ---------- synthetic map markers ---------- */
+/* ---------- map markers ---------- */
 .mk { display:flex; flex-direction:column; align-items:center; }
 .mk .pin { width:22px; height:22px; border-radius:50%; background:#334155; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; border:2px solid rgba(255,255,255,.9); box-shadow:0 2px 10px rgba(0,0,0,.6); position:relative; }
 .mk .lbl { font-size:10.5px; color:#e2e8f0; background:rgba(8,13,25,.8); border:1px solid var(--line); padding:0 6px; border-radius:6px; white-space:nowrap; margin-top:3px; backdrop-filter:blur(4px); }

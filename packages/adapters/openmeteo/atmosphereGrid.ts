@@ -1,6 +1,6 @@
 /**
  * Pure helpers: valley weather grid → soft cloud samples + smoothed pressure isobars.
- * Open-Meteo samples are upsampled so contours look fluid (still illustrative, not NWP-grade).
+ * Open-Meteo samples are upsampled so contours look fluid (live Open-Meteo cloud / pressure, not NWP-grade).
  */
 import type { Feature, FeatureCollection } from "../../ports/index.ts";
 

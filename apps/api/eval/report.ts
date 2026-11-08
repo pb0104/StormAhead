@@ -204,7 +204,7 @@ export function buildEvalReport(h: HindcastService): EvalReport | null {
       "Show your work",
       "Can every claim be traced to a real source?",
       4.8,
-      "Every finding carries source + confidence; planning layers are labelled; after data is for scoring only.",
+      "Every finding carries source + confidence; after imagery and BIPAD grade the run only.",
       [
         "Evidence trail is complete on scored items.",
         "Clear split between generate and grade.",

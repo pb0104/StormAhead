@@ -4,7 +4,7 @@ import type { AssetsSnapshot } from "../packages/ports/index.ts";
 import { mergeAssetsIntoScene } from "../packages/app/mergeAssets.ts";
 
 describe("mergeAssetsIntoScene", () => {
-  it("replaces mock dams/hospitals with OSM assets and keeps closures", () => {
+  it("replaces scene dams/hospitals with OSM assets and keeps closures", () => {
     const scene = new FixtureSceneAdapter().load();
     const mockDamCount = scene.entities.filter((e) => e.kind === "dam").length;
     const mockHospitalCount = scene.entities.filter((e) => e.kind === "hospital").length;
@@ -31,6 +31,6 @@ describe("mergeAssetsIntoScene", () => {
     expect(merged.entities.find((e) => e.id === "osm/node/10")?.at).toEqual([85.4, 27.75]);
     expect(merged.geo.points.features.some((f) => f.properties.id === "osm/node/10")).toBe(true);
     expect(merged.advice["osm/node/10"]?.reasons.some((r) => r.input === "Name" && r.text === "Real Dam")).toBe(true);
-    expect(mockHospitalCount).not.toBe(2); // scene had a different mock count
+    expect(mockHospitalCount).not.toBe(2); // scene hospital count differs from OSM merge
   });
 });

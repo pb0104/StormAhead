@@ -28,7 +28,7 @@ export function CommandRail(p: RailProps) {
           <div className="brand"><span className="b1">Cascade</span><span className="b2">IQ</span></div>
           <button className="icon rail-close" onClick={() => p.setOpen(false)} aria-label="Close command rail">×</button>
         </div>
-        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges, cell sites, night-light outages and social posts are from public feeds (status modelled where noted); radio is listen-only broadcast; depot stock uses planning levels.</p>
+        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Live BIPAD/DHM facilities, alerts and gauges; OpenCelliD; NASA Black Marble; Reddit; live Radio Browser; real relief stock. Assign and approve pending send confirmation — nothing auto-sends.</p>
 
         <section>
           <label className="lbl" htmlFor="scn">Scenario</label>

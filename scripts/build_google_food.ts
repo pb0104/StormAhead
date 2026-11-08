@@ -217,9 +217,9 @@ for (const s of shops) {
   s.why = reasons.join(" ");
 }
 
-// ---- pockets from demo network fixture ----
-const demoNet = JSON.parse(readFileSync("packages/adapters/fixture/fixtures/network.json", "utf8"));
-const pockets: { id: string; name: string; mid: [number, number]; lines: [number, number][][] }[] = demoNet.pockets.map((p: any) => ({
+// ---- pockets from scene network ----
+const sceneNet = JSON.parse(readFileSync("packages/adapters/fixture/fixtures/network.json", "utf8"));
+const pockets: { id: string; name: string; mid: [number, number]; lines: [number, number][][] }[] = sceneNet.pockets.map((p: any) => ({
   id: p.id,
   name: p.name,
   mid: p.mid,

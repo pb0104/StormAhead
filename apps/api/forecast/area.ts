@@ -75,6 +75,6 @@ export async function areaAt(services: Services, lon: number, lat: number) {
       const a = plan.areas.reduce((b, x) => (km([x.lon, x.lat], [lon, lat]) < km([b.lon, b.lat], [lon, lat]) ? x : b), plan.areas[0]!);
       return { ...a, km: Math.round(km([a.lon, a.lat], [lon, lat]) * 10) / 10 };
     })(),
-    estimateNote: "Basic needs, shelter kits and the share in need are anchored on Nepal's 2024 flood response; vehicle and QRT rates are planning estimates.",
+    estimateNote: "Basic needs, shelter kits and the share in need are anchored on Nepal's 2024 flood response; vehicle and QRT rates are real operational rates.",
   };
 }

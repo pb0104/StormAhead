@@ -1,5 +1,5 @@
 // Fetch the valley's rivers and named streams as lines, for the rising-water animation in the console.
-// Output: data/real/kathmandu/rivers.geojson (committed, so the demo never depends on Overpass).
+// Output: data/real/kathmandu/rivers.geojson (committed, so the app never depends on live Overpass for this layer).
 //
 // Source: OpenStreetMap via Overpass, current data by default. Rivers are display context, not a model input, and
 // their courses do not change between snapshots; set RIVERS_ATTIC=2024-01-02T00:00:00Z to pin the pre-event snapshot

@@ -68,9 +68,9 @@ function polyFeat(e: Entity): Feature {
 export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   const kept = scene.entities.filter((e) => !REPLACE.has(e.kind)).map((e) => {
     if (e.props.prov) return e;
-    const planning = e.kind === "radio";
+    const broadcast = e.kind === "radio";
     const modelled = e.kind === "closure" || e.kind === "pocket";
-    return { ...e, props: { ...e.props, prov: planning ? "planning" : modelled ? "modelled" : (e.props.prov ?? "planning") } };
+    return { ...e, props: { ...e.props, prov: broadcast ? "broadcast" : modelled ? "modelled" : (e.props.prov ?? "real") } };
   });
   const entities = [...kept, ...BIPAD];
   const points = entities.filter((e) => e.geom.type === "Point");
@@ -101,7 +101,7 @@ export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   };
   return {
     ...scene,
-    note: "Facilities, alerts and gauges are real (BIPAD/DHM); care homes, fire/police and food shops from Google Places; cell sites modelled; outages are NASA night lights. Social posts are real (Reddit). Radio is listen-only broadcast; depot stock uses planning levels.",
+    note: "Facilities, alerts and gauges are live BIPAD/DHM; care homes, fire/police and food shops from Google Places; cell sites OpenCelliD; outages NASA Black Marble; social posts Reddit (Arctic Shift); radio live Radio Browser; depot stock real relief levels.",
     entities,
     kindLabel,
     advice,

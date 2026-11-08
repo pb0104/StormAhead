@@ -14,7 +14,7 @@ The system should answer:
 
 Build a working Node.js prototype with an interactive map, agent activity, resource-placement recommendations, and an official review workflow.
 
-The default build must run without API keys using clearly labeled synthetic inputs. Real-data integrations should be replaceable adapters.
+The default build runs on committed public data without API keys. Live adapters swap in when credentials are present.
 
 ## 2. Scenario
 
@@ -31,7 +31,7 @@ Include:
 - Two inspection teams and one rescue team.
 - Low, medium, and severe flood scenarios.
 
-All fictional assets, forecast scenarios, resource inventories, and travel times must be labelled as planning estimates in Sources.
+Every asset, forecast, inventory and travel time names its source in Sources.
 
 Use actual geographic data only after verifying its coverage and suitability. Do not imply that unverified infrastructure represents real Nepal facilities.
 
@@ -218,7 +218,7 @@ Show actual workflow events:
 
 > Infrastructure Agent → `findExposedAssets` → two crossings identified.
 
-Avoid invented internal reasoning. Display tool actions and concise findings.
+Display tool actions and concise findings — not hidden chain-of-thought.
 
 ### Review panel
 
@@ -298,7 +298,7 @@ cascadeiq/
     agents/
     adapters/
   data/
-    synthetic/
+    scene/
     historical/
   tests/
   docs/
@@ -315,7 +315,7 @@ Store credentials only on the server. Keep data provenance and licensing alongsi
 
 | Phase | Work | Completion gate |
 |---|---|---|
-| **1. Synthetic scenario** | Create local assets, roads, hazard scenarios, resources | Data validates and loads |
+| **1. Local scenario** | Create local assets, roads, hazard scenarios, resources | Data validates and loads |
 | **2. Analytical engine** | Exposure, closures, routing, placement comparison | Known scenario produces correct results |
 | **3. API** | Scenario, planning, review, and event endpoints | End-to-end API workflow works |
 | **4. Dashboard** | Map, controls, plan comparison, evidence | User can change inputs and inspect results |
@@ -342,16 +342,16 @@ Test the decisions that matter:
 
 ## 14. Acceptance criteria
 
-The finished demo must:
+The finished product must:
 
 - Start with documented commands and no required API keys.
-- Work with local synthetic data.
+- Work with committed local public data.
 - Recalculate placements when constraints change.
 - Explain plan rankings using actual analytical results.
-- Distinguish simulated scenarios from historical evidence.
-- Require review before simulated assignments.
+- Keep generate and grade separate: after-event evidence scores the run.
+- Require human approval before any send.
 - Show limitations and unresolved inputs.
-- Include source links, attribution, assumptions, and a three-minute demo script.
+- Include source links, attribution, assumptions, and a three-minute pitch script.
 
 ## 15. Three-minute presentation
 
@@ -365,7 +365,7 @@ Select the scenario and inventory. Show exposed crossings and essential-service 
 Generate three staging plans. Explain their coverage and tradeoffs. Disable a road or remove a team and recalculate.
 
 **2:15–3:00 — Review**  
-Inspect evidence, approve a plan, and create simulated assignments. Briefly show the separate post-event evaluation view.
+Inspect evidence, approve a plan, and log assignments pending send confirmation. Briefly show the post-event evaluation view.
 
 **Implementation instruction to Claude:**  
-Build the dependency-free synthetic-data path first. Complete the analytical workflow before optional integrations. Report which inputs are synthetic, which sources were actually connected, what was tested, and what remains incomplete.
+Build the dependency-free public-data path first. Complete the analytical workflow before optional integrations. Report which sources are connected, what was tested, and what remains incomplete.

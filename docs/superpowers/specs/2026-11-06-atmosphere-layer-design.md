@@ -47,7 +47,7 @@ Web: ops.atmosphere() → MapStage layers (Atmosphere toggle)
  - Cloud cells above a threshold (e.g. ≥40%) → soft polygons (cell squares or simple dissolve).
  - Pressure → contour LineStrings at fixed intervals (e.g. 2 hPa) + local max/min → H/L points.
 - **Cache:** `data/cache/weather/atmosphere-ktm-v1.json`, max age ~1 hour; `?refresh=1` forces refetch.
-- **Fixture:** deterministic grid for offline / `WEATHER_ADAPTER=fixture`.
+- **Offline:** deterministic grid for local runs / `WEATHER_ADAPTER=fixture` (code path).
 
 ### API
 
@@ -60,7 +60,7 @@ type AtmosphereSnapshot = {
  bbox: [number, number, number, number];
  fetchedAt: string;
  validAt: string; // forecast hour
- source: string; // e.g. open-meteo-forecast | stale-fallback | unavailable | fixture
+ source: string; // e.g. open-meteo-forecast | stale-fallback | unavailable | offline
  licence: string;
  cacheHit: boolean;
  clouds: FeatureCollection; // properties: cloud_cover
@@ -93,8 +93,8 @@ Wire in `apps/api/server.ts` and `packages/app` services, composition beside exi
 
 ## Testing
 
-- Unit: contour/H-L helpers on a tiny synthetic pressure field; cloud threshold → polygon count.
-- Adapter: fixture `fetch` → snapshot shape + disk cache hit on second `load()`.
+- Unit: contour/H-L helpers on a tiny pressure field; cloud threshold → polygon count.
+- Adapter: offline `fetch` → snapshot shape + disk cache hit on second `load()`.
 - Optional smoke: live `/api/weather/atmosphere` returns 200 (skip in CI if offline).
 
 ## Tornado / later hook

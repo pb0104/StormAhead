@@ -6,8 +6,8 @@ The ops console backend is hexagonal: **ports** (`packages/ports`) define contra
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `WEATHER_ADAPTER` | `openmeteo` | `openmeteo` or `fixture` (also selects atmosphere adapter; `mock` still accepted) |
-| `ASSETS_ADAPTER` | `overpass` | `overpass` (live OSM) or `fixture` scene entities via fixture adapter |
+| `WEATHER_ADAPTER` | `openmeteo` | `openmeteo` (live Open-Meteo; also selects atmosphere). Offline code path exists for local runs |
+| `ASSETS_ADAPTER` | `overpass` | `overpass` (live OSM) or offline OSM scene entities |
 | `CESIUM_ION_TOKEN` | (empty) | Optional server-side token for `/api/tiles/cesium` proxy |
 | `PORT` | `3001` | API listen port |
 
@@ -28,8 +28,8 @@ Cache root: `data/cache/` (gitignored). First request fetches upstream; later hi
 
 `OverpassAssetsAdapter` queries [Overpass](https://overpass-api.de/) for the valley box `85.284–85.493 × 27.587–27.788`, maps OSM tags → `hospital | school | dam | airport | tower | shelter`, and returns points with names/tags (ODbL). On Overpass failure it serves the last good cache if present.
 
-The web console loads `/api/assets` on startup and **merges** OSM hospitals, schools, dams, airports, towers and shelters into the scene (see `apps/web/src/mergeAssets.ts`), replacing scene pins for those kinds. Closures, QRT, food and social stay as console fixtures.
+The web console loads `/api/assets` on startup and **merges** OSM hospitals, schools, dams, airports, towers and shelters into the scene (see `apps/web/src/mergeAssets.ts`), replacing scene pins for those kinds. Closures, QRT, food and social stay on the console scene (cascade + live feeds).
 
 ## Swapping an adapter
 
-Edit `apps/api/composition.ts`, or set env: `WEATHER_ADAPTER=fixture`, `ASSETS_ADAPTER=fixture`.
+Edit `apps/api/composition.ts` to swap adapters. Default is live Open-Meteo + Overpass.

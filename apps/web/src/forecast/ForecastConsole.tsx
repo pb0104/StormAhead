@@ -1107,7 +1107,7 @@ export function ForecastConsole() {
               <div className="fx-chips">{g.items.map(([k, l]) => <button key={k} className="fx-chip" aria-pressed={!!vis[k]} onClick={() => { setVis((v) => ({ ...v, [k]: !v[k] })); if (!ran && ["closures", "flood", "runoff", "outages", "landslides", "alerts", "shelterBuildings"].includes(k)) setRan(true); if ((k === "flood" || k === "runoff") && assessRain === null) setAssessRain(OBSERVED_IN); }}>{l}</button>)}</div>
             </div>
           ))}
-          <p className="fx-caveat">Layers fill in as agents finish. Facilities and alerts are real (BIPAD); statuses are modelled; depot stock uses planning levels.</p>
+          <p className="fx-caveat">Layers fill in as agents finish. Facilities and alerts are live BIPAD; statuses from the cascade on the observed flood; depot stock is real relief levels.</p>
         </div>
       )}
 

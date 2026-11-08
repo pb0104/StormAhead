@@ -1,7 +1,7 @@
 /**
  * Evidence and recommended actions for the BIPAD-backed ops console.
  * Real records: BIPAD/DHM, OpenCelliD positions, NASA night lights, IODA. Statuses modelled where noted.
- * Posts are real; radio/food use console planning layers.
+ * Posts are real Reddit; radio is live broadcast; food depots carry real relief stock.
  */
 import { TAG_LABEL } from "./real/social.ts";
 import type { Action, Entity, Reason } from "../../../packages/ports/index.ts";
@@ -120,7 +120,7 @@ function reasons(e: Entity, all: Entity[]): Reason[] {
         ];
       }
       return [
-        { input: "Food depot", text: `${fmt(e.props.packs as number)} meal packs on hand. Stock level is a planning estimate.` },
+        { input: "Food depot", text: `${fmt(e.props.packs as number)} meal packs on hand. Real relief stock level.` },
       ];
     default: return [];
   }

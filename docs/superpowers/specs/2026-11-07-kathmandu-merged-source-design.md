@@ -8,7 +8,7 @@
 
 - One **map** FeatureCollection and one **agent** event log for the Kathmandu / Bagmati ops AOI.
 - Merge existing local layers with Maxar STAC footprints and an NDRRMA summary, without downloading Maxar COGs.
-- Keep every feature and log row attributable (`source`, licence, planning vs observed).
+- Keep every feature and log row attributable (`source`, licence, observed vs derived).
 
 ## Non-goals (v1)
 

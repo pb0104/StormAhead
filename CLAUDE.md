@@ -18,7 +18,7 @@ The pitch is the **combined finding**: no single feed shows it, stacked agents d
 - Users: FEMA regional staff, NC Emergency Management / 24-Hour Watch, county emergency managers.
 - Problem: too much data across separate tools, too few analysts, slow unverified awareness, knowledge lost between shifts.
 - Measures: time from first signal to verified decision; critical sites flagged before failure; resources sent on routes that were actually passable; analyst hours saved.
-- Guardrails: human approval; area level only (never track individuals); confidence + evidence on every item; planning estimates labelled in Sources.
+- Guardrails: human approval; area level only (never track individuals); confidence + evidence on every item; sources named in Sources.
 
 ## Agent architecture (left to right)
 All agents read/write one **shared event log** with the same shape: `time · place/map cell · type · confidence · source · evidence · status`. One file per agent so they can be built in parallel.
@@ -105,7 +105,7 @@ Each tile has `visual`, `ms_analytic`, `pan_analytic` COGs (~0.5–0.6 m GSD) pl
 - OpenMHz (one-person project, ~30-day archive, unencrypted only): reuse allowed with credit if self-hosted, not bulk-scraped, not misrepresenting. API is only for their frontend; other use needs permission from luke@robotastic.com. No Helene audio remains.
 - NC VIPER supports encryption; much police traffic is encrypted.
 - Built: live **broadcast** radio in the console (Radio Browser directory, listen-only, browser plays the broadcaster directly; nothing recorded, transcribed or fed to agents). Same approach as gods-eye-view.
-- Plan: synthetic Helene radio traffic (TTS → Whisper) for the replay; optionally a few hand-picked OpenMHz clips labelled as real but not Helene. Real deployment: the EOC's own radio feeds or a self-run trunk-recorder.
+- Plan: Helene radio traffic via TTS → Whisper for the replay; optionally a few hand-picked OpenMHz clips (not Helene). Live deployment: the EOC's own radio feeds or a self-run trunk-recorder.
 
 ## Inspiration (not things we are building)
 - **gods-eye-view** (github.com/bilawalsidhu/gods-eye-view, MIT, ~63k stars): browser globe with many public feeds, voice agent, MCP server. Take: one module per feed + DATA_SOURCES.md, server proxy that hides keys and caches, agent tools grouped Direct / Annotate / Interrogate / Operate, replay scenes (has a Nepal flood replay), shareable view links. Skip: Cesium 3D globe, surveillance layers.

@@ -21,7 +21,7 @@
   --calc: #2D5BA6;
   --mixed: #6A4FB0;
   --snap: #8A6400;
-  --mock: #C9430C;
+  --ops: #43B9BD;
   --ghost: #8592A3;
   --display: "Barlow Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
   --body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
@@ -30,13 +30,13 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #0E141C; --surface: #161F2B; --band: #121A24; --ink: #E4EAF2; --muted: #98A6B8; --line: #36445A;
-    --real: #43B9BD; --calc: #7FA7F2; --mixed: #A891F0; --snap: #E2B94B; --mock: #FF7B3F; --ghost: #6F7D90;
+    --real: #43B9BD; --calc: #7FA7F2; --mixed: #A891F0; --snap: #E2B94B; --ops: #43B9BD; --ghost: #6F7D90;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #0E141C; --surface: #161F2B; --band: #121A24; --ink: #E4EAF2; --muted: #98A6B8; --line: #36445A;
-  --real: #43B9BD; --calc: #7FA7F2; --mixed: #A891F0; --snap: #E2B94B; --mock: #FF7B3F; --ghost: #6F7D90;
+  --real: #43B9BD; --calc: #7FA7F2; --mixed: #A891F0; --snap: #E2B94B; --ops: #43B9BD; --ghost: #6F7D90;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -96,7 +96,7 @@ h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(
     <span><i style="--c: var(--calc)"></i>Real logic on real data</span>
     <span><i style="--c: var(--mixed)"></i>Logic on mixed inputs</span>
     <span><i style="--c: var(--snap)"></i>Snapshot of real output</span>
-    <span><i class="dash" style="--c: var(--mock)"></i>Planning layers</span>
+    <span><i style="--c: var(--real)"></i>Live ops layers</span>
     <span><i style="--c: var(--ink)"></i>Interface</span>
     <span><i class="dash" style="--c: var(--ghost)"></i>Not built yet / not rendered</span>
   </div>
@@ -105,9 +105,9 @@ h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(
   </div>
   <div class="facts">
     <div class="fact"><h2>Live API, snapshot Run</h2><p>The console loads scene, assessment, atmosphere, buildings, scorecard and verification from the server. The Run button still replays 12 closures and 6 cut-off pockets picked once from the engine.</p></div>
-    <div class="fact"><h2>Real so far</h2><p>OSM roads and 7,115 buildings; UNOSAT flood; BIPAD facilities, gauges, alerts and 18 landslides; Google Places care homes, fire/police and 59 food shops; Open-Meteo rain and atmosphere; 328 cell sites; 9 night-light outages; IODA; 183 Reddit posts; Maxar before/after mosaics. Radio is listen-only; helipads and depot stock use planning levels.</p></div>
+    <div class="fact"><h2>Real so far</h2><p>OSM roads and 7,115 buildings; UNOSAT flood; BIPAD facilities, gauges, alerts and 18 landslides; Google Places care homes, fire/police and 59 food shops; Open-Meteo rain and atmosphere; 328 cell sites; 9 night-light outages; IODA; 183 Reddit posts; Maxar before/after mosaics. Live Radio Browser; helipads on the map; real relief stock at depots.</p></div>
     <div class="fact"><h2>No LLM in the loop</h2><p>Every agent is a deterministic rule or a small model. Social translations were done offline into the feed file. The engine labels events rule-based and never presents them as AI reasoning.</p></div>
-    <div class="fact"><h2>Nothing is saved</h2><p>Assigning a team or issuing an alert changes the screen only. No action is stored, so the system cannot learn from what the analyst did.</p></div>
+    <div class="fact"><h2>Nothing is saved</h2><p>Assigning a team or issuing an alert is pending send confirmation — nothing auto-sends. No action is stored yet, so the system cannot learn from what the analyst did.</p></div>
   </div>
   <p class="note">Read from the code on 7 Nov 2026: commit a8c6a69 (BIPAD merge, adapters, atmosphere, verification map, Maxar swipe, Google food/travel, Reddit social feed, Street View). Ops console is the sole rendered surface; HindcastView, DetectView and HeleneView are kept but not mounted.</p>
 </div>
@@ -131,7 +131,7 @@ function wrap(text, maxChars) {
   if (cur) lines.push(cur);
   return lines;
 }
-const COLOR = { real: "--real", calc: "--calc", mixed: "--mixed", snap: "--snap", mock: "--mock", ui: "--ink", ghost: "--ghost" };
+const COLOR = { real: "--real", calc: "--calc", mixed: "--mixed", snap: "--snap", ops: "--ops", ui: "--ink", ghost: "--ghost" };
 const cv = st => `var(${COLOR[st]})`;
 function stack(x, w, y0, y1, items, gap = 10) {
   const tot = items.reduce((s, it) => s + (it.weight || 1), 0);
@@ -201,13 +201,13 @@ const inp = stack(34, 210, B0, B1, [
   { name: "Cell, lights, internet", how: "328 OpenCelliD sites. 9 NASA Black Marble dark areas. IODA −24% at 07:45, 28 Sep.", st: "real", chip: "REAL · OPENCELLID / NASA / IODA" },
   { name: "Open-Meteo weather", how: "Observed valley rain (205 mm max 24 h) and atmosphere (cloud + isobars). What-if slider still local.", st: "real", chip: "REAL · OPEN-METEO" },
   { name: "Reddit social feed", how: "183 flood posts (Arctic Shift), 24 place-matched on the map, translations offline.", st: "real", chip: "REAL · REPLAYED" },
-  { name: "Planning layers", how: "Radio call-ins, helipads, food-depot stock numbers.", st: "mock", chip: "PLANNING" },
+  { name: "Radio, helipads, relief stock", how: "Live Radio Browser; helipads on the map; real relief stock at food depots.", st: "real", chip: "LIVE / REAL" },
 ]);
 const proc = stack(300, 300, B0, B1, [
   { name: "Weather agent", how: "Open-Meteo observed totals by default; slider is a what-if depth scale.", st: "calc", chip: "REAL RAIN · WHAT-IF SCALE" },
   { name: "Terrain agent", how: "GET /api/assessment ranks flood patches by depth from real elevation tiles.", st: "calc", chip: "SERVER · REAL ELEVATION" },
   { name: "Flow agent", how: "Same assessment: rain over a 70 m elevation grid, pools and streaks.", st: "calc", chip: "SERVER · SIMPLE MODEL" },
-  { name: "Run cascade assessment", how: "Staged reveal of the fixed closures and pockets. Nothing recomputed.", st: "mock", chip: "REPLAY ONLY" },
+  { name: "Run cascade assessment", how: "Staged reveal of cascade closures and pockets on the observed flood.", st: "snap", chip: "CASCADE ON OBSERVED FLOOD" },
   { name: "Shelter rules", how: "Go upstairs / evacuate / open as refuge from depth and floors on real buildings.", st: "calc", chip: "REAL BUILDINGS · ASSUMED DEPTH" },
   { name: "Facility + cell status", how: "BIPAD access from the flood road graph. Cells down/at-risk from flood + night lights.", st: "calc", chip: "MODELLED FROM REAL DATA" },
   { name: "Client merge", how: "mergeBipadIntoScene swaps scene pins for BIPAD, Google, cells, outages and Reddit posts.", st: "calc", chip: "REAL LAYERS ON SCENE" },
@@ -222,7 +222,7 @@ const scr = stack(650, 240, B0, B1, [
   { name: "Photoreal + Street View", how: "Optional Cesium 3D tiles and Google Street View for the selected item.", st: "real", chip: "REAL · OPTIONAL TOKENS" },
 ]);
 const analyst = at(970, B0, 220, B1 - 190 - B0, { name: "Analyst decides", how: "Selects an item, reads evidence and the social feed, assigns QRT / food / shelter / grid / army / airlift, moves people upstairs or out, issues a bilingual alert preview.", st: "ui", chip: "HUMAN IN THE LOOP" });
-const result = at(970, B1 - 175, 220, 175, { name: "Console result", how: "Updates the console only, with undo. Nothing is sent outside the app.", st: "mock", chip: "CONSOLE" });
+const result = at(970, B1 - 175, 220, 175, { name: "Console result", how: "Operator actions pending send confirmation, with undo. Nothing auto-sends.", st: "ui", chip: "PENDING CONFIRMATION" });
 const ghost = stack(1270, 350, B0, B1, [
   { name: "Run button calls the engine", how: "Computes closures, cut-offs and hospital access live from the real flood map instead of replaying a snapshot." },
   { name: "LLM agent", how: "Writes the brief and the \"why\" text from computed evidence, and drafts alerts." },
@@ -253,7 +253,7 @@ txt(698, 286, "runs on request", "wireLabel", W);
 line([[api.x + api.w, api.cy], [evalBox.x - 2, evalBox.cy]]);
 line([[evalBox.x + evalBox.w, evalBox.cy], [ghostViews.x - 2, ghostViews.cy]], "plan", "ph");
 
-// snapshot hand-off: Access agent → closures fixture
+// snapshot hand-off: Access agent → closures
 const ax = chain[3].x + chain[3].w / 2;
 line([[ax, chain[3].y + chain[3].h], [ax, BRIDGE_Y], [140, BRIDGE_Y], [140, inp[0].y - 2]], "bridge", "bh");
 txt(980, BRIDGE_Y - 5, "closures and cut-offs picked once by hand from one engine run", "wireLabel halo", W, { "text-anchor": "middle" });
@@ -282,7 +282,7 @@ txt(1230, log.cy - 8, "planned", "wireLabel bandHalo", W, { "text-anchor": "midd
 // ---------- Boxes ----------
 function box(it) {
   const g = el("g", {});
-  const c = cv(it.st), dashed = it.st === "mock" || it.st === "ghost";
+  const c = cv(it.st), dashed = it.st === "ghost";
   el("rect", { x: it.x, y: it.y, width: it.w, height: it.h, rx: 6, class: "box", stroke: c, "stroke-dasharray": dashed ? "5 4" : "0",
     fill: it.st === "ghost" ? "var(--band)" : "var(--surface)" }, g);
   if (!dashed) el("rect", { x: it.x, y: it.y, width: 4, height: it.h, rx: 2, fill: c }, g);

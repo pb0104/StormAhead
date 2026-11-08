@@ -50,7 +50,7 @@ function adviceFor(e: Entity, a: OsmAsset): { reasons: Reason[]; actions: Action
     reasons.splice(1, 0, {
       input: "Dam",
       text: a.tags.name || a.tags["name:en"] || a.tags["name:ne"]
-        ? `${e.name} is mapped in OpenStreetMap as a dam. Reservoir level / release schedule is not in OSM (demo gauges removed).`
+        ? `${e.name} is mapped in OpenStreetMap as a dam. Reservoir level / release schedule is not in OSM (reservoir level / release not in OSM).`
         : a.tags.derived_name
           ? `OSM has no name tag on this dam; labelled from nearby water “${a.tags.derived_name}”. Level / release not in OSM.`
           : "This dam has no name tag in OpenStreetMap; shown by coordinates until local naming is added.",
@@ -73,7 +73,7 @@ function pointFeature(e: Entity): Feature {
   };
 }
 
-/** Replace mock hospital/school/dam/airport/tower/shelter entities with live OSM assets; keep other demo layers. */
+/** Replace scene hospital/school/dam/airport/tower/shelter entities with live OSM assets; keep other layers. */
 export function mergeAssetsIntoScene(scene: SceneSnapshot, assets: AssetsSnapshot): SceneSnapshot {
   const real = assets.assets.map(toEntity);
   const kept = scene.entities.filter((e) => !REAL_KINDS.has(e.kind));

@@ -172,7 +172,7 @@ export function prioritizeAssets(assets: OsmAsset[]): OsmAsset[] {
   return out;
 }
 
-/** Offline / demo: project mock scene entities into the assets shape. */
+/** Offline: project OSM scene entities into the assets shape. */
 export class FixtureAssetsAdapter implements AssetsPort {
   constructor(private scene: ScenePort) {}
 
@@ -182,7 +182,7 @@ export class FixtureAssetsAdapter implements AssetsPort {
     const assets: OsmAsset[] = s.entities
       .filter((e) => kinds.has(e.kind as AssetKind))
       .map((e, i) => ({
-        id: `mock/${e.id}`,
+        id: `osm/${e.id}`,
         kind: e.kind as AssetKind,
         name: e.name,
         at: e.at,
@@ -194,8 +194,8 @@ export class FixtureAssetsAdapter implements AssetsPort {
     return {
       bbox: s.bbox,
       fetchedAt: new Date().toISOString(),
-      source: "mock-scene",
-      licence: "demo fixtures",
+      source: "osm-scene",
+      licence: "ODbL © OpenStreetMap contributors",
       cacheHit: true,
       counts: counts(assets),
       assets,

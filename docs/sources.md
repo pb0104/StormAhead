@@ -1,6 +1,6 @@
 # Sources and attribution
 
-Real-data availability for the Kathmandu valley was checked on 2026-11-06. Details in [real-data-findings.md](real-data-findings.md). The README has the same table with the console's data provenance breakdown.
+Real-data availability for the Kathmandu valley was checked on 2026-11-06. Details in [real-data-findings.md](real-data-findings.md). Console provenance and licence table: [data-provenance.md](data-provenance.md).
 
 | Source | Link | Status in this build |
 |---|---|---|

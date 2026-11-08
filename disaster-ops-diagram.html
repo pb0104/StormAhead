@@ -120,9 +120,9 @@ header.top { display: grid; gap: 14px; margin-bottom: 28px; }
 .gate-item { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
 .gate-item b { display: block; font-size: .9rem; font-weight: 600; }
 .gate-item span { font-size: .82rem; color: var(--muted); }
-.mock-q { display: flex; gap: 6px; margin-top: 6px; }
-.mock-q i { font-style: normal; font-family: var(--mono); font-size: .68rem; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--line); }
-.mock-q i.ok { background: var(--human); color: var(--surface); border-color: var(--human); }
+.action-q { display: flex; gap: 6px; margin-top: 6px; }
+.action-q i { font-style: normal; font-family: var(--mono); font-size: .68rem; padding: 2px 8px; border-radius: 3px; border: 1px solid var(--line); }
+.action-q i.ok { background: var(--human); color: var(--surface); border-color: var(--human); }
 .outputs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .86rem; }
 .outputs .arrow { color: var(--muted); font-family: var(--mono); }
 .outputs .out { font-weight: 600; padding: 4px 10px; border-radius: 4px; background: var(--surface); border: 1px solid var(--line); }
@@ -175,7 +175,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
     <div class="legend">
       <span><span class="chip">data source</span></span>
       <span><span class="chip model">open model / tool</span></span>
-      <span><span class="chip gated">gated or planning</span></span>
+      <span><span class="chip gated">gated</span></span>
       <span><span class="chip" style="background:var(--accent);color:var(--surface)">1</span> step in selected scenario</span>
     </div>
   </header>
@@ -203,7 +203,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
         <div class="layer-label" style="--c: var(--intake)"><h3>Intake agents</h3><p>One per data type. Turn messy input into structured events.</p></div>
         <div class="cards" style="--c: var(--intake)">
           <div class="card" data-id="social"><span class="tag">Intake</span><h4>Social &amp; Media</h4><p class="job">Turns public posts, photos and video into geolocated reports.</p><div class="chips"><span class="chip model">Multimodal LLM</span><span class="chip model">CrisisTransformers</span></div></div>
-          <div class="card" data-id="voice"><span class="tag">Intake</span><h4>Radio &amp; 911</h4><p class="job">Transcribes calls and scanner traffic, then classifies incidents.</p><div class="chips"><span class="chip model">Whisper</span><span class="chip gated">planning transcripts</span></div></div>
+          <div class="card" data-id="voice"><span class="tag">Intake</span><h4>Radio &amp; 911</h4><p class="job">Transcribes calls and scanner traffic, then classifies incidents.</p><div class="chips"><span class="chip model">Whisper</span><span class="chip gated">EOC transcripts</span></div></div>
           <div class="card" data-id="hydro"><span class="tag">Intake</span><h4>Weather &amp; Hydro</h4><p class="job">Tracks forecasts and flags river gauges crossing flood thresholds.</p><div class="chips"><span class="chip">NWS</span><span class="chip">FIMAN</span><span class="chip">NHC</span></div></div>
           <div class="card" data-id="imagery"><span class="tag">Intake</span><h4>Imagery</h4><p class="job">Compares before/after images along roads and around buildings to find water, washouts, debris and damage.</p><div class="chips"><span class="chip">Maxar Open Data</span><span class="chip model">Multimodal LLM on road crops</span><span class="chip model">Prithvi flood</span><span class="chip model">TerraMind</span><span class="chip model">xView2 damage</span><span class="chip model">GeoChat</span></div></div>
           <div class="card" data-id="infra"><span class="tag">Intake</span><h4>Infrastructure feeds</h4><p class="job">Reads the status of power, cell service, road closures and hospitals.</p><div class="chips"><span class="chip">FCC DIRS</span><span class="chip">DriveNC</span><span class="chip">EAGLE-I</span></div></div>
@@ -259,7 +259,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
         <div class="layer-label" style="--c: var(--human)"><h3>Human gate</h3><p>The analyst's dashboard. The only place actions leave the system.</p></div>
         <div class="gate">
           <div class="gate-grid">
-            <div class="gate-item card human-card" data-id="human" style="--c: var(--human)"><b>Action queue</b><span>Each proposal shows evidence, confidence and the agents behind it.</span><div class="mock-q"><i class="ok">Approve</i><i>Reject</i><i>Edit</i></div></div>
+            <div class="gate-item card human-card" data-id="human" style="--c: var(--human)"><b>Action queue</b><span>Each proposal shows evidence, confidence and the agents behind it.</span><div class="action-q"><i class="ok">Approve</i><i>Reject</i><i>Edit</i></div></div>
             <div class="gate-item"><b>Layered map</b><span>Roads, outages, quiet areas, verified and unverified reports, with a replay slider.</span></div>
             <div class="gate-item"><b>Ask in plain language</b><span>"What's blocking supply to Swannanoa?" The map moves and answers.</span></div>
             <div class="gate-item"><b>Feedback</b><span>Rejections and reasons go back to the agents and the memory.</span></div>
@@ -328,7 +328,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
       <div class="col"><h3>Users</h3><ul><li>FEMA regional staff</li><li>NC Emergency Management, 24-Hour Watch</li><li>County emergency managers</li></ul></div>
       <div class="col"><h3>Problem</h3><ul><li>Too much data across separate tools</li><li>Too few analysts</li><li>Slow, unverified situational awareness</li><li>Knowledge lost between shifts</li></ul></div>
       <div class="col"><h3>Measures</h3><ul><li>Time from first signal to verified decision</li><li>Critical sites flagged before failure</li><li>Resources sent on routes that were passable</li><li>Analyst hours saved</li></ul></div>
-      <div class="col"><h3>Guardrails</h3><ul><li>A person approves every action</li><li>Area level only, no tracking of individuals</li><li>Confidence and evidence on every item</li><li>Planning estimates labelled in Sources</li></ul></div>
+      <div class="col"><h3>Guardrails</h3><ul><li>A person approves every action</li><li>Area level only, no tracking of individuals</li><li>Confidence and evidence on every item</li><li>Sources named on every item</li></ul></div>
     </div>
   </section>
 

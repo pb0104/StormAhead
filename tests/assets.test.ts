@@ -20,9 +20,9 @@ describe("enrichDamNames", () => {
 });
 
 describe("FixtureAssetsAdapter", () => {
-  it("projects hospital/dam/school entities from the mock scene", async () => {
+  it("projects hospital/dam/school entities from the OSM scene", async () => {
     const snap = await new FixtureAssetsAdapter(new FixtureSceneAdapter()).load();
-    expect(snap.source).toBe("mock-scene");
+    expect(snap.source).toBe("osm-scene");
     expect((snap.counts.hospital ?? 0)).toBeGreaterThan(0);
     expect((snap.counts.dam ?? 0)).toBeGreaterThan(0);
     expect(snap.assets.every((a) => a.at.length === 2)).toBe(true);

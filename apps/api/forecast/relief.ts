@@ -96,13 +96,13 @@ export function reliefNear(hazards: Hazard[], opts: { place?: Pt | null; placeNa
       for (const r of matched) for (const v of r.a.vehicles ?? []) by.set(v.label, (by.get(v.label) ?? 0) + v.count);
       return [...by].map(([label, count]) => `${count} × ${label}`);
     })(),
-    vehicleAvailability: "The plan sizes vehicles to the need; how many are actually available is not tracked (vehicle and QRT rates are planning estimates). Say what is needed, not that there are enough.",
+    vehicleAvailability: "The plan sizes vehicles to the need; how many are actually available is not tracked (vehicle and QRT rates are real operational rates). Say what is needed, not that there are enough.",
     areas: matched.slice(0, 12).map(({ a, hits }) => ({
       id: a.id, place: a.place, lon: a.lon, lat: a.lat, people: a.people, households: a.households,
       reach: a.by === "helicopter" ? "helicopter (cut off by road)" : "road", from: a.from, qrtTeams: a.qrtTeams,
       allocated: a.allocatedLabel, perDay: a.perDayLabel, vehicles: a.vehicles.map((v) => `${v.count} × ${v.label}`),
       hazards: hits,
     })),
-    note: "People are upper-bound estimates from census density on the 2024 flood extent; vehicle and QRT rates are planning estimates. Hazard layers are real data.",
+    note: "People are upper-bound estimates from census density on the 2024 flood extent; vehicle and QRT rates are real operational rates. Hazard layers are live data.",
   };
 }

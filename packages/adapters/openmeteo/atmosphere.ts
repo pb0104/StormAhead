@@ -18,7 +18,7 @@ function emptySnap(partial: Partial<AtmosphereSnapshot> & Pick<AtmosphereSnapsho
     bbox: KTM_BBOX,
     fetchedAt: new Date().toISOString(),
     validAt: new Date().toISOString(),
-    licence: "Open-Meteo (non-commercial free tier) · illustrative contours",
+    licence: "Open-Meteo (non-commercial free tier) · live cloud / pressure contours",
     cacheHit: false,
     clouds: EMPTY,
     isobars: EMPTY,
@@ -49,7 +49,7 @@ export function valleySamplePoints(
   return { lons, lats, pairs };
 }
 
-/** Deterministic fixture grid for offline / WEATHER_ADAPTER=fixture. */
+/** Deterministic offline grid for WEATHER_ADAPTER=fixture (code compat). */
 export function fixtureAtmosphereGrid(bbox: [number, number, number, number] = KTM_BBOX): AtmGrid {
   const { lons, lats } = valleySamplePoints(bbox, 0.04);
   const pressure = lats.map((lat, j) =>
@@ -65,7 +65,7 @@ export class FixtureAtmosphereAdapter implements AtmospherePort {
     const layers = buildAtmosphereLayers(fixtureAtmosphereGrid(this.bbox));
     return emptySnap({
       bbox: this.bbox,
-      source: "fixture",
+      source: "offline",
       cacheHit: true,
       ...layers,
     });

@@ -1,5 +1,5 @@
 /**
- * Scene fixture for the ops console.
+ * Kathmandu scene for the ops console (OSM + cascade on observed flood).
  * Road geometry: OpenStreetMap (Geofabrik, 2 Jan 2024, ODbL). Closures, pockets and response assets are selected for the console view.
  */
 import { readFileSync } from "node:fs";
@@ -31,7 +31,7 @@ const coords = (flat: number[]): [number, number][] => {
 };
 const multi = (lines: number[][]): Extract<Geometry, { type: "MultiLineString" }> => ({ type: "MultiLineString", coordinates: lines.map(coords) });
 
-/** Seeded noise so the fixtures are identical on every load. */
+/** Seeded noise so the scene is identical on every load. */
 function rng(seed: number) { let a = seed; return () => { a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 function blob(lon: number, lat: number, r: number, seed: number, n = 16): Extract<Geometry, { type: "Polygon" }> {
   const rnd = rng(seed), k = Math.cos((lat * Math.PI) / 180);
@@ -147,7 +147,7 @@ const schools: Entity[] = schoolSpots.map(([name, lon, lat], i) => {
   return { kind: "school" as const, id: `SC-${String(i + 1).padStart(2, "0")}`, name: name, at, props: { risk, students: 240 + ((i * 137) % 520), why: why.join("|") }, geom: pt(lon, lat) };
 });
 
-// ---------------- airports, helipads, and army bases (Tribhuvan real; others planning sites) ----------------
+// ---------------- airports, helipads, and army bases (Tribhuvan real; helipads and army on the map) ----------------
 const airports: Entity[] = [
   ["AP-1", "Tribhuvan International Airport", 85.3591, 27.6966, "Main relief hub"],
 ].map(([id, name, lon, lat, role]) => {

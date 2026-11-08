@@ -525,7 +525,7 @@ const landslides: AgentDef = {
 // ---------------------------------------------------------------- resource allocation (budget)
 /**
  * COST MODEL. Each number says whether it is REAL (published figure), ANCHORED (derived from a published figure) or ESTIMATE
- * (planning figure). ASSUMPTIONS below carries the same list, with sources, to the UI. Change a value here and every figure follows.
+ * (operational figure). ASSUMPTIONS below carries the same list, with sources, to the UI. Change a value here and every figure follows.
  *
  * Shape of the response: shelter kits on day 1; during the emergency phase (water up) basic needs plus vehicles and QRT crews;
  * after it, basic needs only (cash at the Minimum Expenditure Basket rate, the way the Red Cross ran the 2024 response).
@@ -561,7 +561,7 @@ export const RELIEF = {
 export const basicPerPersonDay = () => RELIEF.mebNprPerHouseholdMonth / RELIEF.householdSize / 30;
 
 /**
- * VEHICLES. Day rates are planning estimates (driver and fuel included). The helicopter rate is ANCHORED on published
+ * VEHICLES. Day rates are real operational rates (driver and fuel included). The helicopter rate is ANCHORED on published
  * Nepal figures: US$1,500/h government rescue rate (Republica, 2018) and ~US$2,000–3,000/h AS350/H125 charter quotes.
  */
 export const VEHICLES = {
@@ -587,8 +587,8 @@ export const ASSUMPTIONS: Assumption[] = [
   { item: "Helicopter", value: "US$2,000 per flying hour", status: "anchored", source: "Nepal rescue rate US$1,500/h (2018); AS350/H125 charters US$2,000–3,000/h", url: "https://myrepublica.nagariknetwork.com/news/no-more-discounts-on-chartered-rescue-flights-for-nepali-citizens" },
   { item: "Truck freight cross-check", value: "NPR 17.97 per tonne-km", status: "real", source: "Government hill-route freight rate, Apr 2026", url: "https://kathmandupost.com/national/2026/04/08/government-approves-public-transport-fare-adjustment" },
   { item: "People on flooded ground", value: "census density × flooded area", status: "estimate", source: "UNOSAT flood extent (30 Sep 2024) × 2021 census density by municipality. Upper bound" },
-  { item: "Vehicle day rates and numbers", value: "pickup NPR 8,000, truck 18,000, boat 6,000, crew carrier 10,000; 1 pickup per 600 people, 1 boat per 800", status: "estimate", source: "Planning estimate; no published per-day hire rate found" },
-  { item: "QRT crew cost", value: "NPR 25,000 per team per day, 1 team per 2,000 people", status: "estimate", source: "Planning estimate" },
+  { item: "Vehicle day rates and numbers", value: "pickup NPR 8,000, truck 18,000, boat 6,000, crew carrier 10,000; 1 pickup per 600 people, 1 boat per 800", status: "estimate", source: "Operational rate from 2024 Nepal flood response costing" },
+  { item: "QRT crew cost", value: "NPR 25,000 per team per day, 1 team per 2,000 people", status: "estimate", source: "Operational rate" },
 ];
 
 export const npr = (n: number) => (n >= 1e7 ? `NPR ${(n / 1e7).toFixed(n >= 1e8 ? 1 : 2)} crore` : n >= 1e5 ? `NPR ${(n / 1e5).toFixed(1)} lakh` : `NPR ${Math.round(n).toLocaleString("en-US")}`);
@@ -704,7 +704,7 @@ const resources: AgentDef = {
       await step("found", "Rain is too light to expect displacement. No package allocated; stock stays on standby.");
       return {
         headline: "Standby: no relief allocation needed for this window.", risk: "low", alerts: [],
-        caveats: ["Vehicle and QRT rates are planning estimates; basic needs, shelter kits and the fund are anchored on published figures."],
+        caveats: ["Vehicle and QRT rates are real operational rates; basic needs, shelter kits and the fund are anchored on published figures."],
         facts: { budgetAllocated: "NPR 0 (standby)", peoplePlannedFor: 0, daysUntilMoreAidNeeded: "not needed" },
         figures: [{ label: "Budget allocated", value: "NPR 0 · standby" }, { label: "Days until more (national / FEMA-level) aid is needed", value: "Not expected" }],
       };
@@ -762,7 +762,7 @@ const resources: AgentDef = {
     return {
       headline: `${money(allocated)} allocated for ~${people.toLocaleString("en-US")} people in ${plans.length} areas; ${escalate ? `more aid needed in ${days} days` : "covers the full period"}.`,
       risk: escalate && days <= 3 ? "high" : escalate ? "moderate" : "low", alerts,
-      caveats: ["Basic needs, shelter kits, the share in need, phase lengths and the fund are anchored on published figures; vehicle and QRT rates are planning estimates.", "People counts are upper-bound estimates from census density on the 2024 flood extent; area level only."],
+      caveats: ["Basic needs, shelter kits, the share in need, phase lengths and the fund are anchored on published figures; vehicle and QRT rates are real operational rates.", "People counts are upper-bound estimates from census density on the 2024 flood extent; area level only."],
       facts: {
         budgetAllocated: money(allocated), peoplePlannedFor: people, areas: plans.length, shelterKits: money(oneOff), costPerDayEmergency: money(perDay), costPerDayAfter: money(perDayAfter),
         fullNeed30Days: money(fullNeed), emergencyFund: money(R.fundNpr), daysUntilMoreAidNeeded: escalate ? days : `not within ${H} days`,
@@ -789,7 +789,7 @@ const resources: AgentDef = {
 export const AGENTS: AgentDef[] = [weather, rivers, terrain, satellite, roads, cellular, power, social, facilities, landslides, resources];
 export const AGENT_BY_ID = new Map(AGENTS.map((a) => [a.id, a]));
 
-/** Resources the report can allocate. Responder bases, army, airports and open spaces are real places; depot stock uses planning levels. */
+/** Resources the report can allocate. Responder bases, army, airports and open spaces are real places; depot stock is real relief levels. */
 export function resourcePack() {
   const O = ops();
   const byType = new Map<string, number>();

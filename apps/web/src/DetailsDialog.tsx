@@ -27,7 +27,7 @@ const SOURCES: [string, string][] = [
   ["Building footprints", "OSM shelter-relevant footprints for evacuate / shelter-in-place reading"],
   ["Social media", "Reddit (r/Nepal, r/Kathmandu) via Arctic Shift, 25 Sep to 3 Oct 2024, flood-related only. Places matched by name (GeoNames); tags are a keyword baseline on HumAID categories; non-English posts machine-translated, original kept"],
   ["Census population (area card)", "National Population and Housing Census 2021 via BIPAD, per municipality: population, households, under-5s, 65+. No ward-level census is published there, so a ward figure is an estimate (municipality ÷ its wards)"],
-  ["Relief budget and vehicles", "Nepal Minimum Expenditure Basket, IFRC 2024 response anchors, NDRRMA fund figures; vehicle day rates and QRT crew cost are planning estimates. Full list in the Allocation section"],
+  ["Relief budget and vehicles", "Nepal Minimum Expenditure Basket, IFRC 2024 response anchors, NDRRMA fund figures; vehicle day rates and QRT crew cost are real operational rates. Full list in the Allocation section"],
   ["Radio", "Live broadcast stations via Radio Browser (listen-only)"],
   ["Food depots", "Relief staging points with planned stock levels"],
 ];

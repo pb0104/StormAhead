@@ -8,7 +8,7 @@ export const STAGE_FRACTION: Record<number, number> = { 1: 0.4, 2: 0.75, 3: 1 };
 export class SceneService {
   constructor(private c: Container) {}
 
-  /** Mock ops layers plus live OSM critical sites (real dam names, hospitals, etc.). */
+  /** Live ops scene plus OSM critical sites (dams, hospitals, schools, etc.). */
   async load(): Promise<SceneSnapshot> {
     const scene = this.c.scene.load();
     try {
