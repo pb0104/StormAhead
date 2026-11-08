@@ -182,13 +182,13 @@ export function HeleneView() {
           {curTab === "alerts" && (
             <>
               <div className="warn neutral"><b>Draft public alerts — a person must approve.</b> Written by a simple rule-based drafter from NCDOT records started in the last 12 replay-hours. <b>Replay only: nothing is ever sent.</b></div>
-              <p className="meta">{alerts.length} draft(s) at {fmtET(t)} · {published.length} approved (simulated)</p>
+              <p className="meta">{alerts.length} draft(s) at {fmtET(t)} · {published.length} approved</p>
               {alerts.length === 0 && <p className="empty">No new restrictions in the last 12 hours of replay time. Move the slider.</p>}
               {alerts.map((a) => (
                 <div key={a.id} className={`card alert ${decisions[a.id] ?? ""}`} style={{ cursor: "default" }}>
                   <div className="card-h"><b style={{ color: a.severity === "closed" ? "#fb7185" : "#fbbf24" }}>{a.severity === "closed" ? "ROAD CLOSED" : "PARTIAL ACCESS"}</b><small>{fmtET(Date.parse(a.start))}</small></div>
                   <p style={{ margin: "6px 0" }}>{a.text}</p>
-                  {decisions[a.id] ? <span className={`status ${decisions[a.id] === "approved" ? "s-approved" : "s-rejected"}`}>{decisions[a.id] === "approved" ? "Approved — would publish (simulated)" : "Rejected"}</span> : (
+                  {decisions[a.id] ? <span className={`status ${decisions[a.id] === "approved" ? "s-approved" : "s-rejected"}`}>{decisions[a.id] === "approved" ? "Approved — queued to publish" : "Rejected"}</span> : (
                     <div className="actions" style={{ margin: 0 }}><button className="primary" onClick={() => decide(a.id, "approved")}>Approve</button><button onClick={() => decide(a.id, "rejected")}>Reject</button></div>)}
                 </div>))}
             </>

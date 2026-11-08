@@ -49,8 +49,8 @@ export function valleySamplePoints(
   return { lons, lats, pairs };
 }
 
-/** Deterministic mock grid for offline / WEATHER_ADAPTER=mock. */
-export function mockAtmosphereGrid(bbox: [number, number, number, number] = KTM_BBOX): AtmGrid {
+/** Deterministic fixture grid for offline / WEATHER_ADAPTER=fixture. */
+export function fixtureAtmosphereGrid(bbox: [number, number, number, number] = KTM_BBOX): AtmGrid {
   const { lons, lats } = valleySamplePoints(bbox, 0.04);
   const pressure = lats.map((lat, j) =>
     lons.map((lon, i) => 1012 + Math.sin(i * 0.7) * 3 + Math.cos(j * 0.9) * 2 - (lat - 27.7) * 8));
@@ -59,13 +59,13 @@ export function mockAtmosphereGrid(bbox: [number, number, number, number] = KTM_
   return { lons, lats, pressure, cloud };
 }
 
-export class MockAtmosphereAdapter implements AtmospherePort {
+export class FixtureAtmosphereAdapter implements AtmospherePort {
   constructor(private bbox: [number, number, number, number] = KTM_BBOX) {}
   async load(): Promise<AtmosphereSnapshot> {
-    const layers = buildAtmosphereLayers(mockAtmosphereGrid(this.bbox));
+    const layers = buildAtmosphereLayers(fixtureAtmosphereGrid(this.bbox));
     return emptySnap({
       bbox: this.bbox,
-      source: "mock",
+      source: "fixture",
       cacheHit: true,
       ...layers,
     });

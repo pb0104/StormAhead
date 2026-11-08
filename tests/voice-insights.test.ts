@@ -123,7 +123,7 @@ describe("tools sent to the live session", () => {
       expect(names).toContain(n);
       expect(OPS_INSTRUCTIONS).toContain(n);
     }
-    expect(OPS_INSTRUCTIONS).toMatch(/DEMO POSTURE/);
+    expect(OPS_INSTRUCTIONS).toMatch(/Five pillars/);
     expect(OPS_INSTRUCTIONS).toMatch(/You CAN control the console's Radio tab/);
   });
 });

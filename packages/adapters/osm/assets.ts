@@ -173,7 +173,7 @@ export function prioritizeAssets(assets: OsmAsset[]): OsmAsset[] {
 }
 
 /** Offline / demo: project mock scene entities into the assets shape. */
-export class MockAssetsAdapter implements AssetsPort {
+export class FixtureAssetsAdapter implements AssetsPort {
   constructor(private scene: ScenePort) {}
 
   async load(): Promise<AssetsSnapshot> {

@@ -1,7 +1,7 @@
 # Merged overlays on Maxar before/after swipe — design
 
-**Date:** 2026-11-07  
-**Status:** Approved (approach A / load merged.geojson)  
+**Date:** 2026-11-07 
+**Status:** Approved (approach A / load merged.geojson) 
 **Branch:** `feat/kathmandu-merged-source`
 
 ## Goal

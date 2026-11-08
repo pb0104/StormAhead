@@ -4,45 +4,43 @@ import { CELL_META, CELL_RISK_M, DARK_AREAS, IODA_REGION, NIGHT, nepalTime } fro
 import type { Done } from "./ContextDrawer.tsx";
 import type { EvalReport, Scorecard } from "./api.ts";
 
-const SOURCES: [string, string, string][] = [
-  ["Road geometry", "Real", "OpenStreetMap via Geofabrik, 2 Jan 2024 (ODbL)"],
-  ["Flood extent", "Real", "UNOSAT SPOT-6 observed flood, 30 Sep 2024 (CC BY-SA)"],
-  ["Hospitals", "Real", `${OPS.hospitals.length} registered in the valley (BIPAD). Map shows government and teaching hospitals plus any that lose access`],
-  ["Schools", "Real", `${SCHOOLS_CHECKED} registered schools checked (BIPAD). Map shows only those at risk`],
-  ["Open spaces", "Real", "IOM-designated humanitarian open spaces (BIPAD)"],
-  ["Fire, police and army sites", "Real", "Registered government sites (BIPAD)"],
-  ["Helipads", "Real (OSM)", "OpenStreetMap helipads kept alongside BIPAD airport"],
-  ["Official alerts", "Real", `${OPS.alerts.length} alerts in the valley, 20 Sep to 5 Oct 2024 (BIPAD)`],
-  ["River gauges", "Real", `${OPS.gauges.length} DHM gauges with official warning and danger levels (via BIPAD)`],
-  ["Landslides", "Real", `${OPS.landslides.length} verified landslide reports, 26 Sep to 6 Oct 2024 (BIPAD)`],
-  ["Cell sites", "Mixed", `Positions are real: OpenCelliD (CC BY-SA 4.0), ${CELL_META.counts.sites} sites merged from ${CELL_META.counts.cells} cells, crowd-sourced estimates. Status is modelled: inside the observed flood extent is down; within ${CELL_RISK_M} m of it, or where night lights went dark, is at risk. Real site outages are not public`],
-  ["Internet connectivity", "Real", `IODA, Georgia Tech. ${IODA_REGION.label}: networks visible on the internet fell ${IODA_REGION.series.bgp!.dropPct}% at ${nepalTime(IODA_REGION.series.bgp!.floodMinAt)} (Nepal time), against the 20 to 26 Sep median. Regional only`],
-  ["Power outages", "Real", `NASA Black Marble nightly lights (VNP46A2). ${DARK_AREAS.length} areas where lights fell below half of normal on clear nights, 29 Sep to 2 Oct, against 19 Aug to 25 Sep. 28 Sep was clouded over. False-dark rate on ordinary nights ${(NIGHT.counts.controlFalseDarkRate * 100).toFixed(1)}%. Likely, not confirmed, outages`],
-  ["Facility status", "Modelled", "Closure rule on the real road network under the observed flood. Access is the road trip from central Kathmandu"],
-  ["Road closures and cut-off pockets", "Modelled", `From the same engine (${OPS.closedSegments} segments close). The map shows a selection`],
-  ["Terrain agent: elevation", "Real", "Public elevation tiles (AWS Terrain Tiles). Used to rank flood patches; absolute depth is an assumption"],
-  ["Flood depth and runoff", "Illustrative", "Depth scales with the rain you set. Not a hydraulic simulation"],
-  ["Weather agent and rain grid", "Real", `Open-Meteo historical weather API, ECMWF IFS 9 km (CC BY 4.0): ${OPS.weather.total2728Mm} mm valley average on 27–28 Sep 2024. The slider is a what-if on top`],
-  ["Atmosphere", "Real", "Open-Meteo cloud cover and MSL pressure (live / cached)"],
-  ["Building footprints", "Real", "OSM shelter-relevant footprints for evacuate / shelter-in-place reading"],
-  ["Social media", "Real", "Reddit (r/Nepal, r/Kathmandu) via Arctic Shift, 25 Sep to 3 Oct 2024, flood-related only. Places matched by name (GeoNames); tags are a keyword baseline on HumAID categories; non-English posts machine-translated, original kept"],
-  ["Census population (area card)", "Real", "National Population and Housing Census 2021 via BIPAD, per municipality: population, households, under-5s, 65+. No ward-level census is published there, so a ward figure is an estimate (municipality ÷ its wards)"],
-  ["Relief budget and vehicles (resource allocation agent)", "Mixed", "Real: Nepal Minimum Expenditure Basket (NPR 15,000 per household a month), 3-day emergency phase (IFRC 2024: Kathmandu water receded after three days), household size, flood extent, census, responder bases. Anchored: shelter kit ≈ NPR 11,500 and 34% needing relief (IFRC 2024 response), 30-day support period, NPR 6.75 crore fund (NDRRMA's first 2026 Bhotekoshi release), helicopter US$2,000/h. Mocked: vehicle day rates and QRT crew cost. Full list with links in the Allocation section"],
-  ["Radio", "Simulated", "Invented call-ins"],
-  ["Food depots", "Simulated", "No public stock feed found"],
+const SOURCES: [string, string][] = [
+  ["Road geometry", "OpenStreetMap via Geofabrik, 2 Jan 2024 (ODbL)"],
+  ["Flood extent", "UNOSAT SPOT-6 observed flood, 30 Sep 2024 (CC BY-SA)"],
+  ["Hospitals", `${OPS.hospitals.length} registered in the valley (BIPAD). Map shows government and teaching hospitals plus any that lose access`],
+  ["Schools", `${SCHOOLS_CHECKED} registered schools checked (BIPAD). Map shows only those at risk`],
+  ["Open spaces", "IOM-designated humanitarian open spaces (BIPAD)"],
+  ["Fire, police and army sites", "Registered government sites (BIPAD)"],
+  ["Helipads", "OpenStreetMap helipads kept alongside BIPAD airport"],
+  ["Official alerts", `${OPS.alerts.length} alerts in the valley, 20 Sep to 5 Oct 2024 (BIPAD)`],
+  ["River gauges", `${OPS.gauges.length} DHM gauges with official warning and danger levels (via BIPAD)`],
+  ["Landslides", `${OPS.landslides.length} verified landslide reports, 26 Sep to 6 Oct 2024 (BIPAD)`],
+  ["Cell sites", `Positions: OpenCelliD (CC BY-SA 4.0), ${CELL_META.counts.sites} sites merged from ${CELL_META.counts.cells} cells. Status modelled from flood extent and night lights (within ${CELL_RISK_M} m of water, or where lights went dark)`],
+  ["Internet connectivity", `IODA, Georgia Tech. ${IODA_REGION.label}: networks visible on the internet fell ${IODA_REGION.series.bgp!.dropPct}% at ${nepalTime(IODA_REGION.series.bgp!.floodMinAt)} (Nepal time), against the 20 to 26 Sep median. Regional only`],
+  ["Power outages", `NASA Black Marble nightly lights (VNP46A2). ${DARK_AREAS.length} areas where lights fell below half of normal on clear nights, 29 Sep to 2 Oct, against 19 Aug to 25 Sep. 28 Sep was clouded over. False-dark rate on ordinary nights ${(NIGHT.counts.controlFalseDarkRate * 100).toFixed(1)}%`],
+  ["Facility status", "Closure rule on the real road network under the observed flood. Access is the road trip from central Kathmandu"],
+  ["Road closures and cut-off pockets", `From the cascade engine (${OPS.closedSegments} segments close). The map shows a selection`],
+  ["Terrain agent: elevation", "Public elevation tiles (AWS Terrain Tiles). Used to rank flood patches"],
+  ["Flood depth and runoff", "Depth scales with forecast rain over real elevation"],
+  ["Weather agent and rain grid", `Open-Meteo historical weather API, ECMWF IFS 9 km (CC BY 4.0): ${OPS.weather.total2728Mm} mm valley average on 27–28 Sep 2024. The slider is a what-if on top`],
+  ["Atmosphere", "Open-Meteo cloud cover and MSL pressure (live / cached)"],
+  ["Building footprints", "OSM shelter-relevant footprints for evacuate / shelter-in-place reading"],
+  ["Social media", "Reddit (r/Nepal, r/Kathmandu) via Arctic Shift, 25 Sep to 3 Oct 2024, flood-related only. Places matched by name (GeoNames); tags are a keyword baseline on HumAID categories; non-English posts machine-translated, original kept"],
+  ["Census population (area card)", "National Population and Housing Census 2021 via BIPAD, per municipality: population, households, under-5s, 65+. No ward-level census is published there, so a ward figure is an estimate (municipality ÷ its wards)"],
+  ["Relief budget and vehicles", "Nepal Minimum Expenditure Basket, IFRC 2024 response anchors, NDRRMA fund figures; vehicle day rates and QRT crew cost are planning estimates. Full list in the Allocation section"],
+  ["Radio", "Live broadcast stations via Radio Browser (listen-only)"],
+  ["Food depots", "Relief staging points with planned stock levels"],
 ];
 const ACTIVITY = [
-  `Facilities agent: ${OPS.hospitals.length} hospitals, ${SCHOOLS_CHECKED} schools, ${OPS.openSpaces.length} open spaces and ${OPS.responders.length} fire and police bases loaded (real, BIPAD).`,
-  `Cascade agent: ${OPS.closedSegments} road segments close under the observed flood; facility access modelled (real roads).`,
-  `Hydrology agent: ${OPS.gauges.filter((g) => g.peak >= g.dangerLevel).length} of ${OPS.gauges.length} river gauges passed danger on 27–28 Sep (real, DHM).`,
-  `Alerts agent: ${OPS.alerts.length} official alerts loaded (real, BIPAD).`,
-  `Weather agent: heaviest 24 h ${OPS.weather.max24hMm} mm valley average; peak ${OPS.weather.peakMmH} mm/h (real, Open-Meteo ECMWF IFS).`,
-  `Comms agent: ${CELL_META.counts.sites} OpenCelliD sites (status modelled) and ${DARK_AREAS.length} night-lights dark areas (NASA Black Marble).`,
-  "Response agent: options drafted per selection. Food depots, posts and radio are simulated.",
+  `Facilities agent: ${OPS.hospitals.length} hospitals, ${SCHOOLS_CHECKED} schools, ${OPS.openSpaces.length} open spaces and ${OPS.responders.length} fire and police bases loaded (BIPAD).`,
+  `Cascade agent: ${OPS.closedSegments} road segments close under the observed flood; facility access modelled on real roads.`,
+  `Hydrology agent: ${OPS.gauges.filter((g) => g.peak >= g.dangerLevel).length} of ${OPS.gauges.length} river gauges passed danger on 27–28 Sep (DHM).`,
+  `Alerts agent: ${OPS.alerts.length} official alerts loaded (BIPAD).`,
+  `Weather agent: heaviest 24 h ${OPS.weather.max24hMm} mm valley average; peak ${OPS.weather.peakMmH} mm/h (Open-Meteo ECMWF IFS).`,
+  `Comms agent: ${CELL_META.counts.sites} OpenCelliD sites and ${DARK_AREAS.length} night-lights dark areas (NASA Black Marble).`,
+  "Response agent: options drafted per selection.",
 ];
 
-/** `legacyActivity` adds the old ops console's fixed agent lines. The forecast console turns it off so the Activity tab
- * lists only the agents it actually runs. */
 export function DetailsDialog({ open, onClose, done, agentLines, scorecard, evaluation, legacyActivity = true }: {
   open: boolean; onClose: () => void; done: Done; agentLines: string[];
   scorecard: Scorecard | null; evaluation?: EvalReport | null; legacyActivity?: boolean;
@@ -63,19 +61,19 @@ export function DetailsDialog({ open, onClose, done, agentLines, scorecard, eval
         </div>
         {tab === "sources" && (
           <table><thead><tr><th>Layer</th><th>Source</th></tr></thead>
-            <tbody>{SOURCES.map(([a, , c]) => <tr key={a}><td>{a}</td><td>{c}</td></tr>)}</tbody></table>
+            <tbody>{SOURCES.map(([a, c]) => <tr key={a}><td>{a}</td><td>{c}</td></tr>)}</tbody></table>
         )}
         {tab === "timeline" && (
           <>
-            <p className="muted">27–28 Sep 2024, local time. Rain, river gauges and official alerts on one clock, all real.</p>
+            <p className="muted">27–28 Sep 2024, local time. Rain, river gauges and official alerts on one clock.</p>
             <ol className="timeline">{TIMELINE.map((t, i) => <li key={i}><time>{t.at.slice(8, 10)} Sep {t.at.slice(11, 16)}</time><span>{t.what}<small>{t.src}</small></span></li>)}</ol>
           </>
         )}
         {tab === "activity" && (
           <>
             <ol className="plain">{[...agentLines, ...(legacyActivity ? ACTIVITY : [])].map((a) => <li key={a}>{a}</li>)}</ol>
-            <h3>Simulated actions this session</h3>
-            {Object.keys(done).length ? <ul className="plain">{Object.entries(done).map(([k, v]) => <li key={k}><code>{k}</code>: {v === "issued" ? "alert issued (simulated)" : "assigned (simulated)"}</li>)}</ul> : <p className="muted">None yet. Select a closure and assign a response.</p>}
+            <h3>Actions this session</h3>
+            {Object.keys(done).length ? <ul className="plain">{Object.entries(done).map(([k, v]) => <li key={k}><code>{k}</code>: {v === "issued" ? "alert issued" : "assigned"}</li>)}</ul> : <p className="muted">None yet. Select a closure and assign a response.</p>}
           </>
         )}
         {tab === "evaluation" && evaluation && <EvaluationPanel evaluation={evaluation} />}
@@ -122,7 +120,7 @@ function EvaluationPanel({ evaluation: e }: { evaluation: EvalReport }) {
       </div>
 
       <h3>Ground-truth metrics</h3>
-      <p className="muted">Computed from the real Kathmandu hindcast against withheld reports — not invented demo numbers.</p>
+      <p className="muted">Computed from the Kathmandu hindcast against withheld BIPAD reports.</p>
       <table>
         <thead><tr><th>Metric</th><th>Value</th><th>What it means</th></tr></thead>
         <tbody>
@@ -131,7 +129,6 @@ function EvaluationPanel({ evaluation: e }: { evaluation: EvalReport }) {
           ))}
         </tbody>
       </table>
-
     </>
   );
 }

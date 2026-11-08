@@ -139,7 +139,7 @@ export function MapStage(p: MapProps) {
       maxZoom: 20,
     });
     map.current = m;
-    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "Real + simulated layers (see Details) · Rain: Open-Meteo (CC BY 4.0) · Facilities, alerts, gauges: BIPAD · Base: Esri World Imagery (Maxar), cached · Roads: © OpenStreetMap contributors" }), "bottom-right");
+    m.addControl(new maplibregl.AttributionControl({ compact: true, customAttribution: "Mixed layers (see Details) · Rain: Open-Meteo (CC BY 4.0) · Facilities, alerts, gauges: BIPAD · Base: Esri World Imagery (Maxar), cached · Roads: © OpenStreetMap contributors" }), "bottom-right");
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
     m.on("load", () => {
       const TL = { "line-opacity-transition": { duration: 600 } }, TF = { "fill-opacity-transition": { duration: 600 } };
@@ -220,7 +220,7 @@ export function MapStage(p: MapProps) {
       m.addLayer({ id: "runoff-raster", type: "raster", source: "runoff", paint: { "raster-opacity": 0, "raster-opacity-transition": { duration: 1500 }, "raster-resampling": "linear", "raster-fade-duration": 0 } });
       // The mapped flood footprint, drawn over both sides of the before/after swipe. Without it the imagery has
       // no referent and you cannot tell where the water was supposed to be. Unfiltered by depth: this is the
-      // observed extent as UNOSAT mapped it, not the console's illustrative depth model.
+      // observed extent as UNOSAT mapped it, not the console depth model.
       m.addLayer({ id: "swipe-flood-fill", type: "fill", source: "flood", layout: { visibility: "none" },
         paint: { "fill-color": "#4DE2FF", "fill-opacity": 0.18 } });
       m.addLayer({ id: "swipe-flood", type: "line", source: "flood", layout: { visibility: "none" },
@@ -419,7 +419,7 @@ export function MapStage(p: MapProps) {
       }
       const atmOn = g("atmosphere") && !!atm && ((atm.clouds?.features?.length ?? 0) + (atm.isobars?.features?.length ?? 0) > 0);
       show("atm-clouds", atmOn); show("atm-isobars-glow", atmOn); show("atm-isobars", atmOn); show("atm-centers", atmOn);
-      // Flood water rises in when the assessment runs; a larger share of the observed extent is shown as time advances (demo).
+      // Flood water rises in when the assessment runs; a larger share of the observed extent is shown as time advances .
       const flowOn = ran && g("runoff");
       show("runoff-raster", g("runoff"));
       (mm as any).__water?.();
@@ -479,7 +479,7 @@ export function MapStage(p: MapProps) {
       // Legacy cyan flood outline only if merged flood chip is off (keeps a referent on the mosaics).
       show("swipe-flood", sw !== null && !mFlood); show("swipe-flood-fill", sw !== null && !mFlood);
       if (sw !== null) (mm as any).__redrawSwipe?.();
-      // Verification overlay: scores the real engine, independent of the demo run on screen.
+      // Verification overlay: scores the real engine, independent of the console run on screen.
       const vOn = g("verify") && !!q.verify;
       if (verifyRef.current !== q.verify) {
         verifyRef.current = q.verify;
@@ -687,7 +687,7 @@ export function MapStage(p: MapProps) {
     if (ready.current) go(); else if (p.view3d) m.once("load", go);
   }, [p.view3d]);
 
-  // Flythrough: tilt the camera and follow the selected road, or orbit the selected site (DEMO camera path).
+  // Flythrough: tilt the camera and follow the selected road, or orbit the selected site (camera path).
   useEffect(() => {
     const m = map.current, sel = props.current.selected;
     cancelAnimationFrame(raf.current);

@@ -15,7 +15,7 @@ export type AreaInfo =
         vehicles: { type: string; label: string; count: number; perDayEachLabel: string; perDayLabel: string; note: string }[];
         kits: number; kitsLabel: string; allocated: number; allocatedLabel: string; days: number; by: "road" | "helicopter"; from: string;
       } | null;
-      plan: string; mocked: string;
+      plan: string; estimateNote: string;
       nearest: { place: string; lon: number; lat: number; people: number; allocatedLabel: string; perDayLabel: string; km: number } | null;
     };
 
@@ -104,7 +104,7 @@ export function AreaPanel({ area, loading, error, onClose }: { area: AreaInfo | 
                 : <p className="fx-muted">The 2024 flood did not reach this ward, so no relief is planned here.</p>}
               <p className="fx-area-src">{area.exposure.basis}</p>
             </section>
-            <p className="fx-area-note">{area.plan} {area.mocked}</p>
+            <p className="fx-area-note">{area.plan} {area.estimateNote}</p>
           </>
         )}
       </div>

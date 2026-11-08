@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { MockSceneAdapter } from "../packages/adapters/mock/index.ts";
+import { FixtureSceneAdapter } from "../packages/adapters/fixture/index.ts";
 import type { AssetsSnapshot } from "../packages/ports/index.ts";
 import { mergeAssetsIntoScene } from "../packages/app/mergeAssets.ts";
 
 describe("mergeAssetsIntoScene", () => {
   it("replaces mock dams/hospitals with OSM assets and keeps closures", () => {
-    const scene = new MockSceneAdapter().load();
+    const scene = new FixtureSceneAdapter().load();
     const mockDamCount = scene.entities.filter((e) => e.kind === "dam").length;
     const mockHospitalCount = scene.entities.filter((e) => e.kind === "hospital").length;
     expect(mockDamCount).toBeGreaterThan(0);

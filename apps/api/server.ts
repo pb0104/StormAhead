@@ -139,7 +139,7 @@ export async function buildServer() {
     if (!s) throw new HttpError(404, "Ward layer not prepared. Run scripts/fetch_wards.mjs.");
     return s;
   });
-  // Demo evaluation pack: real GT metrics + five-pillar LLM-council scores for Details + ORACLE.
+  // Evaluation pack: ground-truth metrics + five-pillar LLM-council scores for Details + ORACLE.
   app.get("/api/evaluation", async () => {
     const { buildEvalReport } = await import("./eval/report.ts");
     const e = buildEvalReport(H());

@@ -81,10 +81,10 @@ The 1 km radius test could not discriminate: in a valley this dense, almost any 
 incidents, so every baseline tied. Two changes fix the method rather than the model:
 
 1. **Score on wards, not radii.** BIPAD records are ward-level reports, so the ward is the resolution the ground
-   truth actually exists at; a 1 km circle around a ward-level point was false precision. 203 ward polygons
-   (OSM `admin_level=9`, pinned to the 2024-09-26 attic date, **evaluation geometry only — never a model input**).
+ truth actually exists at; a 1 km circle around a ward-level point was false precision. 203 ward polygons
+ (OSM `admin_level=9`, pinned to the 2024-09-26 attic date, **evaluation geometry only — never a model input**).
 2. **Count false alarms.** A ward is flagged or not, and reported damage or not, so flagging half the valley is
-   now visibly expensive. The old test had no way to express that cost.
+ now visibly expensive. The old test had no way to express that cost.
 
 19 scorable incidents fall in **10 of 203 wards**. Each agent is compared with same-size random and
 nearest-the-flood baselines, so breadth is not rewarded.
@@ -103,12 +103,12 @@ added nothing to simply knowing where the water was.
 **Readings, in order of confidence:**
 
 - **The Access Agent is the weak one.** It flags 102 of 203 wards — half the valley — to find the same 6 wards the
-  Infrastructure Agent finds with 59. p = 0.39 is indistinguishable from drawing wards at random. This is exactly
-  the failure the old metric hid: its recall looked identical, and only the false-alarm count separates them.
+ Infrastructure Agent finds with 59. p = 0.39 is indistinguishable from drawing wards at random. This is exactly
+ the failure the old metric hid: its recall looked identical, and only the false-alarm count separates them.
 - **The Shelter Agent raises the fewest and best concerns.** 10 wards flagged, the highest precision (0.20) and the
-  best F1, though on only 2 hits — far too few to call it skill (p = 0.082).
+ best F1, though on only 2 hits — far too few to call it skill (p = 0.082).
 - **The Infrastructure Agent is the only one under p < 0.05, and it does not survive scrutiny** (see below). Its F1
-  of 0.17 barely exceeds the given hazard's 0.16, so even at face value it adds almost nothing to the flood map.
+ of 0.17 barely exceeds the given hazard's 0.16, so even at face value it adds almost nothing to the flood map.
 - **Combined, the agents reach 0.90 recall by flagging 62% of the valley.** Operationally that is not a warning.
 
 ### The same result as a map

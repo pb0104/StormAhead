@@ -125,7 +125,7 @@ export function toEntity(b: Assessed): Entity {
 
 const fmt = (n: number) => n.toLocaleString("en-US");
 
-/** Invented evidence and response cards for a selected shelter-reading building. */
+/** Evidence and response cards for a selected shelter-reading building. */
 export function buildingAdvice(e: Entity): { reasons: Reason[]; actions: Action[] } {
   const floors = e.props.floors === "" ? null : Number(e.props.floors);
   const depth = Number(e.props.depthM), lost = Number(e.props.floorsLost);

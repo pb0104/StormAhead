@@ -5,7 +5,7 @@ import { BBOX, DATA_NOTE, ENTITIES, FLOOD_POLYS, GEO } from "./scene.ts";
 export { affected, BBOX, BY_ID, DATA_NOTE, ENTITIES, FLOOD_POLYS, GEO, OF } from "./scene.ts";
 export { actions, distKm, KIND_LABEL, nearest, reasons } from "./advice.ts";
 
-export class MockSceneAdapter implements ScenePort {
+export class FixtureSceneAdapter implements ScenePort {
   private snap: SceneSnapshot | null = null;
 
   load(): SceneSnapshot {

@@ -125,11 +125,11 @@ Bullets grouped by: people & facilities, roads & access, power & communications,
 ## How to prepare
 Numbered actions with a deadline relative to the peak (e.g. "by T-24 h"), most urgent first.
 ## Resource allocation
-If the Resource allocation agent ran, start with one line "**Budget allocated:** <its budgetAllocated>" and one line "**Days until more (national / FEMA-level) aid is needed:** <its daysUntilMoreAidNeeded>" (add "request by <its requestNationalAidBy>" only when it gives a time), copying its figures exactly and noting the costs are mocked. Then a markdown table with columns: Resource | Send to | Why | When. Use only the resources listed. Route around the cut-off pockets and closed bridges. Take the logged actions into account: an action never closes a place. Where help is on site but people likely remain, say what is there and recommend more for that place. Put areas with NO ACTION YET first. Do not repeat what has already been done.
+If the Resource allocation agent ran, start with one line "**Budget allocated:** <its budgetAllocated>" and one line "**Days until more (national / FEMA-level) aid is needed:** <its daysUntilMoreAidNeeded>" (add "request by <its requestNationalAidBy>" only when it gives a time), copying its figures exactly and noting vehicle and crew costs are planning estimates. Then a markdown table with columns: Resource | Send to | Why | When. Use only the resources listed. Route around the cut-off pockets and closed bridges. Take the logged actions into account: an action never closes a place. Where help is on site but people likely remain, say what is there and recommend more for that place. Put areas with NO ACTION YET first. Do not repeat what has already been done.
 ## Public messaging (draft, needs approval)
 One short alert in English and the same in Nepali.
 ## Confidence and gaps
-Three bullets: what the data can and cannot tell us. Say that this is a replay and simulated depot stock is simulated.
+Three bullets: what the data can and cannot tell us. Say that this is a historical replay and depot stock uses planning levels.
 
 Keep it under 650 words. No preamble.`;
 }
@@ -161,7 +161,7 @@ ${budgetLines(results)}| Resource | Send to | Why | When |
 |---|---|---|---|
 ${combined.slice(0, 4).map((c) => `| Nearest responder base | ${c.place} | ${c.agents.length} agents flag it | Before ${c.when ?? "peak"} |`).join("\n") || "| — | — | — | — |"}
 
-Available: ${Object.entries(res.responderBases).map(([k, v]) => `${v} ${k}`).join(", ")}; ${res.usableOpenSpaces} usable open spaces; depots (simulated): ${res.foodDepotsSimulated.join("; ")}.
+Available: ${Object.entries(res.responderBases).map(([k, v]) => `${v} ${k}`).join(", ")}; ${res.usableOpenSpaces} usable open spaces; depots: ${res.foodDepots.join("; ")}.
 
 ## Public messaging (draft, needs approval)
 Needs the LLM to draft bilingual alerts.
@@ -169,12 +169,12 @@ Needs the LLM to draft bilingual alerts.
 ## Confidence and gaps
 - Written by rules because the LLM was unavailable. Numbers come straight from the agents.
 - Replay: window values are what was observed in 2024, used as a perfect-forecast stand-in.
-- Depot stock is simulated; facility statuses are modelled from the observed flood.`;
+- Depot stock uses planning levels; facility statuses are modelled from the observed flood.`;
 }
 
 function budgetLines(results: [string, AgentResult][]): string {
   const r = results.find(([id]) => id === "resources")?.[1];
-  return r?.figures?.length ? `${r.figures.map((f) => `**${f.label}:** ${f.value}${f.note ? ` (${f.note})` : ""}`).join("  \n")}  \n_Costs are mocked for the demo._\n\n` : "";
+  return r?.figures?.length ? `${r.figures.map((f) => `**${f.label}:** ${f.value}${f.note ? ` (${f.note})` : ""}`).join("  \n")}  \n_Vehicle and crew costs are planning estimates._\n\n` : "";
 }
 
 // ---------------------------------------------------------------- fusion

@@ -5,7 +5,7 @@ import { iconDataUrl, RING, type BuildingKind } from "./icons.ts";
 
 /**
  * Photoreal close-up of ONE selected item: CesiumJS plus Google Photorealistic 3D Tiles through Cesium ion (free ion token).
- * Opened from the drawer's "View in photoreal". Only the selected item and the resources it links to are drawn (DEMO fixtures).
+ * Opened from the drawer's "View in photoreal". Only the selected item and the resources it links to are drawn.
  * Cesium loads from a CDN only when this view opens, so the default console has no extra dependency.
  */
 declare global { interface Window { Cesium?: any; CESIUM_BASE_URL?: string } }

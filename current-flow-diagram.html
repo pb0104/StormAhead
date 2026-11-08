@@ -94,18 +94,18 @@ h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(
   <div class="legend" aria-label="Legend">
     <span><i style="--c: var(--real)"></i>Real data</span>
     <span><i style="--c: var(--calc)"></i>Real logic on real data</span>
-    <span><i style="--c: var(--mixed)"></i>Real logic on mock inputs</span>
+    <span><i style="--c: var(--mixed)"></i>Logic on mixed inputs</span>
     <span><i style="--c: var(--snap)"></i>Snapshot of real output</span>
-    <span><i class="dash" style="--c: var(--mock)"></i>Mock or simulated</span>
+    <span><i class="dash" style="--c: var(--mock)"></i>Planning layers</span>
     <span><i style="--c: var(--ink)"></i>Interface</span>
     <span><i class="dash" style="--c: var(--ghost)"></i>Not built yet / not rendered</span>
   </div>
-  <div class="frame" role="img" aria-label="Flow diagram. Top lane, the engine: OpenStreetMap roads and buildings and the UNOSAT flood extent are prepared offline and run through six rule-based agents, including Shelter. BIPAD reports and ward polygons feed only Verification. A Fastify API runs the chain and also serves the modular ops adapters, buildings, scorecard and verification map. A dashed hand-off shows closures picked once from the engine. Bottom lane, the console: live API scene and assessment, BIPAD facilities, Google Places and food, Open-Meteo weather and atmosphere, cell sites, night lights, IODA, Reddit posts, Maxar swipe and the remaining mock radio and helipads feed browser and server rules. These drive the map, verification overlay, swipe, drawer, social feed, Street View and photoreal view. The analyst assigns actions, which only change the screen. Planned: Run calls the engine live, an LLM, a saved action log, live routing, Helene and Detect surfaces in the UI, and any-location config.">
+  <div class="frame" role="img" aria-label="Flow diagram. Top lane, the engine: OpenStreetMap roads and buildings and the UNOSAT flood extent are prepared offline and run through six rule-based agents, including Shelter. BIPAD reports and ward polygons feed only Verification. A Fastify API runs the chain and also serves the modular ops adapters, buildings, scorecard and verification map. A dashed hand-off shows closures picked once from the engine. Bottom lane, the console: live API scene and assessment, BIPAD facilities, Google Places and food, Open-Meteo weather and atmosphere, cell sites, night lights, IODA, Reddit posts, Maxar swipe and the radio and helipads feed browser and server rules. These drive the map, verification overlay, swipe, drawer, social feed, Street View and photoreal view. The analyst assigns actions, which only change the screen. Planned: Run calls the engine live, an LLM, a saved action log, live routing, Helene and Detect surfaces in the UI, and any-location config.">
     <svg id="diagram" viewBox="0 0 1640 1880" xmlns="http://www.w3.org/2000/svg"></svg>
   </div>
   <div class="facts">
     <div class="fact"><h2>Live API, snapshot Run</h2><p>The console loads scene, assessment, atmosphere, buildings, scorecard and verification from the server. The Run button still replays 12 closures and 6 cut-off pockets picked once from the engine.</p></div>
-    <div class="fact"><h2>Real so far</h2><p>OSM roads and 7,115 buildings; UNOSAT flood; BIPAD facilities, gauges, alerts and 18 landslides; Google Places care homes, fire/police and 59 food shops; Open-Meteo rain and atmosphere; 328 cell sites; 9 night-light outages; IODA; 183 Reddit posts; Maxar before/after mosaics. Radio, helipads and depot stock stay simulated.</p></div>
+    <div class="fact"><h2>Real so far</h2><p>OSM roads and 7,115 buildings; UNOSAT flood; BIPAD facilities, gauges, alerts and 18 landslides; Google Places care homes, fire/police and 59 food shops; Open-Meteo rain and atmosphere; 328 cell sites; 9 night-light outages; IODA; 183 Reddit posts; Maxar before/after mosaics. Radio is listen-only; helipads and depot stock use planning levels.</p></div>
     <div class="fact"><h2>No LLM in the loop</h2><p>Every agent is a deterministic rule or a small model. Social translations were done offline into the feed file. The engine labels events rule-based and never presents them as AI reasoning.</p></div>
     <div class="fact"><h2>Nothing is saved</h2><p>Assigning a team or issuing an alert changes the screen only. No action is stored, so the system cannot learn from what the analyst did.</p></div>
   </div>
@@ -201,7 +201,7 @@ const inp = stack(34, 210, B0, B1, [
   { name: "Cell, lights, internet", how: "328 OpenCelliD sites. 9 NASA Black Marble dark areas. IODA −24% at 07:45, 28 Sep.", st: "real", chip: "REAL · OPENCELLID / NASA / IODA" },
   { name: "Open-Meteo weather", how: "Observed valley rain (205 mm max 24 h) and atmosphere (cloud + isobars). What-if slider still local.", st: "real", chip: "REAL · OPEN-METEO" },
   { name: "Reddit social feed", how: "183 flood posts (Arctic Shift), 24 place-matched on the map, translations offline.", st: "real", chip: "REAL · REPLAYED" },
-  { name: "Still simulated", how: "Radio call-ins, helipads, food-depot stock numbers.", st: "mock", chip: "MOCK" },
+  { name: "Planning layers", how: "Radio call-ins, helipads, food-depot stock numbers.", st: "mock", chip: "PLANNING" },
 ]);
 const proc = stack(300, 300, B0, B1, [
   { name: "Weather agent", how: "Open-Meteo observed totals by default; slider is a what-if depth scale.", st: "calc", chip: "REAL RAIN · WHAT-IF SCALE" },
@@ -210,19 +210,19 @@ const proc = stack(300, 300, B0, B1, [
   { name: "Run cascade assessment", how: "Staged reveal of the fixed closures and pockets. Nothing recomputed.", st: "mock", chip: "REPLAY ONLY" },
   { name: "Shelter rules", how: "Go upstairs / evacuate / open as refuge from depth and floors on real buildings.", st: "calc", chip: "REAL BUILDINGS · ASSUMED DEPTH" },
   { name: "Facility + cell status", how: "BIPAD access from the flood road graph. Cells down/at-risk from flood + night lights.", st: "calc", chip: "MODELLED FROM REAL DATA" },
-  { name: "Client merge", how: "mergeBipadIntoScene swaps mock pins for BIPAD, Google, cells, outages and Reddit posts.", st: "calc", chip: "REAL LAYERS ON SCENE" },
+  { name: "Client merge", how: "mergeBipadIntoScene swaps scene pins for BIPAD, Google, cells, outages and Reddit posts.", st: "calc", chip: "REAL LAYERS ON SCENE" },
   { name: "Evidence + recommendations", how: "bipadAdvice: real evidence for most kinds. Pocket travel times from Google Routes + flood graph. Nearest team by straight line otherwise.", st: "mixed", chip: "MOSTLY REAL · SOME ASSUMED", weight: 1.2 },
 ]);
 const scr = stack(650, 240, B0, B1, [
   { name: "Map, 2D or 3D", how: "Closures, depth flood, runoff, buildings, cells, dark areas, atmosphere clouds and isobars.", st: "ui", chip: "INTERFACE" },
   { name: "Status strip + Details", how: "Filter counts. Details lists sources and the Evaluation scorecard verdict.", st: "ui", chip: "INTERFACE" },
   { name: "Drawer + social feed", how: "What failed, recommended responses, IODA chart, nearby Reddit posts (and translations).", st: "ui", chip: "INTERFACE" },
-  { name: "Verification overlay", how: "203 wards coloured hit / miss / false alarm against withheld BIPAD reports. Banner warns demo closures are not scored.", st: "calc", chip: "REAL ENGINE SCORE" },
+  { name: "Verification overlay", how: "203 wards coloured hit / miss / false alarm against withheld BIPAD reports. Banner notes console closures are not scored.", st: "calc", chip: "REAL ENGINE SCORE" },
   { name: "Before / after swipe", how: "Maxar mosaics plus merged pack chips (flood, dark cells, road impact, landslides, NDRRMA).", st: "real", chip: "REAL IMAGERY · CONTEXT ONLY" },
   { name: "Photoreal + Street View", how: "Optional Cesium 3D tiles and Google Street View for the selected item.", st: "real", chip: "REAL · OPTIONAL TOKENS" },
 ]);
 const analyst = at(970, B0, 220, B1 - 190 - B0, { name: "Analyst decides", how: "Selects an item, reads evidence and the social feed, assigns QRT / food / shelter / grid / army / airlift, moves people upstairs or out, issues a bilingual alert preview.", st: "ui", chip: "HUMAN IN THE LOOP" });
-const result = at(970, B1 - 175, 220, 175, { name: "Simulated result", how: "Changes the screen only, with undo. Nothing is sent, saved or fed back to the system.", st: "mock", chip: "SIMULATED" });
+const result = at(970, B1 - 175, 220, 175, { name: "Console result", how: "Updates the console only, with undo. Nothing is sent outside the app.", st: "mock", chip: "CONSOLE" });
 const ghost = stack(1270, 350, B0, B1, [
   { name: "Run button calls the engine", how: "Computes closures, cut-offs and hospital access live from the real flood map instead of replaying a snapshot." },
   { name: "LLM agent", how: "Writes the brief and the \"why\" text from computed evidence, and drafts alerts." },

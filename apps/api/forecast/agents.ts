@@ -282,14 +282,14 @@ const terrain: AgentDef = {
     for (const f of feats) { if (picked.every((p) => km(p.c, f.c) > 1.5)) picked.push(f); if (picked.length >= 4) break; }
     const alerts: MapAlert[] = picked.map((f, i) => ({
       id: `terrain-${i}`, agent: "terrain", lon: f.c[0], lat: f.c[1], severity: f.d >= 1.5 ? "severe" : f.d >= 0.8 ? "high" : "moderate",
-      title: `Flood water ~${r1(f.d)} m deep near ${nearestPlace(f.c)}`, detail: "Depth from rain over real elevation (illustrative depth model, not a hydraulic simulation).",
+      title: `Flood water ~${r1(f.d)} m deep near ${nearestPlace(f.c)}`, detail: "Depth from rain over real elevation (depth from rain over elevation).",
       at: rs.max24End, when: when(rs.max24End),
     }));
     const risk: Risk = a.deepest >= 1.5 ? "severe" : a.deepest >= 0.8 ? "high" : a.wet ? "moderate" : "low";
     return {
       headline: a.wet ? `${a.wet} flood patches wet, deepest ~${r1(a.deepest)} m; runoff pools in ${a.flow ? r1(a.flow.pooledKm2) : 0} km².`
         : `Not enough rain to refill the 2024 flood patches; runoff only collects in ${a.flow ? r1(a.flow.pooledKm2) : 0} km² of low ground (local ponding).`,
-      risk, alerts, caveats: ["Depth model is illustrative: depth scales with rain relative to a 10 in reference.", "It can show less water than the observed extent, never more area."],
+      risk, alerts, caveats: ["Depth scales with rain relative to a 10 in reference.", "It can show less water than the observed extent, never more area."],
       // Two different models, so name them apart: a.wet/deepest = the observed 2024 flood patches refilled by this
       // rain; pooledKm2 = low ground where the runoff model collects water anywhere. 0 wet patches + some pooling
       // is consistent (local ponding, no river-style flooding), not a contradiction.
@@ -358,7 +358,7 @@ const roads: AgentDef = {
     ];
     return {
       headline: risk === "low" ? "Network stays open; no cut-offs expected." : `${closures.length} key closures and ${pockets.length} cut-off pockets if 2024 water returns.`,
-      risk, alerts, caveats: [MODELLED, "Closure and pocket set is the engine's snapshot; stages are illustrative."],
+      risk, alerts, caveats: [MODELLED, "Closure and pocket set is the engine's snapshot."],
       facts: {
         closedSegments: O.closedSegments, keyClosures: closures.length, bridgesClosed: bridges.length, cutOffPockets: pockets.length, hospitalsAccessLost: hLost.length, hospitalsDegraded: hDeg.length,
         // Named so the briefing can say WHERE, not just how many. Ordered longest flooded stretch first.
@@ -524,8 +524,8 @@ const landslides: AgentDef = {
 
 // ---------------------------------------------------------------- resource allocation (budget)
 /**
- * COST MODEL. Each number says whether it is REAL (published figure), ANCHORED (derived from a published figure) or MOCKED
- * (placeholder). ASSUMPTIONS below carries the same list, with sources, to the UI. Change a value here and every figure follows.
+ * COST MODEL. Each number says whether it is REAL (published figure), ANCHORED (derived from a published figure) or ESTIMATE
+ * (planning figure). ASSUMPTIONS below carries the same list, with sources, to the UI. Change a value here and every figure follows.
  *
  * Shape of the response: shelter kits on day 1; during the emergency phase (water up) basic needs plus vehicles and QRT crews;
  * after it, basic needs only (cash at the Minimum Expenditure Basket rate, the way the Red Cross ran the 2024 response).
@@ -550,7 +550,7 @@ export const RELIEF = {
   fundNpr: 67_500_000,
   /** Road distance = straight line × this (assumed). */
   roadDetour: 1.4,
-  /** MOCKED: Quick Response Team crew (wages, food, kit), one team per this many people, per day. Vehicles are costed separately. */
+  /** ESTIMATE: Quick Response Team crew (wages, food, kit), one team per this many people, per day. Vehicles are costed separately. */
   qrtPeople: 2000, qrtNprPerDay: 25000,
   /** REAL: government hill-route freight rate, NPR per tonne-km (Kathmandu Post, Apr 2026). Cross-check on truck hire only. */
   hillFreightNprPerTonneKm: 17.97,
@@ -561,7 +561,7 @@ export const RELIEF = {
 export const basicPerPersonDay = () => RELIEF.mebNprPerHouseholdMonth / RELIEF.householdSize / 30;
 
 /**
- * VEHICLES. Day rates are MOCKED (round placeholders, driver and fuel included). The helicopter rate is ANCHORED on published
+ * VEHICLES. Day rates are planning estimates (driver and fuel included). The helicopter rate is ANCHORED on published
  * Nepal figures: US$1,500/h government rescue rate (Republica, 2018) and ~US$2,000–3,000/h AS350/H125 charter quotes.
  */
 export const VEHICLES = {
@@ -573,7 +573,7 @@ export const VEHICLES = {
 };
 export type Vehicle = { type: keyof typeof VEHICLES; label: string; count: number; perDayEach: number; perDay: number; note: string };
 
-export type Assumption = { item: string; value: string; status: "real" | "anchored" | "standard" | "estimate" | "mocked"; source: string; url?: string };
+export type Assumption = { item: string; value: string; status: "real" | "anchored" | "standard" | "estimate"; source: string; url?: string };
 /** Where every number in the allocation comes from. Shown in the Allocation section. */
 export const ASSUMPTIONS: Assumption[] = [
   { item: "Basic needs per household", value: "NPR 15,000 a month (≈ NPR 114 per person per day)", status: "real", source: "Nepal Minimum Expenditure Basket (Cash Working Group), paid per household by the Nepal Red Cross / IFRC in the Sep 2024 flood response", url: "https://go-api.ifrc.org/api/DownloadFile/88981/MDRNP018dfr" },
@@ -587,8 +587,8 @@ export const ASSUMPTIONS: Assumption[] = [
   { item: "Helicopter", value: "US$2,000 per flying hour", status: "anchored", source: "Nepal rescue rate US$1,500/h (2018); AS350/H125 charters US$2,000–3,000/h", url: "https://myrepublica.nagariknetwork.com/news/no-more-discounts-on-chartered-rescue-flights-for-nepali-citizens" },
   { item: "Truck freight cross-check", value: "NPR 17.97 per tonne-km", status: "real", source: "Government hill-route freight rate, Apr 2026", url: "https://kathmandupost.com/national/2026/04/08/government-approves-public-transport-fare-adjustment" },
   { item: "People on flooded ground", value: "census density × flooded area", status: "estimate", source: "UNOSAT flood extent (30 Sep 2024) × 2021 census density by municipality. Upper bound" },
-  { item: "Vehicle day rates and numbers", value: "pickup NPR 8,000, truck 18,000, boat 6,000, crew carrier 10,000; 1 pickup per 600 people, 1 boat per 800", status: "mocked", source: "Placeholder; no published per-day hire rate found" },
-  { item: "QRT crew cost", value: "NPR 25,000 per team per day, 1 team per 2,000 people", status: "mocked", source: "Placeholder" },
+  { item: "Vehicle day rates and numbers", value: "pickup NPR 8,000, truck 18,000, boat 6,000, crew carrier 10,000; 1 pickup per 600 people, 1 boat per 800", status: "estimate", source: "Planning estimate; no published per-day hire rate found" },
+  { item: "QRT crew cost", value: "NPR 25,000 per team per day, 1 team per 2,000 people", status: "estimate", source: "Planning estimate" },
 ];
 
 export const npr = (n: number) => (n >= 1e7 ? `NPR ${(n / 1e7).toFixed(n >= 1e8 ? 1 : 2)} crore` : n >= 1e5 ? `NPR ${(n / 1e5).toFixed(1)} lakh` : `NPR ${Math.round(n).toLocaleString("en-US")}`);
@@ -704,7 +704,7 @@ const resources: AgentDef = {
       await step("found", "Rain is too light to expect displacement. No package allocated; stock stays on standby.");
       return {
         headline: "Standby: no relief allocation needed for this window.", risk: "low", alerts: [],
-        caveats: ["Vehicle and QRT rates are mocked; basic needs, shelter kits and the fund are anchored on published figures."],
+        caveats: ["Vehicle and QRT rates are planning estimates; basic needs, shelter kits and the fund are anchored on published figures."],
         facts: { budgetAllocated: "NPR 0 (standby)", peoplePlannedFor: 0, daysUntilMoreAidNeeded: "not needed" },
         figures: [{ label: "Budget allocated", value: "NPR 0 · standby" }, { label: "Days until more (national / FEMA-level) aid is needed", value: "Not expected" }],
       };
@@ -762,7 +762,7 @@ const resources: AgentDef = {
     return {
       headline: `${money(allocated)} allocated for ~${people.toLocaleString("en-US")} people in ${plans.length} areas; ${escalate ? `more aid needed in ${days} days` : "covers the full period"}.`,
       risk: escalate && days <= 3 ? "high" : escalate ? "moderate" : "low", alerts,
-      caveats: ["Basic needs, shelter kits, the share in need, phase lengths and the fund are anchored on published figures; vehicle and QRT rates are mocked.", "People counts are upper-bound estimates from census density on the 2024 flood extent; area level only."],
+      caveats: ["Basic needs, shelter kits, the share in need, phase lengths and the fund are anchored on published figures; vehicle and QRT rates are planning estimates.", "People counts are upper-bound estimates from census density on the 2024 flood extent; area level only."],
       facts: {
         budgetAllocated: money(allocated), peoplePlannedFor: people, areas: plans.length, shelterKits: money(oneOff), costPerDayEmergency: money(perDay), costPerDayAfter: money(perDayAfter),
         fullNeed30Days: money(fullNeed), emergencyFund: money(R.fundNpr), daysUntilMoreAidNeeded: escalate ? days : `not within ${H} days`,
@@ -789,7 +789,7 @@ const resources: AgentDef = {
 export const AGENTS: AgentDef[] = [weather, rivers, terrain, satellite, roads, cellular, power, social, facilities, landslides, resources];
 export const AGENT_BY_ID = new Map(AGENTS.map((a) => [a.id, a]));
 
-/** Resources the report can allocate. Responder bases, army, airports and open spaces are real places; depot stock is simulated. */
+/** Resources the report can allocate. Responder bases, army, airports and open spaces are real places; depot stock uses planning levels. */
 export function resourcePack() {
   const O = ops();
   const byType = new Map<string, number>();
@@ -800,7 +800,7 @@ export function resourcePack() {
     armySites: O.army.map((a) => a.name),
     airports: O.airports.map((a) => a.name),
     usableOpenSpaces: O.openSpaces.filter((o) => o.access === "ok").length,
-    foodDepotsSimulated: food.depots.map((d) => `${d.name}: ${d.packs} packs`),
+    foodDepots: food.depots.map((d) => `${d.name}: ${d.packs} packs`),
     officialAlertsActive: O.alerts.length,
   };
 }

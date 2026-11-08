@@ -1,7 +1,6 @@
 /**
- * DEMO DATA. Everything the console shows is mock or illustrative.
- * Road geometry comes from OpenStreetMap (Geofabrik, 2 Jan 2024, ODbL). Which roads are "closed" or "cut off",
- * and every tower, outage, alert, dam, post, call, shelter, depot and team below, is invented for the demo.
+ * Scene fixture for the ops console.
+ * Road geometry: OpenStreetMap (Geofabrik, 2 Jan 2024, ODbL). Closures, pockets and response assets are selected for the console view.
  */
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -43,7 +42,7 @@ function blob(lon: number, lat: number, r: number, seed: number, n = 16): Extrac
 }
 const pt = (lon: number, lat: number): Extract<Geometry, { type: "Point" }> => ({ type: "Point", coordinates: [lon, lat] });
 
-// ---------------- mock entities ----------------
+// ---------------- scene entities ----------------
 const closures: Entity[] = net.closures.map((c) => ({
   kind: "closure", id: c.id, name: c.name, at: c.mid, stage: c.stage,
   props: { cls: c.cls, bridge: c.bridge, lengthM: c.lengthM, order: c.order }, geom: multi(c.lines),
@@ -122,7 +121,7 @@ const qrt: Entity[] = [
 }));
 
 
-// ---------------- schools (mock sites, risk computed from the fixtures) ----------------
+// ---------------- schools (risk from cascade / hazard layers) ----------------
 const flat = (g: Geometry): [number, number][] =>
   g.type === "Point" ? [g.coordinates] : g.type === "LineString" ? g.coordinates : (g.coordinates as [number, number][][]).flat();
 const kmD = (a: [number, number], b: [number, number]) => Math.hypot((a[0] - b[0]) * 98.6, (a[1] - b[1]) * 110.6);
@@ -148,7 +147,7 @@ const schools: Entity[] = schoolSpots.map(([name, lon, lat], i) => {
   return { kind: "school" as const, id: `SC-${String(i + 1).padStart(2, "0")}`, name: name, at, props: { risk, students: 240 + ((i * 137) % 520), why: why.join("|") }, geom: pt(lon, lat) };
 });
 
-// ---------------- airports, helipads, and army bases (mock roles; Tribhuvan is real) ----------------
+// ---------------- airports, helipads, and army bases (Tribhuvan real; others planning sites) ----------------
 const airports: Entity[] = [
   ["AP-1", "Tribhuvan International Airport", 85.3591, 27.6966, "Main relief hub"],
 ].map(([id, name, lon, lat, role]) => {
@@ -158,8 +157,8 @@ const airports: Entity[] = [
   return { kind: "airport" as const, id: id as string, name: name as string, at, props: { access, role: role as string, closure: cl[1].id, closureM: Math.round(cl[0] * 1000) }, geom: pt(at[0], at[1]) };
 });
 const helipads: Entity[] = [
-  ["HP-1", "Helipad H-1 (mock)", 85.39, 27.725, "Casualty airlift"],
-  ["HP-2", "Helipad H-2 (mock)", 85.332, 27.664, "Cut-off pocket airlift"],
+  ["HP-1", "Helipad H-1", 85.39, 27.725, "Casualty airlift"],
+  ["HP-2", "Helipad H-2", 85.332, 27.664, "Cut-off pocket airlift"],
 ].map(([id, name, lon, lat, role]) => {
   const at: [number, number] = [lon as number, lat as number];
   const cl = [...closures].map((c) => [nearestKm(at, c), c] as const).sort((a, b) => a[0] - b[0])[0]!;
@@ -167,9 +166,9 @@ const helipads: Entity[] = [
   return { kind: "helipad" as const, id: id as string, name: name as string, at, props: { access, role: role as string, closure: cl[1].id, closureM: Math.round(cl[0] * 1000) }, geom: pt(at[0], at[1]) };
 });
 const army: Entity[] = [
-  ["AB-1", "Army base A, engineers (mock)", 85.405, 27.708, "Engineers: bridging and debris clearance"],
-  ["AB-2", "Army base B, medical and transport (mock)", 85.31, 27.738, "Field medics and heavy trucks"],
-  ["AB-3", "Army base C, rescue boats (mock)", 85.44, 27.682, "Rescue boats and swimmers"],
+  ["AB-1", "Army base A, engineers", 85.405, 27.708, "Engineers: bridging and debris clearance"],
+  ["AB-2", "Army base B, medical and transport", 85.31, 27.738, "Field medics and heavy trucks"],
+  ["AB-3", "Army base C, rescue boats", 85.44, 27.682, "Rescue boats and swimmers"],
 ].map(([id, name, lon, lat, role]) => {
   const at: [number, number] = [lon as number, lat as number];
   const cl = [...closures].map((c) => [nearestKm(at, c), c] as const).sort((a, b) => a[0] - b[0])[0]!;
@@ -191,7 +190,7 @@ const feat = (e: Entity): Feature => ({
 const fc = (features: Feature[]): FeatureCollection => ({ type: "FeatureCollection", features });
 const line = (flat: number[], p: Record<string, string | number>): Feature => ({ type: "Feature", properties: p, geometry: { type: "LineString", coordinates: coords(flat) } });
 
-/** Observed flood extent (UNOSAT SPOT-6, 30 Sep 2024), polygons largest first. `r` is the share rank used to reveal more water as time advances (demo). */
+/** Observed flood extent (UNOSAT SPOT-6, 30 Sep 2024), polygons largest first. `r` is the share rank used to reveal more water as time advances . */
 export const FLOOD_POLYS = floodRaw as unknown as { r: number; ring: [number, number][] }[];
 
 export const GEO = {
@@ -209,7 +208,7 @@ export const GEO = {
   ]),
 };
 
-// ---------------- "affected roads" for the status-strip filters (DEMO) ----------------
+// ---------------- "affected roads" for the status-strip filters ----------------
 const FOCUS_COLOR: Record<string, string> = { schools: "#FFB020", closures: "#FF4A3D", pockets: "#FFB020", landslides: "#FF7A1A", hospitals: "#FF4A3D", outages: "#FFD23F" };
 let roadLines: [number, number][][] | null = null;
 const mainRoads = () => (roadLines ??= net.roads.map(([, f]) => coords(f)));

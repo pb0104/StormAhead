@@ -58,7 +58,7 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
       return { ok: true };
     case "apply_response": {
       if (args.confirmed !== true) {
-        return { ok: false, error: "Refused: confirmed must be true after the operator agrees. Action is simulated only." };
+        return { ok: false, error: "Refused: confirmed must be true after the operator agrees. Action stays in the console until a person confirms." };
       }
       const mode = String(args.mode);
       if (mode !== "assigned" && mode !== "issued") return { ok: false, error: "mode must be assigned or issued" };

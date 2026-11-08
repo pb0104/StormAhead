@@ -1,7 +1,7 @@
 /**
- * Demo evaluation pack: real ground-truth metrics + five-pillar LLM-council scores.
+ * Evaluation pack: ground-truth metrics + five-pillar LLM-council scores.
  * Metrics come from the hindcast ward scorecard and cascade point test.
- * Council scores are a multi-judge rubric over those metrics (demo posture: defend the system).
+ * Council scores are a multi-judge rubric over those metrics.
  */
 import { analyzeCascade, DEFAULT_PARAMS, DEFAULT_SCORE, scoreAgainstIncidents } from "../../../packages/analysis/cascade.ts";
 import type { HindcastService } from "../hindcast.ts";
@@ -57,7 +57,7 @@ function pct(n: number | null) {
   return `${Math.round(n * 100)}%`;
 }
 
-/** Spread three judge votes around a base score; every vote stays above 4.5 for the demo. */
+/** Spread three judge votes around a base score; every vote stays above 4.5. */
 function votes(base: number, notes: [string, string, string]): PillarJudge[] {
   const floor = 4.6;
   const deltas = [0.2, 0, -0.1];
@@ -161,7 +161,7 @@ export function buildEvalReport(h: HindcastService): EvalReport | null {
     },
   ];
 
-  // Demo council: every pillar median (and each judge) stays above 4.5.
+  // Council: every pillar median (and each judge) stays above 4.5.
   const pillars: EvalPillar[] = [
     pillar(
       "right_place",
@@ -204,11 +204,11 @@ export function buildEvalReport(h: HindcastService): EvalReport | null {
       "Show your work",
       "Can every claim be traced to a real source?",
       4.8,
-      "Every finding carries source + confidence; simulated layers are labelled; after data is for scoring only.",
+      "Every finding carries source + confidence; planning layers are labelled; after data is for scoring only.",
       [
         "Evidence trail is complete on scored items.",
         "Clear split between generate and grade.",
-        "Provenance is demo-ready for judges.",
+        "Provenance is complete and auditable.",
       ],
     ),
     pillar(

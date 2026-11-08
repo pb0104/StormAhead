@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import {
-  MockAtmosphereAdapter, OpenMeteoAtmosphereAdapter, mockAtmosphereGrid,
+  FixtureAtmosphereAdapter, OpenMeteoAtmosphereAdapter, fixtureAtmosphereGrid,
 } from "../packages/adapters/openmeteo/atmosphere.ts";
 import {
   buildAtmosphereLayers, cloudHeatPoints, pressureCenters, pressureIsobars, refineGrid, smoothLine,
@@ -47,16 +47,16 @@ describe("atmosphereGrid", () => {
     expect(smoothLine([[0, 0], [1, 0], [1, 1]], 2).length).toBeGreaterThan(3);
     const centers = pressureCenters(grid);
     expect(centers.features.some((f) => f.properties.kind === "high")).toBe(true);
-    const built = buildAtmosphereLayers(mockAtmosphereGrid());
+    const built = buildAtmosphereLayers(fixtureAtmosphereGrid());
     expect(built.clouds.features[0]?.geometry.type).toBe("Point");
     expect(built.isobars.type).toBe("FeatureCollection");
   });
 });
 
-describe("MockAtmosphereAdapter", () => {
+describe("FixtureAtmosphereAdapter", () => {
   it("returns clouds and isobars", async () => {
-    const snap = await new MockAtmosphereAdapter().load();
-    expect(snap.source).toBe("mock");
+    const snap = await new FixtureAtmosphereAdapter().load();
+    expect(snap.source).toBe("fixture");
     expect(snap.clouds.features.length).toBeGreaterThan(0);
     expect(snap.isobars.features.length).toBeGreaterThan(0);
     expect(snap.extensions).toEqual({});

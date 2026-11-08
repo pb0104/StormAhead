@@ -18,7 +18,7 @@ function stub(over: Partial<OpsHandle> = {}): OpsHandle {
     setMode: vi.fn(),
     startFly: vi.fn(),
     openPhoto: vi.fn(),
-    applyDone: vi.fn(() => ({ ok: true, simulated: true as const })),
+    applyDone: vi.fn(() => ({ ok: true, consoleOnly: true as const })),
     undoDone: vi.fn(() => ({ ok: true })),
     setAlertPreview: vi.fn(),
     ensureLayer: vi.fn(),

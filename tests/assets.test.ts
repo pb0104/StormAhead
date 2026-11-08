@@ -2,8 +2,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { MockSceneAdapter } from "../packages/adapters/mock/index.ts";
-import { enrichDamNames, MockAssetsAdapter, OverpassAssetsAdapter } from "../packages/adapters/osm/assets.ts";
+import { FixtureSceneAdapter } from "../packages/adapters/fixture/index.ts";
+import { enrichDamNames, FixtureAssetsAdapter, OverpassAssetsAdapter } from "../packages/adapters/osm/assets.ts";
 
 describe("enrichDamNames", () => {
   it("labels unnamed dams from nearby named water", () => {
@@ -19,9 +19,9 @@ describe("enrichDamNames", () => {
   });
 });
 
-describe("MockAssetsAdapter", () => {
+describe("FixtureAssetsAdapter", () => {
   it("projects hospital/dam/school entities from the mock scene", async () => {
-    const snap = await new MockAssetsAdapter(new MockSceneAdapter()).load();
+    const snap = await new FixtureAssetsAdapter(new FixtureSceneAdapter()).load();
     expect(snap.source).toBe("mock-scene");
     expect((snap.counts.hospital ?? 0)).toBeGreaterThan(0);
     expect((snap.counts.dam ?? 0)).toBeGreaterThan(0);

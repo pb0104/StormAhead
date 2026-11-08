@@ -15,14 +15,14 @@ Latest pre-event scene is ~5 months before the flood; the post-event scene is ~8
 **Cloud/usability CHECKED 2026-11-07** by building both mosaics and looking at them (`scripts/build_maxar_mosaics.py`):
 - **13 Jan 2024 (pre-event): clear** across the whole valley. Good as a sharp pre-event reference.
 - **6 Oct 2024 (post-event): roughly half obscured by cloud**, scattered over the central urban area and the river
-  corridors — and taken 8 days after the 27-28 Sep peak, by which time the water had receded.
+ corridors — and taken 8 days after the 27-28 Sep peak, by which time the water had receded.
 So there is **no usable post-event optical image of the flood itself**. The pair is shown in the console as
 context, explicitly labelled as not being a flood before/after.
 
 ## Ground truth — UNOSAT (HDX, licence **CC BY-SA**)
 - The product you linked (**3993**, "Kathmandu … 30 Sep 2024") ships **no Kathmandu layers**: only Sentinel-1 extents for Koshi/Madhesh and Gandaki/Lumbini/Bagmati/Madhesh (max lon 84.97, west of the valley). Same in its geodatabase.
 - **Product 3996** (`FL20240928NPL_SHP.zip`, ~121 MB) does contain valley data from SPOT-6, 30 Sep 2024:
-  `Spot6_20240930_FloodExtent_Kathmandu` (112 polygons), `…AnalysisExtent_Kathmandu`, `…PotentiallyAffectedBuilding_Kathmandu` (5,056 buildings).
+ `Spot6_20240930_FloodExtent_Kathmandu` (112 polygons), `…AnalysisExtent_Kathmandu`, `…PotentiallyAffectedBuilding_Kathmandu` (5,056 buildings).
 - Caveat: an optical flood-extent *product* is itself an analyst/algorithm output with its own error and cloud/urban limits; it is "best available reference", not perfect truth. Analysis extent (85.284–85.493 × 27.587–27.788) defines where "not flooded" can be asserted.
 
 ## Pre-event roads — OpenStreetMap

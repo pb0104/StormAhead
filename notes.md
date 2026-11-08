@@ -1,4 +1,4 @@
-**Give Claude the following implementation brief.** It specifies a **Node.js demo for pre-disaster resource planning**, with a Nepal-inspired scenario, clear agent responsibilities, resource links, and a phased build order.
+**Give Claude the following implementation brief.** It specifies a **Node.js build for pre-disaster resource planning**, with a Nepal-inspired scenario, clear agent responsibilities, resource links, and a phased build order.
 
 ---
 
@@ -14,9 +14,9 @@ The system should answer:
 
 Build a working Node.js prototype with an interactive map, agent activity, resource-placement recommendations, and an official review workflow.
 
-The default demo must run without API keys using clearly labeled synthetic inputs. Real-data integrations should be replaceable adapters.
+The default build must run without API keys using clearly labeled synthetic inputs. Real-data integrations should be replaceable adapters.
 
-## 2. Demo scenario
+## 2. Scenario
 
 Use a **Nepal-inspired flood preparedness scenario**.
 
@@ -31,9 +31,9 @@ Include:
 - Two inspection teams and one rescue team.
 - Low, medium, and severe flood scenarios.
 
-All fictional assets, forecast scenarios, resource inventories, and travel times must be labeled **simulated**.
+All fictional assets, forecast scenarios, resource inventories, and travel times must be labelled as planning estimates in Sources.
 
-Use actual geographic data only after verifying its coverage and suitability. Do not imply that invented infrastructure represents real Nepal facilities.
+Use actual geographic data only after verifying its coverage and suitability. Do not imply that unverified infrastructure represents real Nepal facilities.
 
 ### Temporal separation
 
@@ -57,7 +57,7 @@ Post-event Maxar imagery and UNOSAT assessments belong in a separate **evaluatio
 7. Compare three candidate resource-placement plans.
 8. Change a constraint, such as removing one team or closing a road.
 9. Recalculate the recommendations.
-10. Approve a plan and create assignments in a simulated authority inbox.
+10. Approve a plan and create assignments in a console authority inbox.
 
 No actual emergency messages or deployments should occur.
 
@@ -77,11 +77,11 @@ No actual emergency messages or deployments should occur.
 | Input/output validation | Zod |
 | Frontend updates | Server-sent events |
 | Tests | Vitest |
-| LLM integration | Provider adapter with tool calling; optional for default demo |
+| LLM integration | Provider adapter with tool calling; optional for the default build |
 
 **Choose one frontend approach early.** If adapting God’s Eye View takes too long, use MapLibre and preserve the investigation workflow.
 
-The synthetic demo should work without external map tiles, using local GeoJSON layers over a plain background.
+The offline build should work without external map tiles, using local GeoJSON layers over a plain background.
 
 ## 5. System architecture
 
@@ -93,7 +93,7 @@ flowchart TD
     D --> E["Candidate placement evaluation"]
     E --> F["Ranked plans and evidence"]
     F --> G["Official review"]
-    G --> H["Simulated assignments"]
+    G --> H["Console assignments"]
     I["Updated forecast or constraints"] --> B
 ```
 
@@ -112,7 +112,7 @@ Agents should share structured state and evidence IDs. Calculations must come fr
 
 ### Default and optional execution modes
 
-**Default demo mode:** Deterministic orchestration with clearly labeled rule-based agent modules.
+**Default mode:** Deterministic orchestration with clearly labeled rule-based agent modules.
 
 **Optional LLM mode:** The coordinator chooses analytical tools and explains their results. Numerical outputs must remain identical to the tool results.
 
@@ -124,7 +124,7 @@ Implement these entities:
 
 | Entity | Important fields |
 |---|---|
-| **Asset** | ID, type, geometry, name, source, timestamp, simulated flag |
+| **Asset** | ID, type, geometry, name, source, timestamp, planning flag |
 | **Road edge** | ID, endpoints, travel time, scenario availability, provenance |
 | **Hazard scenario** | ID, footprint, time window, affected edges, source, optional probability |
 | **Staging site** | ID, network node, eligibility, capacity, resource compatibility |
@@ -161,7 +161,7 @@ An intersecting road is **exposed**, not automatically confirmed impassable. Sce
 
 ### Resource-placement calculation
 
-For the small demo:
+For the small build:
 
 1. Enumerate resource placements across candidate sites.
 2. Reject placements violating site capacity or resource compatibility.
@@ -173,7 +173,7 @@ For the small demo:
 
 Use **worst-case coverage across the supplied scenarios** as the default objective, followed by response time as a tie-breaker.
 
-If scenario probabilities are not available, do not invent them. An equal-weight scenario average may be shown as an illustrative metric, not a calibrated expected outcome.
+If scenario probabilities are not available, do not invent them. An equal-weight scenario average may be shown as an indicative metric, not a calibrated expected outcome.
 
 Clearly state that the prototype measures modeled accessibility and coverage—not lives saved or operational deployment safety.
 
@@ -199,7 +199,7 @@ Allow users to:
 - Disable a candidate staging location.
 - Simulate a road becoming unavailable.
 - Generate and recalculate plans.
-- Reset the demo.
+- Reset the scenario.
 
 ### Plan comparison
 
@@ -227,7 +227,7 @@ Provide:
 - Approve.
 - Request revision.
 - Reject.
-- Create simulated assignments.
+- Create console assignments.
 
 Changes to the forecast or inventory should mark previously approved plans **“Needs review.”**
 
@@ -304,12 +304,12 @@ cascadeiq/
   docs/
     sources.md
     assumptions.md
-    demo-script.md
+    pitch-script.md
   README.md
   .env.example
 ```
 
-Store credentials only on the server. Keep demo data provenance and licensing alongside the datasets.
+Store credentials only on the server. Keep data provenance and licensing alongside the datasets.
 
 ## 12. Build order and completion gates
 
@@ -321,7 +321,7 @@ Store credentials only on the server. Keep demo data provenance and licensing al
 | **4. Dashboard** | Map, controls, plan comparison, evidence | User can change inputs and inspect results |
 | **5. Agents** | Structured orchestration and optional LLM adapter | Agents invoke tools and preserve evidence |
 | **6. Historical integration** | Add verified Nepal imagery and records | Dates, coverage, and provenance are explicit |
-| **7. Demo polish** | Review workflow, replay, error handling | Complete demo works offline |
+| **7. Polish** | Review workflow, replay, error handling | Complete product works offline |
 
 Do not begin live social scraping, camera-provider integration, or a complex 3D interface before Phase 4 works.
 

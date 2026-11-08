@@ -218,7 +218,7 @@ for (const s of shops) {
 }
 
 // ---- pockets from demo network fixture ----
-const demoNet = JSON.parse(readFileSync("packages/adapters/mock/fixtures/network.json", "utf8"));
+const demoNet = JSON.parse(readFileSync("packages/adapters/fixture/fixtures/network.json", "utf8"));
 const pockets: { id: string; name: string; mid: [number, number]; lines: [number, number][][] }[] = demoNet.pockets.map((p: any) => ({
   id: p.id,
   name: p.name,

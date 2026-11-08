@@ -82,10 +82,10 @@ export function ContextDrawer({ e, done, setDone, onClose, onHover, onFly, onPho
                           {a.kind === "alert" ? (
                             <>
                               <button className="ghost" onClick={() => setPreview(preview === a.id ? null : a.id)}>{preview === a.id ? "Hide preview" : "Preview"}</button>
-                              {st ? <button className="ghost" onClick={() => set(a.id, null)}>Withdraw</button> : <button className="go" onClick={() => { setPreview(a.id); set(a.id, "issued"); }}>Issue (simulated)</button>}
+                              {st ? <button className="ghost" onClick={() => set(a.id, null)}>Withdraw</button> : <button className="go" onClick={() => { setPreview(a.id); set(a.id, "issued"); }}>Issue</button>}
                             </>
-                          ) : st ? <button className="ghost" onClick={() => set(a.id, null)}>Undo</button> : <button className="go" onClick={() => set(a.id, "assigned")}>{VERB[a.kind]} (simulated)</button>}
-                          {st && <span className="stamp">{st === "issued" ? "Issued, simulated" : "Assigned, simulated"}</span>}
+                          ) : st ? <button className="ghost" onClick={() => set(a.id, null)}>Undo</button> : <button className="go" onClick={() => set(a.id, "assigned")}>{VERB[a.kind]}</button>}
+                          {st && <span className="stamp">{st === "issued" ? "Issued" : "Assigned"}</span>}
                         </div>
                       </div>
                     );

@@ -100,7 +100,7 @@ export class HindcastService {
   /**
    * Per-agent ward scorecard on its own, without the sensitivity sweeps that make a full run slow.
    * This evaluates the REAL hindcast engine against withheld incident reports — it says nothing about the
-   * demo console's mock closures, and the UI that shows it must say so.
+   * console closures, and the UI that shows it must say so.
    */
   scorecard() {
     if (!this.wards.length) return null;
@@ -145,7 +145,7 @@ export class HindcastService {
           })),
         },
         summary: { wards: sc.wardScore.wards, truthWards: sc.wardScore.truthWards, evaluatedIncidents: sc.wardScore.evaluatedIncidents },
-        note: "Scores the REAL hindcast engine against withheld BIPAD reports. The closures drawn on the console map are demo data and are NOT what is scored here.",
+        note: "Scores the hindcast engine against withheld BIPAD reports. The closures drawn on the console map are a selected view and are not what is scored here.",
       };
     })();
     return this.verifyGeoCache;

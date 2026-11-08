@@ -2,15 +2,15 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { MockSceneAdapter } from "../packages/adapters/mock/index.ts";
-import { clampInches, describeWeather, MockWeatherAdapter, OpenMeteoWeatherAdapter } from "../packages/adapters/openmeteo/weather.ts";
+import { FixtureSceneAdapter } from "../packages/adapters/fixture/index.ts";
+import { clampInches, describeWeather, FixtureWeatherAdapter, OpenMeteoWeatherAdapter } from "../packages/adapters/openmeteo/weather.ts";
 import { DiskTileCache } from "../packages/adapters/tiles/diskCache.ts";
 import { CachingTileAdapter } from "../packages/adapters/tiles/index.ts";
 import { floodDepths } from "../packages/adapters/runoff/index.ts";
 
-describe("MockSceneAdapter", () => {
+describe("FixtureSceneAdapter", () => {
   it("returns stable entity counts and advice", () => {
-    const s = new MockSceneAdapter().load();
+    const s = new FixtureSceneAdapter().load();
     expect(s.entities.length).toBeGreaterThan(50);
     expect(s.entities.filter((e) => e.kind === "closure").length).toBeGreaterThan(5);
     expect(s.entities.filter((e) => e.kind === "hospital").length).toBe(6);
@@ -53,8 +53,8 @@ describe("weather", () => {
     expect(seed.source).toBe("open-meteo-forecast");
   });
 
-  it("MockWeatherAdapter returns fixed inches", async () => {
-    expect((await new MockWeatherAdapter(12).seedRainfall()).inches).toBe(12);
+  it("FixtureWeatherAdapter returns fixed inches", async () => {
+    expect((await new FixtureWeatherAdapter(12).seedRainfall()).inches).toBe(12);
   });
 });
 

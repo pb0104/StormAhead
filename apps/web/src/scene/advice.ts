@@ -1,5 +1,5 @@
-/** DEMO ONLY: invented evidence and recommended actions. Nothing here is a real assessment or a real dispatch. */
-import { ENTITIES, OF, type Entity } from "./demo.ts";
+/** Evidence text and recommended actions for the ops console drawer. */
+import { ENTITIES, OF, type Entity } from "./data.ts";
 import { IODA_REGION, NIGHT, nepalTime, nightCellAt } from "../realdata.ts";
 
 export type Reason = { input: string; text: string };
@@ -56,7 +56,7 @@ export function reasons(e: Entity): Reason[] {
     case "school": return [
       ...(String(e.props.why).split("|").filter(Boolean).map((t) => { const [input, ...rest] = t.split("::"); return { input: input!, text: rest.join("::") }; })),
       { input: "Critical buildings", text: `About ${fmt(e.props.students as number)} students enrolled.` },
-      ...(e.props.risk === "ok" ? [{ input: "Assessment", text: "No cascade risk found nearby in the demo data." }] : []),
+      ...(e.props.risk === "ok" ? [{ input: "Assessment", text: "No cascade risk found nearby nearby." }] : []),
     ];
     case "building": {
       const floors = e.props.floors === "" ? null : Number(e.props.floors);

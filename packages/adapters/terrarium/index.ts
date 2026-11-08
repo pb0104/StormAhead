@@ -1,6 +1,6 @@
 import { PNG } from "pngjs";
 import type { Grid, TerrainPort, TerrainResult, TileCachePort } from "../../ports/index.ts";
-import { FLOOD_POLYS, BBOX } from "../mock/scene.ts";
+import { FLOOD_POLYS, BBOX } from "../fixture/scene.ts";
 
 export const REF_INCHES = 10, DRY_BELOW_M = 0.2, MAX_DEPTH_AT_REF = 2.4;
 const Z = 13, N = 2 ** Z;

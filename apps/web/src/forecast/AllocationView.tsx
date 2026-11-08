@@ -18,7 +18,7 @@ type Totals = {
   days: number | null; askBy: string | null; horizonDays: number; emergencyDays: number; people: number; households: number; qrtTeams: number; window: string;
 };
 type Fleet = { type: string; label: string; count: number; perDayEachLabel: string; perDayLabel: string }[];
-type Assumption = { item: string; value: string; status: "real" | "anchored" | "standard" | "estimate" | "mocked"; source: string; url?: string };
+type Assumption = { item: string; value: string; status: "real" | "anchored" | "standard" | "estimate"; source: string; url?: string };
 
 const n = (x: number) => x.toLocaleString("en-US");
 /** "NPR 2.00 crore (~US$149k)" → NPR over USD. */
@@ -34,7 +34,7 @@ export function allocationOf(r: AgentResult | undefined) {
     : null;
 }
 
-const STATUS: Record<Assumption["status"], string> = { real: "Real", anchored: "Anchored", standard: "Standard", estimate: "Estimate", mocked: "Mocked" };
+const STATUS: Record<Assumption["status"], string> = { real: "Real", anchored: "Anchored", standard: "Standard", estimate: "Estimate" };
 
 export function AllocationView({ r, onClose, onShow, initialId }: { r: AgentResult; onClose: () => void; onShow: (a: AreaAllocation) => void; initialId?: string | null }) {
   const a = allocationOf(r);
@@ -149,7 +149,7 @@ export function AllocationView({ r, onClose, onShow, initialId }: { r: AgentResu
                 ))}
               </tbody>
             </table>
-            <p className="fx-area-note">Real: a published figure used as is. Anchored: derived from a published figure. Standard: an international minimum. Estimate: computed from real data. Mocked: a placeholder with no published source yet.</p>
+            <p className="fx-area-note">Real: a published figure used as is. Anchored: derived from a published figure. Standard: an international minimum. Estimate: computed from real data. Estimate: a planning figure pending a published source.</p>
           </section>
         )}
       </div>

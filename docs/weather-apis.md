@@ -109,8 +109,8 @@ Legend: F flood, C tropical cyclone, T tornado/severe convective.
 
 1. **Week 1 - Flood MVP.** Add a server-side module that calls Open-Meteo Flood API for the Kathmandu valley points, caches the daily result, and computes exceedance probability. Log the picked river vs. expected river.
 2. **Week 1-2 - Live gauges.** Poll BIPAD `river-stations` and `rain-stations` for Bagmati-basin stations on a short interval; add validity filters; show warning/danger status. Ask BIPAD/NDRRMA about terms and rate limits before relying on it.
-3. **Week 2 - Alerts.** Ingest GDACS RSS (credit GDACS) and show Orange/Red events near Nepal. Add NWS alerts if US demo scenarios are wanted.
-4. **Week 3 - Cyclones.** Fetch ECMWF open-data TC track BUFR from a cloud mirror (AWS) and decode; NHC feeds if the demo needs Atlantic storms.
+3. **Week 2 - Alerts.** Ingest GDACS RSS (credit GDACS) and show Orange/Red events near Nepal. Add NWS alerts if US replay scenarios are wanted.
+4. **Week 3 - Cyclones.** Fetch ECMWF open-data TC track BUFR from a cloud mirror (AWS) and decode; NHC feeds if the replay needs Atlantic storms.
 5. **Later.** GloFAS via EWDS for full ensembles, IMERG for rainfall observations, SPC/HRRR for US convective. Paid APIs only if a gap appears that these cannot fill.
 6. **Licensing before launch.** Free Open-Meteo is non-commercial; budget a paid plan or move to direct GloFAS/ECMWF for commercial use. Keep a credits page (Open-Meteo/GloFAS CC BY 4.0, ECMWF CC-BY-4.0, GDACS, NOAA attribution).
 

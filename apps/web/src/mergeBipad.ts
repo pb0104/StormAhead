@@ -1,6 +1,6 @@
 /**
- * Prefer BIPAD real/modelled facility layers over OSM/mock scene entities.
- * Also swaps mock towers/outages for Aesha's OpenCelliD + Black Marble layers.
+ * Prefer BIPAD facility layers over OSM scene entities.
+ * Also swaps towers/outages for OpenCelliD + Black Marble layers.
  * Keeps closures, pockets, radio, food, helipads from the adapter scene. Social posts are real (Reddit, src/real/social.ts).
  */
 import type { Action, Entity, Feature, FeatureCollection, Kind, Reason, SceneSnapshot } from "../../../packages/ports/index.ts";
@@ -68,9 +68,9 @@ function polyFeat(e: Entity): Feature {
 export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   const kept = scene.entities.filter((e) => !REPLACE.has(e.kind)).map((e) => {
     if (e.props.prov) return e;
-    const simulated = e.kind === "radio";
+    const planning = e.kind === "radio";
     const modelled = e.kind === "closure" || e.kind === "pocket";
-    return { ...e, props: { ...e.props, prov: simulated ? "simulated" : modelled ? "modelled" : (e.props.prov ?? "simulated") } };
+    return { ...e, props: { ...e.props, prov: planning ? "planning" : modelled ? "modelled" : (e.props.prov ?? "planning") } };
   });
   const entities = [...kept, ...BIPAD];
   const points = entities.filter((e) => e.geom.type === "Point");
@@ -81,7 +81,7 @@ export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   };
   const advice: Record<string, { reasons: Reason[]; actions: Action[] }> = { ...scene.advice };
   for (const e of BIPAD) advice[e.id] = bipadAdvice(e, entities);
-  // Refresh advice for kept simulated/modelled entities that reference BIPAD responders/shelters.
+  // Refresh advice for kept entities that reference BIPAD responders/shelters.
   for (const e of kept) {
     if (e.kind === "closure" || e.kind === "pocket" || e.kind === "social" || e.kind === "radio" || e.kind === "food" || e.kind === "helipad") {
       advice[e.id] = bipadAdvice(e, entities);
@@ -101,7 +101,7 @@ export function mergeBipadIntoScene(scene: SceneSnapshot): SceneSnapshot {
   };
   return {
     ...scene,
-    note: "Facilities, alerts and gauges are real (BIPAD/DHM); care homes, fire/police and food shops from Google Places; cell sites modelled; outages are NASA night lights. Social posts are real (Reddit). Radio and depot stock are simulated.",
+    note: "Facilities, alerts and gauges are real (BIPAD/DHM); care homes, fire/police and food shops from Google Places; cell sites modelled; outages are NASA night lights. Social posts are real (Reddit). Radio is listen-only broadcast; depot stock uses planning levels.",
     entities,
     kindLabel,
     advice,

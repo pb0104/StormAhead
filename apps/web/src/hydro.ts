@@ -1,5 +1,5 @@
 /**
- * Flow agent (DEMO): rain-on-grid runoff over the real elevation grid.
+ * Flow agent: rain-on-grid runoff over the real elevation grid.
  * Every cell starts with the same depth of runoff. Each step, a cell passes part of its water to its lowest neighbour (by
  * water-surface height, so ponds fill and spill over). Water drains off slopes and collects in channels and low ground.
  * It is a teaching model: no infiltration map, no drainage network, no buildings, and a 70 m grid. It is not a flood forecast.

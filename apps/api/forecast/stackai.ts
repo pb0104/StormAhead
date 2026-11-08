@@ -4,7 +4,7 @@
  *   STACKAI_ORG_ID    and STACKAI_FLOW_ID — both are in the flow's Export → API snippet:
  *                     https://api.stackai.com/inference/v0/run/{ORG_ID}/{FLOW_ID}
  * Optional: STACKAI_INPUT (default "in-0") and STACKAI_OUTPUT (default "out-0") if the flow's node ids differ,
- * and STACKAI_BASE_URL to point at a different StackAI host (or a local mock for tests).
+ * and STACKAI_BASE_URL to point at a different StackAI host (or a local stub for tests).
  *
  * The flow should be one Input node → one LLM node whose prompt is just {in-0} → one Output node. Every prompt StormAhead
  * sends is self-contained (role, data, format), so the flow needs no prompt of its own.

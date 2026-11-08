@@ -1,7 +1,7 @@
 /**
  * Google Map Tiles API (2D satellite) for the console's base imagery: native zoom 20 over the Kathmandu valley, against
  * Esri's 18 in this setup. The server keeps GOOGLE_MAPS_API_KEY private, holds one tile session and renews it before it
- * expires, and counts tiles against a daily budget (GOOGLE_TILES_DAILY_BUDGET, default 25,000) so a busy demo can't run up
+ * expires, and counts tiles against a daily budget (GOOGLE_TILES_DAILY_BUDGET, default 25,000) so a busy session can't run up
  * a bill; over budget it answers 429 and the map shows the Esri layer underneath.
  *
  * Google's terms for these tiles: show the Google logo and the copyright for the current view (see /attribution), keep

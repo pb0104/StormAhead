@@ -27,7 +27,7 @@ Event window used: Helene landfall/flooding ≈ 2024-09-25 → 2024-09-29; after
 | Cell towers / outages | FCC DIRS: **not found** via ArcGIS search; OpenCellID needs a key. Unverified. |
 
 ## Social media and radio
-**Not probed**, deliberately: platform terms and API access change (X is effectively closed; Reddit/Bluesky have terms and rate limits), and radio/scanner archives (e.g. Broadcastify) have licensing limits. Realistic options: a small hand-labelled/simulated feed clearly marked as simulated, or an open public archive if one is found.
+**Not probed**, deliberately: platform terms and API access change (X is effectively closed; Reddit/Bluesky have terms and rate limits), and radio/scanner archives (e.g. Broadcastify) have licensing limits. Realistic options: a small hand-labelled feed clearly marked as a planning layer, or an open public archive if one is found.
 
 ## Terrain / rainfall / susceptibility — **not audited yet**
 DEM (USGS 3DEP or Copernicus), rainfall (MRMS/Stage IV), pre-event landslide susceptibility (NCGS maps) are the obvious predictors for closures and still need checking.
@@ -38,7 +38,7 @@ DEM (USGS 3DEP or Copernicus), rainfall (MRMS/Stage IV), pre-event landslide sus
 3. **Baselines are mandatory** (lesson from Kathmandu): e.g. "within X m of a gauge-flooded stream", "low height-above-stream", "already-closed neighbours", random same-size sets.
 4. **Matching problem:** TIMS points ↔ OSM edges (snap tolerance, one-to-many, duplicates); only state-maintained roads are scored.
 5. Post-event Maxar/landslide polygons are **evaluation or visual context only**, never inputs to a pre-/during-event prediction.
-6. Public-facing alerts are higher-stakes than the Kathmandu analysis: replay only, labelled simulated, and human approval before anything is "sent".
+6. Public-facing alerts are higher-stakes than the Kathmandu analysis: replay only, labelled as console drafts, and human approval before anything is "sent".
 
 ## Addendum — reporting lag in the NCDOT records (measured while building the replay)
 All **1,132** in-window TIMS records carry a `CreationDate` **at least 13 days after their `StartDateTime`** (median ≈ 18 days; p90 ≈ 78 days). 655 were created on 2024-10-15 by a single admin account and 490 by the TIMS app. So NCDOT **reconstructed** the event timeline after the fact; this is **not** an archive of what DriveNC showed during the storm.

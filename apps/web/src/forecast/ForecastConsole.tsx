@@ -399,7 +399,7 @@ export function ForecastConsole() {
     return 0;
   })();
 
-  // Water level through the window (ILLUSTRATIVE): a linear reservoir on the hourly valley rain. Water builds while it
+  // Water level through the window (MODEL): a linear reservoir on the hourly valley rain. Water builds while it
   // rains and drains with a ~30 h time constant, normalised so the window's peak = the assessed depth.
   const reservoir = useMemo(() => {
     if (!series) return null;
@@ -617,7 +617,7 @@ export function ForecastConsole() {
     applyDone: (actionId, modeStamp) => {
       if (!acts.some((a) => a.id === actionId)) return { ok: false, error: "actionId not on selected entity" };
       setDone((d) => ({ ...d, [actionId]: modeStamp }));
-      return { ok: true, simulated: true as const };
+      return { ok: true, consoleOnly: true as const };
     },
     undoDone: (actionId) => { setDone((d) => { const n = { ...d }; delete n[actionId]; return n; }); return { ok: true }; },
     setAlertPreview: () => {},
@@ -1107,7 +1107,7 @@ export function ForecastConsole() {
               <div className="fx-chips">{g.items.map(([k, l]) => <button key={k} className="fx-chip" aria-pressed={!!vis[k]} onClick={() => { setVis((v) => ({ ...v, [k]: !v[k] })); if (!ran && ["closures", "flood", "runoff", "outages", "landslides", "alerts", "shelterBuildings"].includes(k)) setRan(true); if ((k === "flood" || k === "runoff") && assessRain === null) setAssessRain(OBSERVED_IN); }}>{l}</button>)}</div>
             </div>
           ))}
-          <p className="fx-caveat">Layers fill in as agents finish. Facilities and alerts are real (BIPAD); statuses are modelled; depot stock is simulated.</p>
+          <p className="fx-caveat">Layers fill in as agents finish. Facilities and alerts are real (BIPAD); statuses are modelled; depot stock uses planning levels.</p>
         </div>
       )}
 

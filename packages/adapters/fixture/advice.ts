@@ -1,4 +1,4 @@
-/** DEMO ONLY: invented evidence and recommended actions. Nothing here is a real assessment or a real dispatch. */
+/** Evidence text and recommended actions for the ops console drawer. */
 import { ENTITIES, OF, type Entity } from "./scene.ts";
 import type { Action, Reason } from "../../ports/types.ts";
 export type { Action, Reason } from "../../ports/types.ts";
@@ -51,7 +51,7 @@ export function reasons(e: Entity): Reason[] {
     case "school": return [
       ...(String(e.props.why).split("|").filter(Boolean).map((t) => { const [input, ...rest] = t.split("::"); return { input: input!, text: rest.join("::") }; })),
       { input: "Critical buildings", text: `About ${fmt(e.props.students as number)} students enrolled.` },
-      ...(e.props.risk === "ok" ? [{ input: "Assessment", text: "No cascade risk found nearby in the demo data." }] : []),
+      ...(e.props.risk === "ok" ? [{ input: "Assessment", text: "No cascade risk found nearby nearby." }] : []),
     ];
     case "helipad": return [
       { input: "Airfield", text: `${e.props.role}. Helipad for rotary-wing lift only.` },

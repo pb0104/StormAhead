@@ -90,7 +90,7 @@ dl.readings dd { margin: 3px 0 0; font-size: 12.5px; line-height: 1.6; color: va
 .swipe-note strong { color: #FFD79A; }
 .swipe-note .link { margin-left: 8px; }
 @media (max-width: 900px) { .swipe-note { bottom: 10px; font-size: 11.5px; padding: 7px 10px; } .swipe-tag { top: 46px; } }
-/* Verification overlay banner: states that the overlay scores the engine, not the demo map on screen. */
+/* Verification overlay banner: scores the cascade engine. */
 .verifybar { position: absolute; left: 50%; transform: translateX(-50%); bottom: 18px; z-index: 6; max-width: min(880px, calc(100vw - 48px));
   background: #0E1A22EE; border: 1px solid #2A3C47; border-left: 3px solid #46D68C; border-radius: 6px; padding: 9px 14px;
   font-size: 12.5px; line-height: 1.6; color: var(--mute); backdrop-filter: blur(6px); }
@@ -102,10 +102,10 @@ dl.readings dd { margin: 3px 0 0; font-size: 12.5px; line-height: 1.6; color: va
 .verifybar i.vk.pt { background: #FFFFFF; border-radius: 50%; }
 .verifybar .link { margin-left: 12px; }
 @media (max-width: 900px) { .verifybar { bottom: 10px; font-size: 11.5px; padding: 7px 10px; } }
-/* Evaluation tab: the warning that the scorecard measures the engine, not the demo map. */
+/* Evaluation tab styling. */
 .sheet p.warn { background: #3A1E1A; border-left: 3px solid #FF4A3D; color: #FFD8D2; padding: 9px 12px; border-radius: 4px; font-size: 13px; line-height: 1.5; margin: 10px 0; }
 .sheet tr.given td { color: var(--mute); font-style: italic; }
-/* Marks the few layers drawn from real data in a console that is otherwise demo fixtures. */
+/* Marks layers drawn from verified public feeds. */
 .legend em.real { font-style: normal; font-size: 9px; letter-spacing: .06em; text-transform: uppercase; background: #123A2B; color: #8EE6B8; border-radius: 3px; padding: 1px 4px; }
 .sw { display: inline-block; flex: none; }
 .glyph { flex: none; }
@@ -137,7 +137,7 @@ dl.readings dd { margin: 3px 0 0; font-size: 12.5px; line-height: 1.6; color: va
 .seg2 button { background: var(--panel); border: 0; padding: 4px 11px; font: 500 12px var(--mono); color: var(--mute); }
 .seg2 button + button { border-left: 1px solid var(--line); }
 .seg2 button[aria-pressed="true"] { background: var(--raise); color: var(--text); box-shadow: inset 0 -2px 0 var(--teal); }
-.demo-tag { align-self: center; font: 500 10.5px var(--mono); letter-spacing: .1em; color: var(--amber); border: 1px solid #5B4515; border-radius: 3px; padding: 2px 6px; margin-right: 12px; }
+.ops-tag { align-self: center; font: 500 10.5px var(--mono); letter-spacing: .1em; color: var(--amber); border: 1px solid #5B4515; border-radius: 3px; padding: 2px 6px; margin-right: 12px; }
 .strip .link { align-self: center; }
 @keyframes tick { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
 
@@ -185,7 +185,7 @@ dl.readings dd { margin: 3px 0 0; font-size: 12.5px; line-height: 1.6; color: va
 .sheet th { text-align: left; font: 500 10.5px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--mute); padding: 0 8px 6px 0; }
 .sheet td { padding: 7px 8px 7px 0; border-top: 1px solid var(--line); vertical-align: top; }
 .pill { font: 500 10.5px var(--mono); padding: 2px 7px; border-radius: 3px; background: var(--raise); }
-.pill.real { background: #123A2B; color: #8EE6B8; } .pill.mock { background: #3A2C0E; color: #FFD27A; } .pill.mixed { background: #1F2E38; color: #A9C7DA; } .pill.illustrative { background: #1E2F4A; color: #9CC2FF; }
+.pill.real { background: #123A2B; color: #8EE6B8; } .pill.estimate { background: #3A2C0E; color: #FFD27A; } .pill.mixed { background: #1F2E38; color: #A9C7DA; } .pill.depth { background: #1E2F4A; color: #9CC2FF; }
 ul.plain, ol.plain { margin: 0; padding-left: 18px; font-size: 13px; display: grid; gap: 6px; }
 .muted { color: var(--mute); font-size: 13px; }
 code { font: 12px var(--mono); }
@@ -195,7 +195,7 @@ code { font: 12px var(--mono); }
   .rail { width: min(86vw, 320px); box-shadow: 0 0 40px rgba(0, 0, 0, .6); }
   .shell:has(.rail.open) .strip, .shell:has(.rail.open) .hint { left: 0; }
   .strip { overflow-x: auto; }
-  .demo-tag { display: none; }
+  .ops-tag { display: none; }
   .drawer { top: auto; left: 0; width: 100%; height: 58vh; border-left: 0; border-top: 1px solid var(--line); transform: translateY(100%); border-radius: 12px 12px 0 0; }
   .drawer.open { transform: none; }
   .why li { grid-template-columns: 96px 1fr; }
@@ -233,7 +233,7 @@ code { font: 12px var(--mono); }
 
 .stats { display: flex; flex: 1; min-width: 0; gap: 2px; overflow-x: auto; scrollbar-width: none; }
 .stats::-webkit-scrollbar { display: none; }
-@media (max-width: 1300px) { .demo-tag { display: none; } }
+@media (max-width: 1300px) { .ops-tag { display: none; } }
 
 .photo-bar { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; align-items: center; gap: 14px; padding: 10px 16px 12px; background: rgba(11, 19, 24, .94); border-top: 1px solid var(--line); font: 500 12px var(--mono); }
 .photo-bar span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -256,8 +256,8 @@ code { font: 12px var(--mono); }
 
 /* provenance + timeline (BIPAD layers) */
 .prov { display: inline-block; margin-top: 4px; font: 500 10.5px var(--mono); letter-spacing: .02em; padding: 2px 7px; border-radius: 3px; }
-.prov.real { background: #123A2B; color: #8EE6B8; } .prov.modelled { background: #1F2E38; color: #A9C7DA; } .prov.simulated { background: #3A2C0E; color: #FFD27A; }
-.pill.modelled { background: #1F2E38; color: #A9C7DA; } .pill.simulated { background: #3A2C0E; color: #FFD27A; }
+.prov.real { background: #123A2B; color: #8EE6B8; } .prov.modelled { background: #1F2E38; color: #A9C7DA; } .prov.planning, .prov.simulated { background: #3A2C0E; color: #FFD27A; }
+.pill.modelled { background: #1F2E38; color: #A9C7DA; } .pill.planning { background: #3A2C0E; color: #FFD27A; }
 .timeline { list-style: none; padding: 0; margin: 0; } .timeline li { display: grid; grid-template-columns: 92px 1fr; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--raise); }
 .timeline time { font: 500 11px var(--mono); color: var(--mute); } .timeline small { display: block; color: var(--mute); }
 

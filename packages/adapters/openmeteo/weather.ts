@@ -19,10 +19,10 @@ export function clampInches(n: number) {
   return Math.min(20, Math.max(4, Math.round(n)));
 }
 
-export class MockWeatherAdapter implements WeatherPort {
+export class FixtureWeatherAdapter implements WeatherPort {
   constructor(private inches = DEFAULT_INCHES) {}
   async seedRainfall(): Promise<WeatherSeed> {
-    return { inches: this.inches, source: "mock", fetchedAt: new Date().toISOString() };
+    return { inches: this.inches, source: "fixture", fetchedAt: new Date().toISOString() };
   }
   describe(inches: number) { return describeWeather(inches); }
 }

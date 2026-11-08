@@ -38,7 +38,7 @@ export type OpsHandle = {
   setMode: (m: "2d" | "3d") => void;
   startFly: () => void;
   openPhoto: () => void;
-  applyDone: (actionId: string, mode: "assigned" | "issued") => { ok: boolean; error?: string; simulated?: true };
+  applyDone: (actionId: string, mode: "assigned" | "issued") => { ok: boolean; error?: string; consoleOnly?: true };
   undoDone: (actionId: string) => { ok: boolean };
   setAlertPreview: (actionId: string | null) => void;
   /** Ensure a visibility key is on (does not toggle off). */
@@ -80,7 +80,7 @@ export type OpsHandle = {
   includeAgents: (names: string[]) => { ok: boolean; [k: string]: unknown };
   /** Full intel for ORACLE: agents + fusion + report + UI snapshot. */
   getOracleContext: () => { ok: boolean; [k: string]: unknown };
-  /** Evaluation pack: five pillars + ground-truth metrics (demo defense). */
+  /** Evaluation pack: five pillars + ground-truth metrics. */
   getEvaluation: () => { ok: boolean; [k: string]: unknown };
   /** Actions on the ground (current run only). */
   listActions: () => { ok: boolean; [k: string]: unknown };

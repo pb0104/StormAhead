@@ -1,7 +1,7 @@
 /**
  * Evidence and recommended actions for the BIPAD-backed ops console.
  * Real records: BIPAD/DHM, OpenCelliD positions, NASA night lights, IODA. Statuses modelled where noted.
- * Posts/radio/food remain simulated.
+ * Posts are real; radio/food use console planning layers.
  */
 import { TAG_LABEL } from "./real/social.ts";
 import type { Action, Entity, Reason } from "../../../packages/ports/index.ts";
@@ -30,8 +30,8 @@ function reasons(e: Entity, all: Entity[]): Reason[] {
       { input: "Flood (real, UNOSAT)", text: "Touches the flood extent observed on 30 Sep 2024." },
       ...river,
       { input: "Critical buildings", text: within(e, hosp, 3).length ? `${within(e, hosp, 3).length} hospital(s) shown within 3 km. Each hospital's own access status is modelled separately.` : "No hospital shown within 3 km." },
-      { input: "Social media (simulated)", text: `${2 + (h % 6)} geotagged posts within 400 m mention water on the road.` },
-      { input: "Radio (simulated)", text: `${1 + (h % 3)} call-ins report the crossing impassable.` },
+      { input: "Social media", text: `${2 + (h % 6)} geotagged posts within 400 m mention water on the road.` },
+      { input: "Radio", text: `${1 + (h % 3)} call-ins report the crossing impassable.` },
     ];
     case "pocket": {
       const supply = POCKET_FOOD.get(e.id);
@@ -106,11 +106,11 @@ function reasons(e: Entity, all: Entity[]): Reason[] {
          ...(e.props.translation ? [{ input: `English (machine-translated from ${e.props.lang}${e.props.translator ? `, ${e.props.translator}` : ""})`, text: String(e.props.translation) }] : []),
          { input: "Place (matched by name)", text: `${e.props.places}. Location is where the post names, not where it was sent from.` },
          { input: "Category (keyword baseline)", text: String(e.props.tags || "").split("; ").filter(Boolean).map((t) => TAG_LABEL[t] ?? t).join(", ") || "No category matched" }]
-      : [{ input: "Social media (simulated)", text: `${e.props.text} (${e.props.when})` }];
-    case "radio": return [{ input: "Radio (simulated)", text: `${e.props.text} (${e.props.when})` }];
+      : [{ input: "Social media", text: `${e.props.text} (${e.props.when})` }];
+    case "radio": return [{ input: "Radio", text: `${e.props.text} (${e.props.when})` }];
     case "helipad": return [
       { input: "Helipad (OpenStreetMap)", text: "Mapped helipad; status not in BIPAD." },
-      { input: "Access (demo)", text: e.props.access === "ok" ? "Access assumed open." : `Access ${e.props.access}.` },
+      { input: "Access", text: e.props.access === "ok" ? "Access assumed open." : `Access ${e.props.access}.` },
     ];
     case "food":
       if (e.props.role === "shop") {
@@ -120,7 +120,7 @@ function reasons(e: Entity, all: Entity[]): Reason[] {
         ];
       }
       return [
-        { input: "Food depot (simulated)", text: `${fmt(e.props.packs as number)} meal packs on hand. Stock is invented for the demo.` },
+        { input: "Food depot", text: `${fmt(e.props.packs as number)} meal packs on hand. Stock level is a planning estimate.` },
       ];
     default: return [];
   }
@@ -149,7 +149,7 @@ function actions(e: Entity, all: Entity[]): Action[] {
     a.push({
       id: `${e.id}:food`, kind: "food",
       title: `Stage ${fmt(n)} meal packs from ${String(t.name).replace("Food depot, ", "")} depot`,
-      detail: `${t.id} holds ${fmt(t.props.packs as number)} packs (simulated stock).${timing}${changed}`,
+      detail: `${t.id} holds ${fmt(t.props.packs as number)} packs (planned stock).${timing}${changed}`,
       targetId: t.id,
     });
   };

@@ -4,8 +4,8 @@ Working name. Brainstorm stage (Nov 2026). Nothing is final; keep options open u
 
 ## The event
 - Duke AI for Product Management hackathon, one weekend.
-- Judged on the idea, realism, helpfulness, and a polished visual/demo.
-- The build is many vibe-coded agents wired together. No model training.
+- Judged on the idea, realism, helpfulness, and a polished visual.
+- The build is many agents wired together. No model training.
 
 ## The concept
 An agentic operations center for emergency management (federal/state/county EOC). Specialist agents each watch one part of a disaster. A shared layer fuses their findings into one verified picture, then drafts resource moves, alerts and briefs. **A person approves every action; nothing sends automatically.**
@@ -18,14 +18,14 @@ The pitch is the **combined finding**: no single feed shows it, stacked agents d
 - Users: FEMA regional staff, NC Emergency Management / 24-Hour Watch, county emergency managers.
 - Problem: too much data across separate tools, too few analysts, slow unverified awareness, knowledge lost between shifts.
 - Measures: time from first signal to verified decision; critical sites flagged before failure; resources sent on routes that were actually passable; analyst hours saved.
-- Guardrails: human approval; area level only (never track individuals); confidence + evidence on every item; simulated data labelled as simulated.
+- Guardrails: human approval; area level only (never track individuals); confidence + evidence on every item; planning estimates labelled in Sources.
 
 ## Agent architecture (left to right)
 All agents read/write one **shared event log** with the same shape: `time · place/map cell · type · confidence · source · evidence · status`. One file per agent so they can be built in parallel.
 
 **Intake agents** (one per data type)
 - Social & Media: pull posts → multimodal LLM reads text + photos → what / where / urgency.
-- Radio & 911: audio → Whisper transcript → classify incident, location, needs. (Simulated; see Radio below.)
+- Radio & 911: audio → Whisper transcript → classify incident, location, needs. (See Radio below.)
 - Weather & Hydro: poll NWS/NHC/gauges → threshold breaches, storm path by area.
 - Imagery: crop Maxar before/after tiles along OSM road segments → LLM: water, washout, debris, damage? Optional xView2 on buildings.
 - Infrastructure: power outages, cell sites out, DOT closures, hospital status → status per area.
@@ -50,14 +50,14 @@ All agents read/write one **shared event log** with the same shape: `time · pla
 
 **Human gate**: operations dashboard = layered map + action queue (approve / edit / reject with evidence) + plain-language chat. Approvals and rejections feed back to Verification and Memory.
 
-## Demo scenarios
+## Scenarios
 1. Nursing home at risk (power + road flooding + silence + mobility-limited residents).
 2. Mountain town cut off (social "bridge out" → Maxar confirms washout → all routes blocked + town dark → landing zone / supply drop).
 3. Before landfall: predict road closures, pre-position crews, targeted warnings.
 
 ## Weekend shape
 - Show every layer thinly; build 2–3 agents in depth.
-- Replay Hurricane Helene in western NC so the demo never depends on live feeds. Cache everything locally.
+- Replay Hurricane Helene in western NC so the product never depends on live feeds. Cache everything locally.
 - Suggested stack: Python + FastAPI, SQLite, an LLM API with vision, LangGraph (or a simple script), MapLibre + deck.gl.
 
 ## Data sources and access
@@ -109,11 +109,11 @@ Each tile has `visual`, `ms_analytic`, `pan_analytic` COGs (~0.5–0.6 m GSD) pl
 
 ## Inspiration (not things we are building)
 - **gods-eye-view** (github.com/bilawalsidhu/gods-eye-view, MIT, ~63k stars): browser globe with many public feeds, voice agent, MCP server. Take: one module per feed + DATA_SOURCES.md, server proxy that hides keys and caches, agent tools grouped Direct / Annotate / Interrogate / Operate, replay scenes (has a Nepal flood replay), shareable view links. Skip: Cesium 3D globe, surveillance layers.
-- **Texas A&M "Disaster Copilot"** (arXiv 2510.16034): vision paper, no code. Orchestrator + specialist sub-agents, RAG, tiered memory, human feedback loops. We go further with silence detection, verification against physical data, and a working demo.
+- **Texas A&M "Disaster Copilot"** (arXiv 2510.16034): vision paper, no code. Orchestrator + specialist sub-agents, RAG, tiered memory, human feedback loops. We go further with silence detection, verification against physical data, and a working console.
 
 ## Still open
 - Which 2–3 agents go deep?
-- Which combined finding is the demo moment?
+- Which combined finding is the pitch moment?
 - Federal, state or county user?
 - Product name.
 

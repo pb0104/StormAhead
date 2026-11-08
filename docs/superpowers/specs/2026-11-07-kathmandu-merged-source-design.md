@@ -1,14 +1,14 @@
 # Kathmandu merged open-data pack — design
 
-**Date:** 2026-11-07  
-**Status:** Approved for implementation (approach 1 / layers B / deliverable C)  
+**Date:** 2026-11-07 
+**Status:** Approved for implementation (approach 1 / layers B / deliverable C) 
 **Branch:** `feat/kathmandu-merged-source`
 
 ## Goals
 
 - One **map** FeatureCollection and one **agent** event log for the Kathmandu / Bagmati ops AOI.
 - Merge existing local layers with Maxar STAC footprints and an NDRRMA summary, without downloading Maxar COGs.
-- Keep every feature and log row attributable (`source`, licence, simulated vs observed).
+- Keep every feature and log row attributable (`source`, licence, planning vs observed).
 
 ## Non-goals (v1)
 
@@ -47,15 +47,15 @@ Rebuild: `python -I scripts/build_kathmandu_merged.py`
 
 ```json
 {
-  "id": "…",
-  "time": "ISO-8601 or null",
-  "place": { "lon": 0, "lat": 0, "label": "…" },
-  "type": "flood|hospital|road_impact|power_dark|landslide|maxar_footprint|ndrrma_summary",
-  "confidence": 0.0,
-  "source": "…",
-  "evidence": "…",
-  "status": "observed|modelled|report",
-  "featureId": "same as GeoJSON id when applicable"
+ "id": "…",
+ "time": "ISO-8601 or null",
+ "place": { "lon": 0, "lat": 0, "label": "…" },
+ "type": "flood|hospital|road_impact|power_dark|landslide|maxar_footprint|ndrrma_summary",
+ "confidence": 0.0,
+ "source": "…",
+ "evidence": "…",
+ "status": "observed|modelled|report",
+ "featureId": "same as GeoJSON id when applicable"
 }
 ```
 
@@ -65,16 +65,16 @@ Confidence defaults: observed physical products ~0.85–0.9; modelled road/hospi
 
 ```
 flood_extent + network + ops_layers + night_lights
-        + Maxar STAC (footprints only)
-        + NDRRMA constants
-                │
-                ▼
-   scripts/build_kathmandu_merged.py
-                │
-        ┌───────┴────────┐
-        ▼                ▼
-  merged.geojson    event_log.json
-        └────── provenance.json ──┘
+ + Maxar STAC (footprints only)
+ + NDRRMA constants
+ │
+ ▼
+ scripts/build_kathmandu_merged.py
+ │
+ ┌───────┴────────┐
+ ▼ ▼
+ merged.geojson event_log.json
+ └────── provenance.json ──┘
 ```
 
 ## Error handling

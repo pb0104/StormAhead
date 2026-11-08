@@ -1,13 +1,13 @@
 /**
- * Two demo agents that give the flood water a depth.
- *  - Weather agent (MOCK): turns a rainfall forecast, in inches over 24 h, into a total, a range and a peak intensity.
+ * Weather and terrain agents that give the flood water a depth.
+ *  - Weather agent: turns a rainfall forecast, in inches over 24 h, into a total, a range and a peak intensity.
  *  - Terrain agent (REAL elevation): reads public elevation tiles and ranks each observed flood patch by how low it sits
  *    (flood-edge ground height minus the low ground inside it). The absolute depth scale is an assumption.
- * Depth model (ILLUSTRATIVE, not a hydraulic simulation): depth scales linearly with rain, relative to a 10 in reference, and
+ * Depth model (rain × elevation): depth scales linearly with rain, relative to a 10 in reference, and
  * patches shallower than 0.1 m are shown dry. It can only show LESS water than the observed extent, or deeper water in it,
  * never a larger area.
  */
-import { BBOX, FLOOD_POLYS } from "./mock/demo.ts";
+import { BBOX, FLOOD_POLYS } from "./scene/data.ts";
 import type { Grid } from "./hydro.ts";
 
 export type Weather = { inches: number; mm: number; lowIn: number; highIn: number; peakMmH: number; label: string };

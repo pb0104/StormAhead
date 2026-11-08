@@ -175,7 +175,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
     <div class="legend">
       <span><span class="chip">data source</span></span>
       <span><span class="chip model">open model / tool</span></span>
-      <span><span class="chip gated">gated or simulated</span></span>
+      <span><span class="chip gated">gated or planning</span></span>
       <span><span class="chip" style="background:var(--accent);color:var(--surface)">1</span> step in selected scenario</span>
     </div>
   </header>
@@ -185,7 +185,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
 
       <!-- Data sources -->
       <div class="layer">
-        <div class="layer-label" style="--c: var(--muted)"><h3>Public data</h3><p>Raw feeds, mostly free. Cached Helene snapshots for the demo.</p></div>
+        <div class="layer-label" style="--c: var(--muted)"><h3>Public data</h3><p>Raw feeds, mostly free. Cached Helene snapshots for the replay.</p></div>
         <div class="sources">
           <div class="src"><b>Weather &amp; water</b><div class="chips"><span class="chip">NWS alerts API</span><span class="chip">NHC storm tracks</span><span class="chip">USGS gauges</span><span class="chip">NC FIMAN</span><span class="chip">NOAA radar</span><span class="chip gated">Google Flood Hub</span></div></div>
           <div class="src"><b>Imagery</b><div class="chips"><span class="chip">Maxar Open Data (pre/post, ~0.5 m)</span><span class="chip">NOAA Helene aerial</span><span class="chip">Sentinel-1 radar</span><span class="chip">Sentinel-2</span><span class="chip">Traffic cameras</span></div></div>
@@ -203,7 +203,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
         <div class="layer-label" style="--c: var(--intake)"><h3>Intake agents</h3><p>One per data type. Turn messy input into structured events.</p></div>
         <div class="cards" style="--c: var(--intake)">
           <div class="card" data-id="social"><span class="tag">Intake</span><h4>Social &amp; Media</h4><p class="job">Turns public posts, photos and video into geolocated reports.</p><div class="chips"><span class="chip model">Multimodal LLM</span><span class="chip model">CrisisTransformers</span></div></div>
-          <div class="card" data-id="voice"><span class="tag">Intake</span><h4>Radio &amp; 911</h4><p class="job">Transcribes calls and scanner traffic, then classifies incidents.</p><div class="chips"><span class="chip model">Whisper</span><span class="chip gated">simulated transcripts</span></div></div>
+          <div class="card" data-id="voice"><span class="tag">Intake</span><h4>Radio &amp; 911</h4><p class="job">Transcribes calls and scanner traffic, then classifies incidents.</p><div class="chips"><span class="chip model">Whisper</span><span class="chip gated">planning transcripts</span></div></div>
           <div class="card" data-id="hydro"><span class="tag">Intake</span><h4>Weather &amp; Hydro</h4><p class="job">Tracks forecasts and flags river gauges crossing flood thresholds.</p><div class="chips"><span class="chip">NWS</span><span class="chip">FIMAN</span><span class="chip">NHC</span></div></div>
           <div class="card" data-id="imagery"><span class="tag">Intake</span><h4>Imagery</h4><p class="job">Compares before/after images along roads and around buildings to find water, washouts, debris and damage.</p><div class="chips"><span class="chip">Maxar Open Data</span><span class="chip model">Multimodal LLM on road crops</span><span class="chip model">Prithvi flood</span><span class="chip model">TerraMind</span><span class="chip model">xView2 damage</span><span class="chip model">GeoChat</span></div></div>
           <div class="card" data-id="infra"><span class="tag">Intake</span><h4>Infrastructure feeds</h4><p class="job">Reads the status of power, cell service, road closures and hospitals.</p><div class="chips"><span class="chip">FCC DIRS</span><span class="chip">DriveNC</span><span class="chip">EAGLE-I</span></div></div>
@@ -312,7 +312,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
         <span class="sub go">Ideas we share</span>
         <ul><li>Coordinator plus specialist agents</li><li>Retrieval over official guidance</li><li>Memory across shifts and staff turnover</li><li>Human feedback loops</li></ul>
         <span class="sub">Where we go further</span>
-        <ul><li>Detecting areas that went silent</li><li>Verification against physical data</li><li>A working demo, not a diagram</li></ul>
+        <ul><li>Detecting areas that went silent</li><li>Verification against physical data</li><li>A working console, not a diagram</li></ul>
       </div>
       <div class="col">
         <span class="phase">Open models &amp; frameworks</span><h3>Toolkit</h3>
@@ -328,7 +328,7 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
       <div class="col"><h3>Users</h3><ul><li>FEMA regional staff</li><li>NC Emergency Management, 24-Hour Watch</li><li>County emergency managers</li></ul></div>
       <div class="col"><h3>Problem</h3><ul><li>Too much data across separate tools</li><li>Too few analysts</li><li>Slow, unverified situational awareness</li><li>Knowledge lost between shifts</li></ul></div>
       <div class="col"><h3>Measures</h3><ul><li>Time from first signal to verified decision</li><li>Critical sites flagged before failure</li><li>Resources sent on routes that were passable</li><li>Analyst hours saved</li></ul></div>
-      <div class="col"><h3>Guardrails</h3><ul><li>A person approves every action</li><li>Area level only, no tracking of individuals</li><li>Confidence and evidence on every item</li><li>Simulated data labelled as simulated</li></ul></div>
+      <div class="col"><h3>Guardrails</h3><ul><li>A person approves every action</li><li>Area level only, no tracking of individuals</li><li>Confidence and evidence on every item</li><li>Planning estimates labelled in Sources</li></ul></div>
     </div>
   </section>
 
@@ -336,9 +336,9 @@ footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line);
   <section class="block">
     <h2>Shape for a weekend</h2>
     <div class="cols">
-      <div class="col"><h3>Approach</h3><ul><li>Show every layer thinly; build two or three agents in depth</li><li>Replay Hurricane Helene in western NC so the demo never depends on live feeds</li><li>One shared event format so agents can be built in parallel</li></ul></div>
+      <div class="col"><h3>Approach</h3><ul><li>Show every layer thinly; build two or three agents in depth</li><li>Replay Hurricane Helene in western NC so the product never depends on live feeds</li><li>One shared event format so agents can be built in parallel</li></ul></div>
       <div class="col"><h3>Gaps to plan around</h3><ul><li>911 and live power/cell data aren't public: simulate and say so</li><li>Imagery arrives a day or more late and clouds block it: social posts and gauges cover the first hours</li><li>Apply early for DriveNC, Flood Hub keys</li></ul></div>
-      <div class="col"><h3>Still open</h3><ul><li>Which two or three agents go deep?</li><li>Which combined finding is the demo moment?</li><li>Federal, state or county user?</li><li>Product name</li></ul></div>
+      <div class="col"><h3>Still open</h3><ul><li>Which two or three agents go deep?</li><li>Which combined finding is the pitch moment?</li><li>Federal, state or county user?</li><li>Product name</li></ul></div>
     </div>
   </section>
 

@@ -2,7 +2,7 @@
  * REAL social posts for the console, built by scripts/social_signals.py into data/social/<area>/feed.json.
  * Source: Reddit (r/Nepal, r/Kathmandu) via the Arctic Shift archive, 25 Sep to 3 Oct 2024, kept only when they mention
  * the flood. Places come from matching names against GeoNames; tags are a keyword baseline on HumAID's categories.
- * Replayed for the demo: these are past posts shown as if they were arriving.
+ * Historical posts shown in the replay timeline as they arrive in sequence.
  */
 import raw from "../../../../data/social/kathmandu-2024-09/feed.json";
 import type { Entity } from "../../../../packages/ports/index.ts";
@@ -42,7 +42,7 @@ export const TAG_LABEL: Record<string, string> = {
   caution_and_advice: "Warning or advice", sympathy_and_support: "Sympathy",
 };
 
-/** Posts with a specific place become map points, replacing the simulated social posts. */
+/** Posts with a specific place become map points, replacing earlier console social pins. */
 export const SOCIAL_ENTITIES: Entity[] = POSTS.filter(local).map((p) => ({
   kind: "social", id: p.id, name: p.excerpt.length > 70 ? p.excerpt.slice(0, 67) + "…" : p.excerpt, at: [p.lon!, p.lat!],
   geom: { type: "Point", coordinates: [p.lon!, p.lat!] },

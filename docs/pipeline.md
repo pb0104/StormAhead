@@ -22,11 +22,11 @@ The app's **Detect** mode shows this: run `npm start` and open http://127.0.0.1:
 ## Rebuild
 
 ```bash
-node scripts/fetch_pipeline_inputs.mjs   # wards, gauges, incidents; cached in .cache/bipad
+node scripts/fetch_pipeline_inputs.mjs # wards, gauges, incidents; cached in .cache/bipad
 curl -o glo30.tif https://copernicus-dem-30m.s3.amazonaws.com/Copernicus_DSM_COG_10_N27_00_E085_00_DEM/Copernicus_DSM_COG_10_N27_00_E085_00_DEM.tif
-pip install -r scripts/requirements.txt  # Python 3.12 was used
+pip install -r scripts/requirements.txt # Python 3.12 was used
 python -I scripts/prepare_terrain.py --dem glo30.tif --out data/real/kathmandu
-npm run eval                             # writes data/real/kathmandu/pipeline_eval.json
+npm run eval # writes data/real/kathmandu/pipeline_eval.json
 ```
 
 ## Data
@@ -90,7 +90,7 @@ Rain tells you when. Where is mostly exposure, meaning where people and roads ar
 
 ### Strict 2024 test
 
-Trained on earlier years only, the model had just 8 positive examples: AUC 0.811, recall in top 1% of 5%. On 28 Sep it flagged 83 of 180 wards (46%) and caught 7 of 15 reported incidents (47%), which is no better than chance across wards. The 2024 demo is weaker than the pooled table.
+Trained on earlier years only, the model had just 8 positive examples: AUC 0.811, recall in top 1% of 5%. On 28 Sep it flagged 83 of 180 wards (46%) and caught 7 of 15 reported incidents (47%), which is no better than chance across wards. The 2024 run is weaker than the pooled table.
 
 ### Terrain against UNOSAT
 
@@ -116,7 +116,7 @@ With no flood imagery as input, low HAND ranks UNOSAT's flooded roads well (AUC 
 
 ## God's Eye View: assessment
 
-**Recommendation: use it as an optional demo replay, not as the product UI or pipeline.** It has not been run or integrated here.
+**Recommendation: use it as an optional replay, not as the product UI or pipeline.** It has not been run or integrated here.
 
 **Why it helps:** a 3D globe, a timeline scene director and an existing Nepal flood scene (Bhote Koshi) make it a strong way to show Sept 2024. It also has an MCP server. The code is MIT.
 

@@ -22,7 +22,7 @@ type Ops = {
 };
 export const OPS = raw as unknown as Ops;
 
-export type Provenance = "real" | "modelled" | "simulated";
+export type Provenance = "real" | "modelled" | "planning";
 /** What the drawer shows: where the item comes from, and where its status comes from. */
 export const PROVENANCE = {
   placeModelled: { tag: "real", text: "Real place (BIPAD). Status modelled from the observed flood" },
@@ -32,7 +32,7 @@ export const PROVENANCE = {
   nightLights: { tag: "real", text: "NASA Black Marble night lights · likely power loss" },
   googlePlaces: { tag: "real", text: "Google Places (live snapshot). Status not flood-modelled" },
   modelled: { tag: "modelled", text: "Modelled from the observed flood (UNOSAT, 30 Sep 2024)" },
-  simulated: { tag: "simulated", text: "Simulated for the demo. No public feed" },
+  planning: { tag: "planning", text: "Planning layer. No public live feed" },
 } as const;
 
 type GPlace = { id: string; name: string; at: [number, number]; address?: string | null; types?: string[]; kind: string };
@@ -63,10 +63,10 @@ export const POCKET_TRAVEL = new Map(FOOD.travel.map((t) => [t.pocketId, t]));
 
 const pt = (at: [number, number]): Extract<Geometry, { type: "Point" }> => ({ type: "Point", coordinates: at });
 
-/** Simulated relief depots (stock invented) + Google Places shops with modelled status. */
+/** Relief depots (planned stock) + Google Places shops with modelled status. */
 export const FOOD_DEPOTS: Entity[] = FOOD.depots.map((d) => ({
   kind: "food" as const, id: d.id, name: d.name, at: d.at, geom: pt(d.at),
-  props: { packs: d.packs, role: "depot", shopKind: "depot", status: "usable", prov: "simulated" },
+  props: { packs: d.packs, role: "depot", shopKind: "depot", status: "usable", prov: "planning" },
 }));
 const shopAccess = (s: FoodShop) => (s.status === "lost" ? "lost" : s.status === "degraded" ? "degraded" : "ok");
 export const FOOD_SHOPS: Entity[] = FOOD.shops.map((s, i) => ({

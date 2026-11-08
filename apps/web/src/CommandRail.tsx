@@ -28,7 +28,7 @@ export function CommandRail(p: RailProps) {
           <div className="brand"><span className="b1">Cascade</span><span className="b2">IQ</span></div>
           <button className="icon rail-close" onClick={() => p.setOpen(false)} aria-label="Close command rail">×</button>
         </div>
-        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges, cell sites, night-light outages and social posts are <b>real</b> (status modelled where noted); radio and depot stock are <b>simulated</b>.</p>
+        <p className="tagline">Authority console. Where roads close, where to send response. Kathmandu valley, 27–28 Sep 2024. Facilities, alerts, gauges, cell sites, night-light outages and social posts are from public feeds (status modelled where noted); radio is listen-only broadcast; depot stock uses planning levels.</p>
 
         <section>
           <label className="lbl" htmlFor="scn">Scenario</label>
@@ -127,7 +127,7 @@ export function CommandRail(p: RailProps) {
         </section>
 
         <footer className="rail-foot">
-          <span>{p.actionsDone} simulated action{p.actionsDone === 1 ? "" : "s"}</span>
+          <span>{p.actionsDone} console action{p.actionsDone === 1 ? "" : "s"}</span>
           <button className="link" onClick={p.openDetails}>Details</button>
         </footer>
       </aside>
