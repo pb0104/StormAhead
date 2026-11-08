@@ -74,6 +74,12 @@ export async function runOpsTool(handle: OpsHandle, name: string, args: Record<s
       return handle.showSocialHotspots(args.minPosts != null ? Number(args.minPosts) : undefined);
     case "fly_to_place":
       return handle.flyToPlace(String(args.name ?? ""));
+    case "get_road_closures":
+      return handle.getRoadClosures(args.query != null ? String(args.query) : undefined, args.limit != null ? Math.max(1, Math.min(30, Number(args.limit) || 12)) : undefined);
+    case "open_street_view":
+      return handle.openStreetView({ id: args.id != null ? String(args.id) : undefined, name: args.name != null ? String(args.name) : undefined });
+    case "close_street_view":
+      return handle.closeStreetView();
     case "clear_map_insights":
       return handle.clearInsights();
     case "ask_stormahead": {

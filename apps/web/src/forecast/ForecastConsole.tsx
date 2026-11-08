@@ -27,7 +27,7 @@ import { TalkToggle, useLiveTalk } from "./ForecastTalk.tsx";
 import { ActionsPanel, FollowUp, UpdateConfirm } from "./ActionLog.tsx";
 import { actionsApi, locationLabel, looksLikeUpdate, type ActionsView, type Coverage, type NextRec, type Proposal } from "./actionsApi.ts";
 import { getFactors, getIntent, streamForecast, type AgentResult, type Combined, type Factors, type ForecastEvent, type Intent, type Window } from "./api.ts";
-import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, socialHotspots } from "../voice/insights.ts";
+import { STREET_VIEW_KEY_HINT, affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, socialHotspots } from "../voice/insights.ts";
 import { buildSnapshot, resolveEntity, type OpsHandle } from "../voice/opsHandle.ts";
 import { resolveAgentIds } from "../voice/agentNames.ts";
 import "./forecast.css";
@@ -143,6 +143,7 @@ export function ForecastConsole() {
   const [details, setDetails] = useState(false);
   const [photo, setPhoto] = useState(false);
   const [street, setStreet] = useState(false);
+  const streetKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
   const [token, setToken] = useState(savedToken);
   const [hover, setHover] = useState<string | null>(null);
   const [flying, setFlying] = useState(false);
@@ -448,6 +449,8 @@ export function ForecastConsole() {
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
   const sceneRef = useRef(scene);
+  const streetRef = useRef(street); streetRef.current = street;
+  const stageRef = useRef(stage); stageRef.current = stage;
   const proposalRef = useRef(proposal); proposalRef.current = proposal;
   const actionsViewRef = useRef(actionsView); actionsViewRef.current = actionsView;
   const actionFns = useRef({ logUpdate, saveProposal, undoAction, editAction });
@@ -499,6 +502,8 @@ export function ForecastConsole() {
           ? { id: selectedRef.current.id, name: selectedRef.current.name, kind: selectedRef.current.kind }
           : null,
         activeAlertId: activeAlertRef.current,
+        streetView: { open: streetRef.current, available: !!streetKey },
+        roadClosures: { stage: stageRef.current, closedNow: roadClosureReport(sceneRef.current, stageRef.current, undefined, 0).closedCount, hint: "call get_road_closures for names" },
         boardMinimized: boardMin,
         reportOpen,
         howToNavigate: "Use fly_to_place with a name from placesNearby, or select_entity for a site.",
@@ -648,6 +653,16 @@ export function ForecastConsole() {
       return { ok: true, added: ids, unknown, picked: next };
     },
     getOracleContext: () => buildOracleContext(),
+    getRoadClosures: (query, limit) => roadClosureReport(scene, stage, query, limit ?? 12),
+    openStreetView: (q) => {
+      const e = q.id || q.name ? resolveEntity(scene, buildingById, q) : selected;
+      if (!e) return { ok: false, error: q.id || q.name ? `No map entity matches "${q.name ?? q.id}"` : "Nothing is selected: pass a name or id" };
+      select(e);
+      if (!streetKey) return { ok: false, selected: e.name, streetViewConfigured: false, error: STREET_VIEW_KEY_HINT };
+      setFlying(false); setPhoto(false); setStreet(true);
+      return { ok: true, opened: e.name, lon: e.at[0], lat: e.at[1], note: "Street View opens at the nearest outdoor panorama within 80 m; the overlay says if none exists." };
+    },
+    closeStreetView: () => { setStreet(false); return { ok: true }; },
     listActions: () => {
       const v = actionsViewRef.current;
       return {

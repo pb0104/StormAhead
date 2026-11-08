@@ -49,6 +49,10 @@ export type OpsHandle = {
   showAffectedTowers: () => { ok: boolean; [k: string]: unknown };
   showSocialHotspots: (minPosts?: number) => { ok: boolean; [k: string]: unknown };
   flyToPlace: (name: string) => { ok: boolean; [k: string]: unknown } | Promise<{ ok: boolean; [k: string]: unknown }>;
+  /** Road closures at the current timeline stage, from scene data. */
+  getRoadClosures: (query?: string, limit?: number) => { ok: boolean; [k: string]: unknown };
+  openStreetView: (q: { id?: string; name?: string }) => { ok: boolean; [k: string]: unknown };
+  closeStreetView: () => { ok: boolean; [k: string]: unknown };
   clearInsights: () => { ok: boolean };
   /** Same as the Ask StormAhead bar → intent + factor picker. */
   askStormAhead: (question: string) => Promise<{ ok: boolean; [k: string]: unknown }>;

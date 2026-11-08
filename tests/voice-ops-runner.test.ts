@@ -28,6 +28,9 @@ function stub(over: Partial<OpsHandle> = {}): OpsHandle {
     showAffectedTowers: vi.fn(() => ({ ok: true })),
     showSocialHotspots: vi.fn(() => ({ ok: true })),
     flyToPlace: vi.fn(() => ({ ok: true })),
+    getRoadClosures: vi.fn(() => ({ ok: true, closures: [] })),
+    openStreetView: vi.fn(() => ({ ok: true })),
+    closeStreetView: vi.fn(() => ({ ok: true })),
     clearInsights: vi.fn(() => ({ ok: true })),
     askStormAhead: vi.fn(async () => ({ ok: true })),
     deployAgents: vi.fn(() => ({ ok: true })),
@@ -102,5 +105,21 @@ describe("ORACLE action tools", () => {
     expect(h.removeAction).not.toHaveBeenCalled();
     await runOpsTool(h, "remove_action", { id: "a1", confirmed: true });
     expect(h.removeAction).toHaveBeenCalledWith("a1");
+  });
+
+  it("get_road_closures forwards the query and clamps the limit", async () => {
+    const h = stub();
+    await runOpsTool(h, "get_road_closures", { query: "Bir Hospital", limit: 99 });
+    expect(h.getRoadClosures).toHaveBeenCalledWith("Bir Hospital", 30);
+    await runOpsTool(h, "get_road_closures", {});
+    expect(h.getRoadClosures).toHaveBeenLastCalledWith(undefined, undefined);
+  });
+
+  it("open_street_view / close_street_view route to the handle", async () => {
+    const h = stub();
+    await runOpsTool(h, "open_street_view", { name: "Patan Hospital" });
+    expect(h.openStreetView).toHaveBeenCalledWith({ id: undefined, name: "Patan Hospital" });
+    await runOpsTool(h, "close_street_view", {});
+    expect(h.closeStreetView).toHaveBeenCalled();
   });
 });

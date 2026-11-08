@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, socialHotspots } from "../apps/web/src/voice/insights.ts";
+import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, roadClosureReport, socialHotspots } from "../apps/web/src/voice/insights.ts";
 import { mergeBipadIntoScene } from "../apps/web/src/mergeBipad.ts";
 import type { SceneSnapshot } from "../packages/ports/index.ts";
 
@@ -53,5 +53,27 @@ describe("voice insights", () => {
     expect(r.entities.every((e) => e.kind === "alert")).toBe(true);
     const pick = pickRainfallAlert(s, "Lalitpur");
     expect(pick?.name.toLowerCase()).toContain("lalitpur");
+  });
+
+  it("reports road closures by timeline stage, nearest-first, from entity data", () => {
+    const ent = (kind: string, id: string, name: string, at: [number, number], stage?: number, props: Record<string, string | number | boolean> = {}) =>
+      ({ kind, id, name, at, stage, props, geom: { type: "Point", coordinates: at } }) as never;
+    const scene = { bbox: [85.2, 27.6, 85.5, 27.8], note: "t", kindLabel: {}, advice: {}, geo: {} as never, entities: [
+      ent("closure", "C1", "Bagmati bridge", [85.32, 27.67], 1, { cls: "primary", bridge: true, lengthM: 80 }),
+      ent("closure", "C2", "Far road", [85.45, 27.7], 3, { cls: "secondary" }),
+      ent("pocket", "P1", "Balkhu pocket", [85.30, 27.68]),
+      ent("hospital", "HS-3", "Patan Hospital", [85.3204, 27.6685], undefined, { access: "lost", extraMin: 0 }),
+    ] } as unknown as SceneSnapshot;
+    const dry = roadClosureReport(scene, 0);
+    expect(dry.ok && dry.closedCount).toBe(0);
+    const mid = roadClosureReport(scene, 1);
+    expect(mid.ok && mid.closures.map((c) => c.id)).toEqual(["C1"]);
+    expect(mid.ok && mid.cutOffAreas).toEqual([]);
+    const high = roadClosureReport(scene, 3, "Patan Hospital");
+    expect(high.ok && high.closures[0]!.id).toBe("C1");
+    expect(high.ok && high.closures[0]!.distanceKm).toBeLessThan(1);
+    expect(high.ok && high.hospitalAccess).toEqual([expect.objectContaining({ id: "HS-3", access: "lost", lon: 85.3204 })]);
+    expect(high.ok && high.cutOffAreas[0]!.id).toBe("P1");
+    expect(roadClosureReport(scene, 3, "Nowhereville").ok).toBe(false);
   });
 });

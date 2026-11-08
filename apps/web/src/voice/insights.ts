@@ -148,3 +148,52 @@ export function resolvePlace(
     suggestions,
   };
 }
+
+const kmBetween = (a: LonLat, b: LonLat) => Math.hypot((a[0] - b[0]) * 98.6, (a[1] - b[1]) * 110.6);
+const KEY_HINT = "Street View needs VITE_GOOGLE_MAPS_API_KEY (Maps JavaScript API) in the repo-root .env, then a dev-server restart. It is not configured.";
+export { KEY_HINT as STREET_VIEW_KEY_HINT };
+
+/**
+ * Road-closure picture at the current timeline stage, straight from the scene entities (names and coordinates come from data).
+ * A closure is "closed now" when its stage <= the current stage (same rule the map filter uses). Optional `query` is a place
+ * or hospital name: closures are then sorted by distance to it and hospital access is limited to matches.
+ */
+export function roadClosureReport(scene: SceneSnapshot | null, stage: number, query?: string, limit = 12) {
+  const ents = scene?.entities ?? [];
+  const closures = ents.filter((e) => e.kind === "closure");
+  const closedNow = closures.filter((e) => (e.stage ?? 0) <= stage);
+  const q = (query ?? "").trim();
+  let origin: LonLat | null = null;
+  let originName: string | null = null;
+  let hospitals = ents.filter((e) => e.kind === "hospital");
+  if (q) {
+    const ql = q.toLowerCase();
+    const hit = hospitals.filter((h) => h.name.toLowerCase().includes(ql));
+    if (hit.length) { hospitals = hit; origin = hit[0]!.at; originName = hit[0]!.name; }
+    else {
+      const r = resolvePlace(scene, q);
+      if (r.ok) { origin = r.at; originName = r.name; }
+      else return { ok: false as const, error: `no place or hospital matching "${q}"`, suggestions: r.suggestions };
+    }
+  }
+  const row = (e: Entity) => ({
+    id: e.id, name: e.name, class: e.props.cls ?? null, bridge: !!e.props.bridge, lengthM: e.props.lengthM ?? null,
+    lon: e.at[0], lat: e.at[1], ...(origin ? { distanceKm: +kmBetween(origin, e.at).toFixed(2) } : {}),
+  });
+  const sorted = origin ? [...closedNow].sort((a, b) => kmBetween(origin!, a.at) - kmBetween(origin!, b.at)) : closedNow;
+  const pockets = stage >= 2 ? ents.filter((e) => e.kind === "pocket") : [];
+  const pocketRows = (origin ? [...pockets].sort((a, b) => kmBetween(origin!, a.at) - kmBetween(origin!, b.at)) : pockets)
+    .slice(0, 8).map((e) => ({ id: e.id, name: e.name, lon: e.at[0], lat: e.at[1], ...(origin ? { distanceKm: +kmBetween(origin, e.at).toFixed(2) } : {}) }));
+  return {
+    ok: true as const,
+    stage,
+    note: stage === 0 ? "Water is still low on the timeline: no roads are closed yet." : "Closed = stage <= current timeline stage. Minor closures and cut-off pockets only appear once the water is high (stage 2+).",
+    nearOf: originName,
+    closedCount: closedNow.length,
+    totalPlanned: closures.length,
+    closures: sorted.slice(0, limit).map(row),
+    cutOffAreas: pocketRows,
+    hospitalAccess: hospitals.map((h) => ({ id: h.id, name: h.name, access: h.props.access ?? "unknown", extraDelayMin: h.props.extraMin ?? 0, lon: h.at[0], lat: h.at[1] })),
+    howToShow: "To fly the map to a closure or hospital call select_entity with its id; for a street-level look call open_street_view with that name.",
+  };
+}

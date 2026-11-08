@@ -198,6 +198,31 @@ export const OPS_LIVE_TOOLS = [
     },
   },
   {
+    name: "get_road_closures",
+    description:
+      "Road-closure intel from the app's computed data at the CURRENT timeline time: which roads are closed now (names, class, bridge, length, coordinates), cut-off areas, and hospital access (ok/degraded/lost + extra minutes). Pass an optional query (a place or hospital name) to sort closures by distance from it and limit hospital access, e.g. 'what is cut off near Patan' or 'can ambulances reach Bir Hospital'. Never invent roads or coordinates; use only what this returns.",
+    parameters: {
+      type: "object",
+      properties: { query: { type: "string" }, limit: { type: "number" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "open_street_view",
+    description:
+      "Open Street View (street-level imagery) at a named site, hospital, road closure or other map entity (name or id from get_road_closures / get_oracle_context); with no arguments it uses the currently selected entity. If Street View is not configured it returns ok=false with the reason: tell the operator plainly.",
+    parameters: {
+      type: "object",
+      properties: { name: { type: "string" }, id: { type: "string" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "close_street_view",
+    description: "Close the Street View overlay and return to the map.",
+    parameters: { type: "object", properties: {}, additionalProperties: false },
+  },
+  {
     name: "clear_map_insights",
     description: "Clear map insight filters / reset overlay focus.",
     parameters: { type: "object", properties: {}, additionalProperties: false },
@@ -212,5 +237,6 @@ DEFAULT: For new forecasts / outlooks / "what happens next" — call ask_stormah
 SUMMARIZE / UI: For "what's on screen", "summarize the agents", "brief me", "what did weather find", the situation report, layers, selection, or any UI question — call get_oracle_context first, then give a short spoken summary from that data. Cite specialists by name when useful; you remain ORACLE.
 NAVIGATION: For "take me to X", "go to X", "zoom to X", "fly to X" — call fly_to_place with X. If they name a specific site/hospital/tower, you may select_entity too. If fly_to_place returns suggestions, offer one and retry.
 Map layers / rainfall / towers / social: use the map tools. Never invent a forecast — use ask_stormahead / deploy_agents.
+ROADS & STREET VIEW: For closed roads, cut-off areas, or hospital access call get_road_closures (pass a place/hospital as query) and answer only from its data; to show one, select_entity with its id. For 'show me street view of X' or 'what does it look like there' call open_street_view (close_street_view to leave). If it reports Street View is not configured, say so in one sentence.
 ACTIONS ON THE GROUND: When the operator reports something done ("we sent…", "log that…", "40 people moved…") call log_action with their words, read the returned line back, and call confirm_action_update with confirmed=true only after they agree (cancel_action_update if not). To change or delete one, call list_actions for the id, then edit_action (only the corrected fields) or remove_action (confirm first). An action never closes a place; after saving, mention the next recommendation if it suggests more help. Each new forecast run starts a clean action log.
 Speak one or two short sentences after tools. Be concise.`;
