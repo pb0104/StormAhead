@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, findRadioStations, roadClosureReport, searchSocialPosts, socialOverview, socialHotspots } from "../apps/web/src/voice/insights.ts";
+import { affectedTowers, pickRainfallAlert, rainfallAlerts, resolvePlace, findRadioStations, resolveRadioStation, roadClosureReport, searchSocialPosts, socialOverview, socialHotspots } from "../apps/web/src/voice/insights.ts";
 import { mergeBipadIntoScene } from "../apps/web/src/mergeBipad.ts";
 import type { SceneSnapshot } from "../packages/ports/index.ts";
 
@@ -95,6 +95,35 @@ describe("voice insights", () => {
     expect(r.stations.map((x) => x.id)).toEqual(["b", "c", "a"]);
     expect(findRadioStations([st("a", "Far Pop")], { localOnly: true }).total).toBe(0);
     expect(findRadioStations([st("b", "Kathmandu News")], { query: "kath news" }).total).toBe(1);
+  });
+});
+
+describe("radio station resolution", () => {
+  const st = (id: string, name: string, o: object = {}) => ({ id, name, tags: [], language: "", state: "", distKm: null, inValley: false, news: false, local: false, bitrate: 64, ...o });
+  const list = [st("1", "BBC Nepali 103 MHz", { news: true }), st("2", "BBC Nepali", { news: true, inValley: true }), st("3", "BBC World Service"), st("4", "Radio Nepal", { news: true })];
+  it("matches 'BBC Nepali' exactly first, lists the other match", () => {
+    const r = resolveRadioStation(list, "BBC Nepali");
+    expect(r.station?.id).toBe("2");
+    expect(r.alternatives).toEqual(["BBC Nepali 103 MHz"]);
+  });
+  it("is forgiving about case, punctuation and word order", () => {
+    expect(resolveRadioStation(list, "radio, nepal!").station?.id).toBe("4");
+    expect(resolveRadioStation(list, "nepali bbc").station?.id).toBe("2");
+  });
+  it("returns no station (not a throw) when nothing matches", () => {
+    expect(resolveRadioStation(list, "zzz").station).toBeNull();
+  });
+});
+
+describe("tools sent to the live session", () => {
+  it("declares every ORACLE capability and mentions it in the instructions", async () => {
+    const { OPS_LIVE_TOOLS, OPS_INSTRUCTIONS } = await import("../packages/voice/index.ts");
+    const names = OPS_LIVE_TOOLS.map((t) => t.name);
+    for (const n of ["list_radio_stations", "tune_radio", "stop_radio", "get_road_closures", "open_street_view", "close_street_view", "search_social_posts", "open_social_post"]) {
+      expect(names).toContain(n);
+      expect(OPS_INSTRUCTIONS).toContain(n);
+    }
+    expect(OPS_INSTRUCTIONS).toMatch(/You CAN control the console's Radio tab/);
   });
 });
 

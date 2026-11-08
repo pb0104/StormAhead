@@ -252,3 +252,20 @@ export function findRadioStations<T extends RadioStationLite>(stations: T[], o: 
   const limit = Math.max(1, Math.min(15, o.limit ?? 8));
   return { total: pool.length, stations: pool.slice(0, limit).map((st) => ({ id: st.id, name: st.name, language: st.language, tags: st.tags.slice(0, 4), news: st.news, local: st.inValley || st.local, distKm: st.distKm, bitrate: st.bitrate })) };
 }
+
+/** Resolve a spoken station name ("BBC Nepali", "radio nepal", "khabar") to a station: exact > prefix > all-words match; valley/news first. */
+export function resolveRadioStation<T extends RadioStationLite>(stations: T[], name: string): { station: T | null; alternatives: string[] } {
+  const norm = (x: string) => x.toLowerCase().replace(/[^a-z0-9\u0900-\u097f ]+/g, " ").replace(/\s+/g, " ").trim();
+  const q = norm(name);
+  if (!q) return { station: null, alternatives: [] };
+  const words = q.split(" ");
+  const score = (st: T) => {
+    const n = norm(st.name);
+    if (n === q) return 0;
+    if (n.startsWith(q)) return 1;
+    if (n.includes(q)) return 2;
+    return words.every((w) => n.includes(w)) ? 3 : 9;
+  };
+  const hits = stations.filter((st) => score(st) < 9).sort((a, b) => score(a) - score(b) || Number(b.inValley) - Number(a.inValley) || Number(b.news) - Number(a.news) || a.name.length - b.name.length);
+  return { station: hits[0] ?? null, alternatives: hits.slice(1, 5).map((h) => h.name) };
+}
