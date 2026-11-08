@@ -225,7 +225,7 @@ export const OPS_LIVE_TOOLS = [
   {
     name: "open_street_view",
     description:
-      "Open Street View (street-level imagery) at a named site, hospital, road closure or other map entity (name or id from get_road_closures / get_oracle_context); with no arguments it uses the currently selected entity. If Street View is not configured it returns ok=false with the reason: tell the operator plainly.",
+      "Open Street View (street-level imagery) at any located element: a named site, hospital, shelter, road closure, cut-off pocket, social post (id SP-n), forecast alert or combined finding (id or title from get_oracle_context). Coordinates come from the app's data, never from you. With no arguments it uses the selected entity. If Google has no coverage the overlay says so and shows the nearest panorama distance when there is one. If Street View is not configured it returns ok=false with the reason: tell the operator plainly.",
     parameters: {
       type: "object",
       properties: { name: { type: "string" }, id: { type: "string" } },

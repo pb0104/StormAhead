@@ -9,7 +9,7 @@ import { MapStage, type MapAlertPin, type Rec, type Vis } from "../MapStage.tsx"
 import { ContextDrawer, type Done } from "../ContextDrawer.tsx";
 import { DetailsDialog } from "../DetailsDialog.tsx";
 import { PhotorealView, savedToken } from "../PhotorealView.tsx";
-import { StreetView } from "../StreetView.tsx";
+import { StreetView, type StreetTarget } from "../StreetView.tsx";
 import { SocialFeed } from "../SocialFeed.tsx";
 import { distKm } from "../affected.ts";
 import { fetchScorecard, ops, type Scorecard } from "../api.ts";
@@ -48,6 +48,8 @@ const LAYERS: { group: string; items: [string, string][] }[] = [
 ];
 const SUGGESTIONS = ["How do the next 15 days look?", "What happens in the next 72 hours?", "Which hospitals could lose access this week?", "Where will power and cell service fail?"];
 const HORIZONS: [number, string][] = [[24, "24 h"], [72, "72 h"], [168, "7 days"], [360, "15 days"]];
+
+const STREET_NOTE = "Street View looks within 50 m, then 200 m, then 800 m and says how far the panorama is; the overlay says plainly if there is no coverage.";
 
 export function ForecastConsole() {
   const narrow = typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches;
@@ -143,7 +145,9 @@ export function ForecastConsole() {
   const [done, setDone] = useState<Done>({});
   const [details, setDetails] = useState(false);
   const [photo, setPhoto] = useState(false);
-  const [street, setStreet] = useState(false);
+  const [streetPt, setStreetPt] = useState<StreetTarget | null>(null);
+  const street = !!streetPt;
+  const setStreet = (v: boolean) => { if (!v) setStreetPt(null); };
   const streetKey = (import.meta as any).env?.VITE_GOOGLE_MAPS_API_KEY as string | undefined;
   const [token, setToken] = useState(savedToken);
   const [hover, setHover] = useState<string | null>(null);
@@ -450,6 +454,7 @@ export function ForecastConsole() {
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
   const sceneRef = useRef(scene);
+  const pinsRef = useRef<MapAlertPin[]>([]); pinsRef.current = pins;
   const streetRef = useRef(street); streetRef.current = street;
   const stageRef = useRef(stage); stageRef.current = stage;
   const proposalRef = useRef(proposal); proposalRef.current = proposal;
@@ -667,12 +672,24 @@ export function ForecastConsole() {
     },
     getRoadClosures: (query, limit) => roadClosureReport(scene, stage, query, limit ?? 12),
     openStreetView: (q) => {
+      const open = (t: StreetTarget) => {
+        if (!streetKey) return { ok: false, selected: t.name, streetViewConfigured: false, error: STREET_VIEW_KEY_HINT };
+        setFlying(false); setPhoto(false); setStreetPt(t);
+        return { ok: true, opened: t.name, lon: t.at[0], lat: t.at[1], note: STREET_NOTE };
+      };
+      const needle = (q.name ?? "").trim().toLowerCase();
+      // 1) map entity (sites, hospitals, closures, pockets, social pins...)
       const e = q.id || q.name ? resolveEntity(scene, buildingById, q) : selected;
-      if (!e) return { ok: false, error: q.id || q.name ? `No map entity matches "${q.name ?? q.id}"` : "Nothing is selected: pass a name or id" };
-      select(e);
-      if (!streetKey) return { ok: false, selected: e.name, streetViewConfigured: false, error: STREET_VIEW_KEY_HINT };
-      setFlying(false); setPhoto(false); setStreet(true);
-      return { ok: true, opened: e.name, lon: e.at[0], lat: e.at[1], note: "Street View opens at the nearest outdoor panorama within 80 m; the overlay says if none exists." };
+      if (e) { select(e); return open({ id: e.id, name: e.name, at: e.at }); }
+      // 2) alert pins and combined findings (id or title), 3) a located social post by id
+      const pin = pinsRef.current.find((a) => (q.id && a.id === q.id) || (needle && a.title.toLowerCase().includes(needle)));
+      if (pin) return open({ id: pin.id, name: pin.title, at: [pin.lon, pin.lat] });
+      const post = q.id ? POSTS.find((x) => x.id === q.id) : undefined;
+      if (post) {
+        if (post.lon === null || post.lat === null || !(post.precision === "place" || post.precision === "town")) return { ok: false, error: "That post names no precise place, so it has no Street View." };
+        return open({ id: post.id, name: post.places || "Post location", at: [post.lon, post.lat] });
+      }
+      return { ok: false, error: q.id || q.name ? `No map element, alert, finding or post matches "${q.name ?? q.id}"` : "Nothing is selected: pass a name or id" };
     },
     closeStreetView: () => { setStreet(false); return { ok: true }; },
     listActions: () => {
@@ -812,7 +829,7 @@ export function ForecastConsole() {
       <MapStage scene={scene} ran={ran} revealN={revealN} showPockets={pockets} stage={stage} vis={vis} focus={null} selected={selected} recs={recs} hover={hover}
         buildings={bldgFc} buildingPts={bldgPts} buildingById={buildingById} verify={null} swipe={null} onSelect={select} compact={narrow}
         view3d={mode === "3d"} flood={floodFc} flowUrl={flowUrl} field={field} rainIn={assessRain ?? OBSERVED_IN} flying={flying} onFlyEnd={() => setFlying(false)}
-        atmosphere={atmosphere} padLeft={24} alerts={pins} activeAlert={activeAlert} onAlert={pickAlert} fitAlertsKey={fitKey} goto={goto} panelPad={panelPad} stations={stationPins} onStation={toggleStation}
+        atmosphere={atmosphere} padLeft={24} alerts={pins} activeAlert={activeAlert} onAlert={pickAlert} onStreet={(t) => { setFlying(false); setPhoto(false); setStreetPt(t); }} fitAlertsKey={fitKey} goto={goto} panelPad={panelPad} stations={stationPins} onStation={toggleStation}
         actionPins={actionPins} onActionPin={(key) => { setLocFocus(key); setActionsOpen(true); setRadioOpen(false); setLayersOpen(false); }}
         flyTo={flyTo} onMapClick={picking ? onMapPick : undefined} picking={!!picking}
         waterLevel={waterLevel} riverLevel={riverLevel}
@@ -1022,11 +1039,11 @@ export function ForecastConsole() {
       {toast && <div className="fx-toast fx-glass" role="status"><Icon name="check" size={15} /> {toast}</div>}
 
       {photo && selected && <PhotorealView token={token} setToken={setToken} ran={ran} selected={selected} depths={depths} floodPolys={scene.floodPolys} entities={scene.entities} linked={linkedIds} onClose={() => setPhoto(false)} />}
-      {street && selected && <StreetView selected={selected} onClose={() => setStreet(false)} />}
+      {streetPt && <StreetView selected={streetPt} onClose={() => setStreetPt(null)} />}
       <ContextDrawer key={selected?.id ?? "none"} onHover={setHover} onFly={() => { setMode("3d"); window.setTimeout(() => setFlying(true), mode === "3d" ? 50 : 1500); }}
-        onPhoto={() => { setFlying(false); setStreet(false); setPhoto(true); }} onStreet={() => { setFlying(false); setPhoto(false); setStreet(true); }}
+        onPhoto={() => { setFlying(false); setStreet(false); setPhoto(true); }} onStreet={() => { if (selected) { setFlying(false); setPhoto(false); setStreetPt({ id: selected.id, name: selected.name, at: selected.at }); } }}
         e={selected} done={done} setDone={setDone} onClose={() => { setFlying(false); setPhoto(false); setStreet(false); setSelected(null); }}
-        reasons={why} actions={acts} kindLabel={{ ...scene.kindLabel, building: "Building" }} feed={selected ? <SocialFeed at={selected.at} compact /> : null} />
+        reasons={why} actions={acts} kindLabel={{ ...scene.kindLabel, building: "Building" }} feed={selected ? <SocialFeed onStreet={(t) => { setFlying(false); setPhoto(false); setStreetPt(t); }} at={selected.at} compact /> : null} />
       <DetailsDialog open={details} onClose={() => setDetails(false)} done={done} scorecard={scorecard} note={scene.note}
         agentLines={order.length ? order.map((id) => `${agentsMeta.find((a) => a.id === id)?.name ?? id}: ${results[id]?.headline ?? "not finished"} (${results[id]?.by === "stackai" ? "LLM via StackAI" : "rules"})`) : ["No forecast run yet. Ask a question to deploy the agents."]} />
     </div>

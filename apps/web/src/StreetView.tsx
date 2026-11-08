@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import type { Entity } from "../../../packages/ports/index.ts";
+/** Anything with a name and a place: a map entity, an alert pin, a social post, a combined finding. */
+export type StreetTarget = { id: string; name: string; at: [number, number] };
+const haversineM = (a: { lat: number; lng: number }, b: { lat: () => number; lng: () => number }) => {
+  const R = 6371000, r = Math.PI / 180, dLat = (b.lat() - a.lat) * r, dLng = (b.lng() - a.lng) * r;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat() * r) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+};
 
 /**
  * Street View overlay for the selected site. Covers the MapLibre map (Google Maps
@@ -30,11 +36,12 @@ function loadMaps(key: string): Promise<any> {
   return mapsLoading;
 }
 
-export function StreetView({ selected, onClose }: { selected: Entity; onClose: () => void }) {
+export function StreetView({ selected, onClose }: { selected: StreetTarget; onClose: () => void }) {
   const box = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"idle" | "loading" | "ready" | "empty" | "error">("idle");
   const [msg, setMsg] = useState("");
   const [date, setDate] = useState<string | null>(null);
+  const [dist, setDist] = useState<number | null>(null); // metres from the element to the panorama shown
   const key = KEY();
 
   useEffect(() => {
@@ -50,6 +57,7 @@ export function StreetView({ selected, onClose }: { selected: Entity; onClose: (
     setState("loading");
     setMsg("");
     setDate(null);
+    setDist(null);
     (async () => {
       try {
         window.gm_authFailure = () => {
@@ -59,13 +67,18 @@ export function StreetView({ selected, onClose }: { selected: Entity; onClose: (
         if (dead || !box.current) return;
         const loc = { lat: selected.at[1], lng: selected.at[0] };
         const svc = new maps.StreetViewService();
-        const data: any = await new Promise((resolve, reject) => {
-          svc.getPanorama({ location: loc, radius: 80, source: maps.StreetViewSource.OUTDOOR }, (res: any, status: string) => {
-            if (status === "OK") resolve(res);
-            else if (status === "ZERO_RESULTS") resolve(null);
-            else reject(new Error(`Street View lookup failed: ${status}`));
+        // Widen the search: 50 m, 200 m, then 800 m (mountain areas are thinly covered); the bar says how far the panorama is.
+        let data: any = null;
+        for (const radius of [50, 200, 800]) {
+          data = await new Promise((resolve, reject) => {
+            svc.getPanorama({ location: loc, radius, source: maps.StreetViewSource.OUTDOOR }, (res: any, status: string) => {
+              if (status === "OK") resolve(res);
+              else if (status === "ZERO_RESULTS") resolve(null);
+              else reject(new Error(`Street View lookup failed: ${status}`));
+            });
           });
-        });
+          if (data) break;
+        }
         if (dead || !box.current) return;
         if (!data) { setState("empty"); return; }
         const heading = data.tiles?.centerHeading ?? 0;
@@ -81,6 +94,7 @@ export function StreetView({ selected, onClose }: { selected: Entity; onClose: (
           motionTracking: false,
           showRoadLabels: true,
         });
+        setDist(Math.round(haversineM(loc, data.location.latLng)));
         const rawDate = data.imageDate || null;
         setDate(rawDate);
         setState("ready");
@@ -108,14 +122,15 @@ export function StreetView({ selected, onClose }: { selected: Entity; onClose: (
       )}
       {key && state === "empty" && (
         <div className="photo-card">
-          <h3>No outdoor Street View here</h3>
-          <p>Google has no outdoor panorama within ~80 m of {selected.name}.</p>
+          <h3>No Street View coverage near this point</h3>
+          <p>Google has no outdoor panorama within 800 m of {selected.name}. This is common in mountain and rural areas.</p>
         </div>
       )}
       <div className="photo-bar">
         <span>
           {state === "loading" ? "Looking up Street View…" : "Street View"}
           {" · "}{selected.name}
+          {dist !== null && dist > 30 ? ` · nearest coverage ${dist} m away` : ""}
           {date ? ` · ${date}` : ""}
           {" · © Google"}
         </span>

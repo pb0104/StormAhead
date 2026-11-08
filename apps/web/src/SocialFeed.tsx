@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AREA_POSTS, NEAR_KM, postsNear, SOCIAL_SOURCE, TAG_LABEL, whenLocal, type Post } from "./real/social.ts";
 
-function PostCard({ p }: { p: Post }) {
+function PostCard({ p, onStreet }: { p: Post; onStreet?: (t: { id: string; name: string; at: [number, number] }) => void }) {
   const tags = p.tags.split("; ").filter(Boolean);
   const [broken, setBroken] = useState(false); // deleted posts leave dead image links behind
   const translated = !!p.translation;
@@ -23,6 +23,9 @@ function PostCard({ p }: { p: Post }) {
       {p.image && broken && <p className="muted">Photo no longer available on Reddit.</p>}
       <div className="post-foot">
         {tags.map((t) => <span key={t} className="post-tag">{TAG_LABEL[t] ?? t}</span>)}
+        {onStreet && p.lon !== null && p.lat !== null && (p.precision === "place" || p.precision === "town") && (
+          <button type="button" className="ghost" onClick={() => onStreet({ id: p.id, name: p.places || "Post location", at: [p.lon!, p.lat!] })}>Street View</button>
+        )}
         <a href={p.url} target="_blank" rel="noreferrer">Open on Reddit ↗</a>
       </div>
     </article>
@@ -30,14 +33,14 @@ function PostCard({ p }: { p: Post }) {
 }
 
 /** Posts and photos for a spot on the map: real, past posts replayed as a live feed. */
-export function SocialFeed({ at, compact = false }: { at: [number, number]; compact?: boolean }) {
+export function SocialFeed({ at, compact = false, onStreet }: { at: [number, number]; compact?: boolean; onStreet?: (t: { id: string; name: string; at: [number, number] }) => void }) {
   const near = postsNear(at);
   const wider = AREA_POSTS.slice(0, compact ? 3 : 8);
   return (
     <div className="feed">
       <p className="feed-note"><span className="live-dot" aria-hidden="true" />Replay of real posts. {SOCIAL_SOURCE} Tags are keyword-based, not a trained model.</p>
       <h3>At this spot, within {NEAR_KM} km ({near.length})</h3>
-      {near.length ? near.map((p) => <PostCard key={p.id} p={p} />) : <p className="muted">No post names a place within {NEAR_KM} km of here.</p>}
+      {near.length ? near.map((p) => <PostCard key={p.id} p={p} onStreet={onStreet} />) : <p className="muted">No post names a place within {NEAR_KM} km of here.</p>}
       <h3>Across the valley (no precise place)</h3>
       {wider.map((p) => <PostCard key={p.id} p={p} />)}
       <p className="muted">{AREA_POSTS.length} valley-wide posts in total. Newest first.</p>

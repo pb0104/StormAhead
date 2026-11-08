@@ -488,3 +488,6 @@
   .fx *, .fx *::before, .fx *::after { animation: none !important; transition: none !important; }
   .fx-pin { opacity: 0; } .fx-pin.on { opacity: 1; transform: none; }
 }
+.fx-pop-sv { margin-top: 9px; background: rgba(125, 211, 252, 0.12); color: #BFE6FB; border: 1px solid rgba(125, 211, 252, 0.35); border-radius: 7px; padding: 4px 10px; font: 500 11.5px "Inter", system-ui, sans-serif; cursor: pointer; }
+.fx-pop-sv:hover { background: rgba(125, 211, 252, 0.22); }
+.fx .photo { z-index: 20; } /* Street View / photoreal cover the whole console, including the dock and report */

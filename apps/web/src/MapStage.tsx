@@ -30,6 +30,8 @@ export type MapProps = {
   alerts?: MapAlertPin[];
   activeAlert?: string | null;
   onAlert?: (id: string | null) => void;
+  /** Open Street View at an alert's location (from the callout card). */
+  onStreet?: (t: { id: string; name: string; at: [number, number] }) => void;
   /** Bumped to fit the camera to every visible alert. */
   fitAlertsKey?: number;
   /** Spoken / tool navigation: fly the camera to a lon/lat (ORACLE "take me to…"). */
@@ -812,8 +814,9 @@ export function MapStage(p: MapProps) {
     m.flyTo({ center: [a.lon, a.lat], zoom: Math.max(m.getZoom(), 13.4), padding: pad, duration: 1100, essential: true });
     popup.current = new maplibregl.Popup({ closeButton: true, closeOnClick: false, offset: 18, className: "fx-popup", maxWidth: "300px" })
       .setLngLat([a.lon, a.lat])
-      .setHTML(`<div class="fx-pop sev-${a.severity}"><div class="fx-pop-top"><span class="fx-sev">${a.priority ? `${a.priority} · combined` : a.severity}</span><span class="fx-pop-src">${esc(a.source)}</span></div><h4>${esc(a.title)}</h4><p>${esc(a.detail)}</p>${a.when ? `<div class="fx-pop-when">Expected ${esc(a.when)}</div>` : ""}</div>`)
+      .setHTML(`<div class="fx-pop sev-${a.severity}"><div class="fx-pop-top"><span class="fx-sev">${a.priority ? `${a.priority} · combined` : a.severity}</span><span class="fx-pop-src">${esc(a.source)}</span></div><h4>${esc(a.title)}</h4><p>${esc(a.detail)}</p>${a.when ? `<div class="fx-pop-when">Expected ${esc(a.when)}</div>` : ""}${props.current.onStreet ? `<button type="button" class="fx-pop-sv" data-sv>Street View</button>` : ""}</div>`)
       .addTo(m);
+    popup.current.getElement()?.querySelector("[data-sv]")?.addEventListener("click", () => props.current.onStreet?.({ id: a.id, name: a.title, at: [a.lon, a.lat] }));
     popup.current.on("close", () => { if (props.current.activeAlert === a.id) props.current.onAlert?.(null); });
   }, [p.activeAlert]);
 
